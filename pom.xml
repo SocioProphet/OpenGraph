@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.uengine</groupId>
 	<artifactId>OpenGraph</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>OpenGraph</name>
 	<description>JavaScript graph visualization library for workflow, BPM, org charts, UML, ER, network diagrams.
@@ -48,35 +48,35 @@
 			</plugin>
 
 			<!-- JsLint Maven Plugin : JavaScript code quality control tool -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jslint-maven-plugin</artifactId>
-				<version>1.0.1</version>
-				<configuration>
-					<predefinedVars>OG,OG.geometry,window,Element,Raphael,$,$p,KeyEvent,escape,unescape,jQuery
-					</predefinedVars>
-					<assumeWindows>true</assumeWindows>
-					<assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
-					<tolerateEval>true</tolerateEval>
-					<sourceJsFolder>${javascript.src.dir}</sourceJsFolder>
-					<includes>
-						<include>**/*.js</include>
-					</includes>
-					<excludes>
-						<exclude>raphael-2.1.0-custom.js</exclude>
-						<exclude>common/JSON.js</exclude>
-						<exclude>common/Util.js</exclude>
-					</excludes>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jslint</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			<!--<plugin>-->
+			<!--<groupId>org.codehaus.mojo</groupId>-->
+			<!--<artifactId>jslint-maven-plugin</artifactId>-->
+			<!--<version>1.0.1</version>-->
+			<!--<configuration>-->
+			<!--<predefinedVars>OG,OG.geometry,window,Element,Raphael,$,$p,KeyEvent,escape,unescape,jQuery-->
+			<!--</predefinedVars>-->
+			<!--<assumeWindows>true</assumeWindows>-->
+			<!--<assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>-->
+			<!--<tolerateEval>true</tolerateEval>-->
+			<!--<sourceJsFolder>${javascript.src.dir}</sourceJsFolder>-->
+			<!--<includes>-->
+			<!--<include>**/*.js</include>-->
+			<!--</includes>-->
+			<!--<excludes>-->
+			<!--<exclude>raphael-2.1.0-custom.js</exclude>-->
+			<!--<exclude>common/JSON.js</exclude>-->
+			<!--<exclude>common/Util.js</exclude>-->
+			<!--</excludes>-->
+			<!--<encoding>${project.build.sourceEncoding}</encoding>-->
+			<!--</configuration>-->
+			<!--<executions>-->
+			<!--<execution>-->
+			<!--<goals>-->
+			<!--<goal>jslint</goal>-->
+			<!--</goals>-->
+			<!--</execution>-->
+			<!--</executions>-->
+			<!--</plugin>-->
 
 			<!-- JsTestDriver Maven Plugin : JavasScript Unit Test Framework -->
 			<plugin>
@@ -162,6 +162,14 @@
 								<include>shape/ImageShape.js</include>
 								<include>shape/EdgeShape.js</include>
 								<include>shape/*.js</include>
+								<include>shape/essencia/Activity.js</include>
+								<include>shape/essencia/*.js</include>
+								<include>shape/bpmn/A_Task.js</include>
+								<include>shape/bpmn/Event.js</include>
+								<include>shape/bpmn/E_End.js</include>
+								<include>shape/bpmn/E_Intermediate.js</include>
+								<include>shape/bpmn/E_Start.js</include>
+								<include>shape/bpmn/G_Gateway.js</include>
 								<include>shape/bpmn/*.js</include>
 								<include>renderer/IRenderer.js</include>
 								<include>renderer/*.js</include>
@@ -175,30 +183,38 @@
 							<inputDir>${project.build.directory}/yuicompress</inputDir>
 							<includes>
 								<include>${project.build.directory}/yuicompress/LICENSE.txt</include>
-								<include>raphael-2.1.0-custom*.js</include>
-								<include>common/Constants*.js</include>
-								<include>common/Util*.js</include>
+								<include>raphael-2.1.0-custom.js</include>
+								<include>common/Constants.js</include>
+								<include>common/Util.js</include>
 								<include>common/*.js</include>
-								<include>geometry/Style*.js</include>
-								<include>geometry/Coordinate*.js</include>
-								<include>geometry/Envelope*.js</include>
-								<include>geometry/Geometry*.js</include>
-								<include>geometry/PolyLine*.js</include>
-								<include>geometry/Curve*.js</include>
-								<include>geometry/Ellipse*.js</include>
+								<include>geometry/Style.js</include>
+								<include>geometry/Coordinate.js</include>
+								<include>geometry/Envelope.js</include>
+								<include>geometry/Geometry.js</include>
+								<include>geometry/PolyLine.js</include>
+								<include>geometry/Curve.js</include>
+								<include>geometry/Ellipse.js</include>
 								<include>geometry/*.js</include>
-								<include>shape/IShape*.js</include>
-								<include>shape/Terminal*.js</include>
-								<include>shape/GeomShape*.js</include>
-								<include>shape/TextShape*.js</include>
-								<include>shape/ImageShape*.js</include>
-								<include>shape/EdgeShape*.js</include>
+								<include>shape/IShape.js</include>
+								<include>shape/Terminal.js</include>
+								<include>shape/GeomShape.js</include>
+								<include>shape/TextShape.js</include>
+								<include>shape/ImageShape.js</include>
+								<include>shape/EdgeShape.js</include>
 								<include>shape/*.js</include>
+								<include>shape/essencia/Activity.js</include>
+								<include>shape/essencia/*.js</include>
+								<include>shape/bpmn/A_Task.js</include>
+								<include>shape/bpmn/Event.js</include>
+								<include>shape/bpmn/E_End.js</include>
+								<include>shape/bpmn/E_Intermediate.js</include>
+								<include>shape/bpmn/E_Start.js</include>
+								<include>shape/bpmn/G_Gateway.js</include>
 								<include>shape/bpmn/*.js</include>
-								<include>renderer/IRenderer*.js</include>
+								<include>renderer/IRenderer.js</include>
 								<include>renderer/*.js</include>
-								<include>handler/EventHandler*.js</include>
-								<include>graph/Canvas*.js</include>
+								<include>handler/EventHandler.js</include>
+								<include>graph/Canvas.js</include>
 							</includes>
 						</aggregation>
 						<aggregation>
@@ -210,30 +226,31 @@
 								<include>${javascript.lib.dir}/jquery-1.7.2/jquery-1.7.2.min.js</include>
 								<include>${javascript.lib.dir}/jquery-1.7.2/ui-lightness/jquery-ui-1.8.19.custom.min.js</include>
 								<include>${javascript.lib.dir}/jquery-1.7.2/contextmenu/jquery.contextMenu-min.js</include>
-								<include>raphael-2.1.0-custom*.js</include>
-								<include>common/Constants*.js</include>
-								<include>common/Util*.js</include>
+								<include>raphael-2.1.0-custom.js</include>
+								<include>common/Constants.js</include>
+								<include>common/Util.js</include>
 								<include>common/*.js</include>
-								<include>geometry/Style*.js</include>
-								<include>geometry/Coordinate*.js</include>
-								<include>geometry/Envelope*.js</include>
-								<include>geometry/Geometry*.js</include>
-								<include>geometry/PolyLine*.js</include>
-								<include>geometry/Curve*.js</include>
-								<include>geometry/Ellipse*.js</include>
+								<include>geometry/Style.js</include>
+								<include>geometry/Coordinate.js</include>
+								<include>geometry/Envelope.js</include>
+								<include>geometry/Geometry.js</include>
+								<include>geometry/PolyLine.js</include>
+								<include>geometry/Curve.js</include>
+								<include>geometry/Ellipse.js</include>
 								<include>geometry/*.js</include>
-								<include>shape/IShape*.js</include>
-								<include>shape/Terminal*.js</include>
-								<include>shape/GeomShape*.js</include>
-								<include>shape/TextShape*.js</include>
-								<include>shape/ImageShape*.js</include>
-								<include>shape/EdgeShape*.js</include>
+								<include>shape/IShape.js</include>
+								<include>shape/Terminal.js</include>
+								<include>shape/GeomShape.js</include>
+								<include>shape/TextShape.js</include>
+								<include>shape/ImageShape.js</include>
+								<include>shape/EdgeShape.js</include>
 								<include>shape/*.js</include>
+								<include>shape/essencia/*.js</include>
 								<include>shape/bpmn/*.js</include>
-								<include>renderer/IRenderer*.js</include>
+								<include>renderer/IRenderer.js</include>
 								<include>renderer/*.js</include>
-								<include>handler/EventHandler*.js</include>
-								<include>graph/Canvas*.js</include>
+								<include>handler/EventHandler.js</include>
+								<include>graph/Canvas.js</include>
 							</includes>
 						</aggregation>
 					</aggregations>
