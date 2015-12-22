@@ -105,14 +105,11 @@
                                 <include>geometry/Ellipse.js</include>
                                 <include>geometry/*.js</include>
                                 <include>shape/IShape.js</include>
-                                <include>shape/Terminal.js</include>
                                 <include>shape/GeomShape.js</include>
                                 <include>shape/TextShape.js</include>
                                 <include>shape/ImageShape.js</include>
                                 <include>shape/EdgeShape.js</include>
                                 <include>shape/*.js</include>
-                                <include>shape/essencia/Activity.js</include>
-                                <include>shape/essencia/*.js</include>
                                 <include>shape/bpmn/A_Task.js</include>
                                 <include>shape/bpmn/Event.js</include>
                                 <include>shape/bpmn/E_End.js</include>
@@ -146,14 +143,11 @@
                                 <include>geometry/Ellipse-min.js</include>
                                 <include>geometry/*.js</include>
                                 <include>shape/IShape-min.js</include>
-                                <include>shape/Terminal-min.js</include>
                                 <include>shape/GeomShape-min.js</include>
                                 <include>shape/TextShape-min.js</include>
                                 <include>shape/ImageShape-min.js</include>
                                 <include>shape/EdgeShape-min.js</include>
                                 <include>shape/*.js</include>
-                                <include>shape/essencia/Activity-min.js</include>
-                                <include>shape/essencia/*.js</include>
                                 <include>shape/bpmn/A_Task-min.js</include>
                                 <include>shape/bpmn/Event-min.js</include>
                                 <include>shape/bpmn/E_End-min.js</include>
@@ -193,14 +187,11 @@
                                 <include>geometry/Ellipse-min.js</include>
                                 <include>geometry/*.js</include>
                                 <include>shape/IShape-min.js</include>
-                                <include>shape/Terminal-min.js</include>
                                 <include>shape/GeomShape-min.js</include>
                                 <include>shape/TextShape-min.js</include>
                                 <include>shape/ImageShape-min.js</include>
                                 <include>shape/EdgeShape-min.js</include>
                                 <include>shape/*.js</include>
-                                <include>shape/essencia/Activity-min.js</include>
-                                <include>shape/essencia/*.js</include>
                                 <include>shape/bpmn/A_Task-min.js</include>
                                 <include>shape/bpmn/Event-min.js</include>
                                 <include>shape/bpmn/E_End-min.js</include>

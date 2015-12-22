@@ -90,26 +90,6 @@ OG.shape.IShape = function () {
 	this.exceptionType = '';
 };
 OG.shape.IShape.prototype = {
-	/**
-	 * Shape 간의 연결을 위한 Terminal 을 반환한다.
-	 *
-	 * @return {OG.Terminal[]} Terminal
-	 */
-	createTerminal: function () {
-		if (!this.geom) {
-			return [];
-		}
-
-		var envelope = this.geom.getBoundary();
-
-		return [
-			new OG.Terminal(envelope.getCentroid(), OG.Constants.TERMINAL_TYPE.C, OG.Constants.TERMINAL_TYPE.INOUT),
-			new OG.Terminal(envelope.getRightCenter(), OG.Constants.TERMINAL_TYPE.E, OG.Constants.TERMINAL_TYPE.INOUT),
-			new OG.Terminal(envelope.getLeftCenter(), OG.Constants.TERMINAL_TYPE.W, OG.Constants.TERMINAL_TYPE.INOUT),
-			new OG.Terminal(envelope.getLowerCenter(), OG.Constants.TERMINAL_TYPE.S, OG.Constants.TERMINAL_TYPE.INOUT),
-			new OG.Terminal(envelope.getUpperCenter(), OG.Constants.TERMINAL_TYPE.N, OG.Constants.TERMINAL_TYPE.INOUT)
-		];
-	},
 
 	/**
 	 * 드로잉할 Shape 를 생성하여 반환한다.

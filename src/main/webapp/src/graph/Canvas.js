@@ -458,21 +458,6 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 cursor: "pointer"
             },
             RUBBER_BAND: {stroke: "#0000FF", opacity: 0.2, fill: "#0077FF"},
-            TERMINAL: {
-                stroke: "#03689A",
-                "stroke-width": 0,
-                fill: "r(0.5, 0.5)#FFFFFF-#03689A",
-                "fill-opacity": 0.4,
-                cursor: "pointer"
-            },
-            TERMINAL_OVER: {
-                stroke: "#0077FF",
-                "stroke-width": 0,
-                fill: "r(0.5, 0.5)#FFFFFF-#0077FF",
-                "fill-opacity": 1,
-                cursor: "pointer"
-            },
-            TERMINAL_BBOX: {stroke: "none", fill: "white", "fill-opacity": 0},
             DROP_OVER_BBOX: {stroke: "#0077FF", fill: "none", opacity: 0.3, "shape-rendering": "crispEdges"},
             LABEL: {"font-size": 12, "font-color": "black", "fill": "white"},
             LABEL_EDITOR: {
@@ -679,10 +664,6 @@ OG.graph.Canvas.prototype = {
 
         if (this._CONFIG.GROUP_DROPABLE && element.shape.GROUP_DROPABLE) {
             this._HANDLER.enableDragAndDropGroup(element);
-        }
-
-        if (element.shape.HaveButton) {   // + 버튼을 만들기 위해서
-            this._HANDLER.enableButton(element);
         }
 
         if (this._CONFIG.GROUP_COLLAPSIBLE && element.shape.GROUP_COLLAPSIBLE) {

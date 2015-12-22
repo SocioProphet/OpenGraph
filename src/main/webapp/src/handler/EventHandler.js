@@ -322,22 +322,6 @@ OG.handler.EventHandler.prototype = {
         }
     },
 
-    /*
-     + 버튼을 만들어 버튼을 누를 경우 팝업이 뜬다.
-     auth :  민수환
-     */
-    enableButton: function (element) {
-        var me = this, collapseObj, clickHandle;
-        collapseObj = me._RENDERER.drawButton(element);
-        clickHandle = function (_element, _collapsedOjb) {
-            if (_collapsedOjb && _collapsedOjb.bBox && _collapsedOjb.collapse) {
-                $(_collapsedOjb.collapse).bind("click", function (event) {
-                    $(_element).trigger("btnclick");
-                });
-            }
-        };
-    },
-
     //FIXME Utilize
     checkAutoAttach: function (element, bBoxArray, dx, dy, start, offset, event) {
         var me = this
@@ -1342,7 +1326,6 @@ OG.handler.EventHandler.prototype = {
                                     // enable event
                                     me.setResizable(element, guide, me._isResizable(element.shape));
                                     me.setConnectable(element, guide, me._isConnectable(element.shape));
-                                    me._RENDERER.removeAllTerminal();
                                     me._RENDERER.toFront(guide.group);
                                 }
                             }
@@ -1458,7 +1441,6 @@ OG.handler.EventHandler.prototype = {
                         });
                         me.selectShapes(elements);
 
-                        me._RENDERER.removeAllTerminal();
                         $(this).data("dragBox", {"width": width, "height": height, "x": x, "y": y});
                     }
                     $(this).data("rubber_band_status", "none");
@@ -1762,51 +1744,6 @@ OG.handler.EventHandler.prototype = {
                                 if (e.target.value !== '') {
                                     me.setFillOpacitySelectedShape(e.target.value);
                                 }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-
-    makeLineType: function () {
-        var me = this;
-
-        return {
-            'lineType': {
-                name: '선 종류',
-                items: {
-                    'lineType_straight': {
-                        name: '직선',
-                        type: 'radio',
-                        radio: 'lineType',
-                        value: 'straight',
-                        events: {
-                            change: function (e) {
-                                me.setLineTypeSelectedShape(e.target.value);
-                            }
-                        }
-                    },
-                    'lineType_plain': {
-                        name: '꺾은선',
-                        type: 'radio',
-                        radio: 'lineType',
-                        value: 'plain',
-                        events: {
-                            change: function (e) {
-                                me.setLineTypeSelectedShape(e.target.value);
-                            }
-                        }
-                    },
-                    'lineType_bezier': {
-                        name: '곡선',
-                        type: 'radio',
-                        radio: 'lineType',
-                        value: 'bezier',
-                        events: {
-                            change: function (e) {
-                                me.setLineTypeSelectedShape(e.target.value);
                             }
                         }
                     }
@@ -2527,62 +2464,6 @@ OG.handler.EventHandler.prototype = {
         }
     },
 
-    makeTaskChange: function () {
-        var me = this;
-
-        return {
-            'changeshape': {
-                name: '변경',
-                items: {
-                    'A_Task': {
-                        name: '추상',
-                        type: 'radio',
-                        radio: 'changeshape',
-                        value: 'OG.shape.bpmn.A_Task',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    },
-                    'A_HumanTask': {
-                        name: '사용자',
-                        type: 'radio',
-                        radio: 'changeshape',
-                        value: 'OG.shape.bpmn.A_HumanTask',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    },
-                    'A_WebServiceTask': {
-                        name: '서비스',
-                        type: 'radio',
-                        radio: 'changeshape',
-                        value: 'OG.shape.bpmn.A_WebServiceTask',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    },
-                    'A_ManualTask': {
-                        name: '수동',
-                        type: 'radio',
-                        radio: 'changeshape',
-                        value: "OG.shape.bpmn.A_ManualTask",
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-
     makeAddEvent: function () {
         var me = this;
 
@@ -2929,7 +2810,6 @@ OG.handler.EventHandler.prototype = {
                 format: {
                     name: '형식',
                     items: this.mergeContextMenu(
-                        this.makeLineType(),
                         this.makeLineStyle(),
                         this.makeLineColor(),
                         this.makeLineWidth()
@@ -2952,17 +2832,6 @@ OG.handler.EventHandler.prototype = {
         }
     },
 
-    makeEdgeContextMenu: function (isEdge) {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(isEdge),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend()
-        )
-    },
-
     makeTaskContextMenu: function () {
         return this.mergeContextMenu(
             this.makeDelete(),
@@ -2971,20 +2840,7 @@ OG.handler.EventHandler.prototype = {
             this.makeFont(),
             this.makeBring(),
             this.makeSend(),
-            this.makeTaskChange(),
             this.makeAddEvent(),
-            this.makeProperty()
-        );
-    },
-
-    makeValueChainContextMenu: function () {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend(),
             this.makeProperty()
         );
     },
@@ -3069,7 +2925,7 @@ OG.handler.EventHandler.prototype = {
 
                 if (me._getSelectedElement().length == 1) {
                     if (me._getSelectedElement()[0].shape instanceof OG.shape.EdgeShape) {
-                        items = me.makeEdgeContextMenu(true);
+                        return;
                     } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.G_Gateway) {
                         items = me.makeGatewayContextMenu();
                     } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.Event) {
@@ -3078,8 +2934,6 @@ OG.handler.EventHandler.prototype = {
                         items = me.makeTaskContextMenu();
                     } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.A_Subprocess) {
                         items = me.makeSubprocessContextMenu();
-                    } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.Value_Chain) {
-                        items = me.makeValueChainContextMenu();
                     } else {
                         items = me.makeDefaultContextMenu();
                     }
@@ -3132,7 +2986,6 @@ OG.handler.EventHandler.prototype = {
             // enable event
             me.setResizable(element, guide, me._isResizable(element.shape));
             me.setConnectable(element, guide, me._isConnectable(element.shape));
-            me._RENDERER.removeTerminal(element);
 
             //선택상태 설정
             $(element).attr("_selected", "true");
@@ -3208,7 +3061,6 @@ OG.handler.EventHandler.prototype = {
         if (OG.Util.isElement(element) && element.id) {
             $(element).attr("_selected", "");
             me._RENDERER.removeGuide(element);
-            me._RENDERER.removeTerminal(element);
 
             //선택요소배열 삭제
             me._delSelectedElement(element);
@@ -3244,7 +3096,6 @@ OG.handler.EventHandler.prototype = {
                     }
                 }
             );
-            me._RENDERER.removeAllTerminal();
 
             //선택요소배열 모두삭제 (초기화)
             me._removeAllSelectedElement();
@@ -3517,7 +3368,6 @@ OG.handler.EventHandler.prototype = {
                     me.enableDragAndDropGroup(groupElement);
                 }
 
-                me._RENDERER.removeAllTerminal();
                 me._RENDERER.toFront(guide.group);
             }
         }
@@ -3532,7 +3382,6 @@ OG.handler.EventHandler.prototype = {
         $.each(ungroupedElements, function (idx, item) {
             guide = me._RENDERER.drawGuide(item);
             if (guide) {
-                me._RENDERER.removeAllTerminal();
                 me._RENDERER.toFront(guide.group);
             }
         });
@@ -3583,28 +3432,6 @@ OG.handler.EventHandler.prototype = {
         var me = this;
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"stroke": lineColor});
-        });
-    },
-
-    /**
-     * 메뉴 : 선택된 Shape 들의 Line Type 을 설정한다.
-     *
-     * @param {String} lineType ['straight' | 'plain' | 'bezier']
-     */
-    setLineTypeSelectedShape: function (lineType) {
-        var me = this, guide;
-        $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_shape=" + OG.Constants.SHAPE_TYPE.EDGE + "][_selected=true]").each(function (idx, edge) {
-            OG.Util.apply(edge.shape.geom.style.map, {"edge-type": lineType});
-            edge.shapeStyle = edge.shapeStyle || {};
-            OG.Util.apply(edge.shapeStyle, {"edge-type": lineType});
-
-            me._RENDERER.redrawEdge(edge);
-
-            me._RENDERER.removeGuide(edge);
-            guide = me._RENDERER.drawGuide(edge);
-            me.setResizable(edge, guide, me._isResizable(edge.shape));
-            me.setConnectable(edge, guide, me._isConnectable(edge.shape));
-            me._RENDERER.toFront(guide.group);
         });
     },
 

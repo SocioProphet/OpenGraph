@@ -208,84 +208,6 @@ OG.renderer.IRenderer.prototype = {
     },
 
     /**
-     * 시작, 끝 좌표에 따라 적절한 시작 터미널을 찾아 반환한다.
-     *
-     * @param {Element} element Shape 엘리먼트
-     * @param {Number[]} from 시작자표
-     * @param {Number[]} to 끝자표
-     * @return {Element} 터미널 엘리먼트
-     * @private
-     */
-    _findFromTerminal: function (element, from, to) {
-        // 적절한 연결 터미널 찾기
-        var fromXY = {x: from[0], y: from[1]}, toXY = {x: to[0], y: to[1]},
-            terminalGroup = this.drawTerminal(element),
-            childTerminals = terminalGroup.terminal.childNodes, fromDrct, fromTerminal, i;
-        if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-            if (toXY.x > fromXY.x) {
-                fromDrct = "e";
-            } else {
-                fromDrct = "w";
-            }
-        } else {
-            if (toXY.y > fromXY.y) {
-                fromDrct = "s";
-            } else {
-                fromDrct = "n";
-            }
-        }
-
-        fromTerminal = childTerminals[0];
-        for (i = 0; i < childTerminals.length; i++) {
-            if (childTerminals[i].terminal && childTerminals[i].terminal.direction.toLowerCase() === fromDrct) {
-                fromTerminal = childTerminals[i];
-                break;
-            }
-        }
-
-        return fromTerminal;
-    },
-
-    /**
-     * 시작, 끝 좌표에 따라 적절한 끝 터미널을 찾아 반환한다.
-     *
-     * @param {Element} element Shape 엘리먼트
-     * @param {Number[]} from 시작자표
-     * @param {Number[]} to 끝자표
-     * @return {Element} 터미널 엘리먼트
-     * @private
-     */
-    _findToTerminal: function (element, from, to) {
-        // 적절한 연결 터미널 찾기
-        var fromXY = {x: from[0], y: from[1]}, toXY = {x: to[0], y: to[1]},
-            terminalGroup = this.drawTerminal(element),
-            childTerminals = terminalGroup.terminal.childNodes, toDrct, toTerminal, i;
-        if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-            if (toXY.x > fromXY.x) {
-                toDrct = "w";
-            } else {
-                toDrct = "e";
-            }
-        } else {
-            if (toXY.y > fromXY.y) {
-                toDrct = "n";
-            } else {
-                toDrct = "s";
-            }
-        }
-
-        toTerminal = childTerminals[0];
-        for (i = 0; i < childTerminals.length; i++) {
-            if (childTerminals[i].terminal && childTerminals[i].terminal.direction.toLowerCase() === toDrct) {
-                toTerminal = childTerminals[i];
-                break;
-            }
-        }
-
-        return toTerminal;
-    },
-
-    /**
      * 터미널로부터 부모 Shape element 를 찾아 반환한다.
      *
      * @param {Element,String} terminal 터미널 Element or ID
@@ -412,16 +334,6 @@ OG.renderer.IRenderer.prototype = {
     },
 
     /**
-     * Edge Element 에 저장된 geom, style 정보로 Edge 를 redraw 한다.
-     * Edge 타입(straight, plain) 에 따른 경로를 새로 계산한다.
-     *
-     * @param {Element} edgeElement Edge Shape 엘리먼트
-     */
-    redrawEdge: function (edgeElement) {
-        throw new OG.NotImplementedException();
-    },
-
-    /**
      * Shape 의 연결된 Edge 를 redraw 한다.(이동 또는 리사이즈시)
      *
      * @param {Element} element
@@ -520,33 +432,6 @@ OG.renderer.IRenderer.prototype = {
         throw new OG.NotImplementedException();
     },
 
-    /**
-     * Edge 연결용 터미널을 드로잉한다.
-     *
-     * @param {Element} element DOM Element
-     * @param {String} terminalType 터미널 연결 유형(IN or OUT or INOUT)
-     * @return {Element} terminal group element
-     */
-    drawTerminal: function (element, terminalType) {
-
-        throw new OG.NotImplementedException();
-    },
-
-    /**
-     *  Edge 연결용 터미널을 remove 한다.
-     *
-     * @param {Element} element DOM Element
-     */
-    removeTerminal: function (element) {
-        throw new OG.NotImplementedException();
-    },
-
-    /**
-     *  모든 Edge 연결용 터미널을 remove 한다.
-     */
-    removeAllTerminal: function () {
-        throw new OG.NotImplementedException();
-    },
 
     /**
      * ID에 해당하는 Element 의 Draggable 가이드를 드로잉한다.
@@ -969,94 +854,6 @@ OG.renderer.IRenderer.prototype = {
      */
     resizeBox: function (element, size) {
         throw new OG.NotImplementedException();
-    },
-
-    /**
-     * Edge 유형에 따라 Shape 과의 연결 지점을 찾아 반환한다.
-     *
-     * @param {String} edgeType Edge 유형(straight, plain..)
-     * @param {Element} element 연결할 Shape 엘리먼트
-     * @param {Number[]} from 시작좌표
-     * @param {Number[]} to 끝좌표
-     * @param {Boolean} 시작 연결지점 여부
-     * @return {Object} {position, direction}
-     */
-    intersectionEdge: function (edgeType, element, from, to, isFrom) {
-        var me = this, terminal, position, direction, intersectPoints, i, minDistance = Number.MAX_VALUE, distance,
-            collapsedParents, collapsedEnvelope, collapsedUpperLeft, collapsedGeom, collapsedPosition;
-
-        // element 가 collapsed 인지 체크
-        if (element) {
-            collapsedParents = $(element).parents("[_collapsed=true]");
-            if (collapsedParents.length !== 0) {
-                // collapsed 인 경우
-                collapsedEnvelope = collapsedParents[collapsedParents.length - 1].shape.geom.getBoundary();
-                collapsedUpperLeft = collapsedEnvelope.getUpperLeft();
-                collapsedGeom = new OG.geometry.Rectangle(
-                    collapsedUpperLeft, me._CONFIG.COLLAPSE_SIZE * 3, me._CONFIG.COLLAPSE_SIZE * 2);
-            }
-        }
-        switch (edgeType) {
-            case OG.Constants.EDGE_TYPE.PLAIN:
-            case OG.Constants.EDGE_TYPE.BEZIER:
-
-                terminal = isFrom ? this._findFromTerminal(element, from, to) : this._findToTerminal(element, from, to);
-                position = [terminal.terminal.position.x, terminal.terminal.position.y];
-                direction = terminal.terminal.direction.toLowerCase();
-
-
-                if (collapsedGeom) {
-                    switch (terminal.terminal.direction) {
-                        case OG.Constants.TERMINAL_TYPE.E:
-                            collapsedPosition = collapsedGeom.getBoundary().getRightCenter();
-                            break;
-                        case OG.Constants.TERMINAL_TYPE.W:
-                            collapsedPosition = collapsedGeom.getBoundary().getLeftCenter();
-                            break;
-                        case OG.Constants.TERMINAL_TYPE.S:
-                            collapsedPosition = collapsedGeom.getBoundary().getLowerCenter();
-                            break;
-                        case OG.Constants.TERMINAL_TYPE.N:
-                            collapsedPosition = collapsedGeom.getBoundary().getUpperCenter();
-                            break;
-                    }
-                    if (collapsedPosition) {
-                        position = [collapsedPosition.x, collapsedPosition.y];
-                    }
-                }
-
-                break;
-            case OG.Constants.EDGE_TYPE.STRAIGHT:
-                if (collapsedGeom) {
-                    collapsedPosition = collapsedGeom.getBoundary().getCentroid();
-                    if (isFrom === true) {
-                        from = [collapsedPosition.x, collapsedPosition.y];
-                    } else {
-                        to = [collapsedPosition.x, collapsedPosition.y];
-                    }
-                    intersectPoints = collapsedGeom.intersectToLine([from, to]);
-                } else {
-                    intersectPoints = element.shape.geom.intersectToLine([from, to]);
-                }
-                position = isFrom ? from : to;
-                direction = "c";
-                for (i = 0; i < intersectPoints.length; i++) {
-                    distance = intersectPoints[i].distance(isFrom ? to : from);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        position = [intersectPoints[i].x, intersectPoints[i].y];
-                        direction = "c";
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-
-        return {
-            position : position,
-            direction: direction
-        };
     },
 
     /**
