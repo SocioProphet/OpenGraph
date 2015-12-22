@@ -130,13 +130,10 @@
     <script type="text/javascript" src="../../src/shape/bpmn/ScopeActivity.js"></script>
 
 
-
     <script type="text/javascript" src="../../src/renderer/IRenderer.js"></script>
     <script type="text/javascript" src="../../src/renderer/RaphaelRenderer.js"></script>
     <script type="text/javascript" src="../../src/handler/EventHandler.js"></script>
     <script type="text/javascript" src="../../src/graph/Canvas.js"></script>
-
-
 
 
     <!-- jquery.layout -->
@@ -186,11 +183,11 @@
         $(document).ready(function () {
             // layout
             $('body').layout({
-                west__size        : 160,
+                west__size: 160,
                 enableCursorHotkey: false
             });
             $("#accordion").accordion({
-                fillSpace : false,
+                fillSpace: false,
                 autoHeight: false
             });
 
@@ -200,32 +197,32 @@
             //plain , bezier , straight
 
             canvas.initConfig({
-                selectable       : true,
-                dragSelectable   : true,
-                movable          : true,
-                resizable        : true,
-                connectable      : true,
-                selfConnectable  : true,
-                connectCloneable : true,
-                connectRequired  : true,
-                labelEditable    : true,
-                groupDropable    : true,
-                collapsible      : true,
-                enableHotKey     : true,
+                selectable: true,
+                dragSelectable: true,
+                movable: true,
+                resizable: true,
+                connectable: true,
+                selfConnectable: true,
+                connectCloneable: true,
+                connectRequired: true,
+                labelEditable: true,
+                groupDropable: true,
+                collapsible: true,
+                enableHotKey: true,
                 enableContextMenu: true
             });
 
             // Shape drag & drop
             $(".icon_shape").draggable({
-                start   : function () {
+                start: function () {
                     $('#canvas').data('DRAG_SHAPE', {
                         '_shape_type': $(this).attr('_shape_type'),
-                        '_shape_id'  : $(this).attr('_shape_id'),
-                        '_width'     : $(this).attr('_width'),
-                        '_height'    : $(this).attr('_height')
+                        '_shape_id': $(this).attr('_shape_id'),
+                        '_width': $(this).attr('_width'),
+                        '_height': $(this).attr('_height')
                     });
                 },
-                helper  : 'clone',
+                helper: 'clone',
                 appendTo: "#canvas"
             });
             $("#canvas").droppable({
@@ -234,8 +231,8 @@
                     if (shapeInfo) {
                         shape = eval('new ' + shapeInfo._shape_id + '()');
                         element = canvas.drawShape([
-                            event.pageX - $('#canvas')[0].offsetLeft + $('#canvas')[0].scrollLeft,
-                            event.pageY - $('#canvas')[0].offsetTop + $('#canvas')[0].scrollTop],
+                                    event.pageX - $('#canvas')[0].offsetLeft + $('#canvas')[0].scrollLeft,
+                                    event.pageY - $('#canvas')[0].offsetTop + $('#canvas')[0].scrollTop],
                                 shape, [parseInt(shapeInfo._width, 10), parseInt(shapeInfo._height, 10)]);
                         $('#canvas').removeData('DRAG_SHAPE');
                     }
@@ -289,26 +286,16 @@
             var textShape1 = new OG.TextShape("Text Here, Hello World!");
             var rectshape = canvas.drawShape([400, 300], rectangleShape4, [100, 50]);
             canvas.drawShape([100, 500], imageShape, [150, 50, 45], {'text-anchor': 'middle', 'vertical-align': 'top'});
-            canvas.drawShape([300, 500], textShape1, [200, 100, 45], {'font-size': 10, 'text-anchor': 'start', 'vertical-align': 'middle'});
+            canvas.drawShape([300, 500], textShape1, [200, 100, 45], {
+                'font-size': 10,
+                'text-anchor': 'start',
+                'vertical-align': 'middle'
+            });
 
-            canvas.drawShape(null, new OG.EdgeShape([250, 50],[400, 250]));
+            canvas.drawShape(null, new OG.EdgeShape([250, 50], [400, 250]));
 
             var edge2 = canvas.connect(rectshape, ellipseShape);
-            // draw label
-//            canvas.drawLabel(circleShape, '라벨');
-//            $(circleShape).children('[id$=_LABEL]').hide();
-//
-//            // 라벨 show & hide
-//            $(circleShape).on('mouseover', function (event) {
-//                $(circleShape).children('[id$=_LABEL]').show();
-//                // 아래 방식도 동작
-////                canvas.show($(circleShape).children('[id$=_LABEL]')[0]);
-//            });
-//            $(circleShape).on('mouseout', function (event) {
-//                $(circleShape).children('[id$=_LABEL]').hide();
-//                // // 아래 방식도 동작
-////                canvas.hide($(circleShape).children('[id$=_LABEL]')[0]);
-//            });
+
         });
 
         function save() {
@@ -323,6 +310,8 @@
     <input type="button" value="clear" onclick="canvas.clear();"/>
     <input type="button" value="saveJSON" onclick="save();"/>
     <input type="button" value="loadJSON" onclick="canvas.loadJSON(opengraphJSON);"/>
+    <input type="button" value="undo" onclick="canvas.undo();"/>
+    <input type="button" value="redo" onclick="canvas.redo();"/>
 </div>
 <div class="ui-layout-west">
     <div id="accordion">
@@ -473,33 +462,31 @@
                  _shape_id="OG.shape.essencia.ActivityArrow" _width="100" _height="100"/>
 
 
-
-
-       <!--<img src="images/event_start.png" class="icon_shape" _shape_type="GEOM"-->
-                 <!--_shape_id="OG.shape.bpmn." _width="100" _height="100"/>-->
+            <!--<img src="images/event_start.png" class="icon_shape" _shape_type="GEOM"-->
+            <!--_shape_id="OG.shape.bpmn." _width="100" _height="100"/>-->
 
         </div>
     </div>
 </div>
 <div class="ui-layout-center" id="canvas" style="cursor: default;"/>
 <script type="text/javascript">
-    $(function(){
-        $('#imgGroup').find('img').each(function(index, img){
+    $(function () {
+        $('#imgGroup').find('img').each(function (index, img) {
             var _shape_id = $(img).attr('_shape_id');
             _shape_id = _shape_id.split('.');
             _shape_id = _shape_id[_shape_id.length - 1];
-            var text = $('<p>'+_shape_id+'</p>');
+            var text = $('<p>' + _shape_id + '</p>');
             var clearfix = $('<div></div>');
 
             $(img).after(text);
             text.after(clearfix);
-            $(img).css('float','left');
+            $(img).css('float', 'left');
 
-            text.css('font-size' , 10);
-            text.css('float','left');
-            clearfix.css('clear','both');
+            text.css('font-size', 10);
+            text.css('float', 'left');
+            clearfix.css('clear', 'both');
         });
-        $('.ui-layout-west').css('overflow' , 'auto');
+        $('.ui-layout-west').css('overflow', 'auto');
     })
 </script>
 </body>
