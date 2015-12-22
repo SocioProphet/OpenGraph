@@ -203,20 +203,6 @@ OG.common.Constants = {
 	},
 
 	/**
-	 * Shape - Edge 와의 연결 포인트 터미널 유형 정의
-	 */
-	TERMINAL_TYPE: {
-		C    : "C",
-		E    : "E",
-		W    : "W",
-		S    : "S",
-		N    : "N",
-		IN   : "IN",
-		OUT  : "OUT",
-		INOUT: "INOUT"
-	},
-
-	/**
 	 * Shape - Edge 와의 연결 포인트
 	 */
 	TERMINAL: "_TERMINAL",

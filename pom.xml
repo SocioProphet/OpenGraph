@@ -105,7 +105,6 @@
                                 <include>geometry/Ellipse.js</include>
                                 <include>geometry/*.js</include>
                                 <include>shape/IShape.js</include>
-                                <include>shape/Terminal.js</include>
                                 <include>shape/GeomShape.js</include>
                                 <include>shape/TextShape.js</include>
                                 <include>shape/ImageShape.js</include>
@@ -146,7 +145,6 @@
                                 <include>geometry/Ellipse-min.js</include>
                                 <include>geometry/*.js</include>
                                 <include>shape/IShape-min.js</include>
-                                <include>shape/Terminal-min.js</include>
                                 <include>shape/GeomShape-min.js</include>
                                 <include>shape/TextShape-min.js</include>
                                 <include>shape/ImageShape-min.js</include>
@@ -193,7 +191,6 @@
                                 <include>geometry/Ellipse-min.js</include>
                                 <include>geometry/*.js</include>
                                 <include>shape/IShape-min.js</include>
-                                <include>shape/Terminal-min.js</include>
                                 <include>shape/GeomShape-min.js</include>
                                 <include>shape/TextShape-min.js</include>
                                 <include>shape/ImageShape-min.js</include>
