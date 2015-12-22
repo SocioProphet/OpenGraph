@@ -3,7 +3,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:element name="opengraph">
 		<xs:annotation>
-			<xs:documentation>오픈그래프 루트</xs:documentation>
+			<xs:documentation>오픈그래프 루트 </xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence minOccurs="0" maxOccurs="unbounded">
