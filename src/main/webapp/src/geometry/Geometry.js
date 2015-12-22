@@ -445,9 +445,9 @@ OG.geometry.Geometry.prototype = {
      * @return {OG.geometry.Coordinate[]}
      */
     shortestIntersectToLine: function (line) {
-        var startp = this.convertCoordinate(line[0]);
-        var intersects = this.intersectToLine(line);
-        var i, distance, shortestDistance = 0, shortestIntersection;
+        var startp, intersects, i, distance, shortestDistance = 0, shortestIntersection;
+        startp = this.convertCoordinate(line[0]);
+        intersects = this.intersectToLine(line);
 
         for (i = 0; i < intersects.length; i++) {
             distance =
@@ -462,7 +462,6 @@ OG.geometry.Geometry.prototype = {
                 }
             }
         }
-
         return shortestIntersection;
     },
 

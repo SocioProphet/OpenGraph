@@ -285,35 +285,171 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * 디폴트 스타일 정의
          */
         DEFAULT_STYLE: {
-            SHAPE         : { cursor: "default" },
-            GEOM          : { stroke: "black", "fill-r": ".5", "fill-cx": ".5", "fill-cy": ".5", fill: "white", "fill-opacity": 0, "label-position": "center"  },
-            TEXT          : { stroke: "none", "text-anchor": "middle" },
-            HTML          : { "label-position": "bottom", "text-anchor": "middle", "vertical-align": "top" },
-            IMAGE         : { "label-position": "bottom", "text-anchor": "middle", "vertical-align": "top" },
-            EDGE          : { stroke: "black", fill: "none", "fill-opacity": 0, "stroke-width": 1.5, "stroke-opacity": 1, "edge-type": "plain", "edge-direction": "c c", "arrow-start": "diamond", "arrow-end": "none", "stroke-dasharray": "", "label-position": "center", "stroke-linejoin" : "round" ,cursor: "pointer"},
-            EDGE_SHADOW   : { stroke: "#00FF00", fill: "none", "fill-opacity": 0, "stroke-width": 1, "stroke-opacity": 1, "arrow-start": "none", "arrow-end": "none", "stroke-dasharray": "- ", "edge-type": "plain" ,cursor: "pointer"},
-            EDGE_HIDDEN   : { stroke: "white", fill: "none", "fill-opacity": 0, "stroke-width": 10, "stroke-opacity": 0, cursor: "pointer"},
-            GROUP         : { stroke: "black", fill: "none", "fill-opacity": 0, "label-position": "bottom", "text-anchor": "middle", "vertical-align": "top" },
-            GROUP_HIDDEN  : { stroke: "black", fill: "white", "fill-opacity" :0 , "stroke-opacity": 0 , cursor: "move" },
-            GROUP_SHADOW  : { stroke: "white", fill: "none", "fill-opacity": 0, "stroke-width": 15, "stroke-opacity": 0, cursor: "pointer"},
-            GROUP_SHADOW_MAPPER  : { stroke: "white", fill: "none", "fill-opacity": 0, "stroke-width": 1, "stroke-opacity": 0, cursor: "pointer"},
-            GUIDE_BBOX    : { stroke: "#00FF00", fill: "white", "fill-opacity" :0, "stroke-dasharray": "- ", "shape-rendering": "crispEdges" , cursor: "move"},
-            GUIDE_UL      : { stroke: "#03689a", fill: "#03689a", "fill-opacity" :0.5, cursor: "nwse-resize", "shape-rendering": "crispEdges" },
-            GUIDE_UR      : { stroke: "#03689a", fill: "#03689a", "fill-opacity" :0.5, cursor: "nesw-resize", "shape-rendering": "crispEdges" },
-            GUIDE_LL      : { stroke: "#03689a", fill: "#03689a", "fill-opacity" :0.5, cursor: "nesw-resize", "shape-rendering": "crispEdges" },
-            GUIDE_LR      : { stroke: "#03689a", fill: "#03689a", "fill-opacity" :0.5, cursor: "nwse-resize", "shape-rendering": "crispEdges" },
-            GUIDE_LC      : { stroke: "#03689a", fill: "#03689a", "fill-opacity" :0.5, cursor: "ew-resize", "shape-rendering": "crispEdges" },
-            GUIDE_UC      : { stroke: "black", fill: "#03689a", "fill-opacity" :0.5, cursor: "ns-resize", "shape-rendering": "crispEdges" },
-            GUIDE_RC      : { stroke: "black", fill: "#03689a", "fill-opacity" :0.5, cursor: "ew-resize", "shape-rendering": "crispEdges" },
-            GUIDE_LWC     : { stroke: "black", fill: "#03689a", "fill-opacity" :0.5, cursor: "ns-resize", "shape-rendering": "crispEdges" },
-            GUIDE_FROM    : { stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges" },
-            GUIDE_TO      : { stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges" },
-            GUIDE_CTL_H   : { stroke: "black", fill: "#00FF00", cursor: "ew-resize", "shape-rendering": "crispEdges" },
-            GUIDE_CTL_V   : { stroke: "black", fill: "#00FF00", cursor: "ns-resize", "shape-rendering": "crispEdges" },
-            GUIDE_SHADOW  : { stroke: "black", fill: "none", "stroke-dasharray": "- ", "shape-rendering": "crispEdges" },
-            GUIDE_LINE    : { stroke: "black", fill: "none", "fill-opacity": 0, "stroke-width": 1.2, "stroke-opacity": 1, "stroke-dasharray": "", "arrow-end": "block", "stroke-linejoin" : "round" ,cursor: "pointer"},
-            GUIDE_VIRTUAL_EDGE    : { stroke: "black", fill: "none", "fill-opacity": 0, "stroke-width": 1, "stroke-opacity": 1, "stroke-dasharray": "- ", "stroke-linejoin" : "round", "arrow-start": "none", "arrow-end": "none"},
-            GUIDE_LINE_AREA : {
+            SHAPE: {cursor: "default"},
+            GEOM: {
+                stroke: "black",
+                "fill-r": ".5",
+                "fill-cx": ".5",
+                "fill-cy": ".5",
+                fill: "white",
+                "fill-opacity": 0,
+                "label-position": "center"
+            },
+            TEXT: {stroke: "none", "text-anchor": "middle"},
+            HTML: {"label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"},
+            IMAGE: {"label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"},
+            EDGE: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1.5,
+                "stroke-opacity": 1,
+                "edge-type": "plain",
+                "edge-direction": "c c",
+                "arrow-start": "diamond",
+                "arrow-end": "none",
+                "stroke-dasharray": "",
+                "label-position": "center",
+                "stroke-linejoin": "round",
+                cursor: "pointer"
+            },
+            EDGE_SHADOW: {
+                stroke: "#00FF00",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1,
+                "stroke-opacity": 1,
+                "arrow-start": "none",
+                "arrow-end": "none",
+                "stroke-dasharray": "- ",
+                "edge-type": "plain",
+                cursor: "pointer"
+            },
+            EDGE_HIDDEN: {
+                stroke: "white",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 10,
+                "stroke-opacity": 0,
+                cursor: "pointer"
+            },
+            GROUP: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                "label-position": "bottom",
+                "text-anchor": "middle",
+                "vertical-align": "top"
+            },
+            GROUP_HIDDEN: {stroke: "black", fill: "white", "fill-opacity": 0, "stroke-opacity": 0, cursor: "move"},
+            GROUP_SHADOW: {
+                stroke: "white",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 15,
+                "stroke-opacity": 0,
+                cursor: "pointer"
+            },
+            GROUP_SHADOW_MAPPER: {
+                stroke: "white",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1,
+                "stroke-opacity": 0,
+                cursor: "pointer"
+            },
+            GUIDE_BBOX: {
+                stroke: "#00FF00",
+                fill: "white",
+                "fill-opacity": 0,
+                "stroke-dasharray": "- ",
+                "shape-rendering": "crispEdges",
+                cursor: "move"
+            },
+            GUIDE_UL: {
+                stroke: "#03689a",
+                fill: "#03689a",
+                "fill-opacity": 0.5,
+                cursor: "nwse-resize",
+                "shape-rendering": "crispEdges"
+            },
+            GUIDE_UR: {
+                stroke: "#03689a",
+                fill: "#03689a",
+                "fill-opacity": 0.5,
+                cursor: "nesw-resize",
+                "shape-rendering": "crispEdges"
+            },
+            GUIDE_LL: {
+                stroke: "#03689a",
+                fill: "#03689a",
+                "fill-opacity": 0.5,
+                cursor: "nesw-resize",
+                "shape-rendering": "crispEdges"
+            },
+            GUIDE_LR: {
+                stroke: "#03689a",
+                fill: "#03689a",
+                "fill-opacity": 0.5,
+                cursor: "nwse-resize",
+                "shape-rendering": "crispEdges"
+            },
+            GUIDE_LC: {
+                stroke: "#03689a",
+                fill: "#03689a",
+                "fill-opacity": 0.5,
+                cursor: "ew-resize",
+                "shape-rendering": "crispEdges"
+            },
+            GUIDE_UC: {
+                stroke: "black",
+                fill: "#03689a",
+                "fill-opacity": 0.5,
+                cursor: "ns-resize",
+                "shape-rendering": "crispEdges"
+            },
+            GUIDE_RC: {
+                stroke: "black",
+                fill: "#03689a",
+                "fill-opacity": 0.5,
+                cursor: "ew-resize",
+                "shape-rendering": "crispEdges"
+            },
+            GUIDE_LWC: {
+                stroke: "black",
+                fill: "#03689a",
+                "fill-opacity": 0.5,
+                cursor: "ns-resize",
+                "shape-rendering": "crispEdges"
+            },
+            GUIDE_FROM: {stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"},
+            GUIDE_TO: {stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"},
+            GUIDE_CTL_H: {stroke: "black", fill: "#00FF00", cursor: "ew-resize", "shape-rendering": "crispEdges"},
+            GUIDE_CTL_V: {stroke: "black", fill: "#00FF00", cursor: "ns-resize", "shape-rendering": "crispEdges"},
+            GUIDE_SHADOW: {stroke: "black", fill: "none", "stroke-dasharray": "- ", "shape-rendering": "crispEdges"},
+            GUIDE_LINE: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1.2,
+                "stroke-opacity": 1,
+                "stroke-dasharray": "",
+                "arrow-end": "block",
+                "stroke-linejoin": "round",
+                cursor: "pointer"
+            },
+            GUIDE_VIRTUAL_EDGE: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1,
+                "stroke-opacity": 1,
+                "stroke-dasharray": "- ",
+                "stroke-linejoin": "round",
+                "arrow-start": "none",
+                "arrow-end": "none"
+            },
+            GUIDE_LINE_AREA: {
                 stroke: "#ffffff",
                 fill: "#ffffff",
                 "fill-opacity": 0.1,
@@ -321,16 +457,47 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-opacity": 0.2,
                 cursor: "pointer"
             },
-            RUBBER_BAND   : { stroke: "#0000FF", opacity: 0.2, fill: "#0077FF" },
-            TERMINAL      : { stroke: "#03689A", "stroke-width": 0, fill: "r(0.5, 0.5)#FFFFFF-#03689A", "fill-opacity": 0.4, cursor: "pointer" },
-            TERMINAL_OVER : { stroke: "#0077FF", "stroke-width": 0, fill: "r(0.5, 0.5)#FFFFFF-#0077FF", "fill-opacity": 1, cursor: "pointer" },
-            TERMINAL_BBOX : { stroke: "none", fill: "white", "fill-opacity": 0 },
-            DROP_OVER_BBOX: { stroke: "#0077FF", fill: "none", opacity: 0.3, "shape-rendering": "crispEdges" },
-            LABEL         : { "font-size": 12, "font-color": "black", "fill": "white" },
-            LABEL_EDITOR  : { position: "absolute", overflow: "visible", resize: "none", "text-align": "center", display: "block", padding: 0 },
-            COLLAPSE      : { stroke: "black", fill: "none", "fill-opacity": 0, cursor: "pointer", "shape-rendering": "crispEdges" },
-            COLLAPSE_BBOX : { stroke: "none", fill: "none", "fill-opacity": 0 },
-            BUTTON        : { stroke: "#9FD7FF", fill: "white", "fill-opacity": 0, cursor: "pointer", "shape-rendering": "crispEdges" },
+            RUBBER_BAND: {stroke: "#0000FF", opacity: 0.2, fill: "#0077FF"},
+            TERMINAL: {
+                stroke: "#03689A",
+                "stroke-width": 0,
+                fill: "r(0.5, 0.5)#FFFFFF-#03689A",
+                "fill-opacity": 0.4,
+                cursor: "pointer"
+            },
+            TERMINAL_OVER: {
+                stroke: "#0077FF",
+                "stroke-width": 0,
+                fill: "r(0.5, 0.5)#FFFFFF-#0077FF",
+                "fill-opacity": 1,
+                cursor: "pointer"
+            },
+            TERMINAL_BBOX: {stroke: "none", fill: "white", "fill-opacity": 0},
+            DROP_OVER_BBOX: {stroke: "#0077FF", fill: "none", opacity: 0.3, "shape-rendering": "crispEdges"},
+            LABEL: {"font-size": 12, "font-color": "black", "fill": "white"},
+            LABEL_EDITOR: {
+                position: "absolute",
+                overflow: "visible",
+                resize: "none",
+                "text-align": "center",
+                display: "block",
+                padding: 0
+            },
+            COLLAPSE: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                cursor: "pointer",
+                "shape-rendering": "crispEdges"
+            },
+            COLLAPSE_BBOX: {stroke: "none", fill: "none", "fill-opacity": 0},
+            BUTTON: {
+                stroke: "#9FD7FF",
+                fill: "white",
+                "fill-opacity": 0,
+                cursor: "pointer",
+                "shape-rendering": "crispEdges"
+            },
             CONNECT_GUIDE_EVENT_AREA: {
                 stroke: "#ffffff",
                 fill: "none",
@@ -363,12 +530,12 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 h: 10
             },
             CONNECTABLE_HIGHLIGHT: {
-                "stroke-width": 2,
+                "stroke-width": 2
             },
             NOT_CONNECTABLE_HIGHLIGHT: {
                 fill: "#FAAFBE",
                 "fill-opacity": 0.5
-            },
+            }
         }
     };
 
@@ -514,7 +681,7 @@ OG.graph.Canvas.prototype = {
             this._HANDLER.enableDragAndDropGroup(element);
         }
 
-        if(element.shape.HaveButton){   // + 버튼을 만들기 위해서
+        if (element.shape.HaveButton) {   // + 버튼을 만들기 위해서
             this._HANDLER.enableButton(element);
         }
 
@@ -532,21 +699,21 @@ OG.graph.Canvas.prototype = {
         element = me.drawShape(position, shape, [90, 22 + (input * 20)], style, id);
         envelope = element.shape.geom.getBoundary();
 
-        for(i=0; i<input; i++){
+        for (i = 0; i < input; i++) {
             textShape = new OG.shape.bpmn.M_Text('in' + (i + 1));
             textElement = me.drawShape([envelope.getUpperLeft().x + 25, envelope.getUpperLeft().y + (i * 20) + 30], textShape, [50, 20]);
             element.appendChild(textElement);
             toShape = new OG.shape.To();
-            toElement = me.drawShape([envelope.getUpperLeft().x + 10, envelope.getUpperLeft().y + (i * 20) + 30], toShape, [5, 5], {"r":5});
+            toElement = me.drawShape([envelope.getUpperLeft().x + 10, envelope.getUpperLeft().y + (i * 20) + 30], toShape, [5, 5], {"r": 5});
             element.appendChild(toElement);
         }
 
-        for(i=0; i<output; i++){
+        for (i = 0; i < output; i++) {
             textShape = new OG.shape.bpmn.M_Text('out' + (i + 1));
             textElement = me.drawShape([envelope.getUpperRight().x - 30, envelope.getUpperRight().y + (i * 20) + 30], textShape, [50, 20]);
             element.appendChild(textElement);
             fromShape = new OG.shape.From();
-            fromElement = me.drawShape([envelope.getUpperRight().x - 10, envelope.getUpperRight().y + (i * 20) + 30], fromShape, [5, 5], {"r":5});
+            fromElement = me.drawShape([envelope.getUpperRight().x - 10, envelope.getUpperRight().y + (i * 20) + 30], fromShape, [5, 5], {"r": 5});
             element.appendChild(fromElement);
         }
     },
@@ -602,16 +769,16 @@ OG.graph.Canvas.prototype = {
      * @return {Element} 연결된 Edge 엘리먼트
      */
     connect: function (fromElement, toElement, style, label) {
-        var fromTerminal, toTerminal, edge, guide;
+        var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
         // from Shape 디폴트 터미널
         fromTerminal = this._RENDERER.createDefaultTerminalString(fromElement);
 
         toTerminal = this._RENDERER.createDefaultTerminalString(toElement);
 
-        var fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
+        fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
         fromPosition = [fromPosition.x, fromPosition.y];
-        var toPosition = this._RENDERER._getPositionFromTerminal(toTerminal);
+        toPosition = this._RENDERER._getPositionFromTerminal(toTerminal);
         toPosition = [toPosition.x, toPosition.y];
 
         // draw edge
@@ -641,24 +808,24 @@ OG.graph.Canvas.prototype = {
      * @param {String} label Label
      * @return {Element} 연결된 Edge 엘리먼트
      */
-    connectWithTerminalId: function (fromTerminal, toTerminal, style, label, id, shapeId , geom) {
-        var vertices, edge, guide;
+    connectWithTerminalId: function (fromTerminal, toTerminal, style, label, id, shapeId, geom) {
+        var vertices, edge, fromPosition, toPosition, fromto, shape;
 
-        var fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
+        fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
         fromPosition = [fromPosition.x, fromPosition.y];
-        var toPosition = this._RENDERER._getPositionFromTerminal(toTerminal);
+        toPosition = this._RENDERER._getPositionFromTerminal(toTerminal);
         toPosition = [toPosition.x, toPosition.y];
 
 
-        if(!geom){
-            vertices = [fromPosition,toPosition];
-        }else{
+        if (!geom) {
+            vertices = [fromPosition, toPosition];
+        } else {
             vertices = geom.vertices;
         }
 
 
-        var fromto = JSON.stringify(vertices[0]) + ',' + JSON.stringify(vertices[vertices.length - 1]);
-        var shape = eval('new ' + shapeId + '(' + fromto + ')');
+        fromto = JSON.stringify(vertices[0]) + ',' + JSON.stringify(vertices[vertices.length - 1]);
+        shape = eval('new ' + shapeId + '(' + fromto + ')');
         if (label) {
             shape.label = label;
         }
@@ -1228,9 +1395,10 @@ OG.graph.Canvas.prototype = {
                     cell: []
                 }
             },
-            childShape;
+            childShape, NodeToCell, i,
+            groupNodes, cellMap;
 
-        var NodeToCell = function(item){
+        NodeToCell = function (item) {
             var shape = item.shape,
                 style = item.shapeStyle,
                 geom = shape.geom,
@@ -1299,7 +1467,7 @@ OG.graph.Canvas.prototype = {
             } else if (shape instanceof OG.shape.EdgeShape) {
                 vertices = geom.getVertices();
                 cell['@value'] = '';
-                for (var i = 0; i < vertices.length; i++) {
+                for (i = 0; i < vertices.length; i++) {
                     cell['@value'] = cell['@value'] + vertices[i];
                     if (i < vertices.length - 1) {
                         cell['@value'] = cell['@value'] + ','
@@ -1330,17 +1498,18 @@ OG.graph.Canvas.prototype = {
             return cell;
         };
 
-        var groupNodes = [], cellMap = {};
+        groupNodes = [];
+        cellMap = {};
 
         // check scope activity
-        var CheckParentFromArea = function(groupNodes){
+        var CheckParentFromArea = function (groupNodes) {
             //get area
             var groupNode, groupId,
                 childNodes, childNode, childGroupNode,
                 filteredChildNode, filteredChildNodes
-            i=0,n=groupNodes.length;
+            i = 0, n = groupNodes.length;
 
-            for(;i<n;i++){
+            for (; i < n; i++) {
 
 
                 groupNode = groupNodes[i];
@@ -1354,11 +1523,11 @@ OG.graph.Canvas.prototype = {
                     groupNode.shape.geom.getBoundary());
                 delete childNodes[groupId];
 
-                for(var childNodeKey in childNodes){
+                for (var childNodeKey in childNodes) {
 
                     childNode = childNodes[childNodeKey];
 
-                    if(childNode.shape instanceof OG.shape.bpmn.ScopeActivity){
+                    if (childNode.shape instanceof OG.shape.bpmn.ScopeActivity) {
                         childGroupNode = childNode;
 
                         filteredChildNodes = CANVAS._RENDERER.getElementMapByBBox(
@@ -1369,27 +1538,26 @@ OG.graph.Canvas.prototype = {
                 }
 
                 //remove filterd child nodes from child node
-                for(var fcKey in filteredChildNodes){
+                for (var fcKey in filteredChildNodes) {
                     filteredChildNode = filteredChildNodes[fcKey];
                     delete childNodes[$(filteredChildNode).attr('id')];
                 }
 
                 //set child parent
-                for(var childNodeKey in childNodes){
+                for (var childNodeKey in childNodes) {
                     childNode = childNodes[childNodeKey];
 
-                    if(childNode.shape instanceof OG.shape.HorizontalLaneShape
-                        || childNode.shape instanceof OG.shape.VerticalLaneShape){
+                    if (childNode.shape instanceof OG.shape.HorizontalLaneShape
+                        || childNode.shape instanceof OG.shape.VerticalLaneShape) {
                         // no operation
-                    }else{
-                        if(childNode.shape instanceof OG.shape.EdgeShape){
-                            if( ($(childNode).attr("_from") + "").indexOf(groupId) < 0
-                                && ($(childNode).attr("_to") + "").indexOf(groupId) < 0 )
-                            {
+                    } else {
+                        if (childNode.shape instanceof OG.shape.EdgeShape) {
+                            if (($(childNode).attr("_from") + "").indexOf(groupId) < 0
+                                && ($(childNode).attr("_to") + "").indexOf(groupId) < 0) {
                                 cellMap[$(childNode).attr('id')]['@parent'] = groupId;
                                 cellMap[groupId]['@childs'].push($(childNode).attr('id'));
                             }
-                        }else{
+                        } else {
                             cellMap[$(childNode).attr('id')]['@parent'] = groupId;
                             cellMap[groupId]['@childs'].push($(childNode).attr('id'));
                         }
@@ -1399,13 +1567,13 @@ OG.graph.Canvas.prototype = {
         };
 
         var swimlaneNodes = [];
-        var CheckRoleFromArea = function(swimlaneNodes){
+        var CheckRoleFromArea = function (swimlaneNodes) {
             //get area
             var swimlaneNode, swimlaneId,
                 childNodes, childNode,
-                i=0,n=swimlaneNodes.length;
+                i = 0, n = swimlaneNodes.length;
 
-            for(;i<n;i++){
+            for (; i < n; i++) {
                 swimlaneNode = swimlaneNodes[i];
                 swimlaneId = $(swimlaneNode).attr('id');
 
@@ -1414,9 +1582,9 @@ OG.graph.Canvas.prototype = {
 
                 delete childNodes[swimlaneId];
 
-                for(var childNodeKey in childNodes){
+                for (var childNodeKey in childNodes) {
                     childNode = childNodes[childNodeKey];
-                    if(childNode.shape instanceof OG.shape.bpmn.A_Task){
+                    if (childNode.shape instanceof OG.shape.bpmn.A_Task) {
                         cellMap[$(childNode).attr('id')]['@swimlane'] = swimlaneId;
                     }
                 }
@@ -1437,12 +1605,12 @@ OG.graph.Canvas.prototype = {
                     nextShapeIds;
 
                 // gathering Group
-                if(item.shape instanceof OG.shape.bpmn.ScopeActivity){
+                if (item.shape instanceof OG.shape.bpmn.ScopeActivity) {
                     groupNodes.push(item);
                 }
 
-                if(item.shape instanceof OG.shape.HorizontalLaneShape
-                    || item.shape instanceof OG.shape.VerticalLaneShape){
+                if (item.shape instanceof OG.shape.HorizontalLaneShape
+                    || item.shape instanceof OG.shape.VerticalLaneShape) {
                     swimlaneNodes.push(item);
                 }
 
@@ -1513,7 +1681,7 @@ OG.graph.Canvas.prototype = {
         var canvasWidth, canvasHeight, rootGroup,
             minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE,
             i, cell, shape, id, parent, shapeType, shapeId, x, y, width, height, style, geom, from, to,
-            fromEdge, toEdge, label, fromLabel, toLabel, angle, value, data, dataExt, element,loopType, taskType, swimlane;
+            fromEdge, toEdge, label, fromLabel, toLabel, angle, value, data, dataExt, element, loopType, taskType, swimlane;
 
         this._RENDERER.clear();
 
@@ -1575,13 +1743,13 @@ OG.graph.Canvas.prototype = {
                             shape.label = label;
                         }
                         element = this.drawShape([x, y], shape, [width, height], OG.JSON.decode(style), id, null, false);
-                        if(element.shape instanceof OG.shape.bpmn.A_Task){
+                        if (element.shape instanceof OG.shape.bpmn.A_Task) {
                             element.shape.LoopType = loopType;
                             element.shape.TaskType = taskType;
                         }
                         break;
                     case OG.Constants.SHAPE_TYPE.EDGE:
-                        var list = JSON.parse('[' + value+ ']');
+                        var list = JSON.parse('[' + value + ']');
                         var fromto = JSON.stringify(list[0]) + ',' + JSON.stringify(list[list.length - 1]);
                         shape = eval('new ' + shapeId + '(' + fromto + ')');
                         if (label) {

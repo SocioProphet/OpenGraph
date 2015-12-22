@@ -19,7 +19,7 @@ OG.geometry.Line = function (from, to, poi) {
 
 	OG.geometry.Line.superclass.call(this, [
 		[_from.x, _from.y],
-		[_to.x, _to.y],
+		[_to.x, _to.y]
 	], poi);
 
 	this.TYPE = OG.Constants.GEOM_TYPE.LINE;

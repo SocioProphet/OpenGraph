@@ -225,7 +225,7 @@ OG.common.Constants = {
 	 * Element 의 커넥트 가이드 이벤트 보정영역의 정의
 	 */
 	CONNECT_GUIDE_EVENT_AREA: {
-		NAME  : "CONNECT_GUIDE",
+		NAME  : "CONNECT_GUIDE"
 	},
 	/**
 	 * Element 의 커넥트 가이드 suffix 정의

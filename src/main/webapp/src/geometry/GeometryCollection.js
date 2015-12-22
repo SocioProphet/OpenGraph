@@ -50,7 +50,7 @@ OG.geometry.GeometryCollection.prototype.getVertices = function () {
 };
 OG.geometry.GeometryCollection.prototype.getVerticess = function(){
 	console.log(1231234);
-},
+};
 
 /**
  * 가로, 세로 Offset 만큼 좌표를 이동한다.
