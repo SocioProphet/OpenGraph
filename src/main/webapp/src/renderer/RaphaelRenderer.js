@@ -4396,13 +4396,6 @@ OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset, exclud
 
     this.removeCollapseGuide(element);
 
-    //TODO:
-//  if (element.shape.SHAPE_TYPE == OG.Contraints.SHAPE_TYPE.GROUP){
-    //  element.shape.layoutChild();
-//  }
-    //END
-
-
     if (rElement && type && geometry) {
         geometry.resize(offset[0], offset[1], offset[2], offset[3]);
 
@@ -5368,6 +5361,14 @@ OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
 OG.renderer.RaphaelRenderer.prototype.removeAllVirtualEdge = function () {
     $(this.getRootGroup()).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, false);
     return this.remove(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
+}
+
+OG.renderer.RaphaelRenderer.prototype.undo = function(){
+
+}
+
+OG.renderer.RaphaelRenderer.prototype.redo = function(){
+
 }
 
 

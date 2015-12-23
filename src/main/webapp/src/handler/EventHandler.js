@@ -532,47 +532,22 @@ OG.handler.EventHandler.prototype = {
                 stop: function (event) {
                     var eventOffset = me._getOffset(event),
                         start = $(this).data("start"),
+                        offset = $(this).data("offset"),
                         bBoxArray = $(root).data("bBoxArray"),
                         dx = me._grid(eventOffset.x - start.x, 'move'),
                         dy = me._grid(eventOffset.y - start.y, 'move'),
                         groupTarget = $(root).data("groupTarget"),
-                        offset = $(this).data("offset"),
-                        eleArray, isAttatched, attachTargetId,
-                        guide, edgeId;
+                        eleArray, isAttatched, attachTargetId;
 
                     // 자동 붙기 보정
                     var attatchOffset = me.checkAutoAttach(element, bBoxArray, dx, dy, start, offset, event);
                     dx = attatchOffset["dx"];
                     dy = attatchOffset["dy"];
-                    isAttatched = attatchOffset["attatched"];
-                    attachTargetId = attatchOffset["targetId"];
 
                     // 이동 처리
                     $(this).css({"position": "", "left": "", "top": ""});
 
-                    // 조건 : 이동지에 그룹이 겹치게 되면 취소
-                    if (false) {
-                        eleArray = me._moveElements(bBoxArray, 0, 0);
-                    } else {
-                        eleArray = me._moveElements(bBoxArray, dx, dy);
-
-                        me._RENDERER.getElementMapByBBox(element.shape.geom.getBoundary()
-                            , null
-                            , $(element).attr('id'));
-                    }
-
-                    //TODO : 이것 또한 없애야 할 것... 의존성을 가지면 안됨.
-                    // remove custom control
-                    if (me._getSelectedElement().length == 1) {
-                        element.shape.drawCustomControl(me, element);
-
-                        //자동 붙이기...
-                        if (isAttatched) {
-                            $(element).attr("_event_target_", attachTargetId);
-                        } else {
-                            $(element).attr("_event_target_", "");
-                        }
-                    }
+                    eleArray = me._moveElements(bBoxArray, dx, dy);
 
                     me._RENDERER.addToGroup(root, eleArray);
 
@@ -844,7 +819,10 @@ OG.handler.EventHandler.prototype = {
                     stop: function (event) {
                         var eventOffset = me._getOffset(event),
                             start = $(this).data("start"),
-                            dx = eventOffset.x - start.x;
+                            offset = $(this).data("offset"),
+                            dx = eventOffset.x - start.x,
+                            newX = me._grid(eventOffset.x - offset.x),
+                            newWidth = me._grid(newX - me._num(me._RENDERER.getAttr(guide.lc, "x")));
                         $(this).css({"position": "absolute", "left": "0px", "top": "0px"});
                         if (element && element.shape.geom) {
                             // resizing
@@ -1275,7 +1253,7 @@ OG.handler.EventHandler.prototype = {
      * @param {Boolean} isSelectable 선택가능여부
      */
     setClickSelectable: function (element, isSelectable) {
-        var me = this,root = me._RENDERER.getRootGroup();
+        var me = this, root = me._RENDERER.getRootGroup();
         if (isSelectable === true) {
             // 마우스 클릭하여 선택 처리
             $(element).bind({
@@ -1287,16 +1265,24 @@ OG.handler.EventHandler.prototype = {
                         var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
                         var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE ? true : false;
 
-                        if(isConnectMode){
-                            if(isConnectable && !isEdge){
+                        if (isConnectMode) {
+                            if (isConnectable && !isEdge) {
                                 var target = me._RENDERER.getTargetfromVirtualEdge();
                                 me._RENDERER.removeAllVirtualEdge();
-                                me._RENDERER._CANVAS.connect(target , element);
-                            }else{
+
+                                var eventOffset = me._getOffset(event);
+                                var point = [eventOffset.x, eventOffset.y];
+                                me._RENDERER._CANVAS.connect(target, element, null, null, null, point);
+                                //var edge = me._RENDERER._CANVAS.connect(target, element);
+                                //var point = [eventOffset.x, eventOffset.y];
+                                //var terminal = me._RENDERER.createTerminalString(element, point);
+                                //me._RENDERER.connect(null, terminal, edge, edge.shape.geom.style);
+
+                            } else {
                                 me._RENDERER.removeAllVirtualEdge();
                             }
 
-                        }else{
+                        } else {
                             me._RENDERER.removeAllVirtualEdge();
 
                             if ($(element).attr("_selected") === "true") {
@@ -1370,17 +1356,17 @@ OG.handler.EventHandler.prototype = {
      */
     setDragSelectable: function (isSelectable) {
         var me = this, rootEle = me._RENDERER.getRootElement(),
-            root = me._RENDERER.getRootGroup(), eventOffset;
+            root = me._RENDERER.getRootGroup(), eventOffset, virtualEdgeEvent;
 
         // 배경클릭한 경우 deselect 하도록
-        $(rootEle).bind("click", function (event) {
+        $(rootEle).bind("click", function () {
             if (!$(this).data("dragBox")) {
                 me.deselectAll();
                 me._RENDERER.removeRubberBand(rootEle);
             }
-
             //가상선 생성된 경우 액티브로 등록
             //가상선 액티브인 경우 삭제
+            root = me._RENDERER.getRootGroup();
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
             if (isConnectMode) {
                 if (isConnectMode === 'created') {
@@ -2904,6 +2890,17 @@ OG.handler.EventHandler.prototype = {
         }
     },
 
+    makeEdgeContextMenu: function (isEdge) {
+        return this.mergeContextMenu(
+            this.makeDelete(),
+            this.makeCopy(),
+            this.makeFormat(isEdge),
+            this.makeFont(),
+            this.makeBring(),
+            this.makeSend()
+        )
+    },
+
     makeTaskContextMenu: function () {
         return this.mergeContextMenu(
             this.makeDelete(),
@@ -3010,7 +3007,7 @@ OG.handler.EventHandler.prototype = {
 
                 if (me._getSelectedElement().length == 1) {
                     if (me._getSelectedElement()[0].shape instanceof OG.shape.EdgeShape) {
-                        return;
+                        items = me.makeEdgeContextMenu(true);
                     } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.G_Gateway) {
                         items = me.makeGatewayContextMenu();
                     } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.Event) {
@@ -3144,19 +3141,12 @@ OG.handler.EventHandler.prototype = {
     //TODO : 선택된 모든 Shape를 선택 해제
     deselectShape: function (element) {
         var me = this;
-
         if (OG.Util.isElement(element) && element.id) {
             $(element).attr("_selected", "");
             me._RENDERER.removeGuide(element);
 
             //선택요소배열 삭제
             me._delSelectedElement(element);
-
-            //TODO : 이것 또한 없애야 할 것... 의존성을 가지면 안됨.
-            // remove custom control
-            if (element.shape.geom.custom_control) {
-                $(element.shape.geom.custom_control).trigger("remove");
-            }
         }
     },
 
@@ -4271,9 +4261,11 @@ OG.handler.EventHandler.prototype = {
         this.selectedElements[element.attributes["id"].value] = element;
     },
 
-    //TODO : 선택된 요소를 선택요소배열에 추가
+    //TODO : 선택된 요소를 선택요소배열에서 삭제
     _delSelectedElement: function (element) {
-        delete this.selectedElements[element.attributes["id"].value];
+        if (this.selectedElements) {
+            delete this.selectedElements[element.attributes["id"].value];
+        }
     },
 
     //TODO : 선택요소배열 반환
@@ -4797,7 +4789,7 @@ OG.handler.EventHandler.prototype = {
                 }
 
                 if (isEdge) {
-                    if(isConnectMode){
+                    if (isConnectMode) {
                         return;
                     }
                     if (isDragging) {

@@ -624,21 +624,7 @@ OG.graph.Canvas.prototype = {
      * @param {String} parentId 부모 Element ID 지정 (Optional)
      * @return {Element} Group DOM Element with geometry
      */
-    drawShape: function (position, shape, size, style, id, parentId, gridable) {
-        //강제 그리드 보정
-        gridable = true;
-
-        // MOVE_SNAP_SIZE 적용
-        if (this._CONFIG.DRAG_GRIDABLE && (!OG.Util.isDefined(gridable) || gridable === true)) {
-            if (position) {
-                position[0] = OG.Util.roundGrid(position[0], this._CONFIG.MOVE_SNAP_SIZE);
-                position[1] = OG.Util.roundGrid(position[1], this._CONFIG.MOVE_SNAP_SIZE);
-            }
-            if (size) {
-                size[0] = OG.Util.roundGrid(size[0], this._CONFIG.MOVE_SNAP_SIZE * 2);
-                size[1] = OG.Util.roundGrid(size[1], this._CONFIG.MOVE_SNAP_SIZE * 2);
-            }
-        }
+    drawShape: function (position, shape, size, style, id, parentId) {
 
         var element = this._RENDERER.drawShape(position, shape, size, style, id);
 
@@ -753,13 +739,20 @@ OG.graph.Canvas.prototype = {
      * @param {String} label Label
      * @return {Element} 연결된 Edge 엘리먼트
      */
-    connect: function (fromElement, toElement, style, label) {
+    connect: function (fromElement, toElement, style, label, fromP, toP) {
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
-        // from Shape 디폴트 터미널
-        fromTerminal = this._RENDERER.createDefaultTerminalString(fromElement);
+        if (fromP) {
+            fromTerminal = this._RENDERER.createTerminalString(fromElement, fromP);
+        } else {
+            fromTerminal = this._RENDERER.createDefaultTerminalString(fromElement);
+        }
 
-        toTerminal = this._RENDERER.createDefaultTerminalString(toElement);
+        if (toP) {
+            toTerminal = this._RENDERER.createTerminalString(toElement, toP);
+        } else {
+            toTerminal = this._RENDERER.createDefaultTerminalString(toElement);
+        }
 
         fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
         fromPosition = [fromPosition.x, fromPosition.y];
@@ -1824,6 +1817,20 @@ OG.graph.Canvas.prototype = {
             x2: 0,
             y2: 0
         };
+    },
+
+    /**
+     * 캔버스 undo.
+     */
+    undo: function () {
+        this._RENDERER.undo();
+    },
+
+    /**
+     * 캔버스 redo.
+     */
+    redo: function () {
+        this._RENDERER.redo();
     },
 
     /**
