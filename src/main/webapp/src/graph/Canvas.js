@@ -1369,7 +1369,8 @@ OG.graph.Canvas.prototype = {
                     cell: []
                 }
             },
-            childShape, NodeToCell, i;
+            childShape, NodeToCell, i,
+            cellMap;
 
         NodeToCell = function (item) {
             var shape = item.shape,
@@ -1471,9 +1472,17 @@ OG.graph.Canvas.prototype = {
             return cell;
         };
 
+        cellMap = {};
+
         childShape = function (node) {
             $(node).children("[_type=SHAPE]").each(function (idx, item) {
-                jsonObj.opengraph.cell.push(NodeToCell(item));
+
+                // push cell to array
+                var cell = NodeToCell(item);
+                jsonObj.opengraph.cell.push(cell);
+
+                // gathering Cell Map
+                cellMap[cell["@id"]] = cell;
             });
         };
 
@@ -1485,7 +1494,8 @@ OG.graph.Canvas.prototype = {
         }
 
         //root check
-        childShape(rootGroup);
+        childShape(rootGroup, true);
+
         return jsonObj;
     },
 

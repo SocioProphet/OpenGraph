@@ -443,6 +443,31 @@ OG.handler.EventHandler.prototype = {
                     me._RENDERER.removeGuide(element);
                     guide = me._RENDERER.drawGuide(element);
 
+                    if (element.shape instanceof OG.shape.GroupShape && !(element.shape instanceof OG.shape.bpmn.A_Task)) {
+                        // gathering redraw targets
+                        var childElement
+                            , elementId = $(element).attr('id')
+                            , childElementMap = me._RENDERER.getElementMapByBBox(element.shape.geom.getBoundary()
+                                , null
+                                , elementId);
+
+                        delete childElementMap[elementId];
+
+                        for (var key_childElementMap in childElementMap) {
+
+                            childElement = childElementMap[key_childElementMap];
+
+                            if (childElement instanceof OG.shape.EdgeShape) {
+                                //no operation
+                            } else if ($(childElement).parent().get(0) != root) {
+                                //no operation
+                            } else {
+                                me._RENDERER.removeGuide(childElement);
+                                me._RENDERER.drawGuide(childElement);
+                            }
+                        }
+                    }
+
                     $(this).data("start", {x: eventOffset.x, y: eventOffset.y});
                     $(this).data("offset", {
                         x: eventOffset.x - me._num(me._RENDERER.getAttr(guide.bBox, "x")),
@@ -501,7 +526,6 @@ OG.handler.EventHandler.prototype = {
                     if (!$(element).data('_selected_before_move')) {
                         me.deselectShape(element);
                     }
-
                     me._RENDERER.removeAllConnectGuide();
                     me._RENDERER.toFrontEdges();
                 }
@@ -2606,6 +2630,17 @@ OG.handler.EventHandler.prototype = {
         }
     },
 
+    makeEdgeContextMenu: function (isEdge) {
+        return this.mergeContextMenu(
+            this.makeDelete(),
+            this.makeCopy(),
+            this.makeFormat(isEdge),
+            this.makeFont(),
+            this.makeBring(),
+            this.makeSend()
+        )
+    },
+
     makeTaskContextMenu: function () {
         return this.mergeContextMenu(
             this.makeDelete(),
@@ -2699,7 +2734,7 @@ OG.handler.EventHandler.prototype = {
 
                 if (me._getSelectedElement().length == 1) {
                     if (me._getSelectedElement()[0].shape instanceof OG.shape.EdgeShape) {
-                        return;
+                        items = me.makeEdgeContextMenu(true);
                     } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.G_Gateway) {
                         items = me.makeGatewayContextMenu();
                     } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.Event) {
