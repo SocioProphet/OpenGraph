@@ -41,7 +41,7 @@ OG.shape.bpmn.E_End_Connector.prototype.createShape = function () {
         [60, 34]
     ]);
     geom1.style = new OG.geometry.Style({
-        "fill"        : "black",
+        "fill": "black",
         "fill-opacity": 1
     });
     geomCollection.push(new OG.geometry.Circle([50, 50], 50));

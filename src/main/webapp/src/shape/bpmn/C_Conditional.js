@@ -11,9 +11,9 @@
  * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
  */
 OG.shape.bpmn.C_Conditional = function (from, to, label) {
-	OG.shape.bpmn.C_Conditional.superclass.call(this, from, to, label);
+    OG.shape.bpmn.C_Conditional.superclass.call(this, from, to, label);
 
-	this.SHAPE_ID = 'OG.shape.bpmn.C_Conditional';
+    this.SHAPE_ID = 'OG.shape.bpmn.C_Conditional';
 };
 OG.shape.bpmn.C_Conditional.prototype = new OG.shape.EdgeShape();
 OG.shape.bpmn.C_Conditional.superclass = OG.shape.EdgeShape;
@@ -27,18 +27,18 @@ OG.C_Conditional = OG.shape.bpmn.C_Conditional;
  * @override
  */
 OG.shape.bpmn.C_Conditional.prototype.createShape = function () {
-	if (this.geom) {
-		return this.geom;
-	}
+    if (this.geom) {
+        return this.geom;
+    }
 
-	this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
-	this.geom.style = new OG.geometry.Style({
-		"edge-type"  : "straight",
-		"arrow-start": "open_diamond-wide-long",
-		"arrow-end"  : "open_block-wide-long"
-	});
+    this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
+    this.geom.style = new OG.geometry.Style({
+        "edge-type": "straight",
+        "arrow-start": "open_diamond-wide-long",
+        "arrow-end": "open_block-wide-long"
+    });
 
-	return this.geom;
+    return this.geom;
 };
 /**
  * BPMN : Data Association Connector Shape
@@ -53,9 +53,9 @@ OG.shape.bpmn.C_Conditional.prototype.createShape = function () {
  * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
  */
 OG.shape.bpmn.C_DataAssociation = function (from, to, label) {
-	OG.shape.bpmn.C_DataAssociation.superclass.call(this, from, to, label);
+    OG.shape.bpmn.C_DataAssociation.superclass.call(this, from, to, label);
 
-	this.SHAPE_ID = 'OG.shape.bpmn.C_DataAssociation';
+    this.SHAPE_ID = 'OG.shape.bpmn.C_DataAssociation';
 };
 OG.shape.bpmn.C_DataAssociation.prototype = new OG.shape.EdgeShape();
 OG.shape.bpmn.C_DataAssociation.superclass = OG.shape.EdgeShape;
@@ -69,17 +69,17 @@ OG.C_DataAssociation = OG.shape.bpmn.C_DataAssociation;
  * @override
  */
 OG.shape.bpmn.C_DataAssociation.prototype.createShape = function () {
-	if (this.geom) {
-		return this.geom;
-	}
+    if (this.geom) {
+        return this.geom;
+    }
 
-	this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
-	this.geom.style = new OG.geometry.Style({
-		"edge-type"       : "straight",
-		"arrow-start"     : "none",
-		"arrow-end"       : "classic-wide-long",
-		'stroke-dasharray': '. '
-	});
+    this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
+    this.geom.style = new OG.geometry.Style({
+        "edge-type": "straight",
+        "arrow-start": "none",
+        "arrow-end": "classic-wide-long",
+        'stroke-dasharray': '. '
+    });
 
-	return this.geom;
+    return this.geom;
 };

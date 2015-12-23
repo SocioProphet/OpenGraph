@@ -38,7 +38,7 @@ OG.shape.HorizontalPoolShape.prototype.createShape = function () {
     this.geom.style = new OG.geometry.Style({
         'label-direction': 'vertical',
         'vertical-align' : 'top',
-        'fill' : 'none',
+        'fill' : '#ffffff',
         'title-size' : 32
     });
 

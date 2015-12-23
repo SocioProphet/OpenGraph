@@ -758,7 +758,7 @@ OG.handler.EventHandler.prototype = {
             return;
         }
 
-        if (isConnectable === true) {
+        if (isConnectable) {
             if (!isEdge) {
                 $(guide.line).bind({
                     click: function (event) {
@@ -770,6 +770,8 @@ OG.handler.EventHandler.prototype = {
                     }
                 });
             }
+        }else{
+
         }
     },
 

@@ -9,10 +9,10 @@
  * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
  */
 OG.shape.bpmn.E_End_Link = function (label) {
-	OG.shape.bpmn.E_End_Link.superclass.call(this);
+    OG.shape.bpmn.E_End_Link.superclass.call(this);
 
-	this.SHAPE_ID = 'OG.shape.bpmn.E_End_Link';
-	this.label = label;
+    this.SHAPE_ID = 'OG.shape.bpmn.E_End_Link';
+    this.label = label;
 };
 OG.shape.bpmn.E_End_Link.prototype = new OG.shape.bpmn.Event();
 OG.shape.bpmn.E_End_Link.superclass = OG.shape.bpmn.Event;
@@ -26,34 +26,34 @@ OG.E_End_Link = OG.shape.bpmn.E_End_Link;
  * @override
  */
 OG.shape.bpmn.E_End_Link.prototype.createShape = function () {
-	var geom1, geomCollection = [];
-	if (this.geom) {
-		return this.geom;
-	}
+    var geom1, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
 
-	geom1 = new OG.geometry.Polygon([
-		[20, 35],
-		[20, 65],
-		[60, 65],
-		[60, 80],
-		[85, 50],
-		[60, 20],
-		[60, 35]
-	]);
-	geom1.style = new OG.geometry.Style({
-		"fill"        : "black",
-		"fill-opacity": 1
-	});
+    geom1 = new OG.geometry.Polygon([
+        [20, 35],
+        [20, 65],
+        [60, 65],
+        [60, 80],
+        [85, 50],
+        [60, 20],
+        [60, 35]
+    ]);
+    geom1.style = new OG.geometry.Style({
+        "fill": "black",
+        "fill-opacity": 1
+    });
 
-	geomCollection.push(new OG.geometry.Circle([50, 50], 50));
-	geomCollection.push(new OG.geometry.Circle([50, 50], 42));
-	geomCollection.push(geom1);
+    geomCollection.push(new OG.geometry.Circle([50, 50], 50));
+    geomCollection.push(new OG.geometry.Circle([50, 50], 42));
+    geomCollection.push(geom1);
 
 
-	this.geom = new OG.geometry.GeometryCollection(geomCollection);
-	this.geom.style = new OG.geometry.Style({
-		'label-position': 'bottom'
-	});
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom'
+    });
 
-	return this.geom;
+    return this.geom;
 };

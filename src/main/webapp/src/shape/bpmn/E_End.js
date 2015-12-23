@@ -9,11 +9,11 @@
  * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
  */
 OG.shape.bpmn.E_End = function (label) {
-	OG.shape.bpmn.E_End.superclass.call(this);
+    OG.shape.bpmn.E_End.superclass.call(this);
 
-	this.SHAPE_ID = 'OG.shape.bpmn.E_End';
-	this.label = label;
-	this.inclusion = false;
+    this.SHAPE_ID = 'OG.shape.bpmn.E_End';
+    this.label = label;
+    this.inclusion = false;
 };
 OG.shape.bpmn.E_End.prototype = new OG.shape.bpmn.Event();
 OG.shape.bpmn.E_End.superclass = OG.shape.bpmn.Event;
@@ -27,15 +27,15 @@ OG.E_End = OG.shape.bpmn.E_End;
  * @override
  */
 OG.shape.bpmn.E_End.prototype.createShape = function () {
-	if (this.geom) {
-		return this.geom;
-	}
+    if (this.geom) {
+        return this.geom;
+    }
 
-	this.geom = new OG.geometry.Circle([50, 50], 50);
-	this.geom.style = new OG.geometry.Style({
-		"stroke-width"  : 3,
-		'label-position': 'bottom'
-	});
+    this.geom = new OG.geometry.Circle([50, 50], 50);
+    this.geom.style = new OG.geometry.Style({
+        "stroke-width": 3,
+        'label-position': 'bottom'
+    });
 
-	return this.geom;
+    return this.geom;
 };

@@ -11,9 +11,9 @@
  * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
  */
 OG.shape.bpmn.C_Sequence = function (from, to, label) {
-	OG.shape.bpmn.C_Sequence.superclass.call(this, from, to, label);
+    OG.shape.bpmn.C_Sequence.superclass.call(this, from, to, label);
 
-	this.SHAPE_ID = 'OG.shape.bpmn.C_Sequence';
+    this.SHAPE_ID = 'OG.shape.bpmn.C_Sequence';
 };
 OG.shape.bpmn.C_Sequence.prototype = new OG.shape.EdgeShape();
 OG.shape.bpmn.C_Sequence.superclass = OG.shape.EdgeShape;
@@ -27,16 +27,16 @@ OG.C_Sequence = OG.shape.bpmn.C_Sequence;
  * @override
  */
 OG.shape.bpmn.C_Sequence.prototype.createShape = function () {
-	if (this.geom) {
-		return this.geom;
-	}
+    if (this.geom) {
+        return this.geom;
+    }
 
-	this.geom = new OG.Line(this.from || [0, 0], this.to || [80, 0]);
-	this.geom.style = new OG.geometry.Style({
-		"edge-type"  : "plain",
-		"arrow-start": "none",
-		"arrow-end"  : "block-wide-long"
-	});
+    this.geom = new OG.Line(this.from || [0, 0], this.to || [80, 0]);
+    this.geom.style = new OG.geometry.Style({
+        "edge-type": "plain",
+        "arrow-start": "none",
+        "arrow-end": "block-wide-long"
+    });
 
-	return this.geom;
+    return this.geom;
 };

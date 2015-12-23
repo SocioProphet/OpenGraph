@@ -53,7 +53,7 @@ OG.shape.GroupShape.prototype.createShape = function () {
 
 	this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
 	this.geom.style = new OG.geometry.Style({
-		'fill' : 'none',
+		'fill' : '#ffffff',
 		"stroke": 'none'
 	});
 

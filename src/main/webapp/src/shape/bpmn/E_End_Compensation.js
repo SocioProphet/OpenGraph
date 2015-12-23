@@ -9,10 +9,10 @@
  * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
  */
 OG.shape.bpmn.E_End_Compensation = function (label) {
-	OG.shape.bpmn.E_End_Compensation.superclass.call(this);
+    OG.shape.bpmn.E_End_Compensation.superclass.call(this);
 
-	this.SHAPE_ID = 'OG.shape.bpmn.E_End_Compensation';
-	this.label = label;
+    this.SHAPE_ID = 'OG.shape.bpmn.E_End_Compensation';
+    this.label = label;
 };
 OG.shape.bpmn.E_End_Compensation.prototype = new OG.shape.bpmn.Event();
 OG.shape.bpmn.E_End_Compensation.superclass = OG.shape.bpmn.Event;
@@ -26,44 +26,44 @@ OG.E_End_Compensation = OG.shape.bpmn.E_End_Compensation;
  * @override
  */
 OG.shape.bpmn.E_End_Compensation.prototype.createShape = function () {
-	var geom1, geom2, geom3, geomCollection = [];
-	if (this.geom) {
-		return this.geom;
-	}
+    var geom1, geom2, geom3, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
 
-	geom1 = new OG.geometry.Circle([50, 50], 50);
-	geom1.style = new OG.geometry.Style({
-		"stroke-width": 3
-	});
+    geom1 = new OG.geometry.Circle([50, 50], 50);
+    geom1.style = new OG.geometry.Style({
+        "stroke-width": 3
+    });
 
-	geom2 = new OG.geometry.Polygon([
-		[15, 50],
-		[45, 70],
-		[45, 30]
-	]);
-	geom2.style = new OG.geometry.Style({
-		"fill"        : "black",
-		"fill-opacity": 1
-	});
+    geom2 = new OG.geometry.Polygon([
+        [15, 50],
+        [45, 70],
+        [45, 30]
+    ]);
+    geom2.style = new OG.geometry.Style({
+        "fill": "black",
+        "fill-opacity": 1
+    });
 
-	geom3 = new OG.geometry.Polygon([
-		[45, 50],
-		[75, 70],
-		[75, 30]
-	]);
-	geom3.style = new OG.geometry.Style({
-		"fill"        : "black",
-		"fill-opacity": 1
-	});
+    geom3 = new OG.geometry.Polygon([
+        [45, 50],
+        [75, 70],
+        [75, 30]
+    ]);
+    geom3.style = new OG.geometry.Style({
+        "fill": "black",
+        "fill-opacity": 1
+    });
 
-	geomCollection.push(geom1);
-	geomCollection.push(geom2);
-	geomCollection.push(geom3);
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+    geomCollection.push(geom3);
 
-	this.geom = new OG.geometry.GeometryCollection(geomCollection);
-	this.geom.style = new OG.geometry.Style({
-		'label-position': 'bottom'
-	});
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom'
+    });
 
-	return this.geom;
+    return this.geom;
 };

@@ -2703,10 +2703,19 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         var to = [(_upperRight.x + _ctrlMargin) + x + _ctrlSize, (_upperRight.y) + y];
         var path = 'M' + from[0] + ' ' + from[1] + 'L' + to[0] + ' ' + to[1];
         return path;
-    }
+    };
+
+    var _isConnectable = function () {
+        if (rElement) {
+            return me._CONFIG.CONNECTABLE && rElement.node.shape.CONNECTABLE;
+        } else {
+            return false;
+        }
+    };
 
 
     if (rElement && geometry) {
+
         // Edge 인 경우 따로 처리
         if ($(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
             return this.drawEdgeGuide(element);
@@ -2749,12 +2758,14 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
                 _rcRect.attr({x: _rightCenter.x - _hSize, y: _rightCenter.y - _hSize});
                 _lwcRect.attr({x: _lowerCenter.x - _hSize, y: _lowerCenter.y - _hSize});
 
-                _line = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
-                _linePath1 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
-                _linePath2 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
-                _line.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y});
-                _linePath1.attr({'path': createPath(0, 0)});
-                _linePath2.attr({'path': createPath(0, 8)});
+                if(_isConnectable()){
+                    _line = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
+                    _linePath1 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
+                    _linePath2 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
+                    _line.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y});
+                    _linePath1.attr({'path': createPath(0, 0)});
+                    _linePath2.attr({'path': createPath(0, 8)});
+                }
 
                 return null;
             }
@@ -2789,14 +2800,15 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             _lwcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LWC);
 
 
-            _line = this._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
-            _linePath1 = this._PAPER.path(createPath(0, 0));
-            _linePath2 = this._PAPER.path(createPath(0, 8));
-            _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
-            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
-            _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
-            _linePath2.attr({'stroke-dasharray': '-'});
-
+            if(_isConnectable()){
+                _line = this._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
+                _linePath1 = this._PAPER.path(createPath(0, 0));
+                _linePath2 = this._PAPER.path(createPath(0, 8));
+                _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+                _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+                _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+                _linePath2.attr({'stroke-dasharray': '-'});
+            }
 
             // add to Group
             group.appendChild(_ulRect);
@@ -2808,9 +2820,11 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             group.appendChild(_rcRect);
             group.appendChild(_lwcRect);
 
-            group.appendChild(_linePath1);
-            group.appendChild(_linePath2);
-            group.appendChild(_line);
+            if(_isConnectable()){
+                group.appendChild(_linePath1);
+                group.appendChild(_linePath2);
+                group.appendChild(_line);
+            }
 
 
             this._add(group, rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
@@ -2824,9 +2838,11 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             this._add(_rcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
             this._add(_lwcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
 
-            this._add(_line, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
-            this._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
-            this._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
+            if(_isConnectable()){
+                this._add(_line, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
+                this._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
+                this._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
+            }
 
             guide = {
                 bBox: _bBoxRect.node,
@@ -2839,7 +2855,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
                 uc: _ucRect.node,
                 rc: _rcRect.node,
                 lwc: _lwcRect.node,
-                line: _line.node
+                line: _line ? _line.node : null
             };
 
             // layer 위치 조정
@@ -5288,23 +5304,23 @@ OG.renderer.RaphaelRenderer.prototype.updateVirtualEdge = function (x, y) {
         _y = Math.sqrt(Math.pow(eventProtectLength, 2) - Math.pow(_x, 2));
 
         var fixedTagetP = {
-            x : targetP[0],
-            y : targetP[1]
+            x: targetP[0],
+            y: targetP[1]
         };
-        if(targetP[0] > startP[0]){
+        if (targetP[0] > startP[0]) {
             fixedTagetP.x = targetP[0] - _x;
         }
-        if(targetP[0] < startP[0]){
+        if (targetP[0] < startP[0]) {
             fixedTagetP.x = targetP[0] + _x;
         }
 
-        if(targetP[1] > startP[1]){
+        if (targetP[1] > startP[1]) {
             fixedTagetP.y = targetP[1] - _y;
         }
-        if(targetP[1] < startP[1]){
+        if (targetP[1] < startP[1]) {
             fixedTagetP.y = targetP[1] + _y;
         }
-        return [fixedTagetP.x , fixedTagetP.y];
+        return [fixedTagetP.x, fixedTagetP.y];
     }
 
     virtualEdge = me.getElementById(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
@@ -5363,11 +5379,11 @@ OG.renderer.RaphaelRenderer.prototype.removeAllVirtualEdge = function () {
     return this.remove(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
 }
 
-OG.renderer.RaphaelRenderer.prototype.undo = function(){
+OG.renderer.RaphaelRenderer.prototype.undo = function () {
 
 }
 
-OG.renderer.RaphaelRenderer.prototype.redo = function(){
+OG.renderer.RaphaelRenderer.prototype.redo = function () {
 
 }
 
