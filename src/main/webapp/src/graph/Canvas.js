@@ -624,21 +624,7 @@ OG.graph.Canvas.prototype = {
      * @param {String} parentId 부모 Element ID 지정 (Optional)
      * @return {Element} Group DOM Element with geometry
      */
-    drawShape: function (position, shape, size, style, id, parentId, gridable) {
-        //강제 그리드 보정
-        gridable = true;
-
-        // MOVE_SNAP_SIZE 적용
-        if (this._CONFIG.DRAG_GRIDABLE && (!OG.Util.isDefined(gridable) || gridable === true)) {
-            if (position) {
-                position[0] = OG.Util.roundGrid(position[0], this._CONFIG.MOVE_SNAP_SIZE);
-                position[1] = OG.Util.roundGrid(position[1], this._CONFIG.MOVE_SNAP_SIZE);
-            }
-            if (size) {
-                size[0] = OG.Util.roundGrid(size[0], this._CONFIG.MOVE_SNAP_SIZE * 2);
-                size[1] = OG.Util.roundGrid(size[1], this._CONFIG.MOVE_SNAP_SIZE * 2);
-            }
-        }
+    drawShape: function (position, shape, size, style, id, parentId) {
 
         var element = this._RENDERER.drawShape(position, shape, size, style, id);
 
@@ -749,13 +735,20 @@ OG.graph.Canvas.prototype = {
      * @param {String} label Label
      * @return {Element} 연결된 Edge 엘리먼트
      */
-    connect: function (fromElement, toElement, style, label) {
+    connect: function (fromElement, toElement, style, label, fromP, toP) {
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
-        // from Shape 디폴트 터미널
-        fromTerminal = this._RENDERER.createDefaultTerminalString(fromElement);
+        if (fromP) {
+            fromTerminal = this._RENDERER.createTerminalString(fromElement, fromP);
+        } else {
+            fromTerminal = this._RENDERER.createDefaultTerminalString(fromElement);
+        }
 
-        toTerminal = this._RENDERER.createDefaultTerminalString(toElement);
+        if (toP) {
+            toTerminal = this._RENDERER.createTerminalString(toElement, toP);
+        } else {
+            toTerminal = this._RENDERER.createDefaultTerminalString(toElement);
+        }
 
         fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
         fromPosition = [fromPosition.x, fromPosition.y];
@@ -1376,8 +1369,7 @@ OG.graph.Canvas.prototype = {
                     cell: []
                 }
             },
-            childShape, NodeToCell, i,
-            groupNodes, cellMap;
+            childShape, NodeToCell, i;
 
         NodeToCell = function (item) {
             var shape = item.shape,
@@ -1479,128 +1471,9 @@ OG.graph.Canvas.prototype = {
             return cell;
         };
 
-        groupNodes = [];
-        cellMap = {};
-
-        // check scope activity
-        var CheckParentFromArea = function (groupNodes) {
-            //get area
-            var groupNode, groupId,
-                childNodes, childNode, childGroupNode,
-                filteredChildNode, filteredChildNodes
-            i = 0, n = groupNodes.length;
-
-            for (; i < n; i++) {
-
-
-                groupNode = groupNodes[i];
-                filteredChildNodes = {};
-
-                // set id
-                groupId = groupNode.id;
-
-                // gathering childNodes
-                childNodes = CANVAS._RENDERER.getElementMapByBBox(
-                    groupNode.shape.geom.getBoundary());
-                delete childNodes[groupId];
-
-                for (var childNodeKey in childNodes) {
-
-                    childNode = childNodes[childNodeKey];
-
-                    if (childNode.shape instanceof OG.shape.bpmn.ScopeActivity) {
-                        childGroupNode = childNode;
-
-                        filteredChildNodes = CANVAS._RENDERER.getElementMapByBBox(
-                            childGroupNode.shape.geom.getBoundary()
-                            , filteredChildNodes
-                            , $(childGroupNode).attr('id'));
-                    }
-                }
-
-                //remove filterd child nodes from child node
-                for (var fcKey in filteredChildNodes) {
-                    filteredChildNode = filteredChildNodes[fcKey];
-                    delete childNodes[$(filteredChildNode).attr('id')];
-                }
-
-                //set child parent
-                for (var childNodeKey in childNodes) {
-                    childNode = childNodes[childNodeKey];
-
-                    if (childNode.shape instanceof OG.shape.HorizontalLaneShape
-                        || childNode.shape instanceof OG.shape.VerticalLaneShape) {
-                        // no operation
-                    } else {
-                        if (childNode.shape instanceof OG.shape.EdgeShape) {
-                            if (($(childNode).attr("_from") + "").indexOf(groupId) < 0
-                                && ($(childNode).attr("_to") + "").indexOf(groupId) < 0) {
-                                cellMap[$(childNode).attr('id')]['@parent'] = groupId;
-                                cellMap[groupId]['@childs'].push($(childNode).attr('id'));
-                            }
-                        } else {
-                            cellMap[$(childNode).attr('id')]['@parent'] = groupId;
-                            cellMap[groupId]['@childs'].push($(childNode).attr('id'));
-                        }
-                    }
-                }
-            } //end of for
-        };
-
-        var swimlaneNodes = [];
-        var CheckRoleFromArea = function (swimlaneNodes) {
-            //get area
-            var swimlaneNode, swimlaneId,
-                childNodes, childNode,
-                i = 0, n = swimlaneNodes.length;
-
-            for (; i < n; i++) {
-                swimlaneNode = swimlaneNodes[i];
-                swimlaneId = $(swimlaneNode).attr('id');
-
-                childNodes = CANVAS._RENDERER.getElementMapByBBox(
-                    swimlaneNode.shape.geom.getBoundary());
-
-                delete childNodes[swimlaneId];
-
-                for (var childNodeKey in childNodes) {
-                    childNode = childNodes[childNodeKey];
-                    if (childNode.shape instanceof OG.shape.bpmn.A_Task) {
-                        cellMap[$(childNode).attr('id')]['@swimlane'] = swimlaneId;
-                    }
-                }
-            }
-        };
-
-        childShape = function (node, isRoot) {
+        childShape = function (node) {
             $(node).children("[_type=SHAPE]").each(function (idx, item) {
-                var shape = item.shape,
-                    style = item.shapeStyle,
-                    geom = shape.geom,
-                    envelope = geom.getBoundary(),
-                    cell = {},
-                    vertices,
-                    from,
-                    to,
-                    prevShapeIds,
-                    nextShapeIds;
-
-                // gathering Group
-                if (item.shape instanceof OG.shape.bpmn.ScopeActivity) {
-                    groupNodes.push(item);
-                }
-
-                if (item.shape instanceof OG.shape.HorizontalLaneShape
-                    || item.shape instanceof OG.shape.VerticalLaneShape) {
-                    swimlaneNodes.push(item);
-                }
-
-                // push cell to array
-                cell = NodeToCell(item);
-                jsonObj.opengraph.cell.push(cell);
-
-                // gathering Cell Map
-                cellMap[cell["@id"]] = cell;
+                jsonObj.opengraph.cell.push(NodeToCell(item));
             });
         };
 
@@ -1612,14 +1485,7 @@ OG.graph.Canvas.prototype = {
         }
 
         //root check
-        childShape(rootGroup, true);
-
-        // Group Area Check
-        CheckParentFromArea(groupNodes);
-
-        // Swimlane Area Check
-        CheckRoleFromArea(swimlaneNodes);
-
+        childShape(rootGroup);
         return jsonObj;
     },
 
@@ -1724,10 +1590,6 @@ OG.graph.Canvas.prototype = {
                             shape.label = label;
                         }
                         element = this.drawShape([x, y], shape, [width, height], OG.JSON.decode(style), id, null, false);
-                        if (element.shape instanceof OG.shape.bpmn.A_Task) {
-                            element.shape.LoopType = loopType;
-                            element.shape.TaskType = taskType;
-                        }
                         break;
                     case OG.Constants.SHAPE_TYPE.EDGE:
                         var list = JSON.parse('[' + value + ']');
@@ -1820,6 +1682,20 @@ OG.graph.Canvas.prototype = {
             x2: 0,
             y2: 0
         };
+    },
+
+    /**
+     * 캔버스 undo.
+     */
+    undo: function () {
+        this._RENDERER.undo();
+    },
+
+    /**
+     * 캔버스 redo.
+     */
+    redo: function () {
+        this._RENDERER.redo();
     },
 
     /**

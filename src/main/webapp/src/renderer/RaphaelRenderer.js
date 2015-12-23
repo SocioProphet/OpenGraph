@@ -2039,36 +2039,6 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeLabel = function (shapeElement, te
 };
 
 
-OG.renderer.RaphaelRenderer.prototype.resizeShape = function (element, excludeEdgeId) {
-    if (element.shape instanceof OG.shape.HorizontalPoolShape) {
-        var ele, eleArray = [], i, height = 0, titleSize;
-
-        if (element.shape.geom.style.map['title-size'])
-            titleSize = element.shape.geom.style.map['title-size'];
-
-        for (i = 0; i < element.childNodes.length; i++) {
-            ele = element.childNodes[i];
-            if (ele.shape instanceof OG.shape.HorizontalLaneShape) {
-                eleArray.push(ele);
-            }
-        }
-        for (i = 0; i < eleArray.length; i++) {
-            if ((element.shape.geom.boundary._width - titleSize) != eleArray[i].shape.geom.boundary._width) {
-                var right = element.shape.geom.boundary._width - eleArray[i].shape.geom.boundary._width - titleSize;
-                this.resize(eleArray[i], [0, 0, 0, right]);
-            }
-            if (i != (eleArray.length - 1)) {
-                height += eleArray[i].shape.geom.boundary._height;
-            } else {
-                var lower = element.shape.geom.boundary._height - height - eleArray[i].shape.geom.boundary._height;
-                this.resize(eleArray[i], [0, lower, 0, 0]);
-            }
-        }
-
-    }
-
-}
-
 /**
  * Element 에 저장된 geom, angle, image, text 정보로 shape 을 redraw 한다.
  *
@@ -2337,16 +2307,6 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     }
 
     if (fromShape && toShape) {
-
-        if (fromShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain" || toShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain") {
-            _style["arrow-end"] = "none";
-        } else if (fromShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain_Module" || toShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain_Module") {
-            _style["arrow-end"] = "none";
-        } else if (fromShape.attributes._shape_id.value == "OG.shape.bpmn.A_HumanTask" || toShape.attributes._shape_id.value == "OG.shape.bpmn.A_HumanTask") {
-            _style["edge-type"] = "plain";
-            _style["arrow-start"] = "none";
-            _style["arrow-end"] = "block-wide-long";
-        }
 
         beforeEvent = jQuery.Event("beforeConnectShape", {edge: edge, fromShape: fromShape, toShape: toShape});
         $(this._PAPER.canvas).trigger(beforeEvent);
@@ -4016,20 +3976,10 @@ OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset, exclud
 
     this.removeCollapseGuide(element);
 
-    //TODO:
-//  if (element.shape.SHAPE_TYPE == OG.Contraints.SHAPE_TYPE.GROUP){
-    //  element.shape.layoutChild();
-//  }
-    //END
-
-
     if (rElement && type && geometry) {
         geometry.resize(offset[0], offset[1], offset[2], offset[3]);
 
         this.redrawShape(rElement.node, excludeEdgeId);
-
-        // resize shpae
-        this.resizeShape(rElement.node, excludeEdgeId);
 
         // resizeShape event fire
         $(this._PAPER.canvas).trigger('resizeShape', [rElement.node, offset]);
@@ -4988,6 +4938,14 @@ OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
 OG.renderer.RaphaelRenderer.prototype.removeAllVirtualEdge = function () {
     $(this.getRootGroup()).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, false);
     return this.remove(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
+}
+
+OG.renderer.RaphaelRenderer.prototype.undo = function(){
+
+}
+
+OG.renderer.RaphaelRenderer.prototype.redo = function(){
+
 }
 
 
