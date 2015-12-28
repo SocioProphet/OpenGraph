@@ -156,10 +156,8 @@ OG.geometry.PolyLine.prototype.angleBetweenPoints = function (prev, next) {
         y: next.y
     };
 
-// angle in radians
     angleRadians = Math.atan2(p2.y - p1.y, p2.x - p1.x);
 
-// angle in degrees
     angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
     return angleDeg;
 };

@@ -971,6 +971,7 @@ OG.graph.Canvas.prototype = {
 
     /**
      * 주어진 Boundary Box 영역에 포함되는 Shape(GEOM, TEXT, IMAGE) Element 를 반환한다.
+     * 모든 vertices를 포함한 엘리먼트를 반환한다.
      *
      * @param {OG.geometry.Envelope} envelope Boundary Box 영역
      * @return {Element[]} Element
@@ -1546,6 +1547,7 @@ OG.graph.Canvas.prototype = {
 
         var swimlaneNodes = [];
         var CheckRoleFromArea = function (swimlaneNodes) {
+            console.log(swimlaneNodes);
             //get area
             var swimlaneNode, swimlaneId,
                 childNodes, childNode,

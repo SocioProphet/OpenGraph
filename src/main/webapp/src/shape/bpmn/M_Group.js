@@ -39,8 +39,9 @@ OG.shape.bpmn.M_Group.prototype.createShape = function () {
     this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
     this.geom.style = new OG.geometry.Style({
         //'stroke-dasharray': '- ',
-        "r": 6,
-        fill: '#ffffff',
+        'r': 6,
+        'fill': '#ffffff',
+        'fill-opacity': 1,
         "vertical-align": "top",
         "text-anchor": "start"
 

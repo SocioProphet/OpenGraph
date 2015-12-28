@@ -401,6 +401,40 @@ OG.renderer.IRenderer.prototype = {
         throw new OG.NotImplementedException();
     },
 
+
+    /**
+     * ID에 해당하는 Element 의 Connect Guide 를 제거한다.
+     *
+     * @param {Element,String} element Element 또는 ID
+     */
+    removeConnectGuide: function () {
+        throw new OG.NotImplementedException();
+    },
+
+    /**
+     * 캔버스의 모든 Connect Guide 를 제거한다.
+     *
+     */
+    removeAllConnectGuide: function () {
+        throw new OG.NotImplementedException();
+    },
+
+    /**
+     * ID에 해당하는 Element 이외의 모든 Connect Guide 를 제거한다.
+     *
+     * @param {Element,String} element Element 또는 ID
+     */
+    removeOtherConnectGuide: function () {
+        throw new OG.NotImplementedException();
+    },
+
+    /**
+     * 캔버스의 가상선을 삭제한다.
+     */
+    removeAllVirtualEdge: function () {
+        throw new OG.NotImplementedException();
+    },
+
     /**
      * ID에 해당하는 Edge Element 의 Move & Resize 용 가이드를 드로잉한다.
      *
@@ -574,6 +608,7 @@ OG.renderer.IRenderer.prototype = {
 
     /**
      * 주어진 Boundary Box 영역에 포함되는 Shape(GEOM, TEXT, IMAGE) Element 를 반환한다.
+     * 모든 vertices를 포함한 엘리먼트를 반환한다.
      *
      * @param {OG.geometry.Envelope} envelope Boundary Box 영역
      * @return {Element[]} Element
@@ -642,6 +677,27 @@ OG.renderer.IRenderer.prototype = {
         });
 
         return elements;
+    },
+
+    /**
+     * Element 영역에 포함되는 Shape(GEOM, TEXT, IMAGE) Element List 을 반환한다.
+     *
+     * @param {Element,String} element Element 또는 ID
+     * @return {Element[]} Element
+     */
+    getChildElements: function (element) {
+        var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+        var geometry = rElement ? rElement.node.shape.geom : null;
+        var list = [];
+        if(rElement && geometry){
+            var _list = me.getElementsByBBox(geometry.getBoundary());
+            $.each(_list , function(index,item){
+                if(item.id !== element.id){
+                    list.push(item);
+                }
+            })
+        }
+        return list;
     },
 
     /**

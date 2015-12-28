@@ -677,7 +677,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         geometry.resizeBox(width, height);
 
         groupNode = this.drawGroup(geometry, style, id);
-
         shape.geom = groupNode.geom;
     }
 
@@ -685,8 +684,9 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         groupNode.shape = shape;
     }
     groupNode.shapeStyle = (style instanceof OG.geometry.Style) ? style.map : style;
-
     $(groupNode).attr("_shape_id", shape.SHAPE_ID);
+
+    me._fitGroupOrder(groupNode);
 
     // Draw for Task
     if (shape instanceof OG.shape.bpmn.A_Task) {
@@ -1912,9 +1912,28 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
             }
         }
     }
-
     return group.node;
 };
+
+OG.renderer.RaphaelRenderer.prototype._fitGroupOrder = function (groupNode) {
+    var me = this;
+    if (!groupNode) {
+        return;
+    }
+    if (!groupNode.shape) {
+        return;
+    }
+    if (!groupNode.shape instanceof OG.shape.GroupShape) {
+        return;
+    }
+
+    var root = me.getRootGroup();
+    var childElements = me.getChildElements(groupNode);
+
+    //그룹노드는 그룹내부의 엘리먼트보다 뒤로 향하여야 한다.
+    root.insertBefore(groupNode, childElements[0]);
+
+}
 
 /**
  * Shape 의 Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
@@ -1958,8 +1977,7 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
                 }
                 return intersectArray[0];
             }
-        },
-        centerOfEdge;
+        };
 
     OG.Util.apply(_style, (style instanceof OG.geometry.Style) ? style.map : style || {});
 
@@ -2098,6 +2116,7 @@ OG.renderer.RaphaelRenderer.prototype.resizeShape = function (element, excludeEd
                 eleArray.push(ele);
             }
         }
+        console.log(eleArray);
         for (i = 0; i < eleArray.length; i++) {
             if ((element.shape.geom.boundary._width - titleSize) != eleArray[i].shape.geom.boundary._width) {
                 var right = element.shape.geom.boundary._width - eleArray[i].shape.geom.boundary._width - titleSize;
@@ -2355,6 +2374,9 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
             }
             edge.shape.geom.setVertices(vertices);
 
+            me.trimConnection(edge);
+            me.trimEdge(edge);
+
             return edgeId;
         }
     edgeId = $(element).attr("_fromedge");
@@ -2456,29 +2478,13 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     var vertices = geometry.getVertices();
 
     if (from) {
-        shortestIntersection =
-            fromShape.shape.geom.shortestIntersectToLine([vertices[1], [fromXY.x, fromXY.y]]);
-
-        if (shortestIntersection) {
-            vertices[0].x = shortestIntersection.x
-            vertices[0].y = shortestIntersection.y
-        } else {
-            vertices[0].x = fromXY.x
-            vertices[0].y = fromXY.y
-        }
+        vertices[0].x = fromXY.x
+        vertices[0].y = fromXY.y
     }
 
     if (to) {
-        shortestIntersection =
-            toShape.shape.geom.shortestIntersectToLine([vertices[vertices.length - 2], [toXY.x, toXY.y]]);
-
-        if (shortestIntersection) {
-            vertices[vertices.length - 1].x = shortestIntersection.x
-            vertices[vertices.length - 1].y = shortestIntersection.y
-        } else {
-            vertices[vertices.length - 1].x = toXY.x
-            vertices[vertices.length - 1].y = toXY.y
-        }
+        vertices[vertices.length - 1].x = toXY.x
+        vertices[vertices.length - 1].y = toXY.y
     }
 
     isSelf = fromShape && toShape && fromShape.id === toShape.id;
@@ -2513,6 +2519,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
     }
 
+    me.trimConnection(edge);
     me.trimEdge(edge);
 
     return edge;
@@ -2696,7 +2703,8 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         _ulRect, _urRect, _llRect, _lrRect, _lcRect, _ucRect, _rcRect, _lwcRect, task, end,
         _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2),
         _ctrlSize = me._CONFIG.GUIDE_LINE_SIZE,
-        _ctrlMargin = me._CONFIG.GUIDE_LINE_MARGIN;
+        _ctrlMargin = me._CONFIG.GUIDE_LINE_MARGIN,
+        _trash, isEdge;
 
     var createPath = function (x, y) {
         var from = [(_upperRight.x + _ctrlMargin) + x, (_upperRight.y + _ctrlSize - 8) + y];
@@ -2713,163 +2721,211 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         }
     };
 
-
-    if (rElement && geometry) {
-
-        // Edge 인 경우 따로 처리
-        if ($(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
-            return this.drawEdgeGuide(element);
-        } else {
-            envelope = geometry.getBoundary();
-            _upperLeft = envelope.getUpperLeft();
-            _upperRight = envelope.getUpperRight();
-            _lowerLeft = envelope.getLowerLeft();
-            _lowerRight = envelope.getLowerRight();
-            _leftCenter = envelope.getLeftCenter();
-            _upperCenter = envelope.getUpperCenter();
-            _rightCenter = envelope.getRightCenter();
-            _lowerCenter = envelope.getLowerCenter();
-
-
-            if (this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE)) {
-                // 가이드가 이미 존재하는 경우에는 bBox 만 삭제후 새로 draw
-                // bBox remove -> redraw
-                this._remove(this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
-                _bBoxRect = this._PAPER.rect(_upperLeft.x, _upperLeft.y, envelope.getWidth(), envelope.getHeight());
-                _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
-                this._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
-                _bBoxRect.insertBefore(rElement);
-
-                _ulRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
-                _urRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
-                _llRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LL);
-                _lrRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LR);
-                _lcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LC);
-                _ucRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UC);
-                _rcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
-                _lwcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
-
-                _ulRect.attr({x: _upperLeft.x - _hSize, y: _upperLeft.y - _hSize});
-                _urRect.attr({x: _upperRight.x - _hSize, y: _upperRight.y - _hSize});
-                _llRect.attr({x: _lowerLeft.x - _hSize, y: _lowerLeft.y - _hSize});
-                _lrRect.attr({x: _lowerRight.x - _hSize, y: _lowerRight.y - _hSize});
-                _lcRect.attr({x: _leftCenter.x - _hSize, y: _leftCenter.y - _hSize});
-                _ucRect.attr({x: _upperCenter.x - _hSize, y: _upperCenter.y - _hSize});
-                _rcRect.attr({x: _rightCenter.x - _hSize, y: _rightCenter.y - _hSize});
-                _lwcRect.attr({x: _lowerCenter.x - _hSize, y: _lowerCenter.y - _hSize});
-
-                if(_isConnectable()){
-                    _line = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
-                    _linePath1 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
-                    _linePath2 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
-                    _line.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y});
-                    _linePath1.attr({'path': createPath(0, 0)});
-                    _linePath2.attr({'path': createPath(0, 8)});
-                }
-
-                return null;
-            }
-
-            // group
-            group = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
-            if (group) {
-                this._remove(group);
-                this._remove(this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
-            }
-            group = this._PAPER.group();
-
-            // guide line 랜더링
-            _bBoxRect = this._PAPER.rect(_upperLeft.x, _upperLeft.y, envelope.getWidth(), envelope.getHeight());
-            _ulRect = this._PAPER.rect(_upperLeft.x - _hSize, _upperLeft.y - _hSize, _size, _size);
-            _urRect = this._PAPER.rect(_upperRight.x - _hSize, _upperRight.y - _hSize, _size, _size);
-            _llRect = this._PAPER.rect(_lowerLeft.x - _hSize, _lowerLeft.y - _hSize, _size, _size);
-            _lrRect = this._PAPER.rect(_lowerRight.x - _hSize, _lowerRight.y - _hSize, _size, _size);
-            _lcRect = this._PAPER.rect(_leftCenter.x - _hSize, _leftCenter.y - _hSize, _size, _size);
-            _ucRect = this._PAPER.rect(_upperCenter.x - _hSize, _upperCenter.y - _hSize, _size, _size);
-            _rcRect = this._PAPER.rect(_rightCenter.x - _hSize, _rightCenter.y - _hSize, _size, _size);
-            _lwcRect = this._PAPER.rect(_lowerCenter.x - _hSize, _lowerCenter.y - _hSize, _size, _size);
-
-            _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
-            _ulRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UL);
-            _urRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UR);
-            _llRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LL);
-            _lrRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LR);
-            _lcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LC);
-            _ucRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UC);
-            _rcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_RC);
-            _lwcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LWC);
-
-
-            if(_isConnectable()){
-                _line = this._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
-                _linePath1 = this._PAPER.path(createPath(0, 0));
-                _linePath2 = this._PAPER.path(createPath(0, 8));
-                _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
-                _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
-                _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
-                _linePath2.attr({'stroke-dasharray': '-'});
-            }
-
-            // add to Group
-            group.appendChild(_ulRect);
-            group.appendChild(_urRect);
-            group.appendChild(_llRect);
-            group.appendChild(_lrRect);
-            group.appendChild(_lcRect);
-            group.appendChild(_ucRect);
-            group.appendChild(_rcRect);
-            group.appendChild(_lwcRect);
-
-            if(_isConnectable()){
-                group.appendChild(_linePath1);
-                group.appendChild(_linePath2);
-                group.appendChild(_line);
-            }
-
-
-            this._add(group, rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
-            this._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
-            this._add(_ulRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
-            this._add(_urRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
-            this._add(_llRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LL);
-            this._add(_lrRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LR);
-            this._add(_lcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LC);
-            this._add(_ucRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UC);
-            this._add(_rcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
-            this._add(_lwcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
-
-            if(_isConnectable()){
-                this._add(_line, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
-                this._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
-                this._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
-            }
-
-            guide = {
-                bBox: _bBoxRect.node,
-                group: group.node,
-                ul: _ulRect.node,
-                ur: _urRect.node,
-                ll: _llRect.node,
-                lr: _lrRect.node,
-                lc: _lcRect.node,
-                uc: _ucRect.node,
-                rc: _rcRect.node,
-                lwc: _lwcRect.node,
-                line: _line ? _line.node : null
-            };
-
-            // layer 위치 조정
-            _bBoxRect.insertBefore(rElement);
-            group.insertAfter(rElement);
-
-            // selected 속성값 설정
-            $(rElement.node).attr("_selected", "true");
-
-            return guide;
-        }
+    if (!rElement) {
+        return null;
     }
 
-    return null;
+    if (!geometry) {
+        return null;
+    }
+
+    isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE ? true : false;
+
+    envelope = geometry.getBoundary();
+    _upperLeft = envelope.getUpperLeft();
+    _upperRight = envelope.getUpperRight();
+    _lowerLeft = envelope.getLowerLeft();
+    _lowerRight = envelope.getLowerRight();
+    _leftCenter = envelope.getLeftCenter();
+    _upperCenter = envelope.getUpperCenter();
+    _rightCenter = envelope.getRightCenter();
+    _lowerCenter = envelope.getLowerCenter();
+
+
+    if (this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE)) {
+        // 가이드가 이미 존재하는 경우에는 bBox 만 삭제후 새로 draw
+        // bBox remove -> redraw
+        this._remove(this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
+        if (!isEdge) {
+            _bBoxRect = this._PAPER.rect(_upperLeft.x, _upperLeft.y, envelope.getWidth(), envelope.getHeight());
+        }
+        if (isEdge) {
+            _bBoxRect = this._PAPER.rect(_upperLeft.x - 10, _upperLeft.y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
+        }
+        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+        this._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
+        _bBoxRect.insertBefore(rElement);
+
+        if (!isEdge) {
+            _ulRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
+            _urRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
+            _llRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LL);
+            _lrRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LR);
+            _lcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LC);
+            _ucRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UC);
+            _rcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
+            _lwcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
+            _trash = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
+
+            _ulRect.attr({x: _upperLeft.x - _hSize, y: _upperLeft.y - _hSize});
+            _urRect.attr({x: _upperRight.x - _hSize, y: _upperRight.y - _hSize});
+            _llRect.attr({x: _lowerLeft.x - _hSize, y: _lowerLeft.y - _hSize});
+            _lrRect.attr({x: _lowerRight.x - _hSize, y: _lowerRight.y - _hSize});
+            _lcRect.attr({x: _leftCenter.x - _hSize, y: _leftCenter.y - _hSize});
+            _ucRect.attr({x: _upperCenter.x - _hSize, y: _upperCenter.y - _hSize});
+            _rcRect.attr({x: _rightCenter.x - _hSize, y: _rightCenter.y - _hSize});
+            _lwcRect.attr({x: _lowerCenter.x - _hSize, y: _lowerCenter.y - _hSize});
+            _trash.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y + _ctrlSize + _ctrlMargin});
+
+
+            if (_isConnectable()) {
+                _line = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
+                _linePath1 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
+                _linePath2 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
+                _line.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y});
+                _linePath1.attr({'path': createPath(0, 0)});
+                _linePath2.attr({'path': createPath(0, 8)});
+            }
+        }
+
+        if (isEdge) {
+            _trash = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
+            _trash.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y});
+        }
+
+        return null;
+    }
+
+    // group
+    group = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
+    if (group) {
+        this._remove(group);
+        this._remove(this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
+    }
+    group = this._PAPER.group();
+
+
+    if (!isEdge) {
+        // guide line 랜더링
+        _bBoxRect = this._PAPER.rect(_upperLeft.x, _upperLeft.y, envelope.getWidth(), envelope.getHeight());
+        _ulRect = this._PAPER.rect(_upperLeft.x - _hSize, _upperLeft.y - _hSize, _size, _size);
+        _urRect = this._PAPER.rect(_upperRight.x - _hSize, _upperRight.y - _hSize, _size, _size);
+        _llRect = this._PAPER.rect(_lowerLeft.x - _hSize, _lowerLeft.y - _hSize, _size, _size);
+        _lrRect = this._PAPER.rect(_lowerRight.x - _hSize, _lowerRight.y - _hSize, _size, _size);
+        _lcRect = this._PAPER.rect(_leftCenter.x - _hSize, _leftCenter.y - _hSize, _size, _size);
+        _ucRect = this._PAPER.rect(_upperCenter.x - _hSize, _upperCenter.y - _hSize, _size, _size);
+        _rcRect = this._PAPER.rect(_rightCenter.x - _hSize, _rightCenter.y - _hSize, _size, _size);
+        _lwcRect = this._PAPER.rect(_lowerCenter.x - _hSize, _lowerCenter.y - _hSize, _size, _size);
+        _trash = this._PAPER.image("resources/images/symbol/trash.svg",
+            _upperRight.x + _ctrlMargin, _upperRight.y + _ctrlSize + _ctrlMargin, _ctrlSize, _ctrlSize);
+
+        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+        _ulRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UL);
+        _urRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UR);
+        _llRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LL);
+        _lrRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LR);
+        _lcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LC);
+        _ucRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UC);
+        _rcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_RC);
+        _lwcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LWC);
+        _trash.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+
+
+        if (_isConnectable()) {
+            _line = this._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
+            _linePath1 = this._PAPER.path(createPath(0, 0));
+            _linePath2 = this._PAPER.path(createPath(0, 8));
+            _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+            _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+            _linePath2.attr({'stroke-dasharray': '-'});
+        }
+
+        // add to Group
+        group.appendChild(_ulRect);
+        group.appendChild(_urRect);
+        group.appendChild(_llRect);
+        group.appendChild(_lrRect);
+        group.appendChild(_lcRect);
+        group.appendChild(_ucRect);
+        group.appendChild(_rcRect);
+        group.appendChild(_lwcRect);
+        group.appendChild(_trash);
+
+        if (_isConnectable()) {
+            group.appendChild(_linePath1);
+            group.appendChild(_linePath2);
+            group.appendChild(_line);
+        }
+
+
+        this._add(group, rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
+        this._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
+        this._add(_ulRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
+        this._add(_urRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
+        this._add(_llRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LL);
+        this._add(_lrRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LR);
+        this._add(_lcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LC);
+        this._add(_ucRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UC);
+        this._add(_rcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
+        this._add(_lwcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
+        this._add(_trash, rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
+
+        if (_isConnectable()) {
+            this._add(_line, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
+            this._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
+            this._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
+        }
+
+        guide = {
+            bBox: _bBoxRect.node,
+            group: group.node,
+            ul: _ulRect.node,
+            ur: _urRect.node,
+            ll: _llRect.node,
+            lr: _lrRect.node,
+            lc: _lcRect.node,
+            uc: _ucRect.node,
+            rc: _rcRect.node,
+            lwc: _lwcRect.node,
+            line: _line ? _line.node : null,
+            _trash: _trash.node
+        };
+    }
+    if (isEdge) {
+        // guide line 랜더링
+        _bBoxRect = this._PAPER.rect(_upperLeft.x - 10, _upperLeft.y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
+        _trash = this._PAPER.image("resources/images/symbol/trash.svg",
+            _upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
+
+        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+        _trash.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+
+        group.appendChild(_trash);
+
+        this._add(group, rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
+        this._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
+        this._add(_trash, rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
+
+        guide = {
+            bBox: _bBoxRect.node,
+            group: group.node,
+            _trash: _trash.node
+        };
+    }
+
+    $(_trash.node).click(function () {
+        me.removeShape(element);
+    })
+
+    // layer 위치 조정
+    _bBoxRect.insertBefore(rElement);
+    group.insertAfter(rElement);
+
+    // selected 속성값 설정
+    $(rElement.node).attr("_selected", "true");
+
+    return guide;
 };
 
 /**
@@ -2884,11 +2940,9 @@ OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (element, toBeSt
     var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         geometry = rElement ? rElement.node.shape.geom : null,
         envelope,
-        group, guide,
-        _bBoxRect,
         _upperLeft, _upperRight, _lowerLeft, _lowerRight, _leftCenter, _upperCenter, _rightCenter, _lowerCenter,
-        _ulRect, _urRect, _llRect, _lrRect, _lcRect, _ucRect, _rcRect, _lwcRect, task, end,
-        _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2);
+        _size = me._CONFIG.GUIDE_RECT_SIZE,
+        path;
 
     if (rElement && geometry) {
         // Edge 인 경우 따로 처리
@@ -2896,20 +2950,9 @@ OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (element, toBeSt
             return this.drawEdgeGuide(element);
         } else {
             envelope = geometry.getBoundary();
-            _upperLeft = envelope.getUpperLeft();
-            _upperRight = envelope.getUpperRight();
-            _lowerLeft = envelope.getLowerLeft();
-            _lowerRight = envelope.getLowerRight();
             _leftCenter = envelope.getLeftCenter();
             _upperCenter = envelope.getUpperCenter();
-            _rightCenter = envelope.getRightCenter();
-            _lowerCenter = envelope.getLowerCenter();
-
-
             this.removeStickGuide(vertical);
-
-
-            var path;
 
             if (vertical) {
                 path = this._PAPER.path("M" + _upperCenter.x + ",0L" + _upperCenter.x + ",10000");
@@ -2919,7 +2962,6 @@ OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (element, toBeSt
 
             path.attr("stroke-width", "2");
             path.attr("stroke", "#FFCC50");
-            //path.attr ("stroke-dasharray", '--');
 
             if (vertical)
                 this._stickGuideX = path;
@@ -2957,15 +2999,18 @@ OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (vertical) {
 OG.renderer.RaphaelRenderer.prototype.removeGuide = function (element) {
 
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        guide = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE),
+        guide, bBox;
+    if (rElement) {
+        guide = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
         bBox = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
 
-    rElement.node.removeAttribute("_selected");
-    this._remove(guide);
-    this._remove(bBox);
+        rElement.node.removeAttribute("_selected");
+        this._remove(guide);
+        this._remove(bBox);
 
-    this.removeStickGuide(true);
-    this.removeStickGuide(false);
+        this.removeStickGuide(true);
+        this.removeStickGuide(false);
+    }
 };
 
 /**
@@ -3705,7 +3750,7 @@ OG.renderer.RaphaelRenderer.prototype.collapse = function (element) {
                     }
                 }
 
-                // group 영역 밖의 연결된 otherShape 이 있는 경우 redrawConnectedEdge
+                // group 영역 밖의 연결된 otherShape 이 있는 경우 redraw
                 if (isNeedToRedraw === true) {
                     me.redrawConnectedEdge(_childNodes[i]);
                 }
@@ -3934,6 +3979,8 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
     if (beforeEvent.isPropagationStopped()) {
         return false;
     }
+
+    this.removeAllConnectGuide();
 
     for (i = childNodes.length - 1; i >= 0; i--) {
         if ($(childNodes[i]).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
@@ -4736,6 +4783,12 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
     return null;
 };
 
+
+/**
+ * ID에 해당하는 Element 의 Connect Guide 를 제거한다.
+ *
+ * @param {Element,String} element Element 또는 ID
+ */
 OG.renderer.RaphaelRenderer.prototype.removeConnectGuide = function (element) {
     var me = this;
     var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element),
@@ -4746,6 +4799,10 @@ OG.renderer.RaphaelRenderer.prototype.removeConnectGuide = function (element) {
     me._remove(bBox);
 };
 
+/**
+ * 캔버스의 모든 Connect Guide 를 제거한다.
+ *
+ */
 OG.renderer.RaphaelRenderer.prototype.removeAllConnectGuide = function () {
 
     var me = this;
@@ -4757,6 +4814,11 @@ OG.renderer.RaphaelRenderer.prototype.removeAllConnectGuide = function () {
     });
 };
 
+/**
+ * ID에 해당하는 Element 이외의 모든 Connect Guide 를 제거한다.
+ *
+ * @param {Element,String} element Element 또는 ID
+ */
 OG.renderer.RaphaelRenderer.prototype.removeOtherConnectGuide = function (element) {
 
     var me = this;
@@ -5023,6 +5085,7 @@ OG.renderer.RaphaelRenderer.prototype.getChildNodes = function (element) {
 };
 
 /**
+ * Edge Element 내부의 패스중 나열된 두 꼭지점이 매우 짧은 선일 경우 하나의 꼭지점으로 정리한다.
  * Edge Element 내부의 패스중 나열된 세 꼭지점이 평행에 가까울 경우 하나의 선분으로 정리한다.
  *
  * @param {Element,String} element Element 또는 ID
@@ -5034,6 +5097,7 @@ OG.renderer.RaphaelRenderer.prototype.trimEdge = function (element) {
     var vertices = geometry.getVertices();
     var orgVerticesLength = vertices.length;
 
+    //Edge Element 내부의 패스중 나열된 세 꼭지점이 평행에 가까울 경우 하나의 선분으로 정리한다.
     for (var i = vertices.length; i--;) {
         if (i < vertices.length - 1 && vertices[i - 1]) {
             var angleBetweenThreePoints =
@@ -5058,6 +5122,153 @@ OG.renderer.RaphaelRenderer.prototype.trimEdge = function (element) {
         me.drawEdgeLabel(element, null, 'FROM');
         me.drawEdgeLabel(element, null, 'TO');
     }
+}
+
+/**
+ * Edge Element의 연결 정보가 있을 경우 연결대상과 꼭지점의 다중 중복을 정리한다.
+ * Edge Element의 연결 정보가 있을 경우 선분과 연결대상의 연결점을 자연스럽게 한다.
+ *
+ * @param {Element,String} element Element 또는 ID
+ */
+OG.renderer.RaphaelRenderer.prototype.trimConnection = function (element) {
+    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
+        geometry = rElement ? rElement.node.shape.geom : null,
+        from, to, fromShape, toShape, fromXY, toXY, shortestIntersection;
+
+    var vertices = geometry.getVertices();
+    var orgVerticesLength = vertices.length;
+    from = $(element).attr("_from");
+    to = $(element).attr("_to");
+
+    if (from) {
+        fromShape = this._getShapeFromTerminal(from);
+        fromXY = this._getPositionFromTerminal(from);
+    }
+
+    if (to) {
+        toShape = this._getShapeFromTerminal(to);
+        toXY = this._getPositionFromTerminal(to);
+    }
+
+    //Edge Element의 연결 정보가 있을 경우 연결대상과 꼭지점의 다중 중복을 정리한다.
+    var startVertice;
+    var startVerticeIdx;
+    var firstExternalVertice;
+    var firstExternalVerticeIdx;
+    var lastExcludeVertice;
+    var lastExcludeVerticeIdx;
+    var caculateExternalVerticeLine = function () {
+        if (firstExternalVertice) {
+            if (firstExternalVerticeIdx > 0 && firstExternalVerticeIdx < vertices.length - 1) {
+                var angleBetweenPoints = geometry.isRightAngleBetweenPoints(firstExternalVertice, lastExcludeVertice);
+                if (angleBetweenPoints.flag) {
+                    if (angleBetweenPoints.type === 'horizontal') {
+                        vertices[firstExternalVerticeIdx].y = vertices[startVerticeIdx].y;
+                    }
+                    if (angleBetweenPoints.type === 'vertical') {
+                        vertices[firstExternalVerticeIdx].x = vertices[startVerticeIdx].x;
+                    }
+                }
+            }
+            if (startVerticeIdx === 0) {
+                vertices.splice(startVerticeIdx + 1, firstExternalVerticeIdx - (startVerticeIdx + 1));
+            }
+            if (startVerticeIdx === vertices.length - 1) {
+                vertices.splice(firstExternalVerticeIdx + 1, startVerticeIdx - (firstExternalVerticeIdx + 1));
+            }
+        }
+    }
+    if (fromShape) {
+        for (var i = 0; i < vertices.length; i++) {
+            if (i == 0) {
+                startVertice = vertices[i];
+                startVerticeIdx = i;
+                continue;
+            }
+            var containsPoint = fromShape.shape.geom.isContainsPoint(vertices[i]);
+            if (containsPoint) {
+                if (i == (vertices.length - 1)) {
+                    firstExternalVertice = vertices[i];
+                    firstExternalVerticeIdx = i;
+                    lastExcludeVertice = vertices[i - 1];
+                    lastExcludeVerticeIdx = i - 1;
+                } else {
+                    firstExternalVertice = vertices[i + 1];
+                    firstExternalVerticeIdx = i + 1;
+                    lastExcludeVertice = vertices[i];
+                    lastExcludeVerticeIdx = i;
+                }
+            }
+        }
+        caculateExternalVerticeLine();
+        startVertice = null;
+        startVerticeIdx = null;
+        firstExternalVertice = null;
+        firstExternalVerticeIdx = null;
+        lastExcludeVertice = null;
+        lastExcludeVerticeIdx = null;
+    }
+    if (toShape) {
+        for (var i = vertices.length - 1; i >= 0; i--) {
+            if (i == vertices.length - 1) {
+                startVertice = vertices[i];
+                startVerticeIdx = i;
+                continue;
+            }
+            var containsPoint = toShape.shape.geom.isContainsPoint(vertices[i]);
+            if (containsPoint) {
+                if (i == 0) {
+                    firstExternalVertice = vertices[i];
+                    firstExternalVerticeIdx = i;
+                    lastExcludeVertice = vertices[i + 1];
+                    lastExcludeVerticeIdx = i + 1;
+                } else {
+                    firstExternalVertice = vertices[i - 1];
+                    firstExternalVerticeIdx = i - 1;
+                    lastExcludeVertice = vertices[i];
+                    lastExcludeVerticeIdx = i;
+                }
+            }
+        }
+        caculateExternalVerticeLine();
+    }
+
+    element.shape.geom.setVertices(vertices);
+    element = me.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
+
+
+    //Edge Element의 연결 정보가 있을 경우 선분과 연결대상의 연결점을 자연스럽게 한다.
+    if (from) {
+        shortestIntersection =
+            fromShape.shape.geom.shortestIntersectToLine([vertices[1], [fromXY.x, fromXY.y]]);
+
+        if (shortestIntersection) {
+            vertices[0].x = shortestIntersection.x
+            vertices[0].y = shortestIntersection.y
+        } else {
+            vertices[0].x = fromXY.x
+            vertices[0].y = fromXY.y
+        }
+    }
+
+    if (to) {
+        shortestIntersection =
+            toShape.shape.geom.shortestIntersectToLine([vertices[vertices.length - 2], [toXY.x, toXY.y]]);
+
+        if (shortestIntersection) {
+            vertices[vertices.length - 1].x = shortestIntersection.x
+            vertices[vertices.length - 1].y = shortestIntersection.y
+        } else {
+            vertices[vertices.length - 1].x = toXY.x
+            vertices[vertices.length - 1].y = toXY.y
+        }
+    }
+
+    element.shape.geom.setVertices(vertices);
+    element = me.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
+    me.drawLabel(element);
+    me.drawEdgeLabel(element, null, 'FROM');
+    me.drawEdgeLabel(element, null, 'TO');
 }
 
 /**
@@ -5354,9 +5565,7 @@ OG.renderer.RaphaelRenderer.prototype.updateVirtualEdge = function (x, y) {
  * @param {Number} x 이벤트의 캔버스 기준 y 좌표
  */
 OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
-    var me = this, rElement,
-        geometry,
-        virtualEdge, targetEle;
+    var me = this, virtualEdge, targetEle;
 
     virtualEdge = me.getElementById(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
 

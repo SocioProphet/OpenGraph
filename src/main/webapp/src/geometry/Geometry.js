@@ -169,16 +169,6 @@ OG.geometry.Geometry.prototype = {
         return length;
     },
 
-//	intersect : function (_geometry) {
-//		throw new OG.NotImplementedException();
-//	},
-//
-//	union : function (_geometry) {
-//		throw new OG.NotImplementedException();
-//	},
-
-    // 현 Geometry 객체의 Spatial Transform 를 지원하는 함수들
-
     /**
      * 가로, 세로 Offset 만큼 좌표를 이동한다.
      *
@@ -634,6 +624,34 @@ OG.geometry.Geometry.prototype = {
         }
 
         return percentageDistance;
+    },
+
+    /**
+     * 공간기하객체가 주어진 좌표를 포함하는지를 반환한다.
+     *
+     * @param {OG.geometry.Coordinate} _coordinate 좌표
+     * @return {boolean} true,false
+     */
+    isContainsPoint: function (_coordinate) {
+
+        var boundary, upperLeft, width,
+            height, flag;
+        _coordinate = this.convertCoordinate(_coordinate);
+        boundary = this.getBoundary();
+        flag = false;
+
+        if (boundary && boundary._upperLeft) {
+            upperLeft = boundary._upperLeft;
+            width = boundary._width;
+            height = boundary._height;
+
+            if (_coordinate.x >= upperLeft.x && _coordinate.x <= upperLeft.x + width
+                && _coordinate.y >= upperLeft.y && _coordinate.y <= upperLeft.y + height) {
+                flag = true;
+            }
+        }
+
+        return flag;
     },
 
     /**

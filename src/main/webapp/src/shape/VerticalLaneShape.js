@@ -32,7 +32,9 @@ OG.shape.VerticalLaneShape.prototype.createShape = function () {
 	this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
 	this.geom.style = new OG.geometry.Style({
 		'label-direction': 'horizontal',
-		'vertical-align' : 'top'
+		'vertical-align' : 'top',
+		fill: '#ffffff',
+		'fill-opacity': 1
 	});
 
 	return this.geom;
