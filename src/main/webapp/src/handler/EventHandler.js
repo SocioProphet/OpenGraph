@@ -538,6 +538,9 @@ OG.handler.EventHandler.prototype = {
                     if (element.shape instanceof OG.shape.GroupShape && !(element.shape instanceof OG.shape.bpmn.A_Task)){
                         me._RENDERER._fitGroupOrder(element);
                     }
+                    if (groupTarget && OG.Util.isElement(groupTarget)) {
+                        me._RENDERER._fitGroupOrder(groupTarget);
+                    }
 
                     me._RENDERER.removeAllConnectGuide();
                     me._RENDERER.toFrontEdges();
