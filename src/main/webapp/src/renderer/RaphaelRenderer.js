@@ -2411,6 +2411,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
  */
 OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label) {
 
+    var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
     if (rEdge) {
         edge = rEdge.node;
@@ -2436,6 +2437,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         };
 
     OG.Util.apply(_style, (style instanceof OG.geometry.Style) ? style.map : style || {}, me._CONFIG.DEFAULT_STYLE.EDGE);
+
 
     if (!from) {
         from = $(edge).attr("_from");
@@ -2493,7 +2495,15 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     }
 
     // 라인 드로잉
-    edge = this.drawEdge(new OG.PolyLine(vertices), edge.shape.geom.style, edge ? edge.id : null, isSelf);
+    if(fromShape){
+        isEssensia = $(fromShape).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true;
+    }
+    if(!isEssensia){
+        edge = this.drawEdge(new OG.PolyLine(vertices), me._CONFIG.DEFAULT_STYLE.EDGE, edge ? edge.id : null, isSelf);
+    }
+    if(isEssensia){
+        edge = this.drawEdge(new OG.PolyLine(vertices), me._CONFIG.DEFAULT_STYLE.EDGE_ESSENSIA, edge ? edge.id : null, isSelf);
+    }
 
     // Draw Label
     this.drawLabel(edge, label);
@@ -2704,7 +2714,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2),
         _ctrlSize = me._CONFIG.GUIDE_LINE_SIZE,
         _ctrlMargin = me._CONFIG.GUIDE_LINE_MARGIN,
-        _trash, isEdge;
+        _trash, isEdge, isEssensia;
 
     var createPath = function (x, y) {
         var from = [(_upperRight.x + _ctrlMargin) + x, (_upperRight.y + _ctrlSize - 8) + y];
@@ -2720,6 +2730,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             return false;
         }
     };
+
+
+    isEssensia = $(element).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true
 
     if (!rElement) {
         return null;
@@ -2836,8 +2849,15 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             _linePath1 = this._PAPER.path(createPath(0, 0));
             _linePath2 = this._PAPER.path(createPath(0, 8));
             _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
-            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
-            _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+
+            if(!isEssensia){
+                _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+                _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+            }
+            if(isEssensia){
+                _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
+                _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
+            }
             _linePath2.attr({'stroke-dasharray': '-'});
         }
 

@@ -9052,27 +9052,6 @@ OG.geometry.Geometry.prototype = {
             return this.distanceToLine(D, [A, B]);
         }
 
-        // AB and CD are line segments
-        //   from comp.graphics.algo
-        //
-        //  Solving the above for r and s yields
-        //				(Ay-Cy)(Dx-Cx)-(Ax-Cx)(Dy-Cy)
-        //			r = ----------------------------- (eqn 1)
-        //				(Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx)
-        //
-        //			(Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay)
-        //		s = ----------------------------- (eqn 2)
-        //			(Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx)
-        //	Let P be the position vector of the intersection point, then
-        //		P=A+r(B-A) or
-        //		Px=Ax+r(Bx-Ax)
-        //		Py=Ay+r(By-Ay)
-        //	By examining the values of r & s, you can also determine some other
-        //	limiting conditions:
-        //		If 0<=r<=1 & 0<=s<=1, intersection exists
-        //		r<0 or r>1 or s<0 or s>1 line segments do not intersect
-        //		If the denominator in eqn 1 is zero, AB & CD are parallel
-        //		If the numerator in eqn 1 is also zero, AB & CD are collinear.
         r_top = (A.y - C.y) * (D.x - C.x) - (A.x - C.x) * (D.y - C.y);
         r_bot = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x);
         s_top = (A.y - C.y) * (B.x - A.x) - (A.x - C.x) * (B.y - A.y);
@@ -18257,6 +18236,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
  */
 OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label) {
 
+    var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
     if (rEdge) {
         edge = rEdge.node;
@@ -18282,6 +18262,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         };
 
     OG.Util.apply(_style, (style instanceof OG.geometry.Style) ? style.map : style || {}, me._CONFIG.DEFAULT_STYLE.EDGE);
+
 
     if (!from) {
         from = $(edge).attr("_from");
@@ -18339,7 +18320,15 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     }
 
     // 라인 드로잉
-    edge = this.drawEdge(new OG.PolyLine(vertices), edge.shape.geom.style, edge ? edge.id : null, isSelf);
+    if(fromShape){
+        isEssensia = $(fromShape).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true;
+    }
+    if(!isEssensia){
+        edge = this.drawEdge(new OG.PolyLine(vertices), me._CONFIG.DEFAULT_STYLE.EDGE, edge ? edge.id : null, isSelf);
+    }
+    if(isEssensia){
+        edge = this.drawEdge(new OG.PolyLine(vertices), me._CONFIG.DEFAULT_STYLE.EDGE_ESSENSIA, edge ? edge.id : null, isSelf);
+    }
 
     // Draw Label
     this.drawLabel(edge, label);
@@ -18550,7 +18539,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2),
         _ctrlSize = me._CONFIG.GUIDE_LINE_SIZE,
         _ctrlMargin = me._CONFIG.GUIDE_LINE_MARGIN,
-        _trash, isEdge;
+        _trash, isEdge, isEssensia;
 
     var createPath = function (x, y) {
         var from = [(_upperRight.x + _ctrlMargin) + x, (_upperRight.y + _ctrlSize - 8) + y];
@@ -18566,6 +18555,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             return false;
         }
     };
+
+
+    isEssensia = $(element).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true
 
     if (!rElement) {
         return null;
@@ -18682,8 +18674,15 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             _linePath1 = this._PAPER.path(createPath(0, 0));
             _linePath2 = this._PAPER.path(createPath(0, 8));
             _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
-            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
-            _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+
+            if(!isEssensia){
+                _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+                _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+            }
+            if(isEssensia){
+                _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
+                _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
+            }
             _linePath2.attr({'stroke-dasharray': '-'});
         }
 
@@ -21983,6 +21982,9 @@ OG.handler.EventHandler.prototype = {
                     //_fitGroupOrder
                     if (element.shape instanceof OG.shape.GroupShape && !(element.shape instanceof OG.shape.bpmn.A_Task)){
                         me._RENDERER._fitGroupOrder(element);
+                    }
+                    if (groupTarget && OG.Util.isElement(groupTarget)) {
+                        me._RENDERER._fitGroupOrder(groupTarget);
                     }
 
                     me._RENDERER.removeAllConnectGuide();
@@ -26610,6 +26612,21 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-opacity": 1,
                 "edge-type": "plain",
                 "edge-direction": "c c",
+                "arrow-start": "none",
+                "arrow-end": "block",
+                "stroke-dasharray": "",
+                "label-position": "center",
+                "stroke-linejoin": "round",
+                cursor: "pointer"
+            },
+            EDGE_ESSENSIA: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1.5,
+                "stroke-opacity": 1,
+                "edge-type": "plain",
+                "edge-direction": "c c",
                 "arrow-start": "diamond",
                 "arrow-end": "none",
                 "stroke-dasharray": "",
@@ -26739,6 +26756,18 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-opacity": 1,
                 "stroke-dasharray": "",
                 "arrow-end": "block",
+                "stroke-linejoin": "round",
+                cursor: "pointer"
+            },
+            GUIDE_LINE_ESSENSIA: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1.2,
+                "stroke-opacity": 1,
+                "stroke-dasharray": "",
+                "arrow-start": "diamond",
+                "arrow-end": "none",
                 "stroke-linejoin": "round",
                 cursor: "pointer"
             },
@@ -27683,7 +27712,7 @@ OG.graph.Canvas.prototype = {
 
         NodeToCell = function (item) {
             var shape = item.shape,
-                style = item.shapeStyle,
+                style = item.shape.geom.style.map,
                 geom = shape.geom,
                 envelope = geom.getBoundary(),
                 cell = {},
@@ -27851,7 +27880,6 @@ OG.graph.Canvas.prototype = {
 
         var swimlaneNodes = [];
         var CheckRoleFromArea = function (swimlaneNodes) {
-            console.log(swimlaneNodes);
             //get area
             var swimlaneNode, swimlaneId,
                 childNodes, childNode,
@@ -28095,6 +28123,7 @@ OG.graph.Canvas.prototype = {
                 if (toEdge) {
                     $(element).attr('_toedge', toEdge);
                 }
+
                 if (data) {
                     element.data = OG.JSON.decode(unescape(data));
                 }

@@ -306,6 +306,21 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-opacity": 1,
                 "edge-type": "plain",
                 "edge-direction": "c c",
+                "arrow-start": "none",
+                "arrow-end": "block",
+                "stroke-dasharray": "",
+                "label-position": "center",
+                "stroke-linejoin": "round",
+                cursor: "pointer"
+            },
+            EDGE_ESSENSIA: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1.5,
+                "stroke-opacity": 1,
+                "edge-type": "plain",
+                "edge-direction": "c c",
                 "arrow-start": "diamond",
                 "arrow-end": "none",
                 "stroke-dasharray": "",
@@ -435,6 +450,18 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-opacity": 1,
                 "stroke-dasharray": "",
                 "arrow-end": "block",
+                "stroke-linejoin": "round",
+                cursor: "pointer"
+            },
+            GUIDE_LINE_ESSENSIA: {
+                stroke: "black",
+                fill: "none",
+                "fill-opacity": 0,
+                "stroke-width": 1.2,
+                "stroke-opacity": 1,
+                "stroke-dasharray": "",
+                "arrow-start": "diamond",
+                "arrow-end": "none",
                 "stroke-linejoin": "round",
                 cursor: "pointer"
             },
@@ -1379,7 +1406,7 @@ OG.graph.Canvas.prototype = {
 
         NodeToCell = function (item) {
             var shape = item.shape,
-                style = item.shapeStyle,
+                style = item.shape.geom.style.map,
                 geom = shape.geom,
                 envelope = geom.getBoundary(),
                 cell = {},
@@ -1547,7 +1574,6 @@ OG.graph.Canvas.prototype = {
 
         var swimlaneNodes = [];
         var CheckRoleFromArea = function (swimlaneNodes) {
-            console.log(swimlaneNodes);
             //get area
             var swimlaneNode, swimlaneId,
                 childNodes, childNode,
@@ -1791,6 +1817,7 @@ OG.graph.Canvas.prototype = {
                 if (toEdge) {
                     $(element).attr('_toedge', toEdge);
                 }
+
                 if (data) {
                     element.data = OG.JSON.decode(unescape(data));
                 }
