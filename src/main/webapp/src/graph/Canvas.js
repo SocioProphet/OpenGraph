@@ -313,21 +313,6 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-linejoin": "round",
                 cursor: "pointer"
             },
-            EDGE_ESSENSIA: {
-                stroke: "black",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 1.5,
-                "stroke-opacity": 1,
-                "edge-type": "plain",
-                "edge-direction": "c c",
-                "arrow-start": "diamond",
-                "arrow-end": "none",
-                "stroke-dasharray": "",
-                "label-position": "center",
-                "stroke-linejoin": "round",
-                cursor: "pointer"
-            },
             EDGE_SHADOW: {
                 stroke: "#00FF00",
                 fill: "none",
@@ -1569,7 +1554,7 @@ OG.graph.Canvas.prototype = {
                         }
                     }
                 }
-            } //end of for
+            }
         };
 
         var swimlaneNodes = [];

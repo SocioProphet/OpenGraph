@@ -271,18 +271,20 @@
 //            console.log('onDisconnectShape', edgeElement, fromElement, toElement);
             });
 
-            var rectshape = canvas.drawShape([200, 160], new OG.RectangleShape(), [100, 50]);
-            var activity2 = canvas.drawShape([200, 180], new OG.HorizontalPoolShape(), [200, 200]);
-            var activity1 = canvas.drawShape([200, 200], new OG.ScopeActivity(), [300, 300]);
+//            var rectshape = canvas.drawShape([200, 160], new OG.RectangleShape(), [100, 50]);
+//            var activity2 = canvas.drawShape([200, 180], new OG.HorizontalPoolShape(), [200, 200]);
+//            var activity1 = canvas.drawShape([200, 200], new OG.ScopeActivity(), [300, 300]);
+//
+//
+//            var circleShape = canvas.drawShape([450, 100], new OG.CircleShape(), [100, 100]);
+//
+//            var activity4 = canvas.drawShape([200, 200], new OG.VerticalPoolShape(), [310, 350]);
+//
+//            var edge1 = canvas.connect(activity1, circleShape);
+//            var edge2 = canvas.connect(activity2, circleShape);
+//            var edge3 = canvas.connect(rectshape, circleShape);
 
-
-            var circleShape = canvas.drawShape([450, 100], new OG.CircleShape(), [100, 100]);
-
-            var activity4 = canvas.drawShape([200, 200], new OG.VerticalPoolShape(), [310, 350]);
-
-            var edge1 = canvas.connect(activity1, circleShape);
-            var edge2 = canvas.connect(activity2, circleShape);
-            var edge3 = canvas.connect(rectshape, circleShape);
+            var lane = canvas.drawShape([200, 200], new OG.HorizontalLaneShape(), [250, 200]);
 
             //OG.shape.bpmn.ScopeActivity
             // examples

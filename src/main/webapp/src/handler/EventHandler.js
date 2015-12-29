@@ -463,15 +463,15 @@ OG.handler.EventHandler.prototype = {
                         moveTarget = [element];
                     }
 
-                    $.each(moveTarget, function (idx, selected) {
-                        if (selected.shape instanceof OG.shape.GroupShape && !(selected.shape instanceof OG.shape.bpmn.A_Task)) {
-                            var childElements = me._RENDERER.getChildElements(selected);
-                            $.each(childElements, function (index, childElement) {
-                                me._RENDERER.removeGuide(childElement);
-                                me._RENDERER.drawGuide(childElement);
-                            })
-                        }
-                    })
+                    //$.each(moveTarget, function (idx, selected) {
+                    //    if (selected.shape instanceof OG.shape.GroupShape && !(selected.shape instanceof OG.shape.bpmn.A_Task)) {
+                    //        var childElements = me._RENDERER.getChildElements(selected);
+                    //        $.each(childElements, function (index, childElement) {
+                    //            me._RENDERER.removeGuide(childElement);
+                    //            me._RENDERER.drawGuide(childElement);
+                    //        })
+                    //    }
+                    //})
 
                     me._RENDERER.removeGuide(element);
                     guide = me._RENDERER.drawGuide(element);

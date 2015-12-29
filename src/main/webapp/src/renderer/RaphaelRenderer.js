@@ -1860,7 +1860,6 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
     // 타이틀 라인 Drawing
     OG.Util.apply(_tempStyle, geometry.style.map, _style);
     if (_tempStyle['label-direction'] && _tempStyle['vertical-align'] === 'top') {
-        //boundary = geometry.getBoundary();
         if (_tempStyle['label-direction'] === 'vertical') {
             if (_tempStyle['title-size']) {
                 titleLine = new OG.geometry.Line(
@@ -1931,8 +1930,10 @@ OG.renderer.RaphaelRenderer.prototype._fitGroupOrder = function (groupNode) {
     var childElements = me.getChildElements(groupNode);
 
     //그룹노드는 그룹내부의 엘리먼트보다 뒤로 향하여야 한다.
-    root.insertBefore(groupNode, childElements[0]);
-
+    //TODO. 그룹 내부의 엘리먼트 정렬로 바꿀 것.
+    //if(childElements.length){
+    //    root.insertBefore(groupNode, childElements[0]);
+    //}
 }
 
 /**
@@ -2420,7 +2421,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     }
 
     var me = this, _style = {}, fromShape, toShape, fromXY, toXY,
-        isSelf, beforeEvent, shortestIntersection,
+        isSelf, beforeEvent,
         addAttrValues = function (element, name, value) {
             var attrValue = $(element).attr(name),
                 array = attrValue ? attrValue.split(",") : [],
@@ -2499,10 +2500,14 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         isEssensia = $(fromShape).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true;
     }
     if(!isEssensia){
-        edge = this.drawEdge(new OG.PolyLine(vertices), me._CONFIG.DEFAULT_STYLE.EDGE, edge ? edge.id : null, isSelf);
+        edge.shape.geom.style.map['arrow-start'] = 'none';
+        edge.shape.geom.style.map['arrow-end'] = 'block';
+        edge = this.drawEdge(new OG.PolyLine(vertices), edge.shape.geom.style, edge ? edge.id : null, isSelf);
     }
     if(isEssensia){
-        edge = this.drawEdge(new OG.PolyLine(vertices), me._CONFIG.DEFAULT_STYLE.EDGE_ESSENSIA, edge ? edge.id : null, isSelf);
+        edge.shape.geom.style.map['arrow-start'] = 'diamond';
+        edge.shape.geom.style.map['arrow-end'] = 'none';
+        edge = this.drawEdge(new OG.PolyLine(vertices), edge.shape.geom.style, edge ? edge.id : null, isSelf);
     }
 
     // Draw Label
@@ -3392,7 +3397,7 @@ OG.renderer.RaphaelRenderer.prototype.drawButton = function (element) {
 OG.renderer.RaphaelRenderer.prototype.drawLoopType = function (element) {
     var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect, _rect1,
+        envelope, _upperLeft, _bBoxRect, _rect, _rect1,_lowerCenter,
         _size = me._CONFIG.COLLAPSE_SIZE,
         _hSize = _size / 2;
 
