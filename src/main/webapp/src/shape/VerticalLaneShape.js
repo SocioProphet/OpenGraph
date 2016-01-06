@@ -33,6 +33,7 @@ OG.shape.VerticalLaneShape.prototype.createShape = function () {
 	this.geom.style = new OG.geometry.Style({
 		'label-direction': 'horizontal',
 		'vertical-align' : 'top',
+		'title-size' : 24,
 		fill: '#ffffff',
 		'fill-opacity': 1
 	});

@@ -216,7 +216,7 @@ OG.renderer.IRenderer.prototype = {
      */
     _getShapeFromTerminal: function (terminal) {
         var element;
-        if(terminal){
+        if (terminal) {
             var shapeId = terminal.substring(0, terminal.indexOf(OG.Constants.TERMINAL));
             element = this.getElementById(shapeId);
         }
@@ -327,9 +327,8 @@ OG.renderer.IRenderer.prototype = {
      * Element 에 저장된 geom, angle, image, text 정보로 shape 을 redraw 한다.
      *
      * @param {Element} element Shape 엘리먼트
-     * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
      */
-    redrawShape: function (element, excludeEdgeId) {
+    redrawShape: function (element, inclusion) {
         throw new OG.NotImplementedException();
     },
 
@@ -337,9 +336,8 @@ OG.renderer.IRenderer.prototype = {
      * Shape 의 연결된 Edge 를 redraw 한다.(이동 또는 리사이즈시)
      *
      * @param {Element} element
-     * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
      */
-    redrawConnectedEdge: function (element, excludeEdgeId) {
+    redrawConnectedEdge: function (element) {
         throw new OG.NotImplementedException();
     },
 
@@ -623,83 +621,6 @@ OG.renderer.IRenderer.prototype = {
 
         return elements;
     },
-
-    /**
-     * 주어진 Boundary Box 영역에 포함되는 Shape(GEOM, TEXT, IMAGE) Element Map 을 반환한다.
-     *
-     * @param {OG.geometry.Envelope} envelope Boundary Box 영역
-     * @return {Element[]} Element
-     */
-    getElementMapByBBox: function (envelope, _elements, groupId) {
-        var elements = {}, times;
-        if(_elements){
-            elements = _elements;
-        }
-
-        $(this.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "]").each(function (index, element) {
-            times = envelope.getHowManyContains(element.shape.geom.getVertices());
-            if (element.shape.geom && times > 0) {
-                if($(element).attr("id") === groupId){
-                    //no operation
-                }else{
-                    if(element.shape instanceof OG.shape.EdgeShape){
-                        if( ($(element).attr("_from") + "").indexOf(groupId) < 0
-                            && ($(element).attr("_to") + "").indexOf(groupId) < 0 )
-                        {
-                            elements[element.id] = element;
-                        }
-                    }else if(element.shape instanceof OG.shape.GroupShape){
-                        if(times == 5){
-                            elements[element.id] = element;
-                        }
-                    }else if(element.shape instanceof OG.shape.bpmn.Event){
-                        if($(element).attr("_event_target_")
-                            || element.shape.geom.getVertices().length == times){
-                            elements[element.id] = element;
-                        }
-                    }else{
-                        if(element.shape.geom instanceof OG.geometry.Rectangle){
-                            if(times == 5){
-                                elements[element.id] = element;
-                            }
-                        }else if(element.shape.geom instanceof OG.geometry.Circle){
-                            if(times >= 21){
-                                elements[element.id] = element;
-                            }
-                        }else if(element.shape.geom instanceof OG.geometry.Polygon){
-                            if(times == 5){
-                                elements[element.id] = element;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        return elements;
-    },
-
-    /**
-     * Element 영역에 포함되는 Shape(GEOM, TEXT, IMAGE) Element List 을 반환한다.
-     *
-     * @param {Element,String} element Element 또는 ID
-     * @return {Element[]} Element
-     */
-    getChildElements: function (element) {
-        var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
-        var geometry = rElement ? rElement.node.shape.geom : null;
-        var list = [];
-        if(rElement && geometry){
-            var _list = me.getElementsByBBox(geometry.getBoundary());
-            $.each(_list , function(index,item){
-                if(item.id !== element.id){
-                    list.push(item);
-                }
-            })
-        }
-        return list;
-    },
-
     /**
      * 엘리먼트에 속성값을 설정한다.
      *
@@ -1191,6 +1112,124 @@ OG.renderer.IRenderer.prototype = {
      */
     getConnectGuideElements: function (element) {
         throw new OG.NotImplementedException();
+    },
+
+    /**
+     * 최상위 그룹 엘리먼트인지 반환한다.
+     *
+     * @param {Element} Element  엘리먼트
+     * @return {boolean} true false
+     */
+    isTopGroup: function (element) {
+        if (!element || !element.parentElement) {
+            return false;
+        }
+        if (!element.shape instanceof OG.shape.GroupShape) {
+            return false;
+        }
+
+        if (element.parentElement.id === this.getRootGroup().id) {
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * 부모 엘리먼트를 반환한다. 부모가 루트일때는 반환하지 않는다.
+     *
+     * @param {Element} Element  엘리먼트
+     * @return {Element} Element  엘리먼트
+     */
+    getParent: function (element) {
+        if (!element || !element.parentElement) {
+            return null;
+        }
+        if (element.parentElement.id === this.getRootGroup().id) {
+            return null;
+        }
+        return element.parentElement;
+    },
+
+    /**
+     * 그룹의 하위 엘리먼트를 반환한다.
+     *
+     * @param {Element} Element  엘리먼트
+     * @return {Element} Element  엘리먼트
+     */
+    getChilds: function (element) {
+        var childShapes = [];
+        if (!element || !element.children) {
+            return childShapes;
+        }
+        $.each(element.children, function (index, child) {
+            if ($(child).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
+                childShapes.push(child);
+            }
+        });
+        return childShapes;
+    },
+
+    /**
+     * 그룹의 Shape 인지 반환한다. RootGroup 일 경우는 제외.
+     *
+     * @param {Element} Element  엘리먼트
+     * @return {boolean} true false
+     */
+    isGroup: function (element) {
+        if (!element || !element.parentElement) {
+            return false;
+        }
+        if (element.id === this.getRootGroup().id) {
+            return false;
+        }
+        if (element.shape instanceof OG.shape.GroupShape) {
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * 캔버스의 모든 Shape 들을 리턴
+     *
+     * @return {Array} Elements
+     */
+    getAllShapes: function () {
+        var elements = [];
+        $(this.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "]").each(function (index, element) {
+            elements.push(element);
+        });
+        return elements;
+    },
+    /**
+     * 캔버스의 모든 Edge를 리턴
+     *
+     * @return {Array} Edge Elements
+     */
+    getAllEdges: function () {
+        var edges = [];
+        var elements = this.getAllShapes();
+        $.each(elements, function (index, element) {
+            if ($(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
+                edges.push(element);
+            }
+        })
+        return edges;
+    },
+    /**
+     * Edge 여부를 판단.
+     *
+     * @return {boolean} true false
+     */
+    isEdge: function (element) {
+        return $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
+    },
+    /**
+     * Shape 여부를 판단.
+     *
+     * @return {boolean} true false
+     */
+    isShape: function (element) {
+        return $(element).attr("_type") === OG.Constants.NODE_TYPE.SHAPE;
     }
 };
 OG.renderer.IRenderer.prototype.constructor = OG.renderer.IRenderer;

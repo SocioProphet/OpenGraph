@@ -686,8 +686,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
     groupNode.shapeStyle = (style instanceof OG.geometry.Style) ? style.map : style;
     $(groupNode).attr("_shape_id", shape.SHAPE_ID);
 
-    me._fitGroupOrder(groupNode);
-
     // Draw for Task
     if (shape instanceof OG.shape.bpmn.A_Task) {
         if (groupNode.shape.LoopType != 'None')
@@ -1914,28 +1912,6 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
     return group.node;
 };
 
-OG.renderer.RaphaelRenderer.prototype._fitGroupOrder = function (groupNode) {
-    var me = this;
-    if (!groupNode) {
-        return;
-    }
-    if (!groupNode.shape) {
-        return;
-    }
-    if (!groupNode.shape instanceof OG.shape.GroupShape) {
-        return;
-    }
-
-    var root = me.getRootGroup();
-    var childElements = me.getChildElements(groupNode);
-
-    //그룹노드는 그룹내부의 엘리먼트보다 뒤로 향하여야 한다.
-    //TODO. 그룹 내부의 엘리먼트 정렬로 바꿀 것.
-    //if(childElements.length){
-    //    root.insertBefore(groupNode, childElements[0]);
-    //}
-}
-
 /**
  * Shape 의 Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
  *
@@ -2103,38 +2079,6 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeLabel = function (shapeElement, te
     return labelElement;
 };
 
-
-OG.renderer.RaphaelRenderer.prototype.resizeShape = function (element, excludeEdgeId) {
-    if (element.shape instanceof OG.shape.HorizontalPoolShape) {
-        var ele, eleArray = [], i, height = 0, titleSize;
-
-        if (element.shape.geom.style.map['title-size'])
-            titleSize = element.shape.geom.style.map['title-size'];
-
-        for (i = 0; i < element.childNodes.length; i++) {
-            ele = element.childNodes[i];
-            if (ele.shape instanceof OG.shape.HorizontalLaneShape) {
-                eleArray.push(ele);
-            }
-        }
-        console.log(eleArray);
-        for (i = 0; i < eleArray.length; i++) {
-            if ((element.shape.geom.boundary._width - titleSize) != eleArray[i].shape.geom.boundary._width) {
-                var right = element.shape.geom.boundary._width - eleArray[i].shape.geom.boundary._width - titleSize;
-                this.resize(eleArray[i], [0, 0, 0, right]);
-            }
-            if (i != (eleArray.length - 1)) {
-                height += eleArray[i].shape.geom.boundary._height;
-            } else {
-                var lower = element.shape.geom.boundary._height - height - eleArray[i].shape.geom.boundary._height;
-                this.resize(eleArray[i], [0, lower, 0, 0]);
-            }
-        }
-
-    }
-
-}
-
 /**
  * Element 에 저장된 geom, angle, image, text 정보로 shape 을 redraw 한다.
  *
@@ -2143,52 +2087,53 @@ OG.renderer.RaphaelRenderer.prototype.resizeShape = function (element, excludeEd
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEdgeId, inclusion) {
-    var me = this, envelope, center, width, height, upperLeft,
-        redrawChildConnectedEdge;
+    var me = this, envelope, center, width, height, upperLeft;
 
-    redrawChildConnectedEdge = function (_collapseRootElement, _element) {
+    var redrawChildConnectedEdge = function (_collapseRootElement, _element) {
         var edgeIdArray, fromEdge, toEdge, _childNodes = _element.childNodes, otherShape, i, j, isNeedToRedraw;
         for (i = _childNodes.length - 1; i >= 0; i--) {
-            if ($(_childNodes[i]).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
-                redrawChildConnectedEdge(_collapseRootElement, _childNodes[i]);
 
-                isNeedToRedraw = false;
-                edgeIdArray = $(_childNodes[i]).attr("_fromedge");
-                if (edgeIdArray) {
-                    edgeIdArray = edgeIdArray.split(",");
-                    for (j = 0; j < edgeIdArray.length; j++) {
-                        fromEdge = me.getElementById(edgeIdArray[j]);
-                        if (fromEdge) {
-                            otherShape = me._getShapeFromTerminal($(fromEdge).attr("_from"));
+            if (!me.isShape(_element)) {
+                return;
+            }
+            redrawChildConnectedEdge(_collapseRootElement, _childNodes[i]);
 
-                            // otherShape 이 같은 collapse 범위내에 있는지 체크
-                            if ($(otherShape).parents("#" + _collapseRootElement.id).length === 0) {
-                                isNeedToRedraw = true;
-                            }
+            isNeedToRedraw = false;
+            edgeIdArray = $(_childNodes[i]).attr("_fromedge");
+            if (edgeIdArray) {
+                edgeIdArray = edgeIdArray.split(",");
+                for (j = 0; j < edgeIdArray.length; j++) {
+                    fromEdge = me.getElementById(edgeIdArray[j]);
+                    if (fromEdge) {
+                        otherShape = me._getShapeFromTerminal($(fromEdge).attr("_from"));
+
+                        // otherShape 이 같은 collapse 범위내에 있는지 체크
+                        if ($(otherShape).parents("#" + _collapseRootElement.id).length === 0) {
+                            isNeedToRedraw = true;
                         }
                     }
                 }
+            }
 
-                edgeIdArray = $(_childNodes[i]).attr("_toedge");
-                if (edgeIdArray) {
-                    edgeIdArray = edgeIdArray.split(",");
-                    for (j = 0; j < edgeIdArray.length; j++) {
-                        toEdge = me.getElementById(edgeIdArray[j]);
-                        if (toEdge) {
-                            otherShape = me._getShapeFromTerminal($(toEdge).attr("_to"));
+            edgeIdArray = $(_childNodes[i]).attr("_toedge");
+            if (edgeIdArray) {
+                edgeIdArray = edgeIdArray.split(",");
+                for (j = 0; j < edgeIdArray.length; j++) {
+                    toEdge = me.getElementById(edgeIdArray[j]);
+                    if (toEdge) {
+                        otherShape = me._getShapeFromTerminal($(toEdge).attr("_to"));
 
-                            // otherShape 이 같은 collapse 범위내에 있는지 체크
-                            if ($(otherShape).parents("#" + _collapseRootElement.id).length === 0) {
-                                isNeedToRedraw = true;
-                            }
+                        // otherShape 이 같은 collapse 범위내에 있는지 체크
+                        if ($(otherShape).parents("#" + _collapseRootElement.id).length === 0) {
+                            isNeedToRedraw = true;
                         }
                     }
                 }
+            }
 
-                // group 영역 밖의 연결된 otherShape 이 있는 경우 redrawConnectedEdge
-                if (isNeedToRedraw === true) {
-                    me.redrawConnectedEdge(_childNodes[i]);
-                }
+            // group 영역 밖의 연결된 otherShape 이 있는 경우 redrawConnectedEdge
+            if (isNeedToRedraw === true) {
+                me.redrawConnectedEdge(_childNodes[i], excludeEdgeId);
             }
         }
     };
@@ -2457,6 +2402,11 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         toXY = this._getPositionFromTerminal(to);
     }
 
+    isSelf = fromShape && toShape && fromShape.id === toShape.id;
+    if (isSelf) {
+        fromXY = toXY = fromShape.shape.geom.getBoundary().getRightCenter();
+    }
+
     if (fromShape && toShape) {
 
         if (fromShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain" || toShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain") {
@@ -2490,21 +2440,16 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         vertices[vertices.length - 1].y = toXY.y
     }
 
-    isSelf = fromShape && toShape && fromShape.id === toShape.id;
-    if (isSelf) {
-        fromXY = toXY = fromShape.shape.geom.getBoundary().getRightCenter();
-    }
-
     // 라인 드로잉
-    if(fromShape){
+    if (fromShape) {
         isEssensia = $(fromShape).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true;
     }
-    if(!isEssensia){
+    if (!isEssensia) {
         edge.shape.geom.style.map['arrow-start'] = 'none';
         edge.shape.geom.style.map['arrow-end'] = 'block';
         edge = this.drawEdge(new OG.PolyLine(vertices), edge.shape.geom.style, edge ? edge.id : null, isSelf);
     }
-    if(isEssensia){
+    if (isEssensia) {
         edge.shape.geom.style.map['arrow-start'] = 'diamond';
         edge.shape.geom.style.map['arrow-end'] = 'none';
         edge = this.drawEdge(new OG.PolyLine(vertices), edge.shape.geom.style, edge ? edge.id : null, isSelf);
@@ -2536,6 +2481,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
 
     me.trimConnection(edge);
     me.trimEdge(edge);
+    me.checkBridgeEdge(edge);
 
     return edge;
 };
@@ -2549,7 +2495,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.disconnectOneWay = function (element, connectDirection) {
-    var me = this, fromTerminalId, toTerminalId, fromShape, toShape, fromEdgeId, toEdgeId, fromEdge, toEdge,
+    var me = this, fromShape, toShape,
         removeAttrValue = function (element, name, value) {
             var attrValue = $(element).attr(name),
                 array = attrValue ? attrValue.split(",") : [],
@@ -2564,29 +2510,30 @@ OG.renderer.RaphaelRenderer.prototype.disconnectOneWay = function (element, conn
             return element;
         };
 
-    if (element) {
-        if ($(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
-            // Edge 인 경우 연결된 Shape 의 연결 속성 정보를 삭제
-            var fromTerminal = $(element).attr("_from");
-            var toTerminal = $(element).attr("_to");
+    var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
+    if (!element || !isEdge) {
+        return;
+    }
 
-            if (fromTerminal && connectDirection === 'from') {
-                fromShape = this._getShapeFromTerminal(fromTerminal);
-                removeAttrValue(fromShape, "_toedge", element.id);
-                $(element).removeAttr("_from");
-            }
+    // Edge 인 경우 연결된 Shape 의 연결 속성 정보를 삭제
+    var fromTerminal = $(element).attr("_from");
+    var toTerminal = $(element).attr("_to");
 
-            if (toTerminal && connectDirection === 'to') {
-                toShape = this._getShapeFromTerminal(toTerminal);
-                removeAttrValue(toShape, "_fromedge", element.id);
-                $(element).removeAttr("_to");
-            }
+    if (fromTerminal && connectDirection === 'from') {
+        fromShape = this._getShapeFromTerminal(fromTerminal);
+        removeAttrValue(fromShape, "_toedge", element.id);
+        $(element).removeAttr("_from");
+    }
 
-            // disconnectShape event fire
-            if (fromShape && toShape) {
-                $(this._PAPER.canvas).trigger('disconnectShape', [element, fromShape, toShape]);
-            }
-        }
+    if (toTerminal && connectDirection === 'to') {
+        toShape = this._getShapeFromTerminal(toTerminal);
+        removeAttrValue(toShape, "_fromedge", element.id);
+        $(element).removeAttr("_to");
+    }
+
+    // disconnectShape event fire
+    if (fromShape && toShape) {
+        $(this._PAPER.canvas).trigger('disconnectShape', [element, fromShape, toShape]);
     }
 };
 
@@ -2715,29 +2662,35 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         group, guide,
         _bBoxRect, _line, _linePath1, _linePath2,
         _upperLeft, _upperRight, _lowerLeft, _lowerRight, _leftCenter, _upperCenter, _rightCenter, _lowerCenter,
-        _ulRect, _urRect, _llRect, _lrRect, _lcRect, _ucRect, _rcRect, _lwcRect, task, end,
+        _ulRect, _urRect, _lwlRect, _lwrRect, _lcRect, _ucRect, _rcRect, _lwcRect,
         _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2),
         _ctrlSize = me._CONFIG.GUIDE_LINE_SIZE,
         _ctrlMargin = me._CONFIG.GUIDE_LINE_MARGIN,
-        _trash, isEdge, isEssensia;
+        _trash, isEdge, isEssensia, controllers = [], _isConnectable, isLane,
+        _qUpper, _qLow, _qBisector, _qThirds;
 
-    var createPath = function (x, y) {
-        var from = [(_upperRight.x + _ctrlMargin) + x, (_upperRight.y + _ctrlSize - 8) + y];
-        var to = [(_upperRight.x + _ctrlMargin) + x + _ctrlSize, (_upperRight.y) + y];
+    if (rElement && me._CONFIG.CONNECTABLE && rElement.node.shape.CONNECTABLE) {
+        _isConnectable = true;
+    }
+
+    var createLinePath = function (x, y, idx) {
+        var marginTop = 0;
+        if (idx > 0) {
+            marginTop = 8;
+        }
+        var from = [x, (y + _ctrlSize - 8) + marginTop];
+        var to = [x + _ctrlSize, y + marginTop];
         var path = 'M' + from[0] + ' ' + from[1] + 'L' + to[0] + ' ' + to[1];
         return path;
     };
 
-    var _isConnectable = function () {
-        if (rElement) {
-            return me._CONFIG.CONNECTABLE && rElement.node.shape.CONNECTABLE;
-        } else {
-            return false;
-        }
-    };
+    isEssensia = $(element).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true;
+    isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
 
-
-    isEssensia = $(element).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true
+    if (element.shape instanceof OG.shape.HorizontalLaneShape
+        || element.shape instanceof OG.shape.VerticalLaneShape) {
+        isLane = true;
+    }
 
     if (!rElement) {
         return null;
@@ -2746,8 +2699,6 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
     if (!geometry) {
         return null;
     }
-
-    isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE ? true : false;
 
     envelope = geometry.getBoundary();
     _upperLeft = envelope.getUpperLeft();
@@ -2760,197 +2711,352 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
     _lowerCenter = envelope.getLowerCenter();
 
 
-    if (this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE)) {
-        // 가이드가 이미 존재하는 경우에는 bBox 만 삭제후 새로 draw
-        // bBox remove -> redraw
-        this._remove(this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
-        if (!isEdge) {
-            _bBoxRect = this._PAPER.rect(_upperLeft.x, _upperLeft.y, envelope.getWidth(), envelope.getHeight());
-        }
-        if (isEdge) {
-            _bBoxRect = this._PAPER.rect(_upperLeft.x - 10, _upperLeft.y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
-        }
-        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
-        this._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
-        _bBoxRect.insertBefore(rElement);
-
-        if (!isEdge) {
-            _ulRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
-            _urRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
-            _llRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LL);
-            _lrRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LR);
-            _lcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LC);
-            _ucRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UC);
-            _rcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
-            _lwcRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
-            _trash = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
-
-            _ulRect.attr({x: _upperLeft.x - _hSize, y: _upperLeft.y - _hSize});
-            _urRect.attr({x: _upperRight.x - _hSize, y: _upperRight.y - _hSize});
-            _llRect.attr({x: _lowerLeft.x - _hSize, y: _lowerLeft.y - _hSize});
-            _lrRect.attr({x: _lowerRight.x - _hSize, y: _lowerRight.y - _hSize});
-            _lcRect.attr({x: _leftCenter.x - _hSize, y: _leftCenter.y - _hSize});
-            _ucRect.attr({x: _upperCenter.x - _hSize, y: _upperCenter.y - _hSize});
-            _rcRect.attr({x: _rightCenter.x - _hSize, y: _rightCenter.y - _hSize});
-            _lwcRect.attr({x: _lowerCenter.x - _hSize, y: _lowerCenter.y - _hSize});
-            _trash.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y + _ctrlSize + _ctrlMargin});
-
-
-            if (_isConnectable()) {
-                _line = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
-                _linePath1 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
-                _linePath2 = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
-                _line.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y});
-                _linePath1.attr({'path': createPath(0, 0)});
-                _linePath2.attr({'path': createPath(0, 8)});
-            }
+    function _drawGroup() {
+        // group
+        group = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
+        if (group) {
+            me._remove(group);
+            me._remove(me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
         }
 
-        if (isEdge) {
-            _trash = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
-            _trash.attr({x: _upperRight.x + _ctrlMargin, y: _upperRight.y});
-        }
-
-        return null;
+        group = me._PAPER.group();
+        guide = {
+            group: group.node
+        };
+        me._add(group, rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
     }
 
-    // group
-    group = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
-    if (group) {
-        this._remove(group);
-        this._remove(this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
-    }
-    group = this._PAPER.group();
-
-
-    if (!isEdge) {
-        // guide line 랜더링
-        _bBoxRect = this._PAPER.rect(_upperLeft.x, _upperLeft.y, envelope.getWidth(), envelope.getHeight());
-        _ulRect = this._PAPER.rect(_upperLeft.x - _hSize, _upperLeft.y - _hSize, _size, _size);
-        _urRect = this._PAPER.rect(_upperRight.x - _hSize, _upperRight.y - _hSize, _size, _size);
-        _llRect = this._PAPER.rect(_lowerLeft.x - _hSize, _lowerLeft.y - _hSize, _size, _size);
-        _lrRect = this._PAPER.rect(_lowerRight.x - _hSize, _lowerRight.y - _hSize, _size, _size);
-        _lcRect = this._PAPER.rect(_leftCenter.x - _hSize, _leftCenter.y - _hSize, _size, _size);
-        _ucRect = this._PAPER.rect(_upperCenter.x - _hSize, _upperCenter.y - _hSize, _size, _size);
-        _rcRect = this._PAPER.rect(_rightCenter.x - _hSize, _rightCenter.y - _hSize, _size, _size);
-        _lwcRect = this._PAPER.rect(_lowerCenter.x - _hSize, _lowerCenter.y - _hSize, _size, _size);
-        _trash = this._PAPER.image("resources/images/symbol/trash.svg",
-            _upperRight.x + _ctrlMargin, _upperRight.y + _ctrlSize + _ctrlMargin, _ctrlSize, _ctrlSize);
-
+    function _drawBbox() {
+        if (!isEdge) {
+            _bBoxRect = me._PAPER.rect(_upperLeft.x, _upperLeft.y, envelope.getWidth(), envelope.getHeight());
+        }
+        if (isEdge) {
+            _bBoxRect = me._PAPER.rect(_upperLeft.x - 10, _upperLeft.y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
+        }
         _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+        me._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
+        guide.bBox = _bBoxRect.node;
+    }
+
+    function _redrawBbox() {
+        me._remove(me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
+        if (!isEdge) {
+            _bBoxRect = me._PAPER.rect(_upperLeft.x, _upperLeft.y, envelope.getWidth(), envelope.getHeight());
+        }
+        if (isEdge) {
+            _bBoxRect = me._PAPER.rect(_upperLeft.x - 10, _upperLeft.y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
+        }
+        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+        me._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
+    }
+
+    function _drawGuide() {
+        _ulRect = me._PAPER.rect(_upperLeft.x - _hSize, _upperLeft.y - _hSize, _size, _size);
+        _urRect = me._PAPER.rect(_upperRight.x - _hSize, _upperRight.y - _hSize, _size, _size);
+        _lwlRect = me._PAPER.rect(_lowerLeft.x - _hSize, _lowerLeft.y - _hSize, _size, _size);
+        _lwrRect = me._PAPER.rect(_lowerRight.x - _hSize, _lowerRight.y - _hSize, _size, _size);
+        _lcRect = me._PAPER.rect(_leftCenter.x - _hSize, _leftCenter.y - _hSize, _size, _size);
+        _ucRect = me._PAPER.rect(_upperCenter.x - _hSize, _upperCenter.y - _hSize, _size, _size);
+        _rcRect = me._PAPER.rect(_rightCenter.x - _hSize, _rightCenter.y - _hSize, _size, _size);
+        _lwcRect = me._PAPER.rect(_lowerCenter.x - _hSize, _lowerCenter.y - _hSize, _size, _size);
+
         _ulRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UL);
         _urRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UR);
-        _llRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LL);
-        _lrRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LR);
+        _lwlRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LL);
+        _lwrRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LR);
         _lcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LC);
         _ucRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_UC);
         _rcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_RC);
         _lwcRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LWC);
-        _trash.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
 
-
-        if (_isConnectable()) {
-            _line = this._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
-            _linePath1 = this._PAPER.path(createPath(0, 0));
-            _linePath2 = this._PAPER.path(createPath(0, 8));
-            _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
-
-            if(!isEssensia){
-                _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
-                _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
-            }
-            if(isEssensia){
-                _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
-                _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
-            }
-            _linePath2.attr({'stroke-dasharray': '-'});
-        }
-
-        // add to Group
         group.appendChild(_ulRect);
         group.appendChild(_urRect);
-        group.appendChild(_llRect);
-        group.appendChild(_lrRect);
+        group.appendChild(_lwlRect);
+        group.appendChild(_lwrRect);
         group.appendChild(_lcRect);
         group.appendChild(_ucRect);
         group.appendChild(_rcRect);
         group.appendChild(_lwcRect);
-        group.appendChild(_trash);
 
-        if (_isConnectable()) {
-            group.appendChild(_linePath1);
-            group.appendChild(_linePath2);
-            group.appendChild(_line);
-        }
+        me._add(_ulRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
+        me._add(_urRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
+        me._add(_lwlRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LWL);
+        me._add(_lwrRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LWR);
+        me._add(_lcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LC);
+        me._add(_ucRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UC);
+        me._add(_rcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
+        me._add(_lwcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
 
-
-        this._add(group, rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
-        this._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
-        this._add(_ulRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
-        this._add(_urRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
-        this._add(_llRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LL);
-        this._add(_lrRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LR);
-        this._add(_lcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LC);
-        this._add(_ucRect, rElement.id + OG.Constants.GUIDE_SUFFIX.UC);
-        this._add(_rcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
-        this._add(_lwcRect, rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
-        this._add(_trash, rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
-
-        if (_isConnectable()) {
-            this._add(_line, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
-            this._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
-            this._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
-        }
-
-        guide = {
-            bBox: _bBoxRect.node,
-            group: group.node,
-            ul: _ulRect.node,
-            ur: _urRect.node,
-            ll: _llRect.node,
-            lr: _lrRect.node,
-            lc: _lcRect.node,
-            uc: _ucRect.node,
-            rc: _rcRect.node,
-            lwc: _lwcRect.node,
-            line: _line ? _line.node : null,
-            _trash: _trash.node
-        };
+        guide.ul = _ulRect.node;
+        guide.ur = _urRect.node;
+        guide.lwl = _lwlRect.node;
+        guide.lwr = _lwrRect.node;
+        guide.lc = _lcRect.node;
+        guide.uc = _ucRect.node;
+        guide.rc = _rcRect.node;
+        guide.lwc = _lwcRect.node;
     }
-    if (isEdge) {
-        // guide line 랜더링
-        _bBoxRect = this._PAPER.rect(_upperLeft.x - 10, _upperLeft.y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
-        _trash = this._PAPER.image("resources/images/symbol/trash.svg",
-            _upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
 
-        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+    function _redrawGuide() {
+        _ulRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
+        _urRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
+        _lwlRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LWL);
+        _lwrRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LWR);
+        _lcRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LC);
+        _ucRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UC);
+        _rcRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.RC);
+        _lwcRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LWC);
+
+        _ulRect.attr({x: _upperLeft.x - _hSize, y: _upperLeft.y - _hSize});
+        _urRect.attr({x: _upperRight.x - _hSize, y: _upperRight.y - _hSize});
+        _lwlRect.attr({x: _lowerLeft.x - _hSize, y: _lowerLeft.y - _hSize});
+        _lwrRect.attr({x: _lowerRight.x - _hSize, y: _lowerRight.y - _hSize});
+        _lcRect.attr({x: _leftCenter.x - _hSize, y: _leftCenter.y - _hSize});
+        _ucRect.attr({x: _upperCenter.x - _hSize, y: _upperCenter.y - _hSize});
+        _rcRect.attr({x: _rightCenter.x - _hSize, y: _rightCenter.y - _hSize});
+        _lwcRect.attr({x: _lowerCenter.x - _hSize, y: _lowerCenter.y - _hSize});
+    }
+
+    function _drawTrash() {
+        _trash = me._PAPER.image("resources/images/symbol/trash.svg", 0, 0, _ctrlSize, _ctrlSize);
         _trash.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
-
         group.appendChild(_trash);
+        me._add(_trash, rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
+        guide.trash = _trash.node;
 
-        this._add(group, rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE);
-        this._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
-        this._add(_trash, rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
-
-        guide = {
-            bBox: _bBoxRect.node,
-            group: group.node,
-            _trash: _trash.node
-        };
+        $(_trash.node).click(function () {
+            if (me.isLane(element)) {
+                me.removeLaneShape(element);
+            } else {
+                me.removeShape(element);
+            }
+        })
+        controllers.push(_trash);
     }
 
-    $(_trash.node).click(function () {
-        me.removeShape(element);
-    })
+    function _redrawTrash() {
+        _trash = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
+        controllers.push(_trash);
+    }
 
-    // layer 위치 조정
-    _bBoxRect.insertBefore(rElement);
-    group.insertAfter(rElement);
+    function _drawLine() {
+        _line = me._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
+        _linePath1 = me._PAPER.path(createLinePath(0, 0, 0));
+        _linePath2 = me._PAPER.path(createLinePath(0, 0, 8));
+        _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
 
-    // selected 속성값 설정
-    $(rElement.node).attr("_selected", "true");
+        if (!isEssensia) {
+            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+            _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+        }
+        if (isEssensia) {
+            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
+            _linePath2.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
+        }
+        _linePath2.attr({'stroke-dasharray': '-'});
 
-    return guide;
+        group.appendChild(_linePath1);
+        group.appendChild(_linePath2);
+        group.appendChild(_line);
+
+        me._add(_line, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
+        me._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
+        me._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
+
+        guide.line = _line.node;
+        controllers.push(_line);
+    }
+
+    function _redrawLine() {
+        _line = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
+        _linePath1 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
+        _linePath2 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
+        controllers.push(_line);
+    }
+
+    function _drawLaneQuarter(divideCount) {
+        _qUpper = me._PAPER.image("resources/images/symbol/quarter-upper.png", 0, 0, _ctrlSize, _ctrlSize);
+        _qUpper.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+        group.appendChild(_qUpper);
+        me._add(_qUpper, rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_UPPER);
+        guide.qUpper = _qUpper.node;
+        $(_qUpper.node).click(function () {
+            me.divideLane(element, OG.Constants.GUIDE_SUFFIX.QUARTER_UPPER);
+        });
+
+        _qBisector = me._PAPER.image("resources/images/symbol/quarter-bisector.png", 0, 0, _ctrlSize, _ctrlSize);
+        _qBisector.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+        group.appendChild(_qBisector);
+        me._add(_qBisector, rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_BISECTOR);
+        guide.qBisector = _qBisector.node;
+        $(_qBisector.node).click(function () {
+            me.divideLane(element, OG.Constants.GUIDE_SUFFIX.QUARTER_BISECTOR);
+        });
+
+        _qThirds = me._PAPER.image("resources/images/symbol/quarter-thirds.png", 0, 0, _ctrlSize, _ctrlSize);
+        _qThirds.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+        group.appendChild(_qThirds);
+        me._add(_qThirds, rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_THIRDS);
+        guide.qThirds = _qThirds.node;
+        $(_qThirds.node).click(function () {
+            me.divideLane(element, OG.Constants.GUIDE_SUFFIX.QUARTER_THIRDS);
+        });
+
+        _qLow = me._PAPER.image("resources/images/symbol/quarter-low.png", 0, 0, _ctrlSize, _ctrlSize);
+        _qLow.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+        group.appendChild(_qLow);
+        me._add(_qLow, rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_LOW);
+        guide.qLow = _qLow.node;
+        $(_qLow.node).click(function () {
+            me.divideLane(element, OG.Constants.GUIDE_SUFFIX.QUARTER_LOW);
+        });
+
+        if (divideCount === 0) {
+            _hide(_qBisector);
+            _hide(_qThirds);
+
+            controllers.push(_qUpper);
+            controllers.push(_qLow);
+        }
+        if (divideCount === 1) {
+            _hide(_qThirds);
+
+            controllers.push(_qUpper);
+            controllers.push(_qBisector);
+            controllers.push(_qLow);
+        }
+
+        if (divideCount === 2) {
+            controllers.push(_qUpper);
+            controllers.push(_qBisector);
+            controllers.push(_qThirds);
+            controllers.push(_qLow);
+        }
+    }
+
+    function _redrawLaneQuarter(divideCount) {
+        _qUpper = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_UPPER);
+        _qBisector = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_BISECTOR);
+        _qThirds = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_THIRDS);
+        _qLow = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_LOW);
+
+        if (divideCount === 0) {
+            _hide(_qBisector);
+            _hide(_qThirds);
+            controllers.push(_qUpper);
+            controllers.push(_qLow);
+        }
+
+        if (divideCount === 1) {
+            _hide(_qThirds);
+            controllers.push(_qUpper);
+            controllers.push(_qBisector);
+            controllers.push(_qLow);
+        }
+
+        if (divideCount === 2) {
+            controllers.push(_qUpper);
+            controllers.push(_qBisector);
+            controllers.push(_qThirds);
+            controllers.push(_qLow);
+        }
+
+        $.each(controllers, function (idx, controller) {
+            _show(controller);
+        })
+    }
+
+    function _hide(controller) {
+        //일시적으로 숨기고 캔버스 외각처리.
+        controller.attr({opacity: '0', x: -100, y: -100});
+    }
+
+    function _show(controller) {
+        controller.attr({opacity: '1'});
+    }
+
+    //화면에 보여질 컨트롤러들을 정렬한다.
+    function _setControllerPosition() {
+        var maxIconPerLine = 4, x, y, divide, rest;
+
+        $.each(controllers, function (index, controller) {
+            divide = parseInt(index / maxIconPerLine);
+            rest = parseInt(index % maxIconPerLine);
+            x = _upperRight.x + ((divide + 1) * (_ctrlMargin + _ctrlSize) - _ctrlSize);
+            y = _upperRight.y + (rest * (_ctrlMargin + _ctrlSize));
+
+            controller.attr({x: x, y: y});
+            //라인일경우 하위 라인까지 함께 재배치
+            if (controller.id === rElement.id + OG.Constants.GUIDE_SUFFIX.LINE) {
+                me._getREleById(controller.id + '1').attr({'path': createLinePath(x, y, 0)});
+                me._getREleById(controller.id + '2').attr({'path': createLinePath(x, y, 8)});
+            }
+        });
+    }
+
+    //기존에 가이드가 있을 경우
+    if (this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE)) {
+        if (!isEdge) {
+            _redrawBbox();
+            _redrawGuide();
+
+            if (isLane) {
+                _redrawLaneQuarter(me.enableDivideCount(element));
+            }
+            if (isLane && me.isTopGroup(element) && _isConnectable) {
+                _redrawLine();
+            }
+            if (!isLane && _isConnectable) {
+                _redrawLine();
+            }
+            _redrawTrash();
+        }
+        if (isEdge) {
+            _redrawBbox();
+            _redrawTrash();
+        }
+
+        _setControllerPosition();
+        return null;
+    }
+    //기존에 가이드가 없을 경우
+    else {
+        if (isEdge) {
+            _drawGroup();
+            _drawBbox();
+            _drawTrash();
+        }
+        if (!isEdge) {
+            _drawGroup();
+            _drawBbox();
+            _drawGuide();
+
+            if (isLane) {
+                _drawLaneQuarter(me.enableDivideCount(element));
+            }
+            if (isLane && me.isTopGroup(element) && _isConnectable) {
+                _drawLine();
+            }
+            if (!isLane && _isConnectable) {
+                _drawLine();
+            }
+
+            _drawTrash();
+        }
+        _setControllerPosition();
+
+        // layer 위치 조정
+        if (_bBoxRect) {
+            _bBoxRect.insertBefore(rElement);
+        }
+        if (group) {
+            me.getRootGroup().appendChild(group.node);
+            //group.insertAfter(rElement);
+        }
+        // selected 속성값 설정
+        $(rElement.node).attr("_selected", "true");
+        return guide;
+    }
 };
 
 /**
@@ -2964,10 +3070,7 @@ OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (element, toBeSt
 
     var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         geometry = rElement ? rElement.node.shape.geom : null,
-        envelope,
-        _upperLeft, _upperRight, _lowerLeft, _lowerRight, _leftCenter, _upperCenter, _rightCenter, _lowerCenter,
-        _size = me._CONFIG.GUIDE_RECT_SIZE,
-        path;
+        envelope, _leftCenter, _upperCenter, path;
 
     if (rElement && geometry) {
         // Edge 인 경우 따로 처리
@@ -3397,7 +3500,7 @@ OG.renderer.RaphaelRenderer.prototype.drawButton = function (element) {
 OG.renderer.RaphaelRenderer.prototype.drawLoopType = function (element) {
     var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect, _rect1,_lowerCenter,
+        envelope, _upperLeft, _bBoxRect, _rect, _rect1, _lowerCenter,
         _size = me._CONFIG.COLLAPSE_SIZE,
         _hSize = _size / 2;
 
@@ -4390,11 +4493,10 @@ OG.renderer.RaphaelRenderer.prototype.move = function (element, offset, excludeE
  *
  * @param {Element,String} element Element 또는 ID
  * @param {Number[]} position [x, y]
- * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
  * @return {Element} Element
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.moveCentroid = function (element, position, excludeEdgeId) {
+OG.renderer.RaphaelRenderer.prototype.moveCentroid = function (element, position) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         geometry = rElement ? rElement.node.shape.geom : null,
         bBox, center = {};
@@ -4402,7 +4504,7 @@ OG.renderer.RaphaelRenderer.prototype.moveCentroid = function (element, position
     if (rElement && geometry) {
         center = geometry.getCentroid();
 
-        return this.move(element, [position[0] - center.x, position[1] - center.y], excludeEdgeId);
+        return this.move(element, [position[0] - center.x, position[1] - center.y]);
     } else if (rElement) {
         bBox = rElement.getBBox();
         center.x = bBox.x + OG.Util.round(bBox.width / 2);
@@ -4420,11 +4522,10 @@ OG.renderer.RaphaelRenderer.prototype.moveCentroid = function (element, position
  *
  * @param {Element,String} element Element 또는 ID
  * @param {Number} angle 각도
- * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
  * @return {Element} Element
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle, excludeEdgeId) {
+OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         type = rElement ? rElement.node.getAttribute("_shape") : null,
         geometry = rElement ? rElement.node.shape.geom : null,
@@ -4448,7 +4549,7 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle, exclude
             geometry.rotate(angle);
             rElement.node.shape.angle = angle;
 
-            this.redrawShape(rElement.node, excludeEdgeId);
+            this.redrawShape(rElement.node);
         }
 
         // rotateShape event fire
@@ -4472,11 +4573,10 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle, exclude
  *
  * @param {Element,String} element Element 또는 ID
  * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
- * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
  * @return {Element} Element
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset, excludeEdgeId) {
+OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         type = rElement ? rElement.node.getAttribute("_shape") : null,
         geometry = rElement ? rElement.node.shape.geom : null,
@@ -4487,10 +4587,7 @@ OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset, exclud
     if (rElement && type && geometry) {
         geometry.resize(offset[0], offset[1], offset[2], offset[3]);
 
-        this.redrawShape(rElement.node, excludeEdgeId);
-
-        // resize shpae
-        this.resizeShape(rElement.node, excludeEdgeId);
+        this.redrawShape(rElement.node);
 
         // resizeShape event fire
         $(this._PAPER.canvas).trigger('resizeShape', [rElement.node, offset]);
@@ -5449,34 +5546,28 @@ OG.renderer.RaphaelRenderer.prototype._getPositionFromTerminal = function (termi
 /**
  * 캔버스의 Edge 들을 항상 최상단으로 이동시킨다.
  *
- * @param {Element,String} terminal 터미널 Element or ID
  */
 OG.renderer.RaphaelRenderer.prototype.toFrontEdges = function () {
     //Edge는 항상 toFront
     var me = this;
-    var minIdx;
     var root = me.getRootGroup();
-    var edges = [];
-    var shapes = [];
-    $.each(root.childNodes, function (idx, childNode) {
-        if ($(childNode).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
-            //root.removeChild(childNode);
-            //root.appendChild(childNode);
+    var edges = me.getAllEdges();
 
-            edges.push(childNode);
-        } else {
-            shapes.push(childNode);
-        }
-    });
-
-    for (var i = 0; i < shapes.length; i++) {
-        root.removeChild(shapes[i]);
-        root.appendChild(shapes[i]);
-    }
     for (var i = 0; i < edges.length; i++) {
         root.removeChild(edges[i]);
         root.appendChild(edges[i]);
     }
+}
+
+/**
+ * 캔버스의 Edge 들의 가이드를 제거한다.
+ */
+OG.renderer.RaphaelRenderer.prototype.removeAllEdgeGuide = function () {
+    var me = this;
+    var edges = me.getAllEdges();
+    $.each(edges, function (index, edge) {
+        me.removeGuide(edge);
+    })
 }
 
 /**
@@ -5621,4 +5712,1150 @@ OG.renderer.RaphaelRenderer.prototype.redo = function () {
 
 }
 
+/**
+ * 도형의 Lane 타입 여부를 판별한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {boolean} true false
+ */
+OG.renderer.RaphaelRenderer.prototype.isLane = function (element) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return false;
+    }
+    if (rElement.node.shape instanceof OG.shape.HorizontalLaneShape
+        || rElement.node.shape instanceof OG.shape.VerticalLaneShape) {
+        return true;
+    }
+    return false;
+}
 
+/**
+ * 도형의 Pool 타입 여부를 판별한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {boolean} true false
+ */
+OG.renderer.RaphaelRenderer.prototype.isPool = function (element) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return false;
+    }
+    if (rElement.node.shape instanceof OG.shape.HorizontalPoolShape
+        || rElement.node.shape instanceof OG.shape.VerticalPoolShape) {
+        return true;
+    }
+    return false;
+}
+/**
+ * 도형의 ScopeActivity 타입 여부를 판별한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {boolean} true false
+ */
+OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return false;
+    }
+    if (rElement.node.shape instanceof OG.shape.bpmn.ScopeActivity) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * 도형의 HorizontalLaneShape 타입 여부를 판별한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {boolean} true false
+ */
+OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
+    return element.shape instanceof OG.shape.HorizontalLaneShape;
+}
+
+/**
+ * 도형의 VerticalLaneShape 타입 여부를 판별한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {boolean} true false
+ */
+OG.renderer.RaphaelRenderer.prototype.isVerticalLane = function (element) {
+    return element.shape instanceof OG.shape.VerticalLaneShape;
+}
+
+/**
+ * Lane 타입 도형 하위의 Lane 타입들을 리턴한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {Array} childsLanes
+ */
+OG.renderer.RaphaelRenderer.prototype.getChildLane = function (element) {
+    var childsLanes = [], me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return childsLanes;
+    }
+    element = rElement.node;
+    var childs = me.getChilds(element);
+    $.each(childs, function (index, child) {
+        if (me.isLane(child)) {
+            childsLanes.push(child);
+        }
+    })
+    return childsLanes;
+}
+
+/**
+ * Lane 타입이 내부적으로 분기가 가능한 수를 리턴한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {Number} 0,1,2
+ */
+OG.renderer.RaphaelRenderer.prototype.enableDivideCount = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    var geometry = rElement ? rElement.node.shape.geom : null;
+    if (!rElement || !geometry) {
+        return 0;
+    }
+    element = rElement.node;
+    if (!me.isLane(element)) {
+        return 0;
+    }
+
+    //하위 Lane 이 있다면 분기할 수 없다.
+    if (me.getChildLane(element).length) {
+        return 0;
+    }
+
+    var minSize = me._CONFIG.LANE_MIN_SIZE;
+    var boundary = geometry.getBoundary();
+    var height = boundary.getHeight();
+    var width = boundary.getWidth();
+    if (this.isHorizontalLane(element)) {
+        if (height > (minSize * 3)) {
+            return 2;
+        }
+        if (height > (minSize * 2)) {
+            return 1;
+        }
+    }
+    if (this.isVerticalLane(element)) {
+        if (width > (minSize * 3)) {
+            return 2;
+        }
+        if (width > (minSize * 2)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/**
+ * Lane 의 타이틀 영역을 제외한 boundary 를 리턴한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @param {OG.geometry.Envelope} boundary
+ */
+OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    var geometry = rElement ? rElement.node.shape.geom : null;
+
+    if (!rElement || !geometry) {
+        return null;
+    }
+
+    var boundary = geometry.getBoundary();
+    var style = geometry.style.map;
+    var titleSize = style['title-size'] ? style['title-size'] : 20;
+    var upperLeft = boundary.getUpperLeft();
+    var width = boundary.getWidth();
+    var height = boundary.getHeight();
+    var newUpperLeft, newWidth, newHeight;
+
+    if (!me.isLane(element)) {
+        return boundary;
+    }
+
+    if (me.isHorizontalLane(element)) {
+        newUpperLeft = new OG.geometry.Coordinate(upperLeft.x + titleSize, upperLeft.y);
+        newWidth = width - titleSize;
+        newHeight = height;
+    }
+
+    if (me.isVerticalLane(element)) {
+        newUpperLeft = new OG.geometry.Coordinate(upperLeft.x, upperLeft.y + titleSize);
+        newWidth = width;
+        newHeight = height - titleSize;
+    }
+
+    if (newUpperLeft) {
+        return new OG.geometry.Envelope(newUpperLeft, newWidth, newHeight);
+    }
+
+    //타이틀 라벨이 없을 경우 바운더리 리턴.
+    return boundary;
+}
+
+/**
+ * Lane 을 분기한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @param {String} quarterOrder 분기 명령
+ */
+OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrder) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    var geometry = rElement ? rElement.node.shape.geom : null;
+    if (!rElement || !geometry) {
+        return;
+    }
+    element = rElement.node;
+
+    if (!me.isLane(element)) {
+        return;
+    }
+
+    var isUpper = quarterOrder === OG.Constants.GUIDE_SUFFIX.QUARTER_UPPER ? true : false;
+    var isLow = quarterOrder === OG.Constants.GUIDE_SUFFIX.QUARTER_LOW ? true : false;
+    var isBisector = quarterOrder === OG.Constants.GUIDE_SUFFIX.QUARTER_BISECTOR ? true : false;
+    var isThirds = quarterOrder === OG.Constants.GUIDE_SUFFIX.QUARTER_THIRDS ? true : false;
+
+    //내부 분기일경우
+    //1. 내 영역에서 타이틀 영역을 뺀 것이 분기가능한 바운더리 영역이다.
+    //2. 2등분 또는 3등분 만큼 새로운 lane 을 만들어 영역안에 위치시키고 부모 lane 에 인서트한다.
+    if (isBisector || isThirds) {
+        var quarterLength = isBisector ? 2 : 3;
+        var targetArea = me.getExceptTitleLaneArea(element);
+        var targetUpperLeft = targetArea.getUpperLeft();
+        for (var i = 0; i < quarterLength; i++) {
+            if (me.isHorizontalLane(element)) {
+                var _width = parseInt(targetArea.getWidth());
+                var _height = parseInt(targetArea.getHeight() / quarterLength);
+                var x = targetUpperLeft.x;
+                var y = targetUpperLeft.y + (_height * i);
+                if (i === quarterLength - 1) {
+                    _height = _height + (targetArea.getHeight() % quarterLength);
+                }
+                me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.HorizontalLaneShape(), [_width, _height], null, null, element.id);
+            }
+
+            if (me.isVerticalLane(element)) {
+                var _width = parseInt(targetArea.getWidth() / quarterLength);
+                var _height = parseInt(targetArea.getHeight());
+                var x = targetUpperLeft.x + (_width * i);
+                var y = targetUpperLeft.y;
+                if (i === quarterLength - 1) {
+                    _width = _width + (targetArea.getWidth() % quarterLength);
+                }
+                me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.VerticalLaneShape(), [_width, _height], null, null, element.id);
+            }
+            me.fitLaneOrder(element);
+        }
+    }
+
+    //외부 확장일 경우
+    //1.최상위 lane 일 경우
+    // 1) 하위 lane 이 없으면 하위 lane 을 추가하고 기준으로 삼는다.
+    // 2) 하위 lane 이 있으면 upper,low 에 따른 기준을 골라 삼는다.
+
+    //2.최상위 lane 이 아닐경우
+    // 1) 기준에서 upper, low에 따라 신규 lane 을 생성한다.
+    // 2) 신규 lane 은 디폴트 규격
+    // 3) 신규 lane 을 기준 대상 부모 lane 에 추가한다.
+    if (isUpper || isLow) {
+        var standardLane;
+
+        //최상위 lane 일 경우
+        if (me.isTopGroup(element)) {
+            var childLane = me.getChildLane(element);
+
+            //하위 lane 이 없으면 하위 lane 을 추가하고 기준으로 삼는다.
+            if (!childLane.length) {
+                var targetArea = me.getExceptTitleLaneArea(element);
+                var targetUpperLeft = targetArea.getUpperLeft();
+                var _width = targetArea.getWidth();
+                var _height = targetArea.getHeight();
+                var x = targetUpperLeft.x;
+                var y = targetUpperLeft.y;
+                var shape = me.isHorizontalLane(element) ? new OG.HorizontalLaneShape() : new OG.VerticalLaneShape();
+                standardLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, element.id);
+            }
+
+            //하위 lane 이 있으면 upper,low 에 따른 기준을 골라 삼는다.
+            else {
+                $.each(childLane, function (idx, child) {
+                    if (!standardLane) {
+                        standardLane = child;
+                    }
+                    var childUpperLeft = child.shape.geom.getBoundary().getUpperLeft();
+                    var standardUpperLeft = standardLane.shape.geom.getBoundary().getUpperLeft();
+                    if (me.isHorizontalLane(element) && isUpper) {
+                        //y가 가장 높은것 (좌표상 작은수치)
+                        if (childUpperLeft.y < standardUpperLeft.y) {
+                            standardLane = child;
+                        }
+                    }
+                    if (me.isHorizontalLane(element) && isLow) {
+                        //y 가 가장 낮은것 (좌표상 높은수치)
+                        if (childUpperLeft.y > standardUpperLeft.y) {
+                            standardLane = child;
+                        }
+                    }
+                    if (me.isVerticalLane(element) && isUpper) {
+                        //x 가 가장 높은것
+                        if (childUpperLeft.x > standardUpperLeft.x) {
+                            standardLane = child;
+                        }
+                    }
+                    if (me.isVerticalLane(element) && isLow) {
+                        //x 가 가장 낮은것
+                        if (childUpperLeft.x < standardUpperLeft.x) {
+                            standardLane = child;
+                        }
+                    }
+                });
+            }
+        } else {
+            standardLane = element;
+        }
+
+        //기준이 정해졌다면, 기준에서 upper, low에 따라 신규 lane 을 생성한다.
+        //확장 방향에 따라 영향을 받는 lane 들의 위치를 재조정한다.
+        if (standardLane) {
+            var parent = me.getParent(standardLane);
+            var boundary = standardLane.shape.geom.getBoundary();
+            var defaultSize = me._CONFIG.LANE_DEFAULT_SIZE;
+            var _width;
+            var _height;
+            var shape;
+            var x = boundary.getUpperLeft().x;
+            var y = boundary.getUpperLeft().y;
+            var moveOffset = [];
+
+            if (me.isHorizontalLane(element)) {
+                shape = new OG.HorizontalLaneShape();
+                _width = boundary.getWidth();
+                _height = defaultSize;
+            }
+            if (me.isVerticalLane(element)) {
+                shape = new OG.VerticalLaneShape();
+                _width = defaultSize;
+                _height = boundary.getHeight();
+            }
+
+            if (me.isHorizontalLane(element) && isUpper) {
+                x = boundary.getUpperLeft().x;
+                y = boundary.getUpperLeft().y - _height;
+                moveOffset = [0, (_height * -1)];
+            }
+            if (me.isHorizontalLane(element) && isLow) {
+                x = boundary.getLowerLeft().x;
+                y = boundary.getLowerLeft().y;
+                moveOffset = [0, _height];
+            }
+            if (me.isVerticalLane(element) && isUpper) {
+                x = boundary.getUpperRight().x;
+                y = boundary.getUpperRight().y;
+                moveOffset = [_width, 0];
+            }
+            if (me.isVerticalLane(element) && isLow) {
+                x = boundary.getUpperLeft().x - _width;
+                y = boundary.getUpperLeft().y;
+                moveOffset = [(_width * -1), 0];
+            }
+
+            var lanesToMove = [];
+            var baseLanes = me.getBaseLanes(standardLane);
+            var indexOfLane = me.getIndexOfLane(standardLane);
+            $.each(baseLanes, function (index, baseLane) {
+                if (isUpper) {
+                    if (index < indexOfLane) {
+                        lanesToMove.push(baseLane);
+                    }
+                }
+                if (isLow) {
+                    if (index > indexOfLane) {
+                        lanesToMove.push(baseLane);
+                    }
+                }
+            })
+            me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, parent.id);
+            $.each(lanesToMove, function (index, laneToMove) {
+                me.move(laneToMove, moveOffset);
+            });
+            me.reEstablishLane(standardLane);
+            me.fitLaneOrder(standardLane);
+        }
+    }
+}
+
+/**
+ * Lane 의 최상의 Lane 으로부터 모든 Base Lane 들을 반환한다.
+ * Base Lane 은 자식 Lane 을 가지지 않는 Lane 을 뜻함.
+ * 반환하는 Array 는 좌표상의 값을 기준으로 정렬되어 있는 상태이다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {Array} childBaseLanes
+ */
+OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    var rootLane;
+    var baseLanes = [];
+    var tempLanes = [];
+    var sortable = [];
+
+    function chooseBaseLane(lane) {
+        var _childLanes = me.getChildLane(lane);
+        if (_childLanes.length) {
+            for (var i = 0; i < _childLanes.length; i++) {
+                chooseBaseLane(_childLanes[i]);
+            }
+        } else {
+            tempLanes.push(lane);
+        }
+    }
+
+    if (!rElement) {
+        return baseLanes;
+    }
+    element = rElement.node;
+    rootLane = me.getRootLane(element);
+
+    if (!rootLane) {
+        return baseLanes;
+    }
+
+    chooseBaseLane(rootLane);
+
+    var isHorizontal = me.isHorizontalLane(rootLane);
+    var isVertical = me.isVerticalLane(rootLane);
+
+    $.each(tempLanes, function (index, tempLane) {
+        var upperLeft = tempLane.shape.geom.getBoundary().getUpperLeft();
+        if (isHorizontal) {
+            sortable.push([tempLane, upperLeft.y]);
+        }
+        if (isVertical) {
+            sortable.push([tempLane, upperLeft.x]);
+        }
+    })
+
+    //수직배열: y값이 작은값부터 정렬한다.
+    if (isHorizontal) {
+        sortable.sort(function (a, b) {
+            return a[1] - b[1]
+        })
+    }
+    //수평배열: x값이 큰 값부터 정렬한다.
+    if (isVertical) {
+        sortable.sort(function (a, b) {
+            return b[1] - a[1]
+        })
+    }
+    $.each(sortable, function (index, sort) {
+        baseLanes.push(sort[0]);
+    })
+    return baseLanes;
+}
+
+/**
+ * Lane 의 최상위 Lane 을 반환한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {Element} Lane Element
+ */
+OG.renderer.RaphaelRenderer.prototype.getRootLane = function (element) {
+    var me = this;
+    var rootLane;
+    var parent;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return null;
+    }
+    element = rElement.node;
+
+    if (!me.isLane(element)) {
+        return null;
+    }
+
+    while (!rootLane) {
+        if (!parent) {
+            parent = element;
+        }
+        if (me.getRootGroup().id === parent.id) {
+            rootLane = null;
+            break;
+        }
+        if (me.isTopGroup(parent)) {
+            rootLane = parent;
+        } else {
+            parent = me.getParent(parent);
+        }
+    }
+    return rootLane;
+}
+
+/**
+ * Lane 의 BaseLane 으로부터 자신의 순서를 구한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {Number} index
+ */
+OG.renderer.RaphaelRenderer.prototype.getIndexOfLane = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return null;
+    }
+    element = rElement.node;
+
+    if (!me.isLane(element)) {
+        return null;
+    }
+
+    var index = -1;
+    var baseLanes = me.getBaseLanes(element);
+    $.each(baseLanes, function (idx, baseLane) {
+        if (element.id === baseLane.id) {
+            index = idx;
+        }
+    })
+    if (index < 0) {
+        throw new Error("Lane Element has no index.");
+    } else {
+        return index;
+    }
+}
+
+/**
+ * Lane 의 최상위 Lane 으로부터 Depth를 구한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {Number} depth
+ */
+OG.renderer.RaphaelRenderer.prototype.getDepthOfLane = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return null;
+    }
+    if (!me.isLane(element)) {
+        return null;
+    }
+
+    var lengthToRoot = 0;
+
+    function cacualateDepth(lane) {
+        if (me.isLane(lane) && !me.isTopGroup(lane)) {
+            lengthToRoot++;
+            cacualateDepth(me.getParent(lane));
+        }
+    }
+
+    cacualateDepth(element);
+
+    return lengthToRoot;
+}
+
+/**
+ * Lane 의 BaseLane 영역을 기준으로 전체 Lane 의 구조를 재정립한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ */
+OG.renderer.RaphaelRenderer.prototype.reEstablishLane = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return null;
+    }
+    element = rElement.node;
+
+    if (!me.isLane(element)) {
+        return null;
+    }
+    var baseLanes = me.getBaseLanes(element);
+
+    //베이스라인으로만 이루어진 부모 Lane 집합을 구한다.
+    var estableishTargets = [];
+    var parents = {};
+    $.each(baseLanes, function (index, baseLane) {
+        //key, value 집합으로 추린다.
+        var parent = me.getParent(baseLane);
+        if (parent && parent.id) {
+            parents[parent.id] = parent;
+        }
+    });
+    for (var key in parents) {
+        var hasNoChild = true;
+        var childLanes = me.getChildLane(parents[key]);
+        $.each(childLanes, function (index, childLane) {
+            var childOfchildLanes = me.getChildLane(childLane);
+            if (childOfchildLanes && childOfchildLanes.length) {
+                hasNoChild = false;
+            }
+        });
+        if (hasNoChild) {
+            estableishTargets.push(parents[key]);
+        }
+    }
+
+    function establishLanes(lanes) {
+        //재정립할 대상이 더이상 없을 경우 루프를 종료한다.
+        if (!lanes.length) {
+            return;
+        }
+        //가상의 Lane 트리 구조를 생각했을 때 depth 가 높은 순으로 정렬
+        var sortable = [];
+        $.each(lanes, function (index, lane) {
+            var depth = me.getDepthOfLane(lane);
+            sortable.push([lane, depth]);
+        })
+        sortable.sort(function (a, b) {
+            return b[1] - a[1];
+        })
+
+        //정렬된 재정립 대상마다 childLane의 영역을 기준으로 자신의 영역을 수정한다.
+        $.each(sortable, function (index, sorted) {
+            var lane = sorted[0];
+            var envelope = me.getBoundaryOfElements(me.getChildLane(lane));
+            var style = lane.shape.geom.style.map;
+            var titleSize = style['title-size'] ? style['title-size'] : 20;
+            var left, right, upper, lower;
+            upper = envelope.getUpperLeft().y;
+            lower = envelope.getLowerRight().y;
+            left = envelope.getUpperLeft().x;
+            right = envelope.getLowerRight().x;
+            if (me.isHorizontalLane(lane)) {
+                left = left - titleSize;
+            }
+            if (me.isVerticalLane(lane)) {
+                upper = upper - titleSize;
+            }
+
+            var boundary = lane.shape.geom.getBoundary();
+
+            upper = boundary.getUpperCenter().y - upper;
+            lower = lower - boundary.getLowerCenter().y;
+            left = boundary.getLeftCenter().x - left;
+            right = right - boundary.getRightCenter().x;
+
+            me.resize(lane, [upper, lower, left, right]);
+        })
+
+        //대상마다 부모를 선정하여 다음 루프를 위한 estableishTargets를 다시 수집 한다.
+        var newxtEstableishTargets = [];
+        var nextParents = {};
+        $.each(lanes, function (index, lane) {
+            var depth = me.getDepthOfLane(lane);
+            //depth 가 0은 루트이므로 다음수집대상에 포함되지 않는다.
+            if (depth > 0) {
+                var parent = me.getParent(lane);
+                if (parent && parent.id) {
+                    nextParents[parent.id] = parent;
+                }
+            }
+        })
+        for (var key in nextParents) {
+            newxtEstableishTargets.push(nextParents[key]);
+        }
+        establishLanes(newxtEstableishTargets);
+    }
+
+    establishLanes(estableishTargets);
+}
+
+/**
+ * 주어진 Shape 들의 바운더리 영역을 반환한다.
+ *
+ * @param {Element[]} elements
+ * @return {OG.geometry.Envelope} Envelope 영역
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.getBoundaryOfElements = function (elements) {
+    var geometryArray = [], geometryCollection, envelope, i;
+
+    if (elements && elements.length > 0) {
+        for (i = 0; i < elements.length; i++) {
+
+            geometryArray.push(elements[i].shape.geom);
+        }
+        geometryCollection = new OG.GeometryCollection(geometryArray);
+        envelope = geometryCollection.getBoundary();
+    }
+
+    return envelope;
+};
+
+/**
+ * Lane 의 baseLane 들 중
+ * Lane의 주어진 direction 과 BaseLane 의 주어진 direction 이 가장 가까운 BaseLane 의 인덱스를 반환한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @param {String} direction
+ * @return {Number} index
+ */
+OG.renderer.RaphaelRenderer.prototype.getNearestBaseLaneIndexAsDirection = function (element, direction) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement || !direction) {
+        return null;
+    }
+    if (!me.isLane(element)) {
+        return null;
+    }
+
+    var orgValue;
+    var index;
+    var nearestValue;
+    var baseLanes = me.getBaseLanes(element);
+    var orgEnvelope = me.getBoundary(element);
+    var orgLeft, orgRight, orgUpper, orgLow;
+    orgUpper = orgEnvelope.getUpperLeft().y;
+    orgLow = orgEnvelope.getLowerRight().y;
+    orgLeft = orgEnvelope.getUpperLeft().x;
+    orgRight = orgEnvelope.getLowerRight().x;
+
+    $.each(baseLanes, function (idx, baseLane) {
+        var envelope = me.getBoundary(baseLane);
+        var left, right, upper, low, compareValue;
+        upper = envelope.getUpperLeft().y;
+        low = envelope.getLowerRight().y;
+        left = envelope.getUpperLeft().x;
+        right = envelope.getLowerRight().x;
+        if (direction === 'upper') {
+            compareValue = upper;
+            orgValue = orgUpper;
+        }
+        if (direction === 'low') {
+            compareValue = low;
+            orgValue = orgLow;
+        }
+        if (direction === 'left') {
+            compareValue = left;
+            orgValue = orgLeft;
+        }
+        if (direction === 'right') {
+            compareValue = right;
+            orgValue = orgRight;
+        }
+        if (!nearestValue && nearestValue !== 0) {
+            nearestValue = Math.abs(compareValue - orgValue);
+            index = idx;
+        }
+        if (nearestValue > Math.abs(compareValue - orgValue)) {
+            nearestValue = Math.abs(compareValue - orgValue);
+            index = idx;
+        }
+    })
+
+    return index;
+}
+
+/**
+ * Group 의 내부 도형들의 Boundary를 반환한다.
+ * Lane 이면 최상위 Lane의 내부 도형들의 Boundary를 반환한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {OG.geometry.Envelope} Envelope 영역
+ */
+OG.renderer.RaphaelRenderer.prototype.getBoundaryOfInnerShapesGroup = function (element) {
+    var me = this;
+    var innerShapes = [];
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return null;
+    }
+    element = rElement.node;
+
+    var group;
+    var childsShapes = [];
+    if (me.isLane(element)) {
+        childsShapes = me.getInnerShapesOfLane(element);
+    } else {
+        childsShapes = me.getChilds(element);
+    }
+
+    $.each(childsShapes, function (idx, childsShape) {
+        if (!me.isLane(childsShape)) {
+            innerShapes.push(childsShape);
+        }
+    })
+    if (!innerShapes.length) {
+        return null;
+    }
+    return me.getBoundaryOfElements(innerShapes)
+}
+
+
+/**
+ * Lane 의 BaseLane 중 길이가 가장 작은 Lane 을 반환한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @param {Element} baseLane
+ */
+OG.renderer.RaphaelRenderer.prototype.getSmallestBaseLane = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+
+    if (!rElement) {
+        return null;
+    }
+
+    element = rElement.node;
+
+    if (!me.isLane(element)) {
+        return null;
+    }
+
+    var baseLanes = me.getBaseLanes(element);
+    var smallestValue;
+    var smallestLane;
+    $.each(baseLanes, function (index, baseLane) {
+        var compareValue;
+        var boundary = me.getBoundary(baseLane);
+        if (me.isHorizontalLane(baseLane)) {
+            compareValue = boundary.getWidth();
+        }
+        if (me.isVerticalLane(baseLane)) {
+            compareValue = boundary.getHeight();
+        }
+        if (compareValue) {
+            if (!smallestLane) {
+                smallestLane = baseLane;
+                smallestValue = compareValue;
+            }
+            if (compareValue < smallestValue) {
+                smallestLane = baseLane;
+                smallestValue = compareValue;
+            }
+        }
+    });
+
+    return smallestLane;
+}
+/**
+ * Lane 을 리사이즈한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
+ */
+OG.renderer.RaphaelRenderer.prototype.resizeLane = function (element, offset) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+
+    if (!rElement) {
+        return;
+    }
+    element = rElement.node;
+
+    if (!me.isLane(element)) {
+        return;
+    }
+
+    var resizeChildLane = function (parentLane, resizeOffset) {
+        me.resize(parentLane, resizeOffset);
+
+        var childLanes = me.getChildLane(parentLane);
+        $.each(childLanes, function (index, childLane) {
+            resizeChildLane(childLane, resizeOffset);
+        })
+    }
+
+    var du = offset[0], dlw = offset[1], dl = offset[2], dr = offset[3];
+    var rootLane = me.getRootLane(element);
+    var baseLanes = me.getBaseLanes(element);
+
+    //1.baseLane 이 리사이즈 된 경우 -> 주변 baseLane 리사이즈
+    //2.baseLane 이 아닌 것이 리사이즈 된 경우
+    // -> 리사이즈 증분값으로부터 디렉션을 추적
+    // -> 실질적으로 리사이징 된 베이스 라인을 선정
+    // -> 주변 baseLane 리사이즈
+    var myIndex;
+    if (me.getChildLane(element).length) {
+        if (me.isHorizontalLane(element)) {
+            if (du) {
+                myIndex = me.getNearestBaseLaneIndexAsDirection(element, 'upper');
+            }
+            if (dlw) {
+                myIndex = me.getNearestBaseLaneIndexAsDirection(element, 'low');
+            }
+        }
+        if (me.isVerticalLane(element)) {
+            if (dl) {
+                myIndex = me.getNearestBaseLaneIndexAsDirection(element, 'left');
+            }
+            if (dr) {
+                myIndex = me.getNearestBaseLaneIndexAsDirection(element, 'right');
+            }
+        }
+    } else {
+        myIndex = me.getIndexOfLane(element);
+    }
+
+    if (me.isHorizontalLane(element)) {
+
+        //HorizontalLane 인 경우는 dl, dr 값이 변경되었을 경우 모든 Lane 에 적용.
+        resizeChildLane(rootLane, [0, 0, dl, dr]);
+
+        //HorizontalLane 인 경우는 du,dlw 값이 변경되었을 경우만 주변 Lane 정리와 자신을 변경.
+        if (du || dlw) {
+            me.resize(baseLanes[myIndex], [du, dlw, 0, 0]);
+            if (myIndex > 0) {
+                me.resize(baseLanes[myIndex - 1], [0, (du * -1), 0, 0]);
+            }
+            if (myIndex < baseLanes.length - 1) {
+                me.resize(baseLanes[myIndex + 1], [(dlw * -1), 0, 0, 0]);
+            }
+        }
+    }
+    if (me.isVerticalLane(element)) {
+
+        //VerticalLane 인 경우는 du, dlw 값이 변경되었을 경우 모든 Lane 에 적용.
+        resizeChildLane(rootLane, [du, dlw, 0, 0]);
+
+        //VerticalLane 인 경우는 dl, dr 값이 변경되었을 경우만 주변 Lane 정리와 자신을 변경.
+        if (dl || dr) {
+            me.resize(baseLanes[myIndex], [0, 0, dl, dr]);
+            if (myIndex > 0) {
+                me.resize(baseLanes[myIndex - 1], [0, 0, (dr * -1), 0]);
+            }
+            if (myIndex < baseLanes.length - 1) {
+                me.resize(baseLanes[myIndex + 1], [0, 0, 0, (dl * -1)]);
+            }
+        }
+    }
+
+    //최종적으로 변경된 baseLane들을 기준으로 전체Lane을 재정립한다.
+    me.reEstablishLane(element);
+}
+
+/**
+ * Lane 을 삭제한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ */
+OG.renderer.RaphaelRenderer.prototype.removeLaneShape = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+
+    if (!rElement) {
+        return;
+    }
+    element = rElement.node;
+
+    if (!me.isLane(element)) {
+        me.removeShape(element);
+    }
+
+    if (me.isTopGroup(element)) {
+        me.removeShape(element);
+        return;
+    }
+
+    var baseLanes = me.getBaseLanes(element);
+    var rootLane = me.getRootLane(element);
+    var parentLane = me.getParent(element);
+    var sameSectorLanes = me.getChildLane(parentLane);
+
+    //부모Lane 의 하나있는 childLane 을 삭제할 경우
+    if (sameSectorLanes.length === 1) {
+        me.removeShape(element);
+        me.reEstablishLane(rootLane);
+        return;
+    }
+
+    //부모Lane 에 childLane 이 다수일 경우
+    if (me.isHorizontalLane(element)) {
+        var neighborTopBase;
+        var neighborLowBase;
+        var topBaseIndex = me.getNearestBaseLaneIndexAsDirection(element, 'upper');
+        var lowBaseIndex = me.getNearestBaseLaneIndexAsDirection(element, 'low');
+        var lostSize = me.getBoundary(element).getHeight();
+        if (topBaseIndex > 0) {
+            neighborTopBase = baseLanes[topBaseIndex - 1];
+        }
+        if (lowBaseIndex < baseLanes.length - 1) {
+            neighborLowBase = baseLanes[lowBaseIndex + 1];
+        }
+        if (me.getParent(element))
+            if (neighborTopBase && neighborLowBase) {
+                me.resize(neighborTopBase, [0, lostSize / 2, 0, 0]);
+                me.resize(neighborLowBase, [lostSize / 2, 0, 0, 0]);
+            }
+        if (neighborTopBase && !neighborLowBase) {
+            me.resize(neighborTopBase, [0, lostSize, 0, 0]);
+        }
+        if (!neighborTopBase && neighborLowBase) {
+            me.resize(neighborLowBase, [lostSize, 0, 0, 0]);
+        }
+        me.removeShape(element);
+        me.reEstablishLane(rootLane);
+    }
+
+    if (me.isVerticalLane(element)) {
+        var neighborRightBase;
+        var neighborLeftBase;
+        var rightBaseIndex = me.getNearestBaseLaneIndexAsDirection(element, 'right');
+        var leftBaseIndex = me.getNearestBaseLaneIndexAsDirection(element, 'left');
+        var lostSize = me.getBoundary(element).getWidth();
+        if (rightBaseIndex > 0) {
+            neighborRightBase = baseLanes[rightBaseIndex - 1];
+        }
+        if (leftBaseIndex < baseLanes.length - 1) {
+            neighborLeftBase = baseLanes[leftBaseIndex + 1];
+        }
+        if (me.getParent(element))
+            if (neighborRightBase && neighborLeftBase) {
+                me.resize(neighborRightBase, [0, 0, lostSize / 2, 0]);
+                me.resize(neighborLeftBase, [0, 0, 0, lostSize / 2]);
+            }
+        if (neighborRightBase && !neighborLeftBase) {
+            me.resize(neighborRightBase, [0, 0, lostSize, 0]);
+        }
+        if (!neighborRightBase && neighborLeftBase) {
+            me.resize(neighborLeftBase, [0, 0, 0, lostSize]);
+        }
+        me.removeShape(element);
+        me.reEstablishLane(rootLane);
+    }
+}
+
+/**
+ * Lane 내부 도형들을 구한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ */
+OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfLane = function (element) {
+    var me = this;
+    var innerShapes = [];
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return innerShapes;
+    }
+    element = rElement.node;
+
+    function getInnerShapes(lane) {
+        var childsShapes = me.getChilds(lane);
+        $.each(childsShapes, function (idx, childsShape) {
+            if (me.isLane(childsShape)) {
+                getInnerShapes(childsShape);
+            }
+            if (!me.isLane(childsShape)) {
+                innerShapes.push(childsShape);
+            }
+        })
+    }
+
+    var rootLane = me.getRootLane(element);
+    getInnerShapes(rootLane);
+
+    return innerShapes;
+}
+
+/**
+ * Lane 의 내부 도형들을 앞으로 이동시킨다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ */
+OG.renderer.RaphaelRenderer.prototype.fitLaneOrder = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+
+    if (!rElement) {
+        return;
+    }
+    element = rElement.node;
+
+    if (!me.isLane(element)) {
+        return;
+    }
+
+    var rootLane = me.getRootLane(element);
+    var innerShapesOfLane = me.getInnerShapesOfLane(element);
+
+    $.each(innerShapesOfLane, function (index, innerShape) {
+        rootLane.appendChild(innerShape);
+    });
+}
+
+/**
+ * Edge 가 Gourp 사이를 넘어가는 경우 스타일에 변화를 준다.
+ *
+ * @param {Element,String} Edge Element Element 또는 ID
+ */
+OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
+    var me = this;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+
+    if (!rElement) {
+        return;
+    }
+    element = rElement.node;
+    var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
+    if (!isEdge) {
+        return;
+    }
+
+    var getRootOfShape = function (_element) {
+        var parent = _element.parentElement;
+        if (me.isLane(parent)) {
+            return me.getRootLane(parent);
+        }
+        return parent;
+    };
+
+    var from = $(element).attr("_from");
+    var to = $(element).attr("_to");
+    var fromShape, toShape, fromRoot, toRoot;
+    if (from) {
+        fromShape = this._getShapeFromTerminal(from);
+        fromRoot = getRootOfShape(fromShape);
+    }
+    if (to) {
+        toShape = this._getShapeFromTerminal(to);
+        toRoot = getRootOfShape(toShape);
+    }
+
+    if (fromShape && toShape && fromRoot && toRoot) {
+        if (fromRoot.id !== toRoot.id) {
+            me.setShapeStyle(element, {"stroke-dasharray": '- '});
+            return;
+        }
+    }
+    me.setShapeStyle(element, {"stroke-dasharray": ''});
+}
+/**
+ * 모든 Edge 를 checkBridgeEdge
+ */
+OG.renderer.RaphaelRenderer.prototype.checkAllBridgeEdge = function () {
+    var me = this;
+    var edges = me.getAllEdges();
+    $.each(edges, function (index, edge) {
+        me.checkBridgeEdge(edge);
+    });
+}
+
+/**
+ * Group 내부의 모든 shape 을 리턴한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ */
+OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfGroup = function (element) {
+    var me = this;
+    var innerShapes = [];
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return innerShapes;
+    }
+    element = rElement.node;
+
+    var elements = [];
+    $(element).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "]").each(function (index, element) {
+        elements.push(element);
+    });
+    return elements;
+}
