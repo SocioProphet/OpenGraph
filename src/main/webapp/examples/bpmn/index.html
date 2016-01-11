@@ -236,6 +236,10 @@
                 }
             });
 
+            canvas.onDivideLane(function (event, divideLane){
+               // console.log(divideLane);
+            });
+
             // Shape 이 처음 Draw 되었을 때의 이벤트 리스너
             canvas.onDrawShape(function (event, shapeElement) {
 //            console.log('onDrawShape', shapeElement);

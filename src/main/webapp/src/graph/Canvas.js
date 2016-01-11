@@ -1807,6 +1807,17 @@ OG.graph.Canvas.prototype = {
     },
 
     /**
+     * Lane 이 divide 되었을 때의 이벤트 리스너
+     *
+     * @param {Function} callbackFunc 콜백함수(event, shapeElement)
+     */
+    onDivideLane: function (callbackFunc) {
+        $(this.getRootElement()).bind('divideLane', function (event, divideLanes) {
+            callbackFunc(event, divideLanes);
+        });
+    },
+
+    /**
      * 라벨이 Draw 되었을 때의 이벤트 리스너
      *
      * @param {Function} callbackFunc 콜백함수(event, shapeElement, labelText)

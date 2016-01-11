@@ -41,7 +41,7 @@ OG.shape.bpmn.M_Group.prototype.createShape = function () {
         //'stroke-dasharray': '- ',
         'r': 6,
         'fill': '#ffffff',
-        'fill-opacity': 1,
+        'fill-opacity': 0,
         "vertical-align": "top",
         "text-anchor": "start"
 

@@ -261,7 +261,6 @@ OG.handler.EventHandler.prototype = {
             $(root).removeData("groupTarget");
         }
 
-        //TODO 캔버스 마우스 무빙 이벤트로 교체한다.
         if (renderer.isGroup(element)) {
             $(element).bind({
                 mousemove: function () {
@@ -301,17 +300,18 @@ OG.handler.EventHandler.prototype = {
                     }
 
                     //이동중인 도형 중 Lane,Pool,ScopeActivity가 있다면 반응하지 않는다.
+                    //이동중인 도형 중 Lane 이 있다면 반응하지 않는다.
                     var blackList = false;
                     $.each(bBoxArray, function (idx, item) {
                         if (renderer.isLane(item.id)) {
                             blackList = true;
                         }
-                        if (renderer.isPool(item.id)) {
-                            blackList = true;
-                        }
-                        if (renderer.isScopeActivity(item.id)) {
-                            blackList = true;
-                        }
+                        //if (renderer.isPool(item.id)) {
+                        //    blackList = true;
+                        //}
+                        //if (renderer.isScopeActivity(item.id)) {
+                        //    blackList = true;
+                        //}
                     });
                     if (blackList) {
                         removeDropOverBox(targetElement);
@@ -349,7 +349,6 @@ OG.handler.EventHandler.prototype = {
                         removeDropOverBox(targetElement);
                         return;
                     }
-
 
                     $(root).data("groupTarget", targetElement);
                     me._RENDERER.drawDropOverGuide(targetElement);
@@ -811,7 +810,13 @@ OG.handler.EventHandler.prototype = {
                         $(root).removeData("groupTarget");
                     } else {
                         // ungrouping
-                        renderer.addToGroup(root, eleArray);
+                        var addToGroupArray = [];
+                        $.each(eleArray , function(idx , ele){
+                            if(ele.parentElement.id !== root.id){
+                                addToGroupArray.push(ele);
+                            }
+                        });
+                        renderer.addToGroup(root, addToGroupArray);
                     }
 
                     $.each(me._getSelectedElement(), function (idx, selected) {

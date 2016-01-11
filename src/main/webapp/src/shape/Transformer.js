@@ -30,7 +30,7 @@ OG.shape.Transformer.prototype.createShape = function () {
         'label-direction': 'horizontal',
         'vertical-align' : 'top',
         fill: '#ffffff',
-        'fill-opacity': 1
+        'fill-opacity': 0
     });
 
     return this.geom;

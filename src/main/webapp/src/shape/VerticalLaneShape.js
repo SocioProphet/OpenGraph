@@ -35,7 +35,7 @@ OG.shape.VerticalLaneShape.prototype.createShape = function () {
 		'vertical-align' : 'top',
 		'title-size' : 24,
 		fill: '#ffffff',
-		'fill-opacity': 1
+		'fill-opacity': 0
 	});
 
 	return this.geom;
