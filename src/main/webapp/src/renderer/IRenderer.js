@@ -1216,6 +1216,21 @@ OG.renderer.IRenderer.prototype = {
         return edges;
     },
     /**
+     * 캔버스의 모든 Edge 가 아닌 shpaes 를 리턴
+     *
+     * @return {Array} Edge Elements
+     */
+    getAllNotEdges: function () {
+        var shpaes = [];
+        var elements = this.getAllShapes();
+        $.each(elements, function (index, element) {
+            if ($(element).attr("_shape") !== OG.Constants.SHAPE_TYPE.EDGE) {
+                shpaes.push(element);
+            }
+        })
+        return shpaes;
+    },
+    /**
      * Edge 여부를 판단.
      *
      * @return {boolean} true false

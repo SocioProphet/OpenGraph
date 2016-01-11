@@ -279,7 +279,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         /**
          * Edge 선 이동딜레이 거리
          */
-        EDGE_MOVE_DELAY_SIZE: 10,
+        EDGE_MOVE_DELAY_SIZE: 14,
 
         /**
          * swimLane 최소 폭
@@ -817,16 +817,15 @@ OG.graph.Canvas.prototype = {
 
         fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
         fromPosition = [fromPosition.x, fromPosition.y];
+
         toPosition = this._RENDERER._getPositionFromTerminal(toTerminal);
         toPosition = [toPosition.x, toPosition.y];
-
 
         if (!geom) {
             vertices = [fromPosition, toPosition];
         } else {
             vertices = geom.vertices;
         }
-
 
         fromto = JSON.stringify(vertices[0]) + ',' + JSON.stringify(vertices[vertices.length - 1]);
         shape = eval('new ' + shapeId + '(' + fromto + ')');
@@ -1415,9 +1414,9 @@ OG.graph.Canvas.prototype = {
                     nextShapeIds;
 
                 cell['@id'] = $(item).attr('id');
-                if($(item).parent().attr('id') === $(node).attr('id')){
+                if ($(item).parent().attr('id') === $(node).attr('id')) {
                     cell['@parent'] = $(node).attr('id');
-                }else{
+                } else {
                     cell['@parent'] = $(item).parent().attr('id');
                 }
                 cell['@shapeType'] = shape.TYPE;

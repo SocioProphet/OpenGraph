@@ -2319,10 +2319,6 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
                 }
             }
             edge.shape.geom.setVertices(vertices);
-
-            me.trimConnection(edge);
-            me.trimEdge(edge);
-
             return edgeId;
         }
     edgeId = $(element).attr("_fromedge");
@@ -2442,7 +2438,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
 
     // 라인 드로잉
     if (fromShape) {
-        isEssensia = $(fromShape).attr("_shape_id").indexOf('OG.shape.essencia') === -1 ? false : true;
+        isEssensia = $(fromShape).attr("_shape_id").indexOf('OG.shape.essencia') !== -1;
     }
     if (!isEssensia) {
         edge.shape.geom.style.map['arrow-start'] = 'none';
@@ -2478,8 +2474,8 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         // connectShape event fire
         $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
     }
-
-    me.trimConnection(edge);
+    me.trimConnectInnerVertice(edge);
+    me.trimConnectIntersection(edge);
     me.trimEdge(edge);
     me.checkBridgeEdge(edge);
 
@@ -3063,59 +3059,52 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
  * ID에 해당하는 Element 의 Stick 용 가이드를 드로잉한다.
  *
  * @param {Element,String} element Element 또는 ID
- * @return {Object}
- * @override
+ * @param {Object} position
  */
-OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (element, toBeStuck, vertical) {
+OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
 
-    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _leftCenter, _upperCenter, path;
+    var me = this, path;
 
-    if (rElement && geometry) {
-        // Edge 인 경우 따로 처리
-        if ($(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
-            return this.drawEdgeGuide(element);
-        } else {
-            envelope = geometry.getBoundary();
-            _leftCenter = envelope.getLeftCenter();
-            _upperCenter = envelope.getUpperCenter();
-            this.removeStickGuide(vertical);
-
-            if (vertical) {
-                path = this._PAPER.path("M" + _upperCenter.x + ",0L" + _upperCenter.x + ",10000");
-            } else {
-                path = this._PAPER.path("M0," + _leftCenter.y + "L10000," + _leftCenter.y);
-            }
-
-            path.attr("stroke-width", "2");
-            path.attr("stroke", "#FFCC50");
-
-            if (vertical)
-                this._stickGuideX = path;
-            else
-                this._stickGuideY = path;
-
-            return null;
-        }
+    if (!position) {
+        return;
     }
-    return null;
+    if (position.x) {
+        this.removeStickGuide('vertical');
+        path = this._PAPER.path("M" + position.x + ",0L" + position.x + ",10000");
+        this._stickGuideX = path;
+    }
+    if (position.y) {
+        this.removeStickGuide('horizontal');
+        path = this._PAPER.path("M0," + position.y + "L10000," + position.y);
+        this._stickGuideY = path;
+    }
+    path.attr("stroke-width", "2");
+    path.attr("stroke", "#FFCC50");
+    path.attr("opacity", "0.7");
+
 };
 
-OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (vertical) {
-
-    if (vertical) {
+OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (direction) {
+    if (!direction) {
+        return;
+    }
+    if (direction === 'vertical') {
         if (this._stickGuideX) {
             this._remove(this._stickGuideX);
             this._stickGuideX = null;
         }
-    } else {
+    }
+    if (direction === 'horizontal') {
         if (this._stickGuideY) {
             this._remove(this._stickGuideY);
             this._stickGuideY = null;
         }
     }
+}
 
+OG.renderer.RaphaelRenderer.prototype.removeAllStickGuide = function () {
+    this.removeStickGuide('vertical');
+    this.removeStickGuide('horizontal');
 }
 
 /**
@@ -3135,9 +3124,7 @@ OG.renderer.RaphaelRenderer.prototype.removeGuide = function (element) {
         rElement.node.removeAttribute("_selected");
         this._remove(guide);
         this._remove(bBox);
-
-        this.removeStickGuide(true);
-        this.removeStickGuide(false);
+        this.removeAllStickGuide();
     }
 };
 
@@ -4789,7 +4776,7 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
         _connectBoxRect,
         _upperLeft,
         vertualBoundary,
-        _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2);
+        _size = me._CONFIG.GUIDE_RECT_SIZE;
 
     var spotCircleStyle = me._CONFIG.DEFAULT_STYLE.CONNECT_GUIDE_SPOT_CIRCLE;
     var spotRectStyle = me._CONFIG.DEFAULT_STYLE.CONNECT_GUIDE_SPOT_RECT;
@@ -4822,6 +4809,11 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
                         y: (vertices[index - 1].y + vertices[index].y) / 2
                     }
                     if (isRightAngle.type === 'vertical') {
+                        var lineLenght = vertices[index - 1].y - vertices[index].y;
+                        if(Math.abs(lineLenght) < 50){
+                            return;
+                        }
+
                         var width = spotRectStyle.w;
                         var height = spotRectStyle.h;
                         vertualBoundary = {
@@ -4832,6 +4824,11 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
                         };
                         spotRectStyle.cursor = 'ew-resize';
                     } else {
+                        var lineLenght = vertices[index - 1].x - vertices[index].x;
+                        if(Math.abs(lineLenght) < 50){
+                            return;
+                        }
+
                         var width = spotRectStyle.w;
                         var height = spotRectStyle.h;
                         vertualBoundary = {
@@ -5248,17 +5245,17 @@ OG.renderer.RaphaelRenderer.prototype.trimEdge = function (element) {
 
 /**
  * Edge Element의 연결 정보가 있을 경우 연결대상과 꼭지점의 다중 중복을 정리한다.
- * Edge Element의 연결 정보가 있을 경우 선분과 연결대상의 연결점을 자연스럽게 한다.
+ * 다중 중복 정리 후 Edge 의 모양이 직선인 경우 새로운 plain 을 제작한다.
  *
  * @param {Element,String} element Element 또는 ID
+ * @return {Element} element
  */
-OG.renderer.RaphaelRenderer.prototype.trimConnection = function (element) {
+OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (element) {
     var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         geometry = rElement ? rElement.node.shape.geom : null,
-        from, to, fromShape, toShape, fromXY, toXY, shortestIntersection;
+        from, to, fromShape, toShape, fromXY, toXY;
 
     var vertices = geometry.getVertices();
-    var orgVerticesLength = vertices.length;
     from = $(element).attr("_from");
     to = $(element).attr("_to");
 
@@ -5355,10 +5352,45 @@ OG.renderer.RaphaelRenderer.prototype.trimConnection = function (element) {
         caculateExternalVerticeLine();
     }
 
-    element.shape.geom.setVertices(vertices);
-    element = me.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
+    //다중 중복 정리 후 Edge 의 모양이 직선인 경우 새로운 plain 을 제작한다.
+    if (vertices.length === 2) {
+        element = me.drawEdge(new OG.Line(vertices[0], vertices[1]), element.shape.geom.style, element.id);
+    } else {
+        element.shape.geom.setVertices(vertices);
+        element = me.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
+    }
 
+    me.drawLabel(element);
+    me.drawEdgeLabel(element, null, 'FROM');
+    me.drawEdgeLabel(element, null, 'TO');
 
+    return element;
+}
+
+/**
+ * Edge Element의 연결 정보가 있을 경우 선분과 연결대상의 연결점을 자연스럽게 한다.
+ *
+ * @param {Element,String} element Element 또는 ID
+ * @return {Element} element
+ */
+OG.renderer.RaphaelRenderer.prototype.trimConnectIntersection = function (element) {
+    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
+        geometry = rElement ? rElement.node.shape.geom : null,
+        from, to, fromShape, toShape, fromXY, toXY, shortestIntersection;
+
+    var vertices = geometry.getVertices();
+    from = $(element).attr("_from");
+    to = $(element).attr("_to");
+
+    if (from) {
+        fromShape = this._getShapeFromTerminal(from);
+        fromXY = this._getPositionFromTerminal(from);
+    }
+
+    if (to) {
+        toShape = this._getShapeFromTerminal(to);
+        toXY = this._getPositionFromTerminal(to);
+    }
     //Edge Element의 연결 정보가 있을 경우 선분과 연결대상의 연결점을 자연스럽게 한다.
     if (from) {
         shortestIntersection =
@@ -5391,6 +5423,8 @@ OG.renderer.RaphaelRenderer.prototype.trimConnection = function (element) {
     me.drawLabel(element);
     me.drawEdgeLabel(element, null, 'FROM');
     me.drawEdgeLabel(element, null, 'TO');
+
+    return element;
 }
 
 /**
@@ -5450,6 +5484,9 @@ OG.renderer.RaphaelRenderer.prototype.removeHighlight = function (element, highl
         var childNodes = me.getNotConnectGuideElements(element);
         $.each(childNodes, function (idx, childNode) {
             var orgAttrGroup = $(childNode).data('orgAttrGroup');
+            if(!orgAttrGroup){
+                return;
+            }
             for (var key in highlight) {
                 var orgAttr = orgAttrGroup[key];
                 if (!orgAttr) {
@@ -5530,7 +5567,9 @@ OG.renderer.RaphaelRenderer.prototype._getPercentageFromTerminal = function (ter
  * @private
  */
 OG.renderer.RaphaelRenderer.prototype._getPositionFromTerminal = function (terminal) {
+    var me = this;
     var xy, pXpY;
+    var percentageDistance = {px: 50, py: 50};
     if (terminal) {
         var shapeId = terminal.substring(0, terminal.indexOf(OG.Constants.TERMINAL));
         var replace = terminal.replace(shapeId + OG.Constants.TERMINAL + '_', '');
@@ -5538,6 +5577,13 @@ OG.renderer.RaphaelRenderer.prototype._getPositionFromTerminal = function (termi
         var rElement = this._getREleById(shapeId);
         if (rElement) {
             xy = rElement.node.shape.geom.getPointFromPercentageDistance(pXpY);
+            if (!xy || isNaN(xy.x) || isNaN(xy.y)) {
+                xy = rElement.node.shape.geom.getPointFromPercentageDistance(
+                    [percentageDistance.px, percentageDistance.py]
+                );
+            }
+            xy.x = me._CONFIG.DRAG_GRIDABLE ? OG.Util.roundGrid(xy.x, me._CONFIG.MOVE_SNAP_SIZE / 2) : xy.x;
+            xy.y = me._CONFIG.DRAG_GRIDABLE ? OG.Util.roundGrid(xy.y, me._CONFIG.MOVE_SNAP_SIZE / 2) : xy.y;
         }
     }
     return xy;
@@ -6858,4 +6904,38 @@ OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfGroup = function (element)
         elements.push(element);
     });
     return elements;
+}
+
+/**
+ * 주어진 좌표를 포함하는 Elemnt 중 가장 Front 에 위치한 Element 를 반환한다.
+ *
+ * @param {Number[]} point 좌표값
+ * @return {Element} Element
+ */
+OG.renderer.RaphaelRenderer.prototype.getFrontForCoordinate = function (point) {
+    var me = this, envelope, mostFrontElement;
+
+    function getFront(group) {
+        var frontElement;
+        var childs = me.getChilds(group);
+        if (!childs.length) {
+            return;
+        }
+        $.each(childs, function (index, child) {
+            if (me.isEdge(child)) {
+                return;
+            }
+            envelope = me.getBoundary(child);
+            if (envelope.isContains(point)) {
+                frontElement = child;
+            }
+        })
+        if (frontElement) {
+            mostFrontElement = frontElement;
+            getFront(frontElement);
+        }
+    }
+
+    getFront(me.getRootGroup());
+    return mostFrontElement;
 }
