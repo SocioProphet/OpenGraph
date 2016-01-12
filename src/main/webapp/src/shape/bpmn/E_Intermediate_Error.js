@@ -40,7 +40,7 @@ OG.shape.bpmn.E_Intermediate_Error.prototype.createShape = function () {
 		[40, 50]
 	]);
 	geom1.style = new OG.geometry.Style({
-		fill : "none"
+		fill : "#ffffff"
 	});
 
 	geomCollection.push(new OG.geometry.Circle([50, 50], 50));

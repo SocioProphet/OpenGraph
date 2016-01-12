@@ -11,9 +11,9 @@
  * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
  */
 OG.shape.bpmn.C_Association = function (from, to, label) {
-	OG.shape.bpmn.C_Association.superclass.call(this, from, to, label);
+    OG.shape.bpmn.C_Association.superclass.call(this, from, to, label);
 
-	this.SHAPE_ID = 'OG.shape.bpmn.C_Association';
+    this.SHAPE_ID = 'OG.shape.bpmn.C_Association';
 };
 OG.shape.bpmn.C_Association.prototype = new OG.shape.EdgeShape();
 OG.shape.bpmn.C_Association.superclass = OG.shape.EdgeShape;
@@ -27,17 +27,17 @@ OG.C_Association = OG.shape.bpmn.C_Association;
  * @override
  */
 OG.shape.bpmn.C_Association.prototype.createShape = function () {
-	if (this.geom) {
-		return this.geom;
-	}
+    if (this.geom) {
+        return this.geom;
+    }
 
-	this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
-	this.geom.style = new OG.geometry.Style({
-		"edge-type"       : "straight",
-		"arrow-start"     : "none",
-		"arrow-end"       : "none",
-		'stroke-dasharray': '. '
-	});
+    this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
+    this.geom.style = new OG.geometry.Style({
+        "edge-type": "straight",
+        "arrow-start": "none",
+        "arrow-end": "none",
+        'stroke-dasharray': '. '
+    });
 
-	return this.geom;
+    return this.geom;
 };

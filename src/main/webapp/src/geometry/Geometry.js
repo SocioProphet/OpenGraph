@@ -169,16 +169,6 @@ OG.geometry.Geometry.prototype = {
         return length;
     },
 
-//	intersect : function (_geometry) {
-//		throw new OG.NotImplementedException();
-//	},
-//
-//	union : function (_geometry) {
-//		throw new OG.NotImplementedException();
-//	},
-
-    // 현 Geometry 객체의 Spatial Transform 를 지원하는 함수들
-
     /**
      * 가로, 세로 Offset 만큼 좌표를 이동한다.
      *
@@ -364,27 +354,6 @@ OG.geometry.Geometry.prototype = {
             return this.distanceToLine(D, [A, B]);
         }
 
-        // AB and CD are line segments
-        //   from comp.graphics.algo
-        //
-        //  Solving the above for r and s yields
-        //				(Ay-Cy)(Dx-Cx)-(Ax-Cx)(Dy-Cy)
-        //			r = ----------------------------- (eqn 1)
-        //				(Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx)
-        //
-        //			(Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay)
-        //		s = ----------------------------- (eqn 2)
-        //			(Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx)
-        //	Let P be the position vector of the intersection point, then
-        //		P=A+r(B-A) or
-        //		Px=Ax+r(Bx-Ax)
-        //		Py=Ay+r(By-Ay)
-        //	By examining the values of r & s, you can also determine some other
-        //	limiting conditions:
-        //		If 0<=r<=1 & 0<=s<=1, intersection exists
-        //		r<0 or r>1 or s<0 or s>1 line segments do not intersect
-        //		If the denominator in eqn 1 is zero, AB & CD are parallel
-        //		If the numerator in eqn 1 is also zero, AB & CD are collinear.
         r_top = (A.y - C.y) * (D.x - C.x) - (A.x - C.x) * (D.y - C.y);
         r_bot = (B.x - A.x) * (D.y - C.y) - (B.y - A.y) * (D.x - C.x);
         s_top = (A.y - C.y) * (B.x - A.x) - (A.x - C.x) * (B.y - A.y);
@@ -634,6 +603,34 @@ OG.geometry.Geometry.prototype = {
         }
 
         return percentageDistance;
+    },
+
+    /**
+     * 공간기하객체가 주어진 좌표를 포함하는지를 반환한다.
+     *
+     * @param {OG.geometry.Coordinate} _coordinate 좌표
+     * @return {boolean} true,false
+     */
+    isContainsPoint: function (_coordinate) {
+
+        var boundary, upperLeft, width,
+            height, flag;
+        _coordinate = this.convertCoordinate(_coordinate);
+        boundary = this.getBoundary();
+        flag = false;
+
+        if (boundary && boundary._upperLeft) {
+            upperLeft = boundary._upperLeft;
+            width = boundary._width;
+            height = boundary._height;
+
+            if (_coordinate.x >= upperLeft.x && _coordinate.x <= upperLeft.x + width
+                && _coordinate.y >= upperLeft.y && _coordinate.y <= upperLeft.y + height) {
+                flag = true;
+            }
+        }
+
+        return flag;
     },
 
     /**

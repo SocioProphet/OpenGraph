@@ -206,6 +206,10 @@
                 }
             });
 
+            canvas.onDivideLane(function (event, divideLane){
+               // console.log(divideLane);
+            });
+
             // Shape 이 처음 Draw 되었을 때의 이벤트 리스너
             canvas.onDrawShape(function (event, shapeElement) {
 //            console.log('onDrawShape', shapeElement);
@@ -241,25 +245,42 @@
 //            console.log('onDisconnectShape', edgeElement, fromElement, toElement);
             });
 
-            // examples
-            var circleShape = canvas.drawShape([100, 100], new OG.CircleShape(), [100, 100]);
-            var ellipseShape = canvas.drawShape([200, 400], new OG.EllipseShape('label'), [100, 50]);
+//            var rectshape = canvas.drawShape([200, 160], new OG.RectangleShape(), [100, 50]);
+//            var activity2 = canvas.drawShape([200, 180], new OG.HorizontalPoolShape(), [200, 200]);
+//            var activity1 = canvas.drawShape([200, 200], new OG.ScopeActivity(), [300, 300]);
+//
+//
+//            var circleShape = canvas.drawShape([450, 100], new OG.CircleShape(), [100, 100]);
+//
+//            var activity4 = canvas.drawShape([200, 200], new OG.VerticalPoolShape(), [310, 350]);
+//
+//            var edge1 = canvas.connect(activity1, circleShape);
+//            var edge2 = canvas.connect(activity2, circleShape);
+//            var edge3 = canvas.connect(rectshape, circleShape);
+
+            //var lane = canvas.drawShape([250, 200], new OG.HorizontalLaneShape(), [250, 200]);
+            //var verticalLane = canvas.drawShape([250, 500], new OG.VerticalLaneShape(), [250, 200]);
+
+
+            var circleShape = canvas.drawShape([101, 107], new OG.CircleShape(), [101, 102]);
+            var ellipseShape = canvas.drawShape([203, 405], new OG.EllipseShape('label'), [103, 53]);
 
             // connect
             var edge = canvas.connect(circleShape, ellipseShape);
 
             var rectangleShape4 = new OG.RectangleShape();
-            var imageShape = new OG.ImageShape('http://static.naver.net/www/u/2010/0611/nmms_215646753.gif', 'label');
-            var textShape1 = new OG.TextShape("Text Here, Hello World!");
-            var rectshape = canvas.drawShape([400, 300], rectangleShape4, [100, 50]);
-            canvas.drawShape([100, 500], imageShape, [150, 50, 45], {'text-anchor': 'middle', 'vertical-align': 'top'});
-            canvas.drawShape([300, 500], textShape1, [200, 100, 45], {
-                'font-size': 10,
-                'text-anchor': 'start',
-                'vertical-align': 'middle'
-            });
+            var rectshape = canvas.drawShape([407, 309], rectangleShape4, [101, 55]);
 
-            canvas.drawShape(null, new OG.EdgeShape([250, 50], [400, 250]));
+            //var imageShape = new OG.ImageShape('http://static.naver.net/www/u/2010/0611/nmms_215646753.gif', 'label');
+            //var textShape1 = new OG.TextShape("Text Here, Hello World!");
+//            canvas.drawShape([100, 500], imageShape, [150, 50, 45], {'text-anchor': 'middle', 'vertical-align': 'top'});
+//            canvas.drawShape([300, 500], textShape1, [200, 100, 45], {
+//                'font-size': 10,
+//                'text-anchor': 'start',
+//                'vertical-align': 'middle'
+//            });
+
+            canvas.drawShape(null, new OG.EdgeShape([251, 51], [401, 251]));
 
             var edge2 = canvas.connect(rectshape, ellipseShape);
 

@@ -9,10 +9,10 @@
  * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
  */
 OG.shape.bpmn.E_End_Cancel = function (label) {
-	OG.shape.bpmn.E_End_Cancel.superclass.call(this);
+    OG.shape.bpmn.E_End_Cancel.superclass.call(this);
 
-	this.SHAPE_ID = 'OG.shape.bpmn.E_End_Cancel';
-	this.label = label;
+    this.SHAPE_ID = 'OG.shape.bpmn.E_End_Cancel';
+    this.label = label;
 };
 OG.shape.bpmn.E_End_Cancel.prototype = new OG.shape.bpmn.Event();
 OG.shape.bpmn.E_End_Cancel.superclass = OG.shape.bpmn.Event;
@@ -26,34 +26,34 @@ OG.E_End_Cancel = OG.shape.bpmn.E_End_Cancel;
  * @override
  */
 OG.shape.bpmn.E_End_Cancel.prototype.createShape = function () {
-	var geom1, geom2, geom3, geomCollection = [];
-	if (this.geom) {
-		return this.geom;
-	}
+    var geom1, geom2, geom3, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
 
-	geom1 = new OG.geometry.Circle([50, 50], 50);
-	geom1.style = new OG.geometry.Style({
-		"stroke-width": 3
-	});
+    geom1 = new OG.geometry.Circle([50, 50], 50);
+    geom1.style = new OG.geometry.Style({
+        "stroke-width": 3
+    });
 
-	geom2 = new OG.geometry.Line([25, 25], [75, 75]);
-	geom2.style = new OG.geometry.Style({
-		"stroke-width": 5
-	});
+    geom2 = new OG.geometry.Line([25, 25], [75, 75]);
+    geom2.style = new OG.geometry.Style({
+        "stroke-width": 5
+    });
 
-	geom3 = new OG.geometry.Line([25, 75], [75, 25]);
-	geom3.style = new OG.geometry.Style({
-		"stroke-width": 5
-	});
+    geom3 = new OG.geometry.Line([25, 75], [75, 25]);
+    geom3.style = new OG.geometry.Style({
+        "stroke-width": 5
+    });
 
-	geomCollection.push(geom1);
-	geomCollection.push(geom2);
-	geomCollection.push(geom3);
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+    geomCollection.push(geom3);
 
-	this.geom = new OG.geometry.GeometryCollection(geomCollection);
-	this.geom.style = new OG.geometry.Style({
-		'label-position': 'bottom'
-	});
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom'
+    });
 
-	return this.geom;
+    return this.geom;
 };
