@@ -77,9 +77,11 @@ OG.handler.EventHandler.prototype = {
                 var eventOffset = me._getOffset(event)
                 var frontElement = renderer.getFrontForCoordinate([eventOffset.x, eventOffset.y]);
                 if (!frontElement) {
+                    event.stopImmediatePropagation();
                     return;
                 }
                 if (frontElement.id !== element.id) {
+                    event.stopImmediatePropagation();
                     return;
                 }
 

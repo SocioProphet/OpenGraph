@@ -773,6 +773,10 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         if (!frontGroup) {
             return;
         }
+        //draw 대상이 Edge 이면 리턴.
+        if(me.isEdge(groupNode)){
+            return;
+        }
         //draw 대상이 Lane 인 경우 리턴.
         if (me.isLane(groupNode)) {
             return;
