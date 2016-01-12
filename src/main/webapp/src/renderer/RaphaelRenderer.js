@@ -728,11 +728,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         this.drawExceptionType(groupNode);
 
 
-    if (shape instanceof OG.shape.HorizontalLaneShape
-        || shape instanceof OG.shape.VerticalLaneShape) {
-        groupNode.parentNode.insertBefore(groupNode, groupNode.parentNode.firstChild);
-    }
-
     // Draw Label
     if (!(shape instanceof OG.shape.TextShape)) {
         this.drawLabel(groupNode);
@@ -771,6 +766,37 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         }
     }
 
+    //신규 shape 이면 그룹위에 그려졌을 경우 그룹처리
+    var setGroup = function () {
+        var frontGroup = me.getFrontForBoundary(me.getBoundary(groupNode));
+
+        if (!frontGroup) {
+            return;
+        }
+        //draw 대상이 Lane 인 경우 리턴.
+        if (me.isLane(groupNode)) {
+            return;
+        }
+        //그룹이 Lane 인 경우 RootLane 으로 변경
+        if (me.isLane(frontGroup)) {
+            frontGroup = me.getRootLane(frontGroup);
+        }
+        if (!me._CONFIG.GROUP_DROPABLE || !frontGroup.shape.GROUP_DROPABLE) {
+            return;
+        }
+
+        //그룹이 A_Task 일경우 반응하지 않는다.
+        if (frontGroup.shape instanceof OG.shape.bpmn.A_Task) {
+            return;
+        }
+
+        //자신일 경우 반응하지 않는다.
+        if (frontGroup.id === groupNode.id) {
+            return;
+        }
+        frontGroup.appendChild(groupNode);
+    };
+    setGroup();
 
     if ($(shape).attr('auto_draw') == 'yes') {
         $(groupNode).attr('auto_draw', 'yes');
@@ -2624,7 +2650,7 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
 };
 
 /**
- * ID에 해당하는 Element 의 Edge 연결시 Drop Over 가이드를 드로잉한다.
+ * ID에 해당하는 Element 의 Drop Over 가이드를 드로잉한다.
  *
  * @param {Element,String} element Element 또는 ID
  * @override
@@ -6938,6 +6964,60 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForCoordinate = function (point) {
             }
             envelope = me.getBoundary(child);
             if (envelope.isContains(point)) {
+                frontElement = child;
+            }
+        })
+        if (frontElement) {
+            mostFrontElement = frontElement;
+            getFront(frontElement);
+        }
+    }
+
+    getFront(me.getRootGroup());
+    return mostFrontElement;
+}
+
+/**
+ * Boundary 를 포함하는 가장 Front 에 위치한 Group Element 를 반환한다.
+ *
+ * @param {OG.geometry.Envelope} boundary 영역
+ * @return {Element} Element
+ */
+OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) {
+    var me = this, envelope, mostFrontElement = null;
+    if (!boundary) {
+        return mostFrontElement;
+    }
+
+    function getFront(group) {
+        var frontElement;
+        var childs = me.getChilds(group);
+        if (!childs.length) {
+            return;
+        }
+        $.each(childs, function (index, child) {
+
+            if (me.isEdge(child)) {
+                return;
+            }
+            if (!me.isGroup(child)) {
+                return;
+            }
+
+            if (child.shape instanceof OG.shape.bpmn.A_Task) {
+                return;
+            }
+
+            //바운더리가 일치하는 경우 반응하지 않는다.
+            envelope = me.getBoundary(child);
+            if (boundary.getUpperLeft().x === envelope.getUpperLeft().x &&
+                boundary.getUpperLeft().y === envelope.getUpperLeft().y &&
+                boundary.getWidth() === envelope.getWidth() &&
+                boundary.getHeight() === envelope.getHeight()) {
+                return;
+            }
+
+            if (envelope.isContainsAll(boundary.getVertices())) {
                 frontElement = child;
             }
         })

@@ -246,127 +246,6 @@ OG.handler.EventHandler.prototype = {
         });
     },
 
-
-    /**
-     * 주어진 Shape Element 를 Drag & Drop 으로 그룹핑 가능하도록 한다.
-     *
-     * @param {Element} element Shape Element
-     */
-    enableDragAndDropGroup: function (element) {
-        var renderer = this._RENDERER;
-        var me = this, root = renderer.getRootGroup();
-
-        var removeDropOverBox = function (target) {
-            me._RENDERER.remove(target.id + OG.Constants.DROP_OVER_BBOX_SUFFIX);
-            $(root).removeData("groupTarget");
-        }
-
-        if (renderer.isGroup(element)) {
-            $(element).bind({
-                mousemove: function () {
-                    //A_Task 일 경우 반응하지 않는다.
-                    if (element.shape instanceof OG.shape.bpmn.A_Task) {
-                        return;
-                    }
-
-                    //접혀진 상태면 반응하지 않는다.
-                    if (element.shape.isCollapsed === true) {
-                        return;
-                    }
-                    //도형 이동중이 아니면 반응하지 않는다.
-                    var bBoxArray = $(root).data("bBoxArray");
-                    if (!bBoxArray) {
-                        return;
-                    }
-
-                    //Lane 도형에 접근할 경우 최상위 Lane 으로 타겟변경한다.
-                    var targetElement;
-                    if (renderer.isLane(element)) {
-                        targetElement = renderer.getRootLane(element);
-                    } else {
-                        targetElement = element;
-                    }
-
-                    //이동중인 도형들 속에 타겟이 겹친 경우 반응하지 않는다.
-                    var isSelf = false;
-                    $.each(bBoxArray, function (idx, item) {
-                        if (targetElement.id === item.id) {
-                            isSelf = true;
-                        }
-                    });
-                    if (isSelf) {
-                        removeDropOverBox(targetElement);
-                        return;
-                    }
-
-                    //이동중인 도형 중 Lane,Pool,ScopeActivity가 있다면 반응하지 않는다.
-                    //이동중인 도형 중 Lane 이 있다면 반응하지 않는다.
-                    var blackList = false;
-                    $.each(bBoxArray, function (idx, item) {
-                        if (renderer.isLane(item.id)) {
-                            blackList = true;
-                        }
-                        //if (renderer.isPool(item.id)) {
-                        //    blackList = true;
-                        //}
-                        //if (renderer.isScopeActivity(item.id)) {
-                        //    blackList = true;
-                        //}
-                    });
-                    if (blackList) {
-                        removeDropOverBox(targetElement);
-                        return;
-                    }
-
-                    //이동중인 도형의 전체 바운더리가 완전히 타겟에 속하지 않는다면 반응하지 않는다.
-                    var completelyContain = false;
-                    var moveElements = [];
-                    var transform = [];
-                    $.each(bBoxArray, function (idx, item) {
-                        transform = renderer.getAttr(item.box, 'transform')[0];
-                        moveElements.push(renderer.getElementById(item.id));
-                    });
-                    if (!transform.length) {
-                        removeDropOverBox(targetElement);
-                        return;
-                    }
-
-                    var moveBoundary = renderer.getBoundaryOfElements(moveElements);
-                    var targetBoundary = renderer.getBoundary(targetElement);
-                    var moveTop = moveBoundary.getUpperCenter().y + transform[2];
-                    var moveLow = moveBoundary.getLowerCenter().y + transform[2];
-                    var moveLeft = moveBoundary.getLeftCenter().x + transform[1];
-                    var moveRight = moveBoundary.getRightCenter().x + transform[1];
-
-                    if (targetBoundary.getUpperCenter().y < moveTop &&
-                        targetBoundary.getLowerCenter().y > moveLow &&
-                        targetBoundary.getLeftCenter().x < moveLeft &&
-                        targetBoundary.getRightCenter().x > moveRight
-                    ) {
-                        completelyContain = true;
-                    }
-                    if (!completelyContain) {
-                        removeDropOverBox(targetElement);
-                        return;
-                    }
-
-                    $(root).data("groupTarget", targetElement);
-                    me._RENDERER.drawDropOverGuide(targetElement);
-                },
-                mouseout: function (event) {
-                    //Lane 도형에 접근할 경우 최상위 Lane 으로 타겟변경한다.
-                    var targetElement;
-                    if (renderer.isLane(element)) {
-                        targetElement = renderer.getRootLane(element);
-                    } else {
-                        targetElement = element;
-                    }
-                    removeDropOverBox(targetElement);
-                }
-            });
-        }
-    },
-
     /**
      * 주어진 Shape Element 를 Collapse/Expand 가능하도록 한다.
      *
@@ -662,6 +541,86 @@ OG.handler.EventHandler.prototype = {
             return fixedPosition;
         }
 
+        var removeDropOverBox = function () {
+            var dropOverBoxes = $('[id$=' + OG.Constants.DROP_OVER_BBOX_SUFFIX + ']');
+            $.each(dropOverBoxes, function (index, dropOverBox) {
+                renderer.remove(dropOverBox.id);
+            })
+            $(root).removeData("groupTarget");
+        }
+
+        var setGroupTarget = function () {
+            removeDropOverBox();
+
+            var bBoxArray = $(root).data("bBoxArray");
+            if (!bBoxArray) {
+                return;
+            }
+
+            var moveElements = [];
+            var transform = [];
+            $.each(bBoxArray, function (idx, item) {
+                transform = renderer.getAttr(item.box, 'transform')[0];
+                moveElements.push(renderer.getElementById(item.id));
+            });
+            if (!transform.length) {
+                return;
+            }
+            var moveBoundary = renderer.getBoundaryOfElements(moveElements);
+            var moveTop = moveBoundary.getUpperCenter().y + transform[2];
+            var moveLeft = moveBoundary.getLeftCenter().x + transform[1];
+            var bBoxBoundary = new OG.geometry.Envelope(
+                [moveLeft, moveTop], moveBoundary.getWidth(), moveBoundary.getHeight());
+
+            var frontGroup = renderer.getFrontForBoundary(bBoxBoundary);
+            if (!frontGroup) {
+                return;
+            }
+
+            if (!me._CONFIG.GROUP_DROPABLE || !frontGroup.shape.GROUP_DROPABLE) {
+                return;
+            }
+
+            //Lane 도형에 접근할 경우 최상위 Lane 으로 타겟변경한다.
+            if (renderer.isLane(frontGroup)) {
+                frontGroup = renderer.getRootLane(frontGroup);
+            }
+
+            //A_Task 일 경우 반응하지 않는다.
+            if (frontGroup.shape instanceof OG.shape.bpmn.A_Task) {
+                return;
+            }
+
+            //접혀진 상태면 반응하지 않는다.
+            if (frontGroup.shape.isCollapsed === true) {
+                return;
+            }
+
+            //이동중인 도형들 속에 타겟이 겹친 경우 반응하지 않는다.
+            var isSelf = false;
+            $.each(bBoxArray, function (idx, item) {
+                if (frontGroup.id === item.id) {
+                    isSelf = true;
+                }
+            });
+            if (isSelf) {
+                return;
+            }
+
+            //이동중인 도형 중 Lane 이 있다면 반응하지 않는다.
+            var blackList = false;
+            $.each(bBoxArray, function (idx, item) {
+                if (renderer.isLane(item.id)) {
+                    blackList = true;
+                }
+            });
+            if (blackList) {
+                return;
+            }
+            $(root).data("groupTarget", frontGroup);
+            renderer.drawDropOverGuide(frontGroup);
+        };
+
         if (isMovable === true) {
             $(element).draggable({
                 start: function (event) {
@@ -778,6 +737,8 @@ OG.handler.EventHandler.prototype = {
                         renderer.setAttr(item.box, {transform: "t" + dx + "," + dy});
                     });
 
+                    setGroupTarget();
+
                     renderer.removeAllConnectGuide();
                 },
                 stop: function (event) {
@@ -811,8 +772,8 @@ OG.handler.EventHandler.prototype = {
                     } else {
                         // ungrouping
                         var addToGroupArray = [];
-                        $.each(eleArray , function(idx , ele){
-                            if(ele.parentElement.id !== root.id){
+                        $.each(eleArray, function (idx, ele) {
+                            if (ele.parentElement.id !== root.id) {
                                 addToGroupArray.push(ele);
                             }
                         });
@@ -3664,9 +3625,7 @@ OG.handler.EventHandler.prototype = {
                 me.setConnectGuide(newElement, me._isConnectable(newElement.shape));
                 me.setResizable(newElement, newGuide, me._isResizable(newElement.shape));
                 me.setConnectable(newElement, newGuide, me._isConnectable(newElement.shape));
-                if (me._CONFIG.GROUP_DROPABLE && newElement.shape.GROUP_DROPABLE) {
-                    me.enableDragAndDropGroup(newElement);
-                }
+
                 if (me._CONFIG.GROUP_COLLAPSIBLE && newElement.shape.GROUP_COLLAPSIBLE) {
                     me.enableCollapse(newElement);
                 }
@@ -3713,9 +3672,6 @@ OG.handler.EventHandler.prototype = {
                 me.setConnectGuide(groupElement, me._isConnectable(groupElement.shape));
                 me.setResizable(groupElement, guide, me._isResizable(groupElement.shape));
                 me.setConnectable(groupElement, guide, me._isConnectable(groupElement.shape));
-                if (me._CONFIG.GROUP_DROPABLE && groupElement.shape.GROUP_DROPABLE) {
-                    me.enableDragAndDropGroup(groupElement);
-                }
 
                 me._RENDERER.toFront(guide.group);
             }
@@ -4394,9 +4350,7 @@ OG.handler.EventHandler.prototype = {
                 me.setClickSelectable(newElement, me._isSelectable(newElement.shape));
                 me.setMovable(newElement, me._isMovable(newElement.shape));
                 me.setConnectGuide(newElement, me._isConnectable(newElement.shape));
-                if (me._CONFIG.GROUP_DROPABLE && newElement.shape.GROUP_DROPABLE) {
-                    me.enableDragAndDropGroup(newElement);
-                }
+
                 if (me._CONFIG.GROUP_COLLAPSIBLE && newElement.shape.GROUP_COLLAPSIBLE) {
                     me.enableCollapse(newElement);
                 }
@@ -5230,16 +5184,16 @@ OG.handler.EventHandler.prototype = {
 
                                     var connectableDirection = isConnectableSpot(spot);
                                     var frontElement = renderer.getFrontForCoordinate([eventOffset.x, eventOffset.y]);
-                                    $.each(renderer.getAllNotEdges() , function(idx, otherElement){
+                                    $.each(renderer.getAllNotEdges(), function (idx, otherElement) {
                                         if (frontElement && connectableDirection) {
-                                            if(otherElement.id === frontElement.id){
+                                            if (otherElement.id === frontElement.id) {
                                                 renderer.setHighlight(otherElement, enableStyle);
                                                 renderer.drawConnectGuide(otherElement);
-                                            }else{
+                                            } else {
                                                 renderer.removeHighlight(otherElement, enableStyle);
                                                 renderer.removeConnectGuide(otherElement);
                                             }
-                                        }else{
+                                        } else {
                                             renderer.removeHighlight(otherElement, enableStyle);
                                             renderer.removeConnectGuide(otherElement);
                                         }

@@ -675,10 +675,6 @@ OG.graph.Canvas.prototype = {
             this._HANDLER.enableEditLabel(element);
         }
 
-        if (this._CONFIG.GROUP_DROPABLE && element.shape.GROUP_DROPABLE) {
-            this._HANDLER.enableDragAndDropGroup(element);
-        }
-
         if (element.shape.HaveButton) {   // + 버튼을 만들기 위해서
             this._HANDLER.enableButton(element);
         }
