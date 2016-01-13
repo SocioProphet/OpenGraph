@@ -783,6 +783,9 @@ OG.graph.Canvas.prototype = {
 
         // draw edge
         edge = this._RENDERER.drawShape(null, new OG.EdgeShape(fromPosition, toPosition));
+        edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
+        // edge 방위 설정
+
 
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label);
@@ -806,7 +809,9 @@ OG.graph.Canvas.prototype = {
      * @param {String} toTerminal to Terminal Id
      * @param {OG.geometry.Style,Object} style 스타일
      * @param {String} label Label
-     * @return {Element} 연결된 Edge 엘리먼트
+     * @return {String} id 부여 할 아이디
+     * @return {String} shapeId shapeId
+     * @return {OG.geometry} geom Edge geometry
      */
     connectWithTerminalId: function (fromTerminal, toTerminal, style, label, id, shapeId, geom) {
         var vertices, edge, fromPosition, toPosition, fromto, shape;

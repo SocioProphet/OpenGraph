@@ -774,7 +774,7 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
             return;
         }
         //draw 대상이 Edge 이면 리턴.
-        if(me.isEdge(groupNode)){
+        if (me.isEdge(groupNode)) {
             return;
         }
         //draw 대상이 Lane 인 경우 리턴.
@@ -1244,57 +1244,57 @@ OG.renderer.RaphaelRenderer.prototype.drawEdge = function (line, style, id, isSe
     var me = this, group, _style = {},
         vertices = line.getVertices(),
         from = vertices[0], to = vertices[vertices.length - 1],
-        points = [], edge, edge_direction,
-        getArrayOfOrthogonal_1 = function (from, to, isHorizontal) {
-            if (isHorizontal) {
-                return [
-                    [from[0], from[1]],
-                    [to[0], from[1]],
-                    [to[0], to[1]]
-                ];
-            } else {
-                return [
-                    [from[0], from[1]],
-                    [from[0], to[1]],
-                    [to[0], to[1]]
-                ];
-            }
-        },
-        getArrayOfOrthogonal_2 = function (from, to, isHorizontal) {
-            if (isHorizontal) {
-                if (pointOfInflection && pointOfInflection["x"] > 0) {
-                    return [
-                        [from[0], from[1]],
-                        [from[0] + pointOfInflection["x"], from[1]],
-                        [from[0] + pointOfInflection["x"], to[1]],
-                        [to[0], to[1]]
-                    ];
-                } else {
-                    return [
-                        [from[0], from[1]],
-                        [OG.Util.round((from[0] + to[0]) / 2), from[1]],
-                        [OG.Util.round((from[0] + to[0]) / 2), to[1]],
-                        [to[0], to[1]]
-                    ];
-                }
-            } else {
-                if (pointOfInflection && pointOfInflection["y"] > 0) {
-                    return [
-                        [from[0], from[1]],
-                        [from[0], from[1] + pointOfInflection["y"]],
-                        [to[0], from[1] + pointOfInflection["y"]],
-                        [to[0], to[1]]
-                    ];
-                } else {
-                    return [
-                        [from[0], from[1]],
-                        [from[0], OG.Util.round((from[1] + to[1]) / 2)],
-                        [to[0], OG.Util.round((from[1] + to[1]) / 2)],
-                        [to[0], to[1]]
-                    ];
-                }
-            }
-        };
+        points = [], edge, edge_direction;
+    //getArrayOfOrthogonal_1 = function (from, to, isHorizontal) {
+    //    if (isHorizontal) {
+    //        return [
+    //            [from[0], from[1]],
+    //            [to[0], from[1]],
+    //            [to[0], to[1]]
+    //        ];
+    //    } else {
+    //        return [
+    //            [from[0], from[1]],
+    //            [from[0], to[1]],
+    //            [to[0], to[1]]
+    //        ];
+    //    }
+    //},
+    //getArrayOfOrthogonal_2 = function (from, to, isHorizontal) {
+    //    if (isHorizontal) {
+    //        if (pointOfInflection && pointOfInflection["x"] > 0) {
+    //            return [
+    //                [from[0], from[1]],
+    //                [from[0] + pointOfInflection["x"], from[1]],
+    //                [from[0] + pointOfInflection["x"], to[1]],
+    //                [to[0], to[1]]
+    //            ];
+    //        } else {
+    //            return [
+    //                [from[0], from[1]],
+    //                [OG.Util.round((from[0] + to[0]) / 2), from[1]],
+    //                [OG.Util.round((from[0] + to[0]) / 2), to[1]],
+    //                [to[0], to[1]]
+    //            ];
+    //        }
+    //    } else {
+    //        if (pointOfInflection && pointOfInflection["y"] > 0) {
+    //            return [
+    //                [from[0], from[1]],
+    //                [from[0], from[1] + pointOfInflection["y"]],
+    //                [to[0], from[1] + pointOfInflection["y"]],
+    //                [to[0], to[1]]
+    //            ];
+    //        } else {
+    //            return [
+    //                [from[0], from[1]],
+    //                [from[0], OG.Util.round((from[1] + to[1]) / 2)],
+    //                [to[0], OG.Util.round((from[1] + to[1]) / 2)],
+    //                [to[0], to[1]]
+    //            ];
+    //        }
+    //    }
+    //};
 
     OG.Util.apply(_style, (style instanceof OG.geometry.Style) ? style.map : style || {},
         OG.Util.apply({}, line.style.map, me._CONFIG.DEFAULT_STYLE.EDGE));
@@ -1329,471 +1329,461 @@ OG.renderer.RaphaelRenderer.prototype.drawEdge = function (line, style, id, isSe
                 points = [from, to];
                 break;
             case OG.Constants.EDGE_TYPE.PLAIN:
-                edge_direction = _style["edge-direction"].toLowerCase().split(" ");
-
-                // 'c' 인 경우 위치 보정
-                if (edge_direction[0] === "c" || edge_direction[1] === "c") {
-                    edge_direction = this._adjustEdgeDirection(edge_direction[0], edge_direction[1], [from.x, from.y], [to.x, to.y]).split(" ");
-                }
+                edge_direction = this._adjustEdgeDirection([from.x, from.y], [to.x, to.y]);
                 points = [from, to];
-                if (edge_direction[0] === "e") {
-                    switch (edge_direction[1]) {
-                        case "e":
-                            if (from.x <= to.x) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                                    true
-                                );
-                                points.push([to.x, to.y]);
-                            } else {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y],
-                                    false
-                                ));
-                            }
-                            break;
-                        case "w":
-                            if (from.x <= to.x) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    true
-                                );
-                            } else {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                                    false
-                                ));
-                                points.push([to.x, to.y]);
-                            }
-                            break;
-                        case "s":
-                            if (from.x <= to.x && from.y <= to.y) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                                    true
-                                );
-                                points.push([to.x, to.y]);
-                            } else if (from.x <= to.x && from.y > to.y) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    true
-                                );
-                            } else if (from.x > to.x && from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                                    false
-                                ));
-                                points.push([to.x, to.y]);
-                            } else if (from.x > to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y],
-                                    false
-                                ));
-                            }
-                            break;
-                        case "n":
-                            if (from.x <= to.x && from.y <= to.y) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    true
-                                );
-                            } else if (from.x <= to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                                    false
-                                ));
-                                points.push([to.x, to.y]);
-                            } else if (from.x > to.x && from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y],
-                                    false
-                                ));
-                            } else if (from.x > to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                                    false
-                                ));
-                                points.push([to.x, to.y]);
-                            }
-                            break;
-                    }
-                } else if (edge_direction[0] === "w") {
-                    switch (edge_direction[1]) {
-                        case "e":
-                            if (from.x <= to.x) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                                    false
-                                ));
-                                points.push([to.x, to.y]);
-                            } else {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    true
-                                );
-                            }
-                            break;
-                        case "w":
-                            if (from.x <= to.x) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y],
-                                    false
-                                ));
-
-                            } else {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                                    true
-                                );
-                                points.push([to.x, to.y]);
-                            }
-                            break;
-                        case "s":
-                            if (from.x <= to.x && from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                                    false
-                                ));
-                                points.push([to.x, to.y]);
-                            } else if (from.x <= to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y],
-                                    false
-                                ));
-                            } else if (from.x > to.x && from.y <= to.y) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                                    true
-                                );
-                                points.push([to.x, to.y]);
-                            } else if (from.x > to.x && from.y > to.y) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    true
-                                );
-                            }
-                            break;
-                        case "n":
-                            if (from.x <= to.x && from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y],
-                                    false
-                                ));
-                            } else if (from.x <= to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                                    false
-                                ));
-                                points.push([to.x, to.y]);
-                            } else if (from.x > to.x && from.y <= to.y) {
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    true
-                                ));
-                            } else if (from.x > to.x && from.y > to.y) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                                    true
-                                );
-                                points.push([to.x, to.y]);
-                            }
-                            break;
-                    }
-                } else if (edge_direction[0] === "s") {
-                    switch (edge_direction[1]) {
-                        case "e":
-                            if (from.x <= to.x && from.y <= to.y) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                                    false
-                                );
-                                points.push([to.x, to.y]);
-                            } else if (from.x <= to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                                    true
-                                ));
-                                points.push([to.x, to.y]);
-                            } else if (from.x > to.x && from.y <= to.y) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    false
-                                );
-                            } else if (from.x > to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                                    [to.x, to.y],
-                                    true
-                                ));
-                            }
-                            break;
-                        case "w":
-                            if (from.x <= to.x && from.y <= to.y) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    false
-                                );
-                            } else if (from.x <= to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                                    [to.x, to.y],
-                                    true
-                                ));
-                            } else if (from.x > to.x && from.y <= to.y) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                                    false
-                                );
-                                points.push([to.x, to.y]);
-                            } else if (from.x > to.x && from.y > to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                                    true
-                                ));
-                                points.push([to.x, to.y]);
-                            }
-                            break;
-                        case "s":
-                            if (from.y <= to.y) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                                    false
-                                );
-                                points.push([to.x, to.y]);
-                            } else {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                                    [to.x, to.y],
-                                    true
-                                ));
-                            }
-                            break;
-                        case "n":
-                            if (from.y <= to.y) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    false
-                                );
-                            } else {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                                    true
-                                ));
-                                points.push([to.x, to.y]);
-                            }
-                            break;
-                    }
-                } else if (edge_direction[0] === "n") {
-                    switch (edge_direction[1]) {
-                        case "e":
-                            if (from.x <= to.x && from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                                    true
-                                ));
-                                points.push([to.x, to.y]);
-                            } else if (from.x <= to.x && from.y > to.y) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                                    false
-                                );
-                                points.push([to.x, to.y]);
-                            } else if (from.x > to.x && from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                                    [to.x, to.y],
-                                    true
-                                ));
-                            } else if (from.x > to.x && from.y > to.y) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    false
-                                );
-                            }
-                            break;
-                        case "w":
-                            if (from.x <= to.x && from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                                    [to.x, to.y],
-                                    true
-                                ));
-                            } else if (from.x <= to.x && from.y > to.y) {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    false
-                                );
-                            } else if (from.x > to.x && from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                                    true
-                                ));
-                                points.push([to.x, to.y]);
-                            } else if (from.x > to.x && from.y > to.y) {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                                    false
-                                );
-                                points.push([to.x, to.y]);
-                            }
-                            break;
-                        case "s":
-                            if (from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_2(
-                                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                                    true
-                                ));
-                                points.push([to.x, to.y]);
-                            } else {
-                                points = getArrayOfOrthogonal_2(
-                                    [from.x, from.y],
-                                    [to.x, to.y],
-                                    false
-                                );
-                            }
-                            break;
-                        case "n":
-                            if (from.y <= to.y) {
-                                points = [
-                                    [from.x, from.y]
-                                ];
-                                points = points.concat(getArrayOfOrthogonal_1(
-                                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                                    [to.x, to.y],
-                                    true
-                                ));
-                            } else {
-                                points = getArrayOfOrthogonal_1(
-                                    [from.x, from.y],
-                                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                                    false
-                                );
-                                points.push([to.x, to.y]);
-                            }
-                            break;
-                    }
-                }
+                //if (edge_direction[0] === "e") {
+                //    switch (edge_direction[1]) {
+                //        case "e":
+                //            if (from.x <= to.x) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
+                //                    true
+                //                );
+                //                points.push([to.x, to.y]);
+                //            } else {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                ));
+                //            }
+                //            break;
+                //        case "w":
+                //            if (from.x <= to.x) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    true
+                //                );
+                //            } else {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
+                //                    false
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            }
+                //            break;
+                //        case "s":
+                //            if (from.x <= to.x && from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
+                //                    true
+                //                );
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x <= to.x && from.y > to.y) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    true
+                //                );
+                //            } else if (from.x > to.x && from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
+                //                    false
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x > to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                ));
+                //            }
+                //            break;
+                //        case "n":
+                //            if (from.x <= to.x && from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    true
+                //                );
+                //            } else if (from.x <= to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
+                //                    false
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x > to.x && from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                ));
+                //            } else if (from.x > to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
+                //                    false
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            }
+                //            break;
+                //    }
+                //} else if (edge_direction[0] === "w") {
+                //    switch (edge_direction[1]) {
+                //        case "e":
+                //            if (from.x <= to.x) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
+                //                    false
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    true
+                //                );
+                //            }
+                //            break;
+                //        case "w":
+                //            if (from.x <= to.x) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                ));
+                //
+                //            } else {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
+                //                    true
+                //                );
+                //                points.push([to.x, to.y]);
+                //            }
+                //            break;
+                //        case "s":
+                //            if (from.x <= to.x && from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
+                //                    false
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x <= to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                ));
+                //            } else if (from.x > to.x && from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
+                //                    true
+                //                );
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x > to.x && from.y > to.y) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    true
+                //                );
+                //            }
+                //            break;
+                //        case "n":
+                //            if (from.x <= to.x && from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                ));
+                //            } else if (from.x <= to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
+                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
+                //                    false
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x > to.x && from.y <= to.y) {
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    true
+                //                ));
+                //            } else if (from.x > to.x && from.y > to.y) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
+                //                    true
+                //                );
+                //                points.push([to.x, to.y]);
+                //            }
+                //            break;
+                //    }
+                //} else if (edge_direction[0] === "s") {
+                //    switch (edge_direction[1]) {
+                //        case "e":
+                //            if (from.x <= to.x && from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
+                //                    false
+                //                );
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x <= to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
+                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
+                //                    true
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x > to.x && from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                );
+                //            } else if (from.x > to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
+                //                    [to.x, to.y],
+                //                    true
+                //                ));
+                //            }
+                //            break;
+                //        case "w":
+                //            if (from.x <= to.x && from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                );
+                //            } else if (from.x <= to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
+                //                    [to.x, to.y],
+                //                    true
+                //                ));
+                //            } else if (from.x > to.x && from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
+                //                    false
+                //                );
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x > to.x && from.y > to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
+                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
+                //                    true
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            }
+                //            break;
+                //        case "s":
+                //            if (from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
+                //                    false
+                //                );
+                //                points.push([to.x, to.y]);
+                //            } else {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
+                //                    [to.x, to.y],
+                //                    true
+                //                ));
+                //            }
+                //            break;
+                //        case "n":
+                //            if (from.y <= to.y) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                );
+                //            } else {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
+                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
+                //                    true
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            }
+                //            break;
+                //    }
+                //} else if (edge_direction[0] === "n") {
+                //    switch (edge_direction[1]) {
+                //        case "e":
+                //            if (from.x <= to.x && from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
+                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
+                //                    true
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x <= to.x && from.y > to.y) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
+                //                    false
+                //                );
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x > to.x && from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
+                //                    [to.x, to.y],
+                //                    true
+                //                ));
+                //            } else if (from.x > to.x && from.y > to.y) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                );
+                //            }
+                //            break;
+                //        case "w":
+                //            if (from.x <= to.x && from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
+                //                    [to.x, to.y],
+                //                    true
+                //                ));
+                //            } else if (from.x <= to.x && from.y > to.y) {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                );
+                //            } else if (from.x > to.x && from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
+                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
+                //                    true
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else if (from.x > to.x && from.y > to.y) {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
+                //                    false
+                //                );
+                //                points.push([to.x, to.y]);
+                //            }
+                //            break;
+                //        case "s":
+                //            if (from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_2(
+                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
+                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
+                //                    true
+                //                ));
+                //                points.push([to.x, to.y]);
+                //            } else {
+                //                points = getArrayOfOrthogonal_2(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y],
+                //                    false
+                //                );
+                //            }
+                //            break;
+                //        case "n":
+                //            if (from.y <= to.y) {
+                //                points = [
+                //                    [from.x, from.y]
+                //                ];
+                //                points = points.concat(getArrayOfOrthogonal_1(
+                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
+                //                    [to.x, to.y],
+                //                    true
+                //                ));
+                //            } else {
+                //                points = getArrayOfOrthogonal_1(
+                //                    [from.x, from.y],
+                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
+                //                    false
+                //                );
+                //                points.push([to.x, to.y]);
+                //            }
+                //            break;
+                //    }
+                //}
                 break;
             case OG.Constants.EDGE_TYPE.BEZIER:
-                edge_direction = _style["edge-direction"].toLowerCase().split(" ");
 
-                // 'c' 인 경우 위치 보정
-                if (edge_direction[0] === "c" || edge_direction[1] === "c") {
-                    edge_direction = this._adjustEdgeDirection(edge_direction[0], edge_direction[1], [from.x, from.y], [to.x, to.y]).split(" ");
-                }
-
+                edge_direction = this._adjustEdgeDirection([from.x, from.y], [to.x, to.y]);
                 points = this._bezierCurve([from.x, from.y], [to.x, to.y], edge_direction[0], edge_direction[1]);
                 break;
         }
@@ -5385,6 +5375,7 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (elemen
     //다중 중복 정리 후 Edge 의 모양이 직선인 경우 새로운 plain 을 제작한다.
     if (vertices.length === 2) {
         element = me.drawEdge(new OG.Line(vertices[0], vertices[1]), element.shape.geom.style, element.id);
+        element = me.trimEdgeDirection(element, fromShape, toShape);
     } else {
         element.shape.geom.setVertices(vertices);
         element = me.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
@@ -7033,4 +7024,75 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) 
 
     getFront(me.getRootGroup());
     return mostFrontElement;
+}
+
+//trimEdgeDirection
+/**
+ * 신규 Edge 의 vertices 를 연결대상 도형에 따라 설정한다
+ *
+ * @param {Element,String} Edge Element 또는 ID
+ * @param {Element,String} FromShape Element 또는 ID
+ * @param {Element,String} ToShape Element 또는 ID
+ * @return {Element} Edge Element
+ */
+OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromShape, toShape) {
+
+    //세 도형 중 하나라도 누락되면 수행하지 않는다.
+    if (!edge || !fromShape || !toShape) {
+        return edge;
+    }
+    var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
+    var rFromShape = this._getREleById(OG.Util.isElement(fromShape) ? fromShape.id : fromShape);
+    var rToShape = this._getREleById(OG.Util.isElement(toShape) ? toShape.id : toShape);
+    if (!rEdge || !rFromShape || !rToShape) {
+        return edge;
+    }
+    edge = rEdge.node;
+    fromShape = rFromShape.node;
+    toShape = rToShape.node;
+
+
+    //plain 선형이 아닌경우 수행하지 않는다.
+    var edgeType = edge.shape.geom.style.map['edge-type'];
+    if (edgeType && edgeType != 'plain') {
+        return edge;
+    }
+
+    var me = this;
+    var points = [];
+    var vertices = edge.shape.geom.getVertices();
+    var fromP = vertices[0];
+    var toP = vertices[vertices.length - 1];
+
+    var fromBoundary = me.getBoundary(fromShape);
+    var toBoundary = me.getBoundary(toShape);
+    var fLeft = fromBoundary.getLeftCenter().x;
+    var fRight = fromBoundary.getRightCenter().x;
+
+    var tLeft = toBoundary.getLeftCenter().x;
+    var tRight = toBoundary.getRightCenter().x;
+
+    if (tRight < fLeft || tLeft > fRight) {
+        points.push([fromP.x, fromP.y]);
+        points.push([fromP.x + ((toP.x - fromP.x) / 2), fromP.y]);
+        points.push([fromP.x + ((toP.x - fromP.x) / 2), toP.y]);
+        points.push([toP.x, toP.y]);
+
+    } else {
+        points.push([fromP.x, fromP.y]);
+        points.push([fromP.x, fromP.y + ((toP.y - fromP.y) / 2)]);
+        points.push([toP.x, fromP.y + ((toP.y - fromP.y) / 2)]);
+        points.push([toP.x, toP.y]);
+    }
+
+    //등분된 선분에 그리드 시스템 적용
+    if (me._CONFIG.DRAG_GRIDABLE) {
+        $.each(points, function (index, point) {
+            point[0] = OG.Util.roundGrid(point[0], me._CONFIG.MOVE_SNAP_SIZE / 2);
+            point[1] = OG.Util.roundGrid(point[1], me._CONFIG.MOVE_SNAP_SIZE / 2);
+            points[index] = point;
+        })
+    }
+
+    return me.drawEdge(new OG.PolyLine(points), edge.shape.geom.style, edge.id);
 }
