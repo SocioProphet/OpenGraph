@@ -26573,9 +26573,9 @@ OG.handler.EventHandler.prototype = {
         });
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
             if (item.id) {
-                if(me._RENDERER.isLane(item)){
+                if (me._RENDERER.isLane(item)) {
                     me._RENDERER.removeLaneShape(item);
-                }else{
+                } else {
                     me._RENDERER.removeShape(item);
                 }
 
@@ -26667,13 +26667,15 @@ OG.handler.EventHandler.prototype = {
      * 메뉴 : 선택된 Shape 들을 붙여넣기 한다.
      */
     pasteSelectedShape: function (e) {
-        var me = this, root = me._RENDERER.getRootGroup(),
+        var me = this;
+        var renderer = me._RENDERER;
+        var root = renderer.getRootGroup(),
             copiedElement = $(root).data("copied"),
             selectedElement = [], dx, dy, avgX = 0, avgY = 0;
         if (copiedElement) {
-            $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
+            $(renderer.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
                 if (item.id) {
-                    me._RENDERER.removeGuide(item);
+                    renderer.removeGuide(item);
                 }
             });
 
@@ -26699,7 +26701,7 @@ OG.handler.EventHandler.prototype = {
                     }
                     newShape.geom.style = item.shape.geom.style;
                     newShape.geom.move(me._CONFIG.COPY_PASTE_PADDING, me._CONFIG.COPY_PASTE_PADDING);
-                    newElement = me._RENDERER.drawShape(
+                    newElement = renderer.drawShape(
                         null, newShape,
                         null, item.shapeStyle
                     );
@@ -26708,12 +26710,12 @@ OG.handler.EventHandler.prototype = {
                     if (e) {
                         dx = e.offsetX - avgX;
                         dy = e.offsetY - avgY;
-                        newElement = me._RENDERER.drawShape(
+                        newElement = renderer.drawShape(
                             [boundary.getCentroid().x + dx, boundary.getCentroid().y + dy],
                             newShape, [boundary.getWidth(), boundary.getHeight()], item.shapeStyle
                         );
                     } else {
-                        newElement = me._RENDERER.drawShape(
+                        newElement = renderer.drawShape(
                             [boundary.getCentroid().x + me._CONFIG.COPY_PASTE_PADDING, boundary.getCentroid().y + me._CONFIG.COPY_PASTE_PADDING],
                             newShape, [boundary.getWidth(), boundary.getHeight()], item.shapeStyle
                         );
@@ -26724,7 +26726,7 @@ OG.handler.EventHandler.prototype = {
                 newElement.data = item.data;
 
                 // enable event
-                newGuide = me._RENDERER.drawGuide(newElement);
+                newGuide = renderer.drawGuide(newElement);
                 me.setClickSelectable(newElement, me._isSelectable(newElement.shape));
                 me.setMovable(newElement, me._isMovable(newElement.shape));
                 me.setConnectGuide(newElement, me._isConnectable(newElement.shape));
@@ -26745,9 +26747,30 @@ OG.handler.EventHandler.prototype = {
             });
             $(root).data("copied", selectedElement);
 
-            me._RENDERER.addHistory();
+            renderer.addHistory();
         }
-        $(me._RENDERER._CANVAS._CONTAINER).trigger('pasteShape', [copiedElement, selectedElement]);
+
+        var copiedShapes = [];
+        var pastedShapes = [];
+        var copiedChilds = [];
+        var selectedChilds = [];
+        var setPastedShapes = function (copied, selected) {
+            copiedShapes.push(copied);
+            pastedShapes.push(selected);
+
+            if (renderer.isGroup(copied)) {
+                copiedChilds = renderer.getChilds(copied);
+                selectedChilds = renderer.getChilds(selected);
+                $.each(copiedChilds, function (idx, copiedChild) {
+                    setPastedShapes(copiedChild, selectedChilds[idx]);
+                });
+            }
+        };
+        $.each(copiedElement, function (index, copied) {
+            setPastedShapes(copied, selectedElement[index]);
+        });
+
+        $(renderer._CANVAS._CONTAINER).trigger('pasteShape', [copiedShapes, pastedShapes]);
     },
 
     /**
