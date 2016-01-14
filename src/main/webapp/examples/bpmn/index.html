@@ -244,6 +244,16 @@
 //            console.log('onDrawShape', shapeElement);
             });
 
+            // Undo 되었을 때의 이벤트 리스너
+            canvas.onUndo(function (event) {
+//            console.log('undo');
+            });
+
+            // Redo 되었을 때의 이벤트 리스너
+            canvas.onRedo(function (event) {
+//            console.log('redo');
+            });
+
             // Shape 이 Redraw 되었을 때의 이벤트 리스너
             canvas.onRedrawShape(function (event, shapeElement) {
 //            console.log('onRedrawShape', shapeElement);

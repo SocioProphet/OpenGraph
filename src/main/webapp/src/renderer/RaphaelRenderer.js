@@ -5817,11 +5817,12 @@ OG.renderer.RaphaelRenderer.prototype.undo = function () {
     var history = me._CONFIG.HISTORY;
     var historyIndex = me._CONFIG.HISTORY_INDEX;
 
-    if (historyIndex > 0) {
+    if (historyIndex >= 0) {
         historyIndex = historyIndex - 1;
         me._CANVAS.loadJSON(history[historyIndex]);
     }
     me._CONFIG.HISTORY_INDEX = historyIndex;
+    $(this._PAPER.canvas).trigger('undo');
 };
 
 /**
@@ -5839,6 +5840,7 @@ OG.renderer.RaphaelRenderer.prototype.redo = function () {
         me._CANVAS.loadJSON(history[historyIndex]);
     }
     me._CONFIG.HISTORY_INDEX = historyIndex;
+    $(this._PAPER.canvas).trigger('redo');
 };
 
 /**

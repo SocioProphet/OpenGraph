@@ -21671,11 +21671,12 @@ OG.renderer.RaphaelRenderer.prototype.undo = function () {
     var history = me._CONFIG.HISTORY;
     var historyIndex = me._CONFIG.HISTORY_INDEX;
 
-    if (historyIndex > 0) {
+    if (historyIndex >= 0) {
         historyIndex = historyIndex - 1;
         me._CANVAS.loadJSON(history[historyIndex]);
     }
     me._CONFIG.HISTORY_INDEX = historyIndex;
+    $(this._PAPER.canvas).trigger('undo');
 };
 
 /**
@@ -21693,6 +21694,7 @@ OG.renderer.RaphaelRenderer.prototype.redo = function () {
         me._CANVAS.loadJSON(history[historyIndex]);
     }
     me._CONFIG.HISTORY_INDEX = historyIndex;
+    $(this._PAPER.canvas).trigger('redo');
 };
 
 /**
@@ -28473,11 +28475,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         /**
          * 히스토리 인덱스
          */
-        HISTORY_INDEX : 0,
+        HISTORY_INDEX: 0,
         /**
          * 히스토리 저장소
          */
-        HISTORY : [],
+        HISTORY: [],
         /**
          * 히스토리 저장 횟수
          */
@@ -29150,7 +29152,7 @@ OG.graph.Canvas.prototype = {
             this._HANDLER.enableCollapse(element);
         }
 
-        if(!id){
+        if (!id) {
             this._RENDERER.addHistory();
         }
 
@@ -29182,7 +29184,7 @@ OG.graph.Canvas.prototype = {
             element.appendChild(fromElement);
         }
 
-        if(!id){
+        if (!id) {
             this._RENDERER.addHistory();
         }
     },
@@ -30279,6 +30281,28 @@ OG.graph.Canvas.prototype = {
     onDrawShape: function (callbackFunc) {
         $(this.getRootElement()).bind('drawShape', function (event, shapeElement) {
             callbackFunc(event, shapeElement);
+        });
+    },
+
+    /**
+     * Undo 되었을때의 이벤트 리스너
+     *
+     * @param {Function} callbackFunc 콜백함수(event)
+     */
+    onUndo: function (callbackFunc) {
+        $(this.getRootElement()).bind('undo', function (event) {
+            callbackFunc(event);
+        });
+    },
+
+    /**
+     * Undo 되었을때의 이벤트 리스너
+     *
+     * @param {Function} callbackFunc 콜백함수(event)
+     */
+    onRedo: function (callbackFunc) {
+        $(this.getRootElement()).bind('redo', function (event) {
+            callbackFunc(event);
         });
     },
 
