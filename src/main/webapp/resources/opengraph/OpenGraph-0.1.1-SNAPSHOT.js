@@ -14906,8 +14906,9 @@ OG.renderer.IRenderer.prototype = {
      * Element 에 저장된 geom, angle, image, text 정보로 shape 을 redraw 한다.
      *
      * @param {Element} element Shape 엘리먼트
+     * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
      */
-    redrawShape: function (element, inclusion) {
+    redrawShape: function (element, excludeEdgeId) {
         throw new OG.NotImplementedException();
     },
 
@@ -15824,6 +15825,30 @@ OG.renderer.IRenderer.prototype = {
      */
     isShape: function (element) {
         return $(element).attr("_type") === OG.Constants.NODE_TYPE.SHAPE;
+    },
+    /**
+     * 캔버스의 히스토리를 초기화한다.
+     */
+    initHistory: function(){
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스에 히스토리를 추가한다.
+     */
+    addHistory: function () {
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스의 Undo
+     */
+    undo: function(){
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스의 Redo
+     */
+    redo: function(){
+        throw new OG.NotImplementedException();
     }
 };
 OG.renderer.IRenderer.prototype.constructor = OG.renderer.IRenderer;
@@ -16456,11 +16481,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         groupNode, geometry, text, image, html,
         me = this, change = false;
 
-    //id가 없을때와 있을때를 구분..
-    if (!id) {
-        change = true;
-    }
-
     if (shape instanceof OG.shape.GeomShape) {
         geometry = shape.createShape();
 
@@ -16629,7 +16649,14 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         }
         frontGroup.appendChild(groupNode);
     };
-    setGroup();
+    if (!id) {
+        setGroup();
+    }
+
+    //TODO Shape 의 위치를 수정하고 Root 에 마우스 드래그시 알 수 있도록 데이터를 삽입한다.
+    if (!id && (me.isLane(groupNode) || me.isPool(groupNode))) {
+
+    }
 
     if ($(shape).attr('auto_draw') == 'yes') {
         $(groupNode).attr('auto_draw', 'yes');
@@ -16637,9 +16664,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
 
     // drawShape event fire
     $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
-
-    if (change && style != me._CONFIG.DEFAULT_STYLE.EDGE_SHADOW)
-        $(this._PAPER.canvas).trigger('change');
 
     return groupNode;
 };
@@ -17872,7 +17896,6 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
             if (text !== undefined && beforeText !== undefined && text !== beforeText) {
                 // labelChanged event fire
                 $(this._PAPER.canvas).trigger('labelChanged', [element, text, beforeText]);
-                $(this._PAPER.canvas).trigger('change');
             }
         }
     }
@@ -18100,10 +18123,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
 
     // redrawShape event fire
     $(this._PAPER.canvas).trigger('redrawShape', [element]);
-    // setinclusion으로 그린 경우 트리거 발생 안하게 처리
-    if (!inclusion) {
-        $(this._PAPER.canvas).trigger('change');
-    }
+
     return element;
 };
 
@@ -18672,8 +18692,10 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         $(_trash.node).click(function () {
             if (me.isLane(element)) {
                 me.removeLaneShape(element);
+                me.addHistory();
             } else {
                 me.removeShape(element);
+                me.addHistory();
             }
         })
         controllers.push(_trash);
@@ -19962,7 +19984,6 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
 
     // removeShape event fire
     $(this._PAPER.canvas).trigger('removeShape', [removedElement]);
-    $(this._PAPER.canvas).trigger('change');
 };
 
 /**
@@ -21568,7 +21589,7 @@ OG.renderer.RaphaelRenderer.prototype.updateVirtualEdge = function (x, y) {
 
         me.drawEdge(new OG.PolyLine([start, fixedEnd]), virtualEdgeStyle, OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
     }
-}
+};
 
 /**
  * 캔버스의 가상선의 타겟 엘리먼트를 구한다.
@@ -21590,7 +21611,7 @@ OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
     }
 
     return null;
-}
+};
 
 /**
  * 캔버스의 가상선을 삭제한다.
@@ -21598,15 +21619,81 @@ OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
 OG.renderer.RaphaelRenderer.prototype.removeAllVirtualEdge = function () {
     $(this.getRootGroup()).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, false);
     return this.remove(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
+};
+
+/**
+ * 캔버스의 히스토리를 초기화한다.
+ *
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.initHistory = function () {
+    var me = this;
+    me._CONFIG.HISTORY_INDEX = 0;
+    me._CONFIG.HISTORY[me._CANVAS.toJSON()];
 }
 
+/**
+ * 캔버스에 히스토리를 추가한다.
+ *
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
+    var me = this;
+    var history = me._CONFIG.HISTORY;
+    var historySize = me._CONFIG.HISTORY_SIZE;
+    var historyIndex = me._CONFIG.HISTORY_INDEX;
+
+    if (history.length == 0) {
+        historyIndex = 0;
+        history.push(me._CANVAS.toJSON());
+
+    } else {
+        if (historySize <= history.length) {
+            history.splice(0, 1);
+            historyIndex = historyIndex - 1;
+        }
+        history.splice(historyIndex + 1);
+        history.push(me._CANVAS.toJSON());
+        historyIndex = history.length - 1;
+    }
+
+    me._CONFIG.HISTORY = history;
+    me._CONFIG.HISTORY_INDEX = historyIndex;
+};
+
+/**
+ * 캔버스의 Undo
+ *
+ * @override
+ */
 OG.renderer.RaphaelRenderer.prototype.undo = function () {
+    var me = this;
+    var history = me._CONFIG.HISTORY;
+    var historyIndex = me._CONFIG.HISTORY_INDEX;
 
-}
+    if (historyIndex > 0) {
+        historyIndex = historyIndex - 1;
+        me._CANVAS.loadJSON(history[historyIndex]);
+    }
+    me._CONFIG.HISTORY_INDEX = historyIndex;
+};
 
+/**
+ * 캔버스의 Redo
+ *
+ * @override
+ */
 OG.renderer.RaphaelRenderer.prototype.redo = function () {
+    var me = this;
+    var history = me._CONFIG.HISTORY;
+    var historyIndex = me._CONFIG.HISTORY_INDEX;
 
-}
+    if (historyIndex < history.length - 1) {
+        historyIndex = historyIndex + 1;
+        me._CANVAS.loadJSON(history[historyIndex]);
+    }
+    me._CONFIG.HISTORY_INDEX = historyIndex;
+};
 
 /**
  * 도형의 Lane 타입 여부를 판별한다.
@@ -21624,7 +21711,7 @@ OG.renderer.RaphaelRenderer.prototype.isLane = function (element) {
         return true;
     }
     return false;
-}
+};
 
 /**
  * 도형의 Pool 타입 여부를 판별한다.
@@ -21642,7 +21729,7 @@ OG.renderer.RaphaelRenderer.prototype.isPool = function (element) {
         return true;
     }
     return false;
-}
+};
 /**
  * 도형의 ScopeActivity 타입 여부를 판별한다.
  *
@@ -21658,7 +21745,7 @@ OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
         return true;
     }
     return false;
-}
+};
 
 /**
  * 도형의 HorizontalLaneShape 타입 여부를 판별한다.
@@ -21668,7 +21755,7 @@ OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
  */
 OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
     return element.shape instanceof OG.shape.HorizontalLaneShape;
-}
+};
 
 /**
  * 도형의 VerticalLaneShape 타입 여부를 판별한다.
@@ -21678,7 +21765,7 @@ OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
  */
 OG.renderer.RaphaelRenderer.prototype.isVerticalLane = function (element) {
     return element.shape instanceof OG.shape.VerticalLaneShape;
-}
+};
 
 /**
  * Lane 타입 도형 하위의 Lane 타입들을 리턴한다.
@@ -21700,7 +21787,7 @@ OG.renderer.RaphaelRenderer.prototype.getChildLane = function (element) {
         }
     })
     return childsLanes;
-}
+};
 
 /**
  * Lane 타입이 내부적으로 분기가 가능한 수를 리턴한다.
@@ -21746,7 +21833,7 @@ OG.renderer.RaphaelRenderer.prototype.enableDivideCount = function (element) {
         }
     }
     return 0;
-}
+};
 
 /**
  * Lane 의 타이틀 영역을 제외한 boundary 를 리턴한다.
@@ -21793,7 +21880,7 @@ OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element
 
     //타이틀 라벨이 없을 경우 바운더리 리턴.
     return boundary;
-}
+};
 
 /**
  * Lane 을 분기한다.
@@ -21997,7 +22084,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
     }
-}
+};
 
 /**
  * Lane 의 최상의 Lane 으로부터 모든 Base Lane 들을 반환한다.
@@ -22067,7 +22154,7 @@ OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
         baseLanes.push(sort[0]);
     })
     return baseLanes;
-}
+};
 
 /**
  * Lane 의 최상위 Lane 을 반환한다.
@@ -22136,7 +22223,7 @@ OG.renderer.RaphaelRenderer.prototype.getIndexOfLane = function (element) {
     } else {
         return index;
     }
-}
+};
 
 /**
  * Lane 의 최상위 Lane 으로부터 Depth를 구한다.
@@ -22166,7 +22253,7 @@ OG.renderer.RaphaelRenderer.prototype.getDepthOfLane = function (element) {
     cacualateDepth(element);
 
     return lengthToRoot;
-}
+};
 
 /**
  * Lane 의 BaseLane 영역을 기준으로 전체 Lane 의 구조를 재정립한다.
@@ -22273,7 +22360,7 @@ OG.renderer.RaphaelRenderer.prototype.reEstablishLane = function (element) {
     }
 
     establishLanes(estableishTargets);
-}
+};
 
 /**
  * 주어진 Shape 들의 바운더리 영역을 반환한다.
@@ -22357,10 +22444,10 @@ OG.renderer.RaphaelRenderer.prototype.getNearestBaseLaneIndexAsDirection = funct
             nearestValue = Math.abs(compareValue - orgValue);
             index = idx;
         }
-    })
+    });
 
     return index;
-}
+};
 
 /**
  * Group 의 내부 도형들의 Boundary를 반환한다.
@@ -22390,12 +22477,12 @@ OG.renderer.RaphaelRenderer.prototype.getBoundaryOfInnerShapesGroup = function (
         if (!me.isLane(childsShape)) {
             innerShapes.push(childsShape);
         }
-    })
+    });
     if (!innerShapes.length) {
         return null;
     }
     return me.getBoundaryOfElements(innerShapes)
-}
+};
 
 
 /**
@@ -22443,7 +22530,7 @@ OG.renderer.RaphaelRenderer.prototype.getSmallestBaseLane = function (element) {
     });
 
     return smallestLane;
-}
+};
 /**
  * Lane 을 리사이즈한다.
  *
@@ -22538,7 +22625,7 @@ OG.renderer.RaphaelRenderer.prototype.resizeLane = function (element, offset) {
 
     //최종적으로 변경된 baseLane들을 기준으로 전체Lane을 재정립한다.
     me.reEstablishLane(element);
-}
+};
 
 /**
  * Lane 을 삭제한다.
@@ -22661,7 +22748,7 @@ OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfLane = function (element) 
     getInnerShapes(rootLane);
 
     return innerShapes;
-}
+};
 
 /**
  * Lane 의 내부 도형들을 앞으로 이동시킨다.
@@ -22687,12 +22774,12 @@ OG.renderer.RaphaelRenderer.prototype.fitLaneOrder = function (element) {
     $.each(innerShapesOfLane, function (index, innerShape) {
         rootLane.appendChild(innerShape);
     });
-}
+};
 
 /**
  * Edge 가 Gourp 사이를 넘어가는 경우 스타일에 변화를 준다.
  *
- * @param {Element,String} Edge Element Element 또는 ID
+ * @param {Element,String} Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
     var me = this;
@@ -22734,7 +22821,7 @@ OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
         }
     }
     me.setShapeStyle(element, {"stroke-dasharray": ''});
-}
+};
 /**
  * 모든 Edge 를 checkBridgeEdge
  */
@@ -22744,7 +22831,7 @@ OG.renderer.RaphaelRenderer.prototype.checkAllBridgeEdge = function () {
     $.each(edges, function (index, edge) {
         me.checkBridgeEdge(edge);
     });
-}
+};
 
 /**
  * Group 내부의 모든 shape 을 리턴한다.
@@ -22765,7 +22852,7 @@ OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfGroup = function (element)
         elements.push(element);
     });
     return elements;
-}
+};
 
 /**
  * 주어진 좌표를 포함하는 Elemnt 중 가장 Front 에 위치한 Element 를 반환한다.
@@ -22799,7 +22886,7 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForCoordinate = function (point) {
 
     getFront(me.getRootGroup());
     return mostFrontElement;
-}
+};
 
 /**
  * Boundary 를 포함하는 가장 Front 에 위치한 Group Element 를 반환한다.
@@ -22844,7 +22931,7 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) 
             if (envelope.isContainsAll(boundary.getVertices())) {
                 frontElement = child;
             }
-        })
+        });
         if (frontElement) {
             mostFrontElement = frontElement;
             getFront(frontElement);
@@ -22853,7 +22940,7 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) 
 
     getFront(me.getRootGroup());
     return mostFrontElement;
-}
+};
 
 //trimEdgeDirection
 /**
@@ -22924,7 +23011,7 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
     }
 
     return me.drawEdge(new OG.PolyLine(points), edge.shape.geom.style, edge.id);
-}
+};
 /**
  * Event Handler
  *
@@ -22965,6 +23052,8 @@ OG.handler.EventHandler.prototype = {
                     textAlign = "center",
                     fromLabel,
                     toLabel,
+                    beforeLabel,
+                    afterLabel,
                     /**
                      * 라인(꺽은선)의 중심위치를 반환한다.
                      *
@@ -23047,16 +23136,21 @@ OG.handler.EventHandler.prototype = {
                         }));
                         $(labelEditor).focus();
                         $(labelEditor).val(element.shape.html);
+                        beforeLabel = element.shape.html;
 
                         $(labelEditor).bind({
                             focusout: function () {
                                 element.shape.html = this.value;
+                                afterLabel = this.value;
                                 if (element.shape.html) {
                                     renderer.redrawShape(element);
                                     this.parentNode.removeChild(this);
                                 } else {
                                     renderer.removeShape(element);
                                     this.parentNode.removeChild(this);
+                                }
+                                if (beforeLabel !== afterLabel) {
+                                    renderer.addHistory();
                                 }
                             }
                         });
@@ -23073,16 +23167,21 @@ OG.handler.EventHandler.prototype = {
                         }));
                         $(labelEditor).focus();
                         $(labelEditor).val(element.shape.text);
+                        beforeLabel = element.shape.text;
 
                         $(labelEditor).bind({
                             focusout: function () {
                                 element.shape.text = this.value;
+                                afterLabel = this.value;
                                 if (element.shape.text) {
                                     renderer.redrawShape(element);
                                     this.parentNode.removeChild(this);
                                 } else {
                                     renderer.removeShape(element);
                                     this.parentNode.removeChild(this);
+                                }
+                                if (beforeLabel !== afterLabel) {
+                                    renderer.addHistory();
                                 }
                             }
                         });
@@ -23144,6 +23243,7 @@ OG.handler.EventHandler.prototype = {
                             $(labelEditor).val(fromLabel ? element.shape.fromLabel : element.shape.toLabel);
                         } else {
                             $(labelEditor).val(element.shape.label);
+                            beforeLabel = element.shape.label;
                         }
 
                         $(labelEditor).bind({
@@ -23154,6 +23254,10 @@ OG.handler.EventHandler.prototype = {
                                     renderer.drawEdgeLabel(element, this.value, 'TO');
                                 } else {
                                     renderer.drawLabel(element, this.value);
+                                    afterLabel = this.value;
+                                    if (beforeLabel !== afterLabel) {
+                                        renderer.addHistory();
+                                    }
                                 }
 
                                 this.parentNode.removeChild(this);
@@ -23171,11 +23275,16 @@ OG.handler.EventHandler.prototype = {
                         }));
                         $(labelEditor).focus();
                         $(labelEditor).val(element.shape.label);
+                        beforeLabel = element.shape.label;
 
                         $(labelEditor).bind({
                             focusout: function () {
                                 renderer.drawLabel(element, this.value);
                                 this.parentNode.removeChild(this);
+                                afterLabel = this.value;
+                                if (beforeLabel !== afterLabel) {
+                                    renderer.addHistory();
+                                }
                             }
                         });
                     }
@@ -23730,6 +23839,7 @@ OG.handler.EventHandler.prototype = {
                     renderer.removeAllConnectGuide();
                     renderer.toFrontEdges();
                     renderer.checkAllBridgeEdge();
+                    renderer.addHistory();
                 }
             });
             renderer.setAttr(element, {cursor: 'move'});
@@ -24255,41 +24365,41 @@ OG.handler.EventHandler.prototype = {
                 if (conditionsPassToFix) {
                     conditionsPassCandidates.push(correctionCondition);
                 }
-            })
+            });
             $.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
                 fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
             });
 
             return fixedPosition;
-        }
+        };
 
         var upHandle = function (handleName) {
             if (handleName === 'ul' || handleName === 'uc' || handleName === 'ur') {
                 return true;
             }
             return false;
-        }
+        };
 
         var lowHandle = function (handleName) {
             if (handleName === 'lwl' || handleName === 'lwc' || handleName === 'lwr') {
                 return true;
             }
             return false;
-        }
+        };
 
         var rightHandle = function (handleName) {
             if (handleName === 'ur' || handleName === 'rc' || handleName === 'lwr') {
                 return true;
             }
             return false;
-        }
+        };
 
         var leftHandle = function (handleName) {
             if (handleName === 'ul' || handleName === 'lc' || handleName === 'lwl') {
                 return true;
             }
             return false;
-        }
+        };
 
         if (isResizable === true) {
             if (!isEdge) {
@@ -24429,6 +24539,7 @@ OG.handler.EventHandler.prototype = {
                             }
 
                             renderer.removeAllConnectGuide();
+                            renderer.addHistory();
                         }
                     });
                 }
@@ -24505,7 +24616,7 @@ OG.handler.EventHandler.prototype = {
                                 var target = me._RENDERER.getTargetfromVirtualEdge();
                                 me._RENDERER.removeAllVirtualEdge();
                                 me._RENDERER._CANVAS.connect(target, element, null, null);
-
+                                renderer.addHistory();
                             } else {
                                 me._RENDERER.removeAllVirtualEdge();
                             }
@@ -24583,7 +24694,11 @@ OG.handler.EventHandler.prototype = {
             if (isConnectMode === 'active') {
                 eventOffset = me._getOffset(event);
                 renderer.updateVirtualEdge(eventOffset.x, eventOffset.y);
+                return;
             }
+
+            //TODO Lnae,Pool 위치조정 모드일 경우 수행
+
         });
 
 
@@ -24684,11 +24799,23 @@ OG.handler.EventHandler.prototype = {
      */
     setEnableHotKey: function (isEnableHotKey) {
         var me = this;
+        var renderer = me._RENDERER;
         if (isEnableHotKey === true) {
             // delete, ctrl+A
-            $(me._RENDERER.getContainer()).bind("keydown", function (event) {
+            $(renderer.getContainer()).bind("keydown", function (event) {
                 // 라벨수정중엔 keydown 이벤트무시
                 if (!/^textarea$/i.test(event.target.tagName) && !/^input$/i.test(event.target.tagName)) {
+                    // Undo Redo
+                    if (me._CONFIG.ENABLE_HOTKEY_CTRL_Z && (event.ctrlKey || event.metaKey) && event.keyCode === KeyEvent.DOM_VK_Z) {
+                        if (event.shiftKey) {
+                            event.preventDefault();
+                            renderer.redo();
+                        } else {
+                            event.preventDefault();
+                            renderer.undo();
+                        }
+                    }
+
                     // Delete : 삭제
                     if (me._CONFIG.ENABLE_HOTKEY_DELETE && event.keyCode === KeyEvent.DOM_VK_DELETE) {
                         event.preventDefault();
@@ -24742,18 +24869,22 @@ OG.handler.EventHandler.prototype = {
                         if (event.shiftKey && event.keyCode === KeyEvent.DOM_VK_LEFT) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), -1 * (me._CONFIG.DRAG_GRIDABLE ? (me._CONFIG.MOVE_SNAP_SIZE / 2) : 1), 0);
+                            renderer.addHistory();
                         }
                         if (event.shiftKey && event.keyCode === KeyEvent.DOM_VK_RIGHT) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), (me._CONFIG.DRAG_GRIDABLE ? (me._CONFIG.MOVE_SNAP_SIZE / 2) : 1), 0);
+                            renderer.addHistory();
                         }
                         if (event.shiftKey && event.keyCode === KeyEvent.DOM_VK_UP) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), 0, -1 * (me._CONFIG.DRAG_GRIDABLE ? (me._CONFIG.MOVE_SNAP_SIZE / 2) : 1));
+                            renderer.addHistory();
                         }
                         if (event.shiftKey && event.keyCode === KeyEvent.DOM_VK_DOWN) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), 0, (me._CONFIG.DRAG_GRIDABLE ? (me._CONFIG.MOVE_SNAP_SIZE / 2) : 1));
+                            renderer.addHistory();
                         }
                     }
                     if (me._CONFIG.ENABLE_HOTKEY_ARROW) {
@@ -24762,27 +24893,31 @@ OG.handler.EventHandler.prototype = {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), -1 * (me._CONFIG.MOVE_SNAP_SIZE / 2), 0);
                             me.selectShapes(me._getSelectedElement());
+                            renderer.addHistory();
                         }
                         if (!event.shiftKey && event.keyCode === KeyEvent.DOM_VK_RIGHT) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), (me._CONFIG.MOVE_SNAP_SIZE / 2), 0);
                             me.selectShapes(me._getSelectedElement());
+                            renderer.addHistory();
                         }
                         if (!event.shiftKey && event.keyCode === KeyEvent.DOM_VK_UP) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), 0, -1 * (me._CONFIG.MOVE_SNAP_SIZE / 2));
                             me.selectShapes(me._getSelectedElement());
+                            renderer.addHistory();
                         }
                         if (!event.shiftKey && event.keyCode === KeyEvent.DOM_VK_DOWN) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), 0, (me._CONFIG.MOVE_SNAP_SIZE / 2));
                             me.selectShapes(me._getSelectedElement());
+                            renderer.addHistory();
                         }
                     }
                 }
             });
         } else {
-            $(me._RENDERER.getContainer()).unbind("keydown");
+            $(renderer.getContainer()).unbind("keydown");
         }
     },
 
@@ -24791,6 +24926,7 @@ OG.handler.EventHandler.prototype = {
      */
     enableRootContextMenu: function () {
         var me = this;
+        var renderer = me._RENDERER;
 
         $.contextMenu({
             selector: '#' + me._RENDERER.getRootElement().id,
@@ -24818,6 +24954,7 @@ OG.handler.EventHandler.prototype = {
                                 'view_actualSize': {
                                     name: '실제 사이즈', callback: function () {
                                         me._RENDERER.setScale(1);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'sep2_1': '---------',
@@ -24830,41 +24967,49 @@ OG.handler.EventHandler.prototype = {
                                 'view_25': {
                                     name: '25%', callback: function () {
                                         me._RENDERER.setScale(0.25);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_50': {
                                     name: '50%', callback: function () {
                                         me._RENDERER.setScale(0.5);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_75': {
                                     name: '75%', callback: function () {
                                         me._RENDERER.setScale(0.75);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_100': {
                                     name: '100%', callback: function () {
                                         me._RENDERER.setScale(1);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_150': {
                                     name: '150%', callback: function () {
                                         me._RENDERER.setScale(1.5);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_200': {
                                     name: '200%', callback: function () {
                                         me._RENDERER.setScale(2);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_300': {
                                     name: '300%', callback: function () {
                                         me._RENDERER.setScale(3);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_400': {
                                     name: '400%', callback: function () {
                                         me._RENDERER.setScale(4);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'sep2_3': '---------',
@@ -25834,6 +25979,7 @@ OG.handler.EventHandler.prototype = {
                         events: {
                             change: function (e) {
                                 me._RENDERER.alignTop();
+                                me._RENDERER.addHistory();
                             }
                         }
                     },
@@ -25845,6 +25991,7 @@ OG.handler.EventHandler.prototype = {
                         events: {
                             change: function (e) {
                                 me._RENDERER.alignLeft();
+                                me._RENDERER.addHistory();
                             }
                         }
                     },
@@ -25856,6 +26003,7 @@ OG.handler.EventHandler.prototype = {
                         events: {
                             change: function (e) {
                                 me._RENDERER.alignRight();
+                                me._RENDERER.addHistory();
                             }
                         }
                     },
@@ -25867,6 +26015,7 @@ OG.handler.EventHandler.prototype = {
                         events: {
                             change: function (e) {
                                 me._RENDERER.alignBottom();
+                                me._RENDERER.addHistory();
                             }
                         }
                     }
@@ -26371,6 +26520,7 @@ OG.handler.EventHandler.prototype = {
             root[0].appendChild(item);
             me.selectShape(item);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26382,6 +26532,7 @@ OG.handler.EventHandler.prototype = {
             root[0].insertBefore(item, root[0].children[0]);
             me.selectShape(item);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26393,6 +26544,7 @@ OG.handler.EventHandler.prototype = {
             var length = $(item).prevAll().length;
             root[0].insertBefore(item, root[0].children[length + 1]);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26405,6 +26557,7 @@ OG.handler.EventHandler.prototype = {
             root[0].insertBefore(item, root[0].children[length - 2]);
             me.selectShape(item);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26420,9 +26573,15 @@ OG.handler.EventHandler.prototype = {
         });
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
             if (item.id) {
-                me._RENDERER.removeShape(item);
+                if(me._RENDERER.isLane(item)){
+                    me._RENDERER.removeLaneShape(item);
+                }else{
+                    me._RENDERER.removeShape(item);
+                }
+
             }
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26460,6 +26619,7 @@ OG.handler.EventHandler.prototype = {
 
             $(item).trigger("changeTo" + type);
         });
+        me._RENDERER.addHistory();
     },
 
 
@@ -26584,6 +26744,8 @@ OG.handler.EventHandler.prototype = {
                 selectedElement.push(newElement);
             });
             $(root).data("copied", selectedElement);
+
+            me._RENDERER.addHistory();
         }
         $(me._RENDERER._CANVAS._CONTAINER).trigger('pasteShape', [copiedElement, selectedElement]);
     },
@@ -26621,6 +26783,7 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.toFront(guide.group);
             }
         }
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26635,6 +26798,7 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.toFront(guide.group);
             }
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26659,6 +26823,7 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.toFront(guide.group);
             }
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26671,6 +26836,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"stroke-width": lineWidth});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26683,6 +26849,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"stroke": lineColor});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26702,6 +26869,7 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.redrawShape(item);
             }
         });
+        me._RENDERER.addHistory();
     },
 
     setAddEventSelectedShape: function (value) {
@@ -26758,7 +26926,7 @@ OG.handler.EventHandler.prototype = {
             item.appendChild(newElement);
         });
 
-
+        me._RENDERER.addHistory();
     },
 
     setTaskTypeSelectedShape: function (taskType) {
@@ -26784,18 +26952,21 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.redrawShape(item);
             }
         });
+        me._RENDERER.addHistory();
     },
 
     setExceptionType: function (element, exceptionType) {
         var me = this;
         element.shape.exceptionType = exceptionType;
         me._RENDERER.redrawShape(element);
+        me._RENDERER.addHistory();
     },
 
     setInclusion: function (element, inclusion) {
         var me = this;
         element.shape.inclusion = inclusion;
         me._RENDERER.redrawShape(element, null, true);
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26808,6 +26979,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"stroke-dasharray": lineStyle});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26820,6 +26992,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"arrow-start": arrowType + '-wide-long'});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26832,6 +27005,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"arrow-end": arrowType + '-wide-long'});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26847,8 +27021,8 @@ OG.handler.EventHandler.prototype = {
             } else {
                 me._RENDERER.setShapeStyle(item, {"fill": fillColor, "fill-opacity": 1});
             }
-
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26861,6 +27035,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-family": fontFamily});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26873,6 +27048,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-size": fontSize});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26885,6 +27061,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-color": fontColor});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26897,6 +27074,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-weight": fontWeight});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26909,6 +27087,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-style": fontStyle});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26921,6 +27100,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"text-decoration": textDecoration});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26933,6 +27113,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"label-direction": labelDirection});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26945,6 +27126,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"label-angle": labelAngle});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26987,6 +27169,7 @@ OG.handler.EventHandler.prototype = {
                 });
             }
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -26999,6 +27182,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"vertical-align": verticalAlign});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -27011,6 +27195,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"text-anchor": horizontalAlign});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -27023,6 +27208,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.drawLabel(item, label);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -27035,6 +27221,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_shape=" + OG.Constants.SHAPE_TYPE.EDGE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.drawEdgeLabel(item, label, 'FROM');
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -27047,6 +27234,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_shape=" + OG.Constants.SHAPE_TYPE.EDGE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.drawEdgeLabel(item, label, 'TO');
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -27057,6 +27245,7 @@ OG.handler.EventHandler.prototype = {
         if (me._CONFIG.SCALE + me._CONFIG.SCALE * 0.1 <= me._CONFIG.SCALE_MAX) {
             me._RENDERER.setScale(me._CONFIG.SCALE + me._CONFIG.SCALE * 0.1);
         }
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -27067,6 +27256,7 @@ OG.handler.EventHandler.prototype = {
         if (me._CONFIG.SCALE - me._CONFIG.SCALE * 0.1 >= me._CONFIG.SCALE_MIN) {
             me._RENDERER.setScale(me._CONFIG.SCALE - me._CONFIG.SCALE * 0.1);
         }
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -27075,6 +27265,7 @@ OG.handler.EventHandler.prototype = {
     fitWindow: function () {
         var me = this, container = me._RENDERER.getContainer();
         me._RENDERER.fitCanvasSize([container.clientWidth, container.clientHeight], true);
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -27873,6 +28064,7 @@ OG.handler.EventHandler.prototype = {
                                 renderer.trimConnectInnerVertice(element);
                                 renderer.trimConnectIntersection(element);
                                 renderer.trimEdge(element);
+                                renderer.addHistory();
                             }
                         });
                     }
@@ -28218,6 +28410,7 @@ OG.handler.EventHandler.prototype = {
                                     if (connectableDirection && !frontElement) {
                                         renderer.disconnectOneWay(element, connectableDirection);
                                     }
+                                    renderer.addHistory();
                                 }
                             });
 
@@ -28255,6 +28448,19 @@ OG.EventHandler = OG.handler.EventHandler;
 OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroundImage) {
 
     this._CONFIG = {
+        /**
+         * 히스토리 인덱스
+         */
+        HISTORY_INDEX : 0,
+        /**
+         * 히스토리 저장소
+         */
+        HISTORY : [],
+        /**
+         * 히스토리 저장 횟수
+         */
+        HISTORY_SIZE: 100,
+
         /**
          * 클릭선택 가능여부
          */
@@ -28343,6 +28549,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * 핫키 가능여부
          */
         ENABLE_HOTKEY: true,
+
+        /**
+         * 핫키 : UNDO REDO 키 가능여부
+         */
+        ENABLE_HOTKEY_CTRL_Z: true,
 
         /**
          * 핫키 : DELETE 삭제 키 가능여부
@@ -28917,6 +29128,10 @@ OG.graph.Canvas.prototype = {
             this._HANDLER.enableCollapse(element);
         }
 
+        if(!id){
+            this._RENDERER.addHistory();
+        }
+
         return element;
     },
 
@@ -28943,6 +29158,10 @@ OG.graph.Canvas.prototype = {
             fromShape = new OG.shape.From();
             fromElement = me.drawShape([envelope.getUpperRight().x - 10, envelope.getUpperRight().y + (i * 20) + 30], fromShape, [5, 5], {"r": 5});
             element.appendChild(fromElement);
+        }
+
+        if(!id){
+            this._RENDERER.addHistory();
         }
     },
 

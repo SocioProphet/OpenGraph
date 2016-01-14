@@ -22,6 +22,19 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 
     this._CONFIG = {
         /**
+         * 히스토리 인덱스
+         */
+        HISTORY_INDEX : 0,
+        /**
+         * 히스토리 저장소
+         */
+        HISTORY : [],
+        /**
+         * 히스토리 저장 횟수
+         */
+        HISTORY_SIZE: 100,
+
+        /**
          * 클릭선택 가능여부
          */
         SELECTABLE: true,
@@ -109,6 +122,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * 핫키 가능여부
          */
         ENABLE_HOTKEY: true,
+
+        /**
+         * 핫키 : UNDO REDO 키 가능여부
+         */
+        ENABLE_HOTKEY_CTRL_Z: true,
 
         /**
          * 핫키 : DELETE 삭제 키 가능여부
@@ -683,6 +701,10 @@ OG.graph.Canvas.prototype = {
             this._HANDLER.enableCollapse(element);
         }
 
+        if(!id){
+            this._RENDERER.addHistory();
+        }
+
         return element;
     },
 
@@ -709,6 +731,10 @@ OG.graph.Canvas.prototype = {
             fromShape = new OG.shape.From();
             fromElement = me.drawShape([envelope.getUpperRight().x - 10, envelope.getUpperRight().y + (i * 20) + 30], fromShape, [5, 5], {"r": 5});
             element.appendChild(fromElement);
+        }
+
+        if(!id){
+            this._RENDERER.addHistory();
         }
     },
 

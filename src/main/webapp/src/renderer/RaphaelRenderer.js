@@ -627,11 +627,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         groupNode, geometry, text, image, html,
         me = this, change = false;
 
-    //id가 없을때와 있을때를 구분..
-    if (!id) {
-        change = true;
-    }
-
     if (shape instanceof OG.shape.GeomShape) {
         geometry = shape.createShape();
 
@@ -800,7 +795,14 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         }
         frontGroup.appendChild(groupNode);
     };
-    setGroup();
+    if (!id) {
+        setGroup();
+    }
+
+    //TODO Shape 의 위치를 수정하고 Root 에 마우스 드래그시 알 수 있도록 데이터를 삽입한다.
+    if (!id && (me.isLane(groupNode) || me.isPool(groupNode))) {
+
+    }
 
     if ($(shape).attr('auto_draw') == 'yes') {
         $(groupNode).attr('auto_draw', 'yes');
@@ -808,9 +810,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
 
     // drawShape event fire
     $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
-
-    if (change && style != me._CONFIG.DEFAULT_STYLE.EDGE_SHADOW)
-        $(this._PAPER.canvas).trigger('change');
 
     return groupNode;
 };
@@ -2043,7 +2042,6 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
             if (text !== undefined && beforeText !== undefined && text !== beforeText) {
                 // labelChanged event fire
                 $(this._PAPER.canvas).trigger('labelChanged', [element, text, beforeText]);
-                $(this._PAPER.canvas).trigger('change');
             }
         }
     }
@@ -2271,10 +2269,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
 
     // redrawShape event fire
     $(this._PAPER.canvas).trigger('redrawShape', [element]);
-    // setinclusion으로 그린 경우 트리거 발생 안하게 처리
-    if (!inclusion) {
-        $(this._PAPER.canvas).trigger('change');
-    }
+
     return element;
 };
 
@@ -2843,8 +2838,10 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         $(_trash.node).click(function () {
             if (me.isLane(element)) {
                 me.removeLaneShape(element);
+                me.addHistory();
             } else {
                 me.removeShape(element);
+                me.addHistory();
             }
         })
         controllers.push(_trash);
@@ -4133,7 +4130,6 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
 
     // removeShape event fire
     $(this._PAPER.canvas).trigger('removeShape', [removedElement]);
-    $(this._PAPER.canvas).trigger('change');
 };
 
 /**
@@ -5739,7 +5735,7 @@ OG.renderer.RaphaelRenderer.prototype.updateVirtualEdge = function (x, y) {
 
         me.drawEdge(new OG.PolyLine([start, fixedEnd]), virtualEdgeStyle, OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
     }
-}
+};
 
 /**
  * 캔버스의 가상선의 타겟 엘리먼트를 구한다.
@@ -5761,7 +5757,7 @@ OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
     }
 
     return null;
-}
+};
 
 /**
  * 캔버스의 가상선을 삭제한다.
@@ -5769,15 +5765,81 @@ OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
 OG.renderer.RaphaelRenderer.prototype.removeAllVirtualEdge = function () {
     $(this.getRootGroup()).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, false);
     return this.remove(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
+};
+
+/**
+ * 캔버스의 히스토리를 초기화한다.
+ *
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.initHistory = function () {
+    var me = this;
+    me._CONFIG.HISTORY_INDEX = 0;
+    me._CONFIG.HISTORY[me._CANVAS.toJSON()];
 }
 
+/**
+ * 캔버스에 히스토리를 추가한다.
+ *
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
+    var me = this;
+    var history = me._CONFIG.HISTORY;
+    var historySize = me._CONFIG.HISTORY_SIZE;
+    var historyIndex = me._CONFIG.HISTORY_INDEX;
+
+    if (history.length == 0) {
+        historyIndex = 0;
+        history.push(me._CANVAS.toJSON());
+
+    } else {
+        if (historySize <= history.length) {
+            history.splice(0, 1);
+            historyIndex = historyIndex - 1;
+        }
+        history.splice(historyIndex + 1);
+        history.push(me._CANVAS.toJSON());
+        historyIndex = history.length - 1;
+    }
+
+    me._CONFIG.HISTORY = history;
+    me._CONFIG.HISTORY_INDEX = historyIndex;
+};
+
+/**
+ * 캔버스의 Undo
+ *
+ * @override
+ */
 OG.renderer.RaphaelRenderer.prototype.undo = function () {
+    var me = this;
+    var history = me._CONFIG.HISTORY;
+    var historyIndex = me._CONFIG.HISTORY_INDEX;
 
-}
+    if (historyIndex > 0) {
+        historyIndex = historyIndex - 1;
+        me._CANVAS.loadJSON(history[historyIndex]);
+    }
+    me._CONFIG.HISTORY_INDEX = historyIndex;
+};
 
+/**
+ * 캔버스의 Redo
+ *
+ * @override
+ */
 OG.renderer.RaphaelRenderer.prototype.redo = function () {
+    var me = this;
+    var history = me._CONFIG.HISTORY;
+    var historyIndex = me._CONFIG.HISTORY_INDEX;
 
-}
+    if (historyIndex < history.length - 1) {
+        historyIndex = historyIndex + 1;
+        me._CANVAS.loadJSON(history[historyIndex]);
+    }
+    me._CONFIG.HISTORY_INDEX = historyIndex;
+};
 
 /**
  * 도형의 Lane 타입 여부를 판별한다.
@@ -5795,7 +5857,7 @@ OG.renderer.RaphaelRenderer.prototype.isLane = function (element) {
         return true;
     }
     return false;
-}
+};
 
 /**
  * 도형의 Pool 타입 여부를 판별한다.
@@ -5813,7 +5875,7 @@ OG.renderer.RaphaelRenderer.prototype.isPool = function (element) {
         return true;
     }
     return false;
-}
+};
 /**
  * 도형의 ScopeActivity 타입 여부를 판별한다.
  *
@@ -5829,7 +5891,7 @@ OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
         return true;
     }
     return false;
-}
+};
 
 /**
  * 도형의 HorizontalLaneShape 타입 여부를 판별한다.
@@ -5839,7 +5901,7 @@ OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
  */
 OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
     return element.shape instanceof OG.shape.HorizontalLaneShape;
-}
+};
 
 /**
  * 도형의 VerticalLaneShape 타입 여부를 판별한다.
@@ -5849,7 +5911,7 @@ OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
  */
 OG.renderer.RaphaelRenderer.prototype.isVerticalLane = function (element) {
     return element.shape instanceof OG.shape.VerticalLaneShape;
-}
+};
 
 /**
  * Lane 타입 도형 하위의 Lane 타입들을 리턴한다.
@@ -5871,7 +5933,7 @@ OG.renderer.RaphaelRenderer.prototype.getChildLane = function (element) {
         }
     })
     return childsLanes;
-}
+};
 
 /**
  * Lane 타입이 내부적으로 분기가 가능한 수를 리턴한다.
@@ -5917,7 +5979,7 @@ OG.renderer.RaphaelRenderer.prototype.enableDivideCount = function (element) {
         }
     }
     return 0;
-}
+};
 
 /**
  * Lane 의 타이틀 영역을 제외한 boundary 를 리턴한다.
@@ -5964,7 +6026,7 @@ OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element
 
     //타이틀 라벨이 없을 경우 바운더리 리턴.
     return boundary;
-}
+};
 
 /**
  * Lane 을 분기한다.
@@ -6168,7 +6230,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
     }
-}
+};
 
 /**
  * Lane 의 최상의 Lane 으로부터 모든 Base Lane 들을 반환한다.
@@ -6238,7 +6300,7 @@ OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
         baseLanes.push(sort[0]);
     })
     return baseLanes;
-}
+};
 
 /**
  * Lane 의 최상위 Lane 을 반환한다.
@@ -6307,7 +6369,7 @@ OG.renderer.RaphaelRenderer.prototype.getIndexOfLane = function (element) {
     } else {
         return index;
     }
-}
+};
 
 /**
  * Lane 의 최상위 Lane 으로부터 Depth를 구한다.
@@ -6337,7 +6399,7 @@ OG.renderer.RaphaelRenderer.prototype.getDepthOfLane = function (element) {
     cacualateDepth(element);
 
     return lengthToRoot;
-}
+};
 
 /**
  * Lane 의 BaseLane 영역을 기준으로 전체 Lane 의 구조를 재정립한다.
@@ -6444,7 +6506,7 @@ OG.renderer.RaphaelRenderer.prototype.reEstablishLane = function (element) {
     }
 
     establishLanes(estableishTargets);
-}
+};
 
 /**
  * 주어진 Shape 들의 바운더리 영역을 반환한다.
@@ -6528,10 +6590,10 @@ OG.renderer.RaphaelRenderer.prototype.getNearestBaseLaneIndexAsDirection = funct
             nearestValue = Math.abs(compareValue - orgValue);
             index = idx;
         }
-    })
+    });
 
     return index;
-}
+};
 
 /**
  * Group 의 내부 도형들의 Boundary를 반환한다.
@@ -6561,12 +6623,12 @@ OG.renderer.RaphaelRenderer.prototype.getBoundaryOfInnerShapesGroup = function (
         if (!me.isLane(childsShape)) {
             innerShapes.push(childsShape);
         }
-    })
+    });
     if (!innerShapes.length) {
         return null;
     }
     return me.getBoundaryOfElements(innerShapes)
-}
+};
 
 
 /**
@@ -6614,7 +6676,7 @@ OG.renderer.RaphaelRenderer.prototype.getSmallestBaseLane = function (element) {
     });
 
     return smallestLane;
-}
+};
 /**
  * Lane 을 리사이즈한다.
  *
@@ -6709,7 +6771,7 @@ OG.renderer.RaphaelRenderer.prototype.resizeLane = function (element, offset) {
 
     //최종적으로 변경된 baseLane들을 기준으로 전체Lane을 재정립한다.
     me.reEstablishLane(element);
-}
+};
 
 /**
  * Lane 을 삭제한다.
@@ -6832,7 +6894,7 @@ OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfLane = function (element) 
     getInnerShapes(rootLane);
 
     return innerShapes;
-}
+};
 
 /**
  * Lane 의 내부 도형들을 앞으로 이동시킨다.
@@ -6858,12 +6920,12 @@ OG.renderer.RaphaelRenderer.prototype.fitLaneOrder = function (element) {
     $.each(innerShapesOfLane, function (index, innerShape) {
         rootLane.appendChild(innerShape);
     });
-}
+};
 
 /**
  * Edge 가 Gourp 사이를 넘어가는 경우 스타일에 변화를 준다.
  *
- * @param {Element,String} Edge Element Element 또는 ID
+ * @param {Element,String} Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
     var me = this;
@@ -6905,7 +6967,7 @@ OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
         }
     }
     me.setShapeStyle(element, {"stroke-dasharray": ''});
-}
+};
 /**
  * 모든 Edge 를 checkBridgeEdge
  */
@@ -6915,7 +6977,7 @@ OG.renderer.RaphaelRenderer.prototype.checkAllBridgeEdge = function () {
     $.each(edges, function (index, edge) {
         me.checkBridgeEdge(edge);
     });
-}
+};
 
 /**
  * Group 내부의 모든 shape 을 리턴한다.
@@ -6936,7 +6998,7 @@ OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfGroup = function (element)
         elements.push(element);
     });
     return elements;
-}
+};
 
 /**
  * 주어진 좌표를 포함하는 Elemnt 중 가장 Front 에 위치한 Element 를 반환한다.
@@ -6970,7 +7032,7 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForCoordinate = function (point) {
 
     getFront(me.getRootGroup());
     return mostFrontElement;
-}
+};
 
 /**
  * Boundary 를 포함하는 가장 Front 에 위치한 Group Element 를 반환한다.
@@ -7015,7 +7077,7 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) 
             if (envelope.isContainsAll(boundary.getVertices())) {
                 frontElement = child;
             }
-        })
+        });
         if (frontElement) {
             mostFrontElement = frontElement;
             getFront(frontElement);
@@ -7024,7 +7086,7 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) 
 
     getFront(me.getRootGroup());
     return mostFrontElement;
-}
+};
 
 //trimEdgeDirection
 /**
@@ -7095,4 +7157,4 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
     }
 
     return me.drawEdge(new OG.PolyLine(points), edge.shape.geom.style, edge.id);
-}
+};

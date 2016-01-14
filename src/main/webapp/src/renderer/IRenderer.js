@@ -272,8 +272,9 @@ OG.renderer.IRenderer.prototype = {
      * Element 에 저장된 geom, angle, image, text 정보로 shape 을 redraw 한다.
      *
      * @param {Element} element Shape 엘리먼트
+     * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
      */
-    redrawShape: function (element, inclusion) {
+    redrawShape: function (element, excludeEdgeId) {
         throw new OG.NotImplementedException();
     },
 
@@ -1190,6 +1191,30 @@ OG.renderer.IRenderer.prototype = {
      */
     isShape: function (element) {
         return $(element).attr("_type") === OG.Constants.NODE_TYPE.SHAPE;
+    },
+    /**
+     * 캔버스의 히스토리를 초기화한다.
+     */
+    initHistory: function(){
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스에 히스토리를 추가한다.
+     */
+    addHistory: function () {
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스의 Undo
+     */
+    undo: function(){
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스의 Redo
+     */
+    redo: function(){
+        throw new OG.NotImplementedException();
     }
 };
 OG.renderer.IRenderer.prototype.constructor = OG.renderer.IRenderer;
