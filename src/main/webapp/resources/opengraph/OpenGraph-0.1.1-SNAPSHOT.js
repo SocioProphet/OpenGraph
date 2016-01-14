@@ -26752,15 +26752,14 @@ OG.handler.EventHandler.prototype = {
 
         var copiedShapes = [];
         var pastedShapes = [];
-        var copiedChilds = [];
-        var selectedChilds = [];
+
         var setPastedShapes = function (copied, selected) {
             copiedShapes.push(copied);
             pastedShapes.push(selected);
 
             if (renderer.isGroup(copied)) {
-                copiedChilds = renderer.getChilds(copied);
-                selectedChilds = renderer.getChilds(selected);
+                var copiedChilds = renderer.getChilds(copied);
+                var selectedChilds = renderer.getChilds(selected);
                 $.each(copiedChilds, function (idx, copiedChild) {
                     setPastedShapes(copiedChild, selectedChilds[idx]);
                 });
