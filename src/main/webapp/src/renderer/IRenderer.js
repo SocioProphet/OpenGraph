@@ -104,107 +104,52 @@ OG.renderer.IRenderer.prototype = {
     },
 
     /**
-     * 한쪽이상 끊긴 경우 Edge Direction 을 보정한다.
+     * Edge Direction 을 보정한다.
      *
-     * @param {String} fromDrct 시작방향
-     * @param {String} toDrct 끝방향
      * @param {Number[]} from 시작위치
      * @param {Number[]} to 끝위치
-     * @return {String} edge-direction 보정된 edge-direction
+     * @return {String[]} edge-direction 보정된 edge-direction
      * @private
      */
-    _adjustEdgeDirection: function (fromDrct, toDrct, from, to) {
+    _adjustEdgeDirection: function (from, to) {
+        var fromDrct, toDrct;
         var fromXY = {x: from[0], y: from[1]}, toXY = {x: to[0], y: to[1]};
-        // 한쪽이 끊긴 경우 방향 보정
-        if (fromDrct === "c" && toDrct === "c") {
-            if (fromXY.x <= toXY.x && fromXY.y <= toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    fromDrct = "e";
-                    toDrct = "w";
-                } else {
-                    fromDrct = "s";
-                    toDrct = "n";
-                }
-            } else if (fromXY.x <= toXY.x && fromXY.y > toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    fromDrct = "e";
-                    toDrct = "w";
-                } else {
-                    fromDrct = "n";
-                    toDrct = "s";
-                }
-            } else if (fromXY.x > toXY.x && fromXY.y <= toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    fromDrct = "w";
-                    toDrct = "e";
-                } else {
-                    fromDrct = "s";
-                    toDrct = "n";
-                }
-            } else if (fromXY.x > toXY.x && fromXY.y > toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    fromDrct = "w";
-                    toDrct = "e";
-                } else {
-                    fromDrct = "n";
-                    toDrct = "s";
-                }
+
+        if (fromXY.x <= toXY.x && fromXY.y <= toXY.y) {
+            if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
+                fromDrct = "e";
+                toDrct = "w";
+            } else {
+                fromDrct = "s";
+                toDrct = "n";
             }
-        } else if (fromDrct === "c" && toDrct !== "c") {
-            if (fromXY.x <= toXY.x && fromXY.y <= toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    fromDrct = "e";
-                } else {
-                    fromDrct = "s";
-                }
-            } else if (fromXY.x <= toXY.x && fromXY.y > toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    fromDrct = "e";
-                } else {
-                    fromDrct = "n";
-                }
-            } else if (fromXY.x > toXY.x && fromXY.y <= toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    fromDrct = "w";
-                } else {
-                    fromDrct = "s";
-                }
-            } else if (fromXY.x > toXY.x && fromXY.y > toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    fromDrct = "w";
-                } else {
-                    fromDrct = "n";
-                }
+        } else if (fromXY.x <= toXY.x && fromXY.y > toXY.y) {
+            if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
+                fromDrct = "e";
+                toDrct = "w";
+            } else {
+                fromDrct = "n";
+                toDrct = "s";
             }
-        } else if (fromDrct !== "c" && toDrct === "c") {
-            if (fromXY.x <= toXY.x && fromXY.y <= toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    toDrct = "w";
-                } else {
-                    toDrct = "n";
-                }
-            } else if (fromXY.x <= toXY.x && fromXY.y > toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    toDrct = "w";
-                } else {
-                    toDrct = "s";
-                }
-            } else if (fromXY.x > toXY.x && fromXY.y <= toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    toDrct = "e";
-                } else {
-                    toDrct = "n";
-                }
-            } else if (fromXY.x > toXY.x && fromXY.y > toXY.y) {
-                if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
-                    toDrct = "e";
-                } else {
-                    toDrct = "s";
-                }
+        } else if (fromXY.x > toXY.x && fromXY.y <= toXY.y) {
+            if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
+                fromDrct = "w";
+                toDrct = "e";
+            } else {
+                fromDrct = "s";
+                toDrct = "n";
+            }
+        } else if (fromXY.x > toXY.x && fromXY.y > toXY.y) {
+            if (Math.abs(toXY.x - fromXY.x) > Math.abs(toXY.y - fromXY.y)) {
+                fromDrct = "w";
+                toDrct = "e";
+            } else {
+                fromDrct = "n";
+                toDrct = "s";
             }
         }
 
-        return fromDrct + " " + toDrct;
+        return [fromDrct, toDrct];
     },
 
     /**
@@ -327,8 +272,9 @@ OG.renderer.IRenderer.prototype = {
      * Element 에 저장된 geom, angle, image, text 정보로 shape 을 redraw 한다.
      *
      * @param {Element} element Shape 엘리먼트
+     * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
      */
-    redrawShape: function (element, inclusion) {
+    redrawShape: function (element, excludeEdgeId) {
         throw new OG.NotImplementedException();
     },
 
@@ -1245,6 +1191,30 @@ OG.renderer.IRenderer.prototype = {
      */
     isShape: function (element) {
         return $(element).attr("_type") === OG.Constants.NODE_TYPE.SHAPE;
+    },
+    /**
+     * 캔버스의 히스토리를 초기화한다.
+     */
+    initHistory: function(){
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스에 히스토리를 추가한다.
+     */
+    addHistory: function () {
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스의 Undo
+     */
+    undo: function(){
+        throw new OG.NotImplementedException();
+    },
+    /**
+     * 캔버스의 Redo
+     */
+    redo: function(){
+        throw new OG.NotImplementedException();
     }
 };
 OG.renderer.IRenderer.prototype.constructor = OG.renderer.IRenderer;

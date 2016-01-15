@@ -22,6 +22,19 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 
     this._CONFIG = {
         /**
+         * 히스토리 인덱스
+         */
+        HISTORY_INDEX: 0,
+        /**
+         * 히스토리 저장소
+         */
+        HISTORY: [],
+        /**
+         * 히스토리 저장 횟수
+         */
+        HISTORY_SIZE: 100,
+
+        /**
          * 클릭선택 가능여부
          */
         SELECTABLE: true,
@@ -109,6 +122,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * 핫키 가능여부
          */
         ENABLE_HOTKEY: true,
+
+        /**
+         * 핫키 : UNDO REDO 키 가능여부
+         */
+        ENABLE_HOTKEY_CTRL_Z: true,
 
         /**
          * 핫키 : DELETE 삭제 키 가능여부
@@ -683,6 +701,10 @@ OG.graph.Canvas.prototype = {
             this._HANDLER.enableCollapse(element);
         }
 
+        if (!id) {
+            this._RENDERER.addHistory();
+        }
+
         return element;
     },
 
@@ -709,6 +731,10 @@ OG.graph.Canvas.prototype = {
             fromShape = new OG.shape.From();
             fromElement = me.drawShape([envelope.getUpperRight().x - 10, envelope.getUpperRight().y + (i * 20) + 30], fromShape, [5, 5], {"r": 5});
             element.appendChild(fromElement);
+        }
+
+        if (!id) {
+            this._RENDERER.addHistory();
         }
     },
 
@@ -783,6 +809,9 @@ OG.graph.Canvas.prototype = {
 
         // draw edge
         edge = this._RENDERER.drawShape(null, new OG.EdgeShape(fromPosition, toPosition));
+        edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
+        // edge 방위 설정
+
 
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label);
@@ -806,7 +835,9 @@ OG.graph.Canvas.prototype = {
      * @param {String} toTerminal to Terminal Id
      * @param {OG.geometry.Style,Object} style 스타일
      * @param {String} label Label
-     * @return {Element} 연결된 Edge 엘리먼트
+     * @return {String} id 부여 할 아이디
+     * @return {String} shapeId shapeId
+     * @return {OG.geometry} geom Edge geometry
      */
     connectWithTerminalId: function (fromTerminal, toTerminal, style, label, id, shapeId, geom) {
         var vertices, edge, fromPosition, toPosition, fromto, shape;
@@ -1799,6 +1830,28 @@ OG.graph.Canvas.prototype = {
     onDrawShape: function (callbackFunc) {
         $(this.getRootElement()).bind('drawShape', function (event, shapeElement) {
             callbackFunc(event, shapeElement);
+        });
+    },
+
+    /**
+     * Undo 되었을때의 이벤트 리스너
+     *
+     * @param {Function} callbackFunc 콜백함수(event)
+     */
+    onUndo: function (callbackFunc) {
+        $(this.getRootElement()).bind('undo', function (event) {
+            callbackFunc(event);
+        });
+    },
+
+    /**
+     * Undo 되었을때의 이벤트 리스너
+     *
+     * @param {Function} callbackFunc 콜백함수(event)
+     */
+    onRedo: function (callbackFunc) {
+        $(this.getRootElement()).bind('redo', function (event) {
+            callbackFunc(event);
         });
     },
 

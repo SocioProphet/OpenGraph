@@ -38,6 +38,8 @@ OG.handler.EventHandler.prototype = {
                     textAlign = "center",
                     fromLabel,
                     toLabel,
+                    beforeLabel,
+                    afterLabel,
                     /**
                      * 라인(꺽은선)의 중심위치를 반환한다.
                      *
@@ -120,16 +122,21 @@ OG.handler.EventHandler.prototype = {
                         }));
                         $(labelEditor).focus();
                         $(labelEditor).val(element.shape.html);
+                        beforeLabel = element.shape.html;
 
                         $(labelEditor).bind({
                             focusout: function () {
                                 element.shape.html = this.value;
+                                afterLabel = this.value;
                                 if (element.shape.html) {
                                     renderer.redrawShape(element);
                                     this.parentNode.removeChild(this);
                                 } else {
                                     renderer.removeShape(element);
                                     this.parentNode.removeChild(this);
+                                }
+                                if (beforeLabel !== afterLabel) {
+                                    renderer.addHistory();
                                 }
                             }
                         });
@@ -146,16 +153,21 @@ OG.handler.EventHandler.prototype = {
                         }));
                         $(labelEditor).focus();
                         $(labelEditor).val(element.shape.text);
+                        beforeLabel = element.shape.text;
 
                         $(labelEditor).bind({
                             focusout: function () {
                                 element.shape.text = this.value;
+                                afterLabel = this.value;
                                 if (element.shape.text) {
                                     renderer.redrawShape(element);
                                     this.parentNode.removeChild(this);
                                 } else {
                                     renderer.removeShape(element);
                                     this.parentNode.removeChild(this);
+                                }
+                                if (beforeLabel !== afterLabel) {
+                                    renderer.addHistory();
                                 }
                             }
                         });
@@ -217,6 +229,7 @@ OG.handler.EventHandler.prototype = {
                             $(labelEditor).val(fromLabel ? element.shape.fromLabel : element.shape.toLabel);
                         } else {
                             $(labelEditor).val(element.shape.label);
+                            beforeLabel = element.shape.label;
                         }
 
                         $(labelEditor).bind({
@@ -227,6 +240,10 @@ OG.handler.EventHandler.prototype = {
                                     renderer.drawEdgeLabel(element, this.value, 'TO');
                                 } else {
                                     renderer.drawLabel(element, this.value);
+                                    afterLabel = this.value;
+                                    if (beforeLabel !== afterLabel) {
+                                        renderer.addHistory();
+                                    }
                                 }
 
                                 this.parentNode.removeChild(this);
@@ -244,11 +261,16 @@ OG.handler.EventHandler.prototype = {
                         }));
                         $(labelEditor).focus();
                         $(labelEditor).val(element.shape.label);
+                        beforeLabel = element.shape.label;
 
                         $(labelEditor).bind({
                             focusout: function () {
                                 renderer.drawLabel(element, this.value);
                                 this.parentNode.removeChild(this);
+                                afterLabel = this.value;
+                                if (beforeLabel !== afterLabel) {
+                                    renderer.addHistory();
+                                }
                             }
                         });
                     }
@@ -803,6 +825,7 @@ OG.handler.EventHandler.prototype = {
                     renderer.removeAllConnectGuide();
                     renderer.toFrontEdges();
                     renderer.checkAllBridgeEdge();
+                    renderer.addHistory();
                 }
             });
             renderer.setAttr(element, {cursor: 'move'});
@@ -1328,41 +1351,41 @@ OG.handler.EventHandler.prototype = {
                 if (conditionsPassToFix) {
                     conditionsPassCandidates.push(correctionCondition);
                 }
-            })
+            });
             $.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
                 fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
             });
 
             return fixedPosition;
-        }
+        };
 
         var upHandle = function (handleName) {
             if (handleName === 'ul' || handleName === 'uc' || handleName === 'ur') {
                 return true;
             }
             return false;
-        }
+        };
 
         var lowHandle = function (handleName) {
             if (handleName === 'lwl' || handleName === 'lwc' || handleName === 'lwr') {
                 return true;
             }
             return false;
-        }
+        };
 
         var rightHandle = function (handleName) {
             if (handleName === 'ur' || handleName === 'rc' || handleName === 'lwr') {
                 return true;
             }
             return false;
-        }
+        };
 
         var leftHandle = function (handleName) {
             if (handleName === 'ul' || handleName === 'lc' || handleName === 'lwl') {
                 return true;
             }
             return false;
-        }
+        };
 
         if (isResizable === true) {
             if (!isEdge) {
@@ -1502,6 +1525,7 @@ OG.handler.EventHandler.prototype = {
                             }
 
                             renderer.removeAllConnectGuide();
+                            renderer.addHistory();
                         }
                     });
                 }
@@ -1578,7 +1602,7 @@ OG.handler.EventHandler.prototype = {
                                 var target = me._RENDERER.getTargetfromVirtualEdge();
                                 me._RENDERER.removeAllVirtualEdge();
                                 me._RENDERER._CANVAS.connect(target, element, null, null);
-
+                                renderer.addHistory();
                             } else {
                                 me._RENDERER.removeAllVirtualEdge();
                             }
@@ -1656,7 +1680,11 @@ OG.handler.EventHandler.prototype = {
             if (isConnectMode === 'active') {
                 eventOffset = me._getOffset(event);
                 renderer.updateVirtualEdge(eventOffset.x, eventOffset.y);
+                return;
             }
+
+            //TODO Lnae,Pool 위치조정 모드일 경우 수행
+
         });
 
 
@@ -1757,11 +1785,23 @@ OG.handler.EventHandler.prototype = {
      */
     setEnableHotKey: function (isEnableHotKey) {
         var me = this;
+        var renderer = me._RENDERER;
         if (isEnableHotKey === true) {
             // delete, ctrl+A
-            $(me._RENDERER.getContainer()).bind("keydown", function (event) {
+            $(renderer.getContainer()).bind("keydown", function (event) {
                 // 라벨수정중엔 keydown 이벤트무시
                 if (!/^textarea$/i.test(event.target.tagName) && !/^input$/i.test(event.target.tagName)) {
+                    // Undo Redo
+                    if (me._CONFIG.ENABLE_HOTKEY_CTRL_Z && (event.ctrlKey || event.metaKey) && event.keyCode === KeyEvent.DOM_VK_Z) {
+                        if (event.shiftKey) {
+                            event.preventDefault();
+                            renderer.redo();
+                        } else {
+                            event.preventDefault();
+                            renderer.undo();
+                        }
+                    }
+
                     // Delete : 삭제
                     if (me._CONFIG.ENABLE_HOTKEY_DELETE && event.keyCode === KeyEvent.DOM_VK_DELETE) {
                         event.preventDefault();
@@ -1815,18 +1855,22 @@ OG.handler.EventHandler.prototype = {
                         if (event.shiftKey && event.keyCode === KeyEvent.DOM_VK_LEFT) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), -1 * (me._CONFIG.DRAG_GRIDABLE ? (me._CONFIG.MOVE_SNAP_SIZE / 2) : 1), 0);
+                            renderer.addHistory();
                         }
                         if (event.shiftKey && event.keyCode === KeyEvent.DOM_VK_RIGHT) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), (me._CONFIG.DRAG_GRIDABLE ? (me._CONFIG.MOVE_SNAP_SIZE / 2) : 1), 0);
+                            renderer.addHistory();
                         }
                         if (event.shiftKey && event.keyCode === KeyEvent.DOM_VK_UP) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), 0, -1 * (me._CONFIG.DRAG_GRIDABLE ? (me._CONFIG.MOVE_SNAP_SIZE / 2) : 1));
+                            renderer.addHistory();
                         }
                         if (event.shiftKey && event.keyCode === KeyEvent.DOM_VK_DOWN) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), 0, (me._CONFIG.DRAG_GRIDABLE ? (me._CONFIG.MOVE_SNAP_SIZE / 2) : 1));
+                            renderer.addHistory();
                         }
                     }
                     if (me._CONFIG.ENABLE_HOTKEY_ARROW) {
@@ -1835,27 +1879,31 @@ OG.handler.EventHandler.prototype = {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), -1 * (me._CONFIG.MOVE_SNAP_SIZE / 2), 0);
                             me.selectShapes(me._getSelectedElement());
+                            renderer.addHistory();
                         }
                         if (!event.shiftKey && event.keyCode === KeyEvent.DOM_VK_RIGHT) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), (me._CONFIG.MOVE_SNAP_SIZE / 2), 0);
                             me.selectShapes(me._getSelectedElement());
+                            renderer.addHistory();
                         }
                         if (!event.shiftKey && event.keyCode === KeyEvent.DOM_VK_UP) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), 0, -1 * (me._CONFIG.MOVE_SNAP_SIZE / 2));
                             me.selectShapes(me._getSelectedElement());
+                            renderer.addHistory();
                         }
                         if (!event.shiftKey && event.keyCode === KeyEvent.DOM_VK_DOWN) {
                             event.preventDefault();
                             me._moveElements(me._getMoveTargets(), 0, (me._CONFIG.MOVE_SNAP_SIZE / 2));
                             me.selectShapes(me._getSelectedElement());
+                            renderer.addHistory();
                         }
                     }
                 }
             });
         } else {
-            $(me._RENDERER.getContainer()).unbind("keydown");
+            $(renderer.getContainer()).unbind("keydown");
         }
     },
 
@@ -1864,6 +1912,7 @@ OG.handler.EventHandler.prototype = {
      */
     enableRootContextMenu: function () {
         var me = this;
+        var renderer = me._RENDERER;
 
         $.contextMenu({
             selector: '#' + me._RENDERER.getRootElement().id,
@@ -1891,6 +1940,7 @@ OG.handler.EventHandler.prototype = {
                                 'view_actualSize': {
                                     name: '실제 사이즈', callback: function () {
                                         me._RENDERER.setScale(1);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'sep2_1': '---------',
@@ -1903,41 +1953,49 @@ OG.handler.EventHandler.prototype = {
                                 'view_25': {
                                     name: '25%', callback: function () {
                                         me._RENDERER.setScale(0.25);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_50': {
                                     name: '50%', callback: function () {
                                         me._RENDERER.setScale(0.5);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_75': {
                                     name: '75%', callback: function () {
                                         me._RENDERER.setScale(0.75);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_100': {
                                     name: '100%', callback: function () {
                                         me._RENDERER.setScale(1);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_150': {
                                     name: '150%', callback: function () {
                                         me._RENDERER.setScale(1.5);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_200': {
                                     name: '200%', callback: function () {
                                         me._RENDERER.setScale(2);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_300': {
                                     name: '300%', callback: function () {
                                         me._RENDERER.setScale(3);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'view_400': {
                                     name: '400%', callback: function () {
                                         me._RENDERER.setScale(4);
+                                        renderer.addHistory();
                                     }
                                 },
                                 'sep2_3': '---------',
@@ -2907,6 +2965,7 @@ OG.handler.EventHandler.prototype = {
                         events: {
                             change: function (e) {
                                 me._RENDERER.alignTop();
+                                me._RENDERER.addHistory();
                             }
                         }
                     },
@@ -2918,6 +2977,7 @@ OG.handler.EventHandler.prototype = {
                         events: {
                             change: function (e) {
                                 me._RENDERER.alignLeft();
+                                me._RENDERER.addHistory();
                             }
                         }
                     },
@@ -2929,6 +2989,7 @@ OG.handler.EventHandler.prototype = {
                         events: {
                             change: function (e) {
                                 me._RENDERER.alignRight();
+                                me._RENDERER.addHistory();
                             }
                         }
                     },
@@ -2940,6 +3001,7 @@ OG.handler.EventHandler.prototype = {
                         events: {
                             change: function (e) {
                                 me._RENDERER.alignBottom();
+                                me._RENDERER.addHistory();
                             }
                         }
                     }
@@ -3444,6 +3506,7 @@ OG.handler.EventHandler.prototype = {
             root[0].appendChild(item);
             me.selectShape(item);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3455,6 +3518,7 @@ OG.handler.EventHandler.prototype = {
             root[0].insertBefore(item, root[0].children[0]);
             me.selectShape(item);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3466,6 +3530,7 @@ OG.handler.EventHandler.prototype = {
             var length = $(item).prevAll().length;
             root[0].insertBefore(item, root[0].children[length + 1]);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3478,6 +3543,7 @@ OG.handler.EventHandler.prototype = {
             root[0].insertBefore(item, root[0].children[length - 2]);
             me.selectShape(item);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3493,9 +3559,15 @@ OG.handler.EventHandler.prototype = {
         });
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
             if (item.id) {
-                me._RENDERER.removeShape(item);
+                if (me._RENDERER.isLane(item)) {
+                    me._RENDERER.removeLaneShape(item);
+                } else {
+                    me._RENDERER.removeShape(item);
+                }
+
             }
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3533,6 +3605,7 @@ OG.handler.EventHandler.prototype = {
 
             $(item).trigger("changeTo" + type);
         });
+        me._RENDERER.addHistory();
     },
 
 
@@ -3580,13 +3653,15 @@ OG.handler.EventHandler.prototype = {
      * 메뉴 : 선택된 Shape 들을 붙여넣기 한다.
      */
     pasteSelectedShape: function (e) {
-        var me = this, root = me._RENDERER.getRootGroup(),
+        var me = this;
+        var renderer = me._RENDERER;
+        var root = renderer.getRootGroup(),
             copiedElement = $(root).data("copied"),
             selectedElement = [], dx, dy, avgX = 0, avgY = 0;
         if (copiedElement) {
-            $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
+            $(renderer.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
                 if (item.id) {
-                    me._RENDERER.removeGuide(item);
+                    renderer.removeGuide(item);
                 }
             });
 
@@ -3612,7 +3687,7 @@ OG.handler.EventHandler.prototype = {
                     }
                     newShape.geom.style = item.shape.geom.style;
                     newShape.geom.move(me._CONFIG.COPY_PASTE_PADDING, me._CONFIG.COPY_PASTE_PADDING);
-                    newElement = me._RENDERER.drawShape(
+                    newElement = renderer.drawShape(
                         null, newShape,
                         null, item.shapeStyle
                     );
@@ -3621,12 +3696,12 @@ OG.handler.EventHandler.prototype = {
                     if (e) {
                         dx = e.offsetX - avgX;
                         dy = e.offsetY - avgY;
-                        newElement = me._RENDERER.drawShape(
+                        newElement = renderer.drawShape(
                             [boundary.getCentroid().x + dx, boundary.getCentroid().y + dy],
                             newShape, [boundary.getWidth(), boundary.getHeight()], item.shapeStyle
                         );
                     } else {
-                        newElement = me._RENDERER.drawShape(
+                        newElement = renderer.drawShape(
                             [boundary.getCentroid().x + me._CONFIG.COPY_PASTE_PADDING, boundary.getCentroid().y + me._CONFIG.COPY_PASTE_PADDING],
                             newShape, [boundary.getWidth(), boundary.getHeight()], item.shapeStyle
                         );
@@ -3637,7 +3712,7 @@ OG.handler.EventHandler.prototype = {
                 newElement.data = item.data;
 
                 // enable event
-                newGuide = me._RENDERER.drawGuide(newElement);
+                newGuide = renderer.drawGuide(newElement);
                 me.setClickSelectable(newElement, me._isSelectable(newElement.shape));
                 me.setMovable(newElement, me._isMovable(newElement.shape));
                 me.setConnectGuide(newElement, me._isConnectable(newElement.shape));
@@ -3657,8 +3732,30 @@ OG.handler.EventHandler.prototype = {
                 selectedElement.push(newElement);
             });
             $(root).data("copied", selectedElement);
+
+            renderer.addHistory();
         }
-        $(me._RENDERER._CANVAS._CONTAINER).trigger('pasteShape', [copiedElement, selectedElement]);
+
+        var copiedShapes = [];
+        var pastedShapes = [];
+
+        var setPastedShapes = function (copied, selected) {
+            copiedShapes.push(copied);
+            pastedShapes.push(selected);
+
+            if (renderer.isGroup(copied)) {
+                var copiedChilds = renderer.getChilds(copied);
+                var selectedChilds = renderer.getChilds(selected);
+                $.each(copiedChilds, function (idx, copiedChild) {
+                    setPastedShapes(copiedChild, selectedChilds[idx]);
+                });
+            }
+        };
+        $.each(copiedElement, function (index, copied) {
+            setPastedShapes(copied, selectedElement[index]);
+        });
+
+        $(renderer._CANVAS._CONTAINER).trigger('pasteShape', [copiedShapes, pastedShapes]);
     },
 
     /**
@@ -3694,6 +3791,7 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.toFront(guide.group);
             }
         }
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3708,6 +3806,7 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.toFront(guide.group);
             }
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3732,6 +3831,7 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.toFront(guide.group);
             }
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3744,6 +3844,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"stroke-width": lineWidth});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3756,6 +3857,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"stroke": lineColor});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3775,6 +3877,7 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.redrawShape(item);
             }
         });
+        me._RENDERER.addHistory();
     },
 
     setAddEventSelectedShape: function (value) {
@@ -3831,7 +3934,7 @@ OG.handler.EventHandler.prototype = {
             item.appendChild(newElement);
         });
 
-
+        me._RENDERER.addHistory();
     },
 
     setTaskTypeSelectedShape: function (taskType) {
@@ -3857,18 +3960,21 @@ OG.handler.EventHandler.prototype = {
                 me._RENDERER.redrawShape(item);
             }
         });
+        me._RENDERER.addHistory();
     },
 
     setExceptionType: function (element, exceptionType) {
         var me = this;
         element.shape.exceptionType = exceptionType;
         me._RENDERER.redrawShape(element);
+        me._RENDERER.addHistory();
     },
 
     setInclusion: function (element, inclusion) {
         var me = this;
         element.shape.inclusion = inclusion;
         me._RENDERER.redrawShape(element, null, true);
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3881,6 +3987,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"stroke-dasharray": lineStyle});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3893,6 +4000,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"arrow-start": arrowType + '-wide-long'});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3905,6 +4013,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"arrow-end": arrowType + '-wide-long'});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3920,8 +4029,8 @@ OG.handler.EventHandler.prototype = {
             } else {
                 me._RENDERER.setShapeStyle(item, {"fill": fillColor, "fill-opacity": 1});
             }
-
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3934,6 +4043,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-family": fontFamily});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3946,6 +4056,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-size": fontSize});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3958,6 +4069,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-color": fontColor});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3970,6 +4082,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-weight": fontWeight});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3982,6 +4095,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"font-style": fontStyle});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -3994,6 +4108,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"text-decoration": textDecoration});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4006,6 +4121,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"label-direction": labelDirection});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4018,6 +4134,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"label-angle": labelAngle});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4060,6 +4177,7 @@ OG.handler.EventHandler.prototype = {
                 });
             }
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4072,6 +4190,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"vertical-align": verticalAlign});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4084,6 +4203,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.setShapeStyle(item, {"text-anchor": horizontalAlign});
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4096,6 +4216,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.drawLabel(item, label);
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4108,6 +4229,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_shape=" + OG.Constants.SHAPE_TYPE.EDGE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.drawEdgeLabel(item, label, 'FROM');
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4120,6 +4242,7 @@ OG.handler.EventHandler.prototype = {
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_shape=" + OG.Constants.SHAPE_TYPE.EDGE + "][_selected=true]").each(function (idx, item) {
             me._RENDERER.drawEdgeLabel(item, label, 'TO');
         });
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4130,6 +4253,7 @@ OG.handler.EventHandler.prototype = {
         if (me._CONFIG.SCALE + me._CONFIG.SCALE * 0.1 <= me._CONFIG.SCALE_MAX) {
             me._RENDERER.setScale(me._CONFIG.SCALE + me._CONFIG.SCALE * 0.1);
         }
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4140,6 +4264,7 @@ OG.handler.EventHandler.prototype = {
         if (me._CONFIG.SCALE - me._CONFIG.SCALE * 0.1 >= me._CONFIG.SCALE_MIN) {
             me._RENDERER.setScale(me._CONFIG.SCALE - me._CONFIG.SCALE * 0.1);
         }
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4148,6 +4273,7 @@ OG.handler.EventHandler.prototype = {
     fitWindow: function () {
         var me = this, container = me._RENDERER.getContainer();
         me._RENDERER.fitCanvasSize([container.clientWidth, container.clientHeight], true);
+        me._RENDERER.addHistory();
     },
 
     /**
@@ -4946,6 +5072,7 @@ OG.handler.EventHandler.prototype = {
                                 renderer.trimConnectInnerVertice(element);
                                 renderer.trimConnectIntersection(element);
                                 renderer.trimEdge(element);
+                                renderer.addHistory();
                             }
                         });
                     }
@@ -5291,6 +5418,7 @@ OG.handler.EventHandler.prototype = {
                                     if (connectableDirection && !frontElement) {
                                         renderer.disconnectOneWay(element, connectableDirection);
                                     }
+                                    renderer.addHistory();
                                 }
                             });
 
