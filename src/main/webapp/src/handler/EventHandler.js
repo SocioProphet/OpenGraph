@@ -572,15 +572,15 @@ OG.handler.EventHandler.prototype = {
             }
 
             return fixedPosition;
-        }
+        };
 
         var removeDropOverBox = function () {
             var dropOverBoxes = $('[id$=' + OG.Constants.DROP_OVER_BBOX_SUFFIX + ']');
             $.each(dropOverBoxes, function (index, dropOverBox) {
                 renderer.remove(dropOverBox.id);
-            })
+            });
             $(root).removeData("groupTarget");
-        }
+        };
 
         var setGroupTarget = function () {
             removeDropOverBox();
@@ -1644,6 +1644,42 @@ OG.handler.EventHandler.prototype = {
     },
 
     /**
+     * Lane,Pool 엘리먼트가 새로 생성될 시 그룹을 맺도록 한다.
+     *
+     * @param {Element} element Shape 엘리먼트
+     */
+    setGroupDropable: function (element) {
+        var me = this;
+        var renderer = me._RENDERER;
+        var root = renderer.getRootGroup();
+
+        $(element).bind("mousedown", function () {
+            var newPool = $(root).data('newPool');
+            var poolInnderShape = $(root).data('poolInnderShape');
+            if (!renderer.isLane(element) && !renderer.isPool(element)) {
+                return;
+            }
+            if (!newPool) {
+                return;
+            }
+            if (element.id !== newPool.id) {
+                return;
+            }
+
+            $.each(poolInnderShape, function (index, innderShape) {
+                newPool.appendChild(innderShape);
+            });
+
+            if ($(newPool).data('originalStyle')) {
+                newPool.shape.geom.style.map = $(newPool).data('originalStyle');
+            }
+            renderer.redrawShape(newPool);
+
+            $(root).data('newPool', false);
+            $(root).data('poolInnderShape', []);
+        });
+    },
+    /**
      * 마우스 드래그 영역지정 선택가능여부를 설정한다.
      * 선택가능해야 리사이즈가 가능하다.
      *
@@ -1652,7 +1688,74 @@ OG.handler.EventHandler.prototype = {
     setDragSelectable: function (isSelectable) {
         var renderer = this._RENDERER;
         var me = this, rootEle = renderer.getRootElement(),
-            root = renderer.getRootGroup(), eventOffset;
+            root = renderer.getRootGroup();
+
+        var correctionConditionAnalysis = function (correctionConditions, offset) {
+            var fixedPosition = {
+                x: offset.x,
+                y: offset.y
+            };
+            var calculateFixedPosition = function (expectedPosition) {
+                if (!expectedPosition) {
+                    return fixedPosition;
+                }
+                if (expectedPosition.x && !expectedPosition.y) {
+                    return {
+                        x: expectedPosition.x,
+                        y: fixedPosition.y
+                    }
+                }
+                if (expectedPosition.y && !expectedPosition.x) {
+                    return {
+                        x: fixedPosition.x,
+                        y: expectedPosition.y
+                    }
+                }
+                if (expectedPosition.x && expectedPosition.y) {
+                    return expectedPosition;
+                }
+                return fixedPosition;
+            };
+            if (!correctionConditions || !correctionConditions.length) {
+                return fixedPosition;
+            }
+
+            var conditionsPassCandidates = [];
+            $.each(correctionConditions, function (index, correctionCondition) {
+                var condition = correctionCondition.condition;
+
+                var conditionsPassToFix = true;
+                if (condition.minX) {
+                    if (offset.x > condition.minX) {
+                        conditionsPassToFix = false;
+                    }
+                }
+                if (condition.maxX) {
+                    if (offset.x < condition.maxX) {
+                        conditionsPassToFix = false;
+                    }
+                }
+                if (condition.minY) {
+                    if (offset.y > condition.minY) {
+                        conditionsPassToFix = false;
+                    }
+                }
+                if (condition.maxY) {
+                    if (offset.y < condition.maxY) {
+                        conditionsPassToFix = false;
+                    }
+                }
+
+                if (conditionsPassToFix) {
+                    conditionsPassCandidates.push(correctionCondition);
+                }
+            });
+            $.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
+                fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
+            });
+
+            return fixedPosition;
+        };
 
         // 배경클릭한 경우 deselect 하도록
         $(rootEle).bind("click", function () {
@@ -1680,13 +1783,26 @@ OG.handler.EventHandler.prototype = {
             if (isConnectMode === 'active') {
                 eventOffset = me._getOffset(event);
                 renderer.updateVirtualEdge(eventOffset.x, eventOffset.y);
-                return;
             }
 
-            //TODO Lnae,Pool 위치조정 모드일 경우 수행
+            //Lane,Pool 이 새로 그려졌을 경우 위치조정
+            var newPool = $(root).data('newPool');
+            var correctionConditions = $(root).data('correctionConditions');
+            if (newPool) {
 
+                var geometry = newPool.shape.geom;
+                var eventOffset = me._getOffset(event);
+                var newX = eventOffset.x;
+                var newY = eventOffset.y;
+
+                var conditionAnalysis = correctionConditionAnalysis(correctionConditions, {x: newX, y: newY});
+                newX = me._grid(conditionAnalysis.x, 'move');
+                newY = me._grid(conditionAnalysis.y, 'move');
+
+                geometry.moveCentroid([newX, newY]);
+                renderer.redrawShape(newPool);
+            }
         });
-
 
         $(rootEle).bind("contextmenu", function (event) {
             if (event.target.nodeName == 'svg') {

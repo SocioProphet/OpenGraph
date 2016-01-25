@@ -300,7 +300,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         EDGE_MOVE_DELAY_SIZE: 14,
 
         /**
-         * swimLane 최소 폭
+         * swimLane 리사이즈 최소 폭
          */
         LANE_MIN_SIZE: 50,
 
@@ -308,6 +308,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * swimLane 확장 기본 폭
          */
         LANE_DEFAULT_SIZE: 100,
+
+        /**
+         * swimLane, pool 생성 기본 가로,세로
+         */
+        POOL_DEFAULT_SIZE: [300, 200],
 
         /**
          * 그룹 하위 shape 와 그룹사이의 여유폭
@@ -687,6 +692,7 @@ OG.graph.Canvas.prototype = {
 
         this._HANDLER.setClickSelectable(element, this._HANDLER._isSelectable(element.shape));
         this._HANDLER.setMovable(element, this._HANDLER._isMovable(element.shape));
+        this._HANDLER.setGroupDropable(element);
         this._HANDLER.setConnectGuide(element, this._HANDLER._isConnectable(element.shape));
 
         if (this._HANDLER._isLabelEditable(element.shape)) {
