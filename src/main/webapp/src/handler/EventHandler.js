@@ -1662,9 +1662,6 @@ OG.handler.EventHandler.prototype = {
             if (!newPool) {
                 return;
             }
-            if (element.id !== newPool.id) {
-                return;
-            }
 
             $.each(poolInnderShape, function (index, innderShape) {
                 newPool.appendChild(innderShape);
@@ -1674,9 +1671,7 @@ OG.handler.EventHandler.prototype = {
                 newPool.shape.geom.style.map = $(newPool).data('originalStyle');
             }
             renderer.redrawShape(newPool);
-
-            $(root).data('newPool', false);
-            $(root).data('poolInnderShape', []);
+            renderer.offDropablePool();
         });
     },
     /**

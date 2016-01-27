@@ -672,11 +672,12 @@ OG.graph.Canvas.prototype = {
      * @param {OG.geometry.Style,Object} style 스타일 (Optional)
      * @param {String} id Element ID 지정 (Optional)
      * @param {String} parentId 부모 Element ID 지정 (Optional)
+     * @param {Boolean} preventDrop Lane, Pool 생성 drop 모드 수행 방지
      * @return {Element} Group DOM Element with geometry
      */
-    drawShape: function (position, shape, size, style, id, parentId) {
+    drawShape: function (position, shape, size, style, id, parentId, preventDrop) {
 
-        var element = this._RENDERER.drawShape(position, shape, size, style, id);
+        var element = this._RENDERER.drawShape(position, shape, size, style, id, preventDrop);
 
         if (position && (shape.TYPE === OG.Constants.SHAPE_TYPE.EDGE)) {
             element = this._RENDERER.move(element, position);

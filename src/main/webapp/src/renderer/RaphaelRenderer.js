@@ -618,10 +618,11 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
  * @param {Number[]} size Shape Width, Height
  * @param {OG.geometry.Style,Object} style 스타일
  * @param {String} id Element ID 지정
+ * @param {Boolean} preventDrop Lane, Pool 생성 drop 모드 수행 방지
  * @return {Element} Group DOM Element with geometry
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, size, style, id) {
+OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, size, style, id, preventDrop) {
     var width = size ? size[0] : 100,
         height = size ? size[1] : 100,
         groupNode, geometry, text, image, html,
@@ -799,7 +800,7 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         setGroup();
     }
 
-    if (!id && (me.isLane(groupNode) || me.isPool(groupNode))) {
+    if (!id && !preventDrop && (me.isLane(groupNode) || me.isPool(groupNode))) {
         me.setDropablePool(groupNode);
     }
 
@@ -6090,7 +6091,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 if (i === quarterLength - 1) {
                     _height = _height + (targetArea.getHeight() % quarterLength);
                 }
-                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.HorizontalLaneShape(), [_width, _height], null, null, element.id);
+                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.HorizontalLaneShape(), [_width, _height], null, null, element.id, true);
                 divedLanes.push(newLane);
             }
 
@@ -6102,7 +6103,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 if (i === quarterLength - 1) {
                     _width = _width + (targetArea.getWidth() % quarterLength);
                 }
-                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.VerticalLaneShape(), [_width, _height], null, null, element.id);
+                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.VerticalLaneShape(), [_width, _height], null, null, element.id, true);
                 divedLanes.push(newLane);
             }
             me.fitLaneOrder(element);
@@ -6134,7 +6135,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 var x = targetUpperLeft.x;
                 var y = targetUpperLeft.y;
                 var shape = me.isHorizontalLane(element) ? new OG.HorizontalLaneShape() : new OG.VerticalLaneShape();
-                standardLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, element.id);
+                standardLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, element.id, true);
                 divedLanes.push(standardLane);
             }
 
@@ -6236,7 +6237,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                     }
                 }
             })
-            var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, parent.id);
+            var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, parent.id, true);
             divedLanes.push(newLane);
             $.each(lanesToMove, function (index, laneToMove) {
                 me.move(laneToMove, moveOffset);
@@ -6251,6 +6252,8 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
     }
+
+    me.offDropablePool();
 };
 
 /**
@@ -7302,4 +7305,15 @@ OG.renderer.RaphaelRenderer.prototype.setDropablePool = function (element) {
     $(root).data('correctionConditions', calculateDropCorrectionConditions());
 
     return element;
+}
+
+/**
+ * 신규 Lane 또는 Pool 드랍모드를 해제한다.
+ *
+ */
+OG.renderer.RaphaelRenderer.prototype.offDropablePool = function () {
+    var me = this;
+    var root = me.getRootGroup();
+    $(root).data('newPool', false);
+    $(root).data('poolInnderShape', []);
 }
