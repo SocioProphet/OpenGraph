@@ -18,7 +18,7 @@
  * console.log(map2.get('key1'));
  *
  * @param {Object} jsonObject key:value 매핑 JSON 오브젝트
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.common.HashMap = function (jsonObject) {
 	/**

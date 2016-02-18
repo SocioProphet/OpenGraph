@@ -12,7 +12,7 @@
  * @param {Number} radiusX X축 반경
  * @param {Number} radiusY Y축 반경
  * @param {Number} angle X축 기울기
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Ellipse = function (center, radiusX, radiusY, angle) {
 

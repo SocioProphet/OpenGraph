@@ -10,7 +10,7 @@
  * var geom = new OG.geometry.Curve([[200, 100], [100, 300], [-100, -100], [-200, 100]]);
  *
  * @param {OG.geometry.Coordinate[]} controlPoints Curve Vertex 좌표 Array
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Curve = function (controlPoints) {
 

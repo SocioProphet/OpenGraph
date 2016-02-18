@@ -10,7 +10,7 @@
  *
  * @param {OG.geometry.Coordinate} from 라인 시작 좌표값
  * @param {OG.geometry.Coordinate} to 라인 끝 좌표값
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Line = function (from, to, poi) {
 

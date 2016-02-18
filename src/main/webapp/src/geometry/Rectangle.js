@@ -11,7 +11,7 @@
  * @param {OG.geometry.Coordinate} upperLeft 좌상단좌표
  * @param {Number} width 너비
  * @param {Number} height 높이
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Rectangle = function (upperLeft, width, height) {
 

@@ -7,7 +7,7 @@
  *
  * @param {String} html 임베드 HTML String
  * @param {String} label 라벨 [Optional]
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.shape.HtmlShape = function (html, label) {
 	OG.shape.HtmlShape.superclass.call(this);

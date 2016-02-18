@@ -10,7 +10,7 @@
  *
  * @param {Number} x x좌표
  * @param {Number} y y좌표
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Coordinate = function (x, y) {
 

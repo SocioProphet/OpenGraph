@@ -12,7 +12,7 @@
  * @param {String} backgroundColor 캔버스 배경색
  * @param {String} backgroundImage 캔버스 배경이미지
  * @param {Object} config Configuration
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.renderer.RaphaelRenderer = function (container, containerSize, backgroundColor, backgroundImage, config) {
     OG.renderer.RaphaelRenderer.superclass.call(this, arguments);
@@ -5805,6 +5805,14 @@ OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
 
     me._CONFIG.HISTORY = history;
     me._CONFIG.HISTORY_INDEX = historyIndex;
+
+
+    //캔버스가 서버로부터 받은 데이터를 적용시키는 과정이 아닐 경우 브로드캐스트 수행.
+    if(!me._CANVAS.getRemoteDuring()){
+        OG.RemoteHandler.broadCastCanvas(me._CANVAS, function(canvas){
+
+        });
+    }
 };
 
 /**

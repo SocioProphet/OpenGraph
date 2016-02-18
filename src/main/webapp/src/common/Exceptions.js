@@ -4,7 +4,7 @@
  * @class
  *
  * @param {String} message 메시지
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.common.NotSupportedException = function (message) {
 	/**
@@ -27,7 +27,7 @@ OG.NotSupportedException = OG.common.NotSupportedException;
  * @class
  *
  * @param {String} message 메시지
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.common.NotImplementedException = function (message) {
 	/**
@@ -50,7 +50,7 @@ OG.NotImplementedException = OG.common.NotImplementedException;
  * @class
  *
  * @param {String} message 메시지
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.common.ParamError = function (message) {
 	/**

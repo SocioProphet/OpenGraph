@@ -3,7 +3,7 @@
  *
  * @class
  *
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.common.CurveUtil = {
 	/**

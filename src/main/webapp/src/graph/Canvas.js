@@ -16,11 +16,31 @@
  * @param {Number[]} containerSize 컨테이너 Width, Height
  * @param {String} backgroundColor 캔버스 배경색
  * @param {String} backgroundImage 캔버스 배경이미지
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroundImage) {
 
     this._CONFIG = {
+        /**
+         * 서버 수신 데이터 처리중
+         */
+        REMOTE_PERFORMED_DURING: false,
+        /**
+         * 리모트 데피니션
+         */
+        REMOTE_IDENTIFIER: null,
+        /**
+         * 리모트 모드
+         */
+        REMOTEABLE: false,
+        /**
+         * 리모트 모드 수정권한
+         */
+        REMOTE_EDITABLE: false,
+        /**
+         * 리모트 모드 마스터모드
+         */
+        REMOTE_ISMASTER: false,
         /**
          * 히스토리 인덱스
          */
@@ -581,7 +601,39 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 };
 
 OG.graph.Canvas.prototype = {
-
+    setRemoteDuring: function (during) {
+        this._CONFIG.REMOTE_PERFORMED_DURING = during;
+    },
+    getRemoteDuring: function () {
+        return this._CONFIG.REMOTE_PERFORMED_DURING;
+    },
+    setIdentifier: function (identifier) {
+        this._CONFIG.REMOTE_IDENTIFIER = identifier;
+    },
+    getIdentifier: function () {
+        return this._CONFIG.REMOTE_IDENTIFIER;
+    },
+    getRemotable: function () {
+        return this._CONFIG.REMOTEABLE;
+    },
+    setRemotable: function (remotable) {
+        this._CONFIG.REMOTEABLE = remotable;
+    },
+    setRemoteEditable: function (editable) {
+        this._CONFIG.REMOTE_EDITABLE = editable;
+    },
+    getRemoteEditable: function () {
+        return this._CONFIG.REMOTE_EDITABLE;
+    },
+    setRemoteIsMaster: function (isMaster) {
+        this._CONFIG.REMOTE_ISMASTER = isMaster;
+    },
+    getRemoteIsMaster: function () {
+        return this._CONFIG.REMOTE_ISMASTER;
+    },
+    setCurrentCanvas: function (canvas) {
+        this._RENDERER.setCanvas(canvas);
+    },
     /**
      * Canvas 의 설정값을 초기화한다.
      *
@@ -603,11 +655,9 @@ OG.graph.Canvas.prototype = {
      *
      * @param {Object} config JSON 포맷의 configuration
      */
-    setCurrentCanvas: function (canvas) {
-        this._RENDERER.setCanvas(canvas);
-    },
     initConfig: function (config) {
         if (config) {
+            this._CONFIG.REMOTEABLE = config.remoteable === undefined ? this._CONFIG.REMOTEABLE : config.remoteable;
             this._CONFIG.SELECTABLE = config.selectable === undefined ? this._CONFIG.SELECTABLE : config.selectable;
             this._CONFIG.DRAG_SELECTABLE = config.dragSelectable === undefined ? this._CONFIG.DRAG_SELECTABLE : config.dragSelectable;
             this._CONFIG.MOVABLE = config.movable === undefined ? this._CONFIG.MOVABLE : config.movable;
@@ -1881,7 +1931,7 @@ OG.graph.Canvas.prototype = {
     onDrawLabel: function (callbackFunc) {
         $(this.getRootElement()).bind('drawLabel', function (event, shapeElement, labelText) {
             callbackFunc(event, shapeElement, labelText);
-        });
+        })
     },
 
     /**

@@ -6,7 +6,7 @@
  *
  * @param {OG.renderer.IRenderer} renderer 렌더러
  * @param {Object} config Configuration
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.handler.EventHandler = function (renderer, config) {
     this._RENDERER = renderer;

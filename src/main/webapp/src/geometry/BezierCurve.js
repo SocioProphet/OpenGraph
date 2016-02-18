@@ -10,7 +10,7 @@
  * var geom = new OG.geometry.BezierCurve([[200, 100], [100, 300], [-100, -100], [-200, 100]]);
  *
  * @param {OG.geometry.Coordinate[]} controlPoints [from, control_point1, control_point2, to]
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.BezierCurve = function (controlPoints) {
     var bezier, t, i;
