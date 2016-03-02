@@ -3735,9 +3735,11 @@ OG.handler.EventHandler.prototype = {
      */
     selectAll: function () {
         var me = this;
+        var elements = [];
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "]").each(function (index, element) {
-            me.selectShape(element);
+            elements.push(element);
         });
+        me.selectShapes(elements);
     },
 
     /**
