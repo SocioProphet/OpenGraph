@@ -800,8 +800,12 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         setGroup();
     }
 
-    if (!id && !preventDrop && (me.isLane(groupNode) || me.isPool(groupNode))) {
-        me.setDropablePool(groupNode);
+    if (!id && (me.isLane(groupNode) || me.isPool(groupNode))) {
+        if (preventDrop) {
+            me.putInnerShapeToPool(groupNode);
+        } else {
+            me.setDropablePool(groupNode);
+        }
     }
 
     if ($(shape).attr('auto_draw') == 'yes') {
@@ -5808,9 +5812,9 @@ OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
 
 
     //캔버스가 서버로부터 받은 데이터를 적용시키는 과정이 아닐 경우 브로드캐스트 수행.
-    if(me._CANVAS.getRemotable()){
-        if(!me._CANVAS.getRemoteDuring()){
-            OG.RemoteHandler.broadCastCanvas(me._CANVAS, function(canvas){
+    if (me._CANVAS.getRemotable()) {
+        if (!me._CANVAS.getRemoteDuring()) {
+            OG.RemoteHandler.broadCastCanvas(me._CANVAS, function (canvas) {
 
             });
         }
@@ -7194,6 +7198,41 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
 };
 
 /**
+ * Lane 또는 Pool 내부 도형들을 그룹에 포함시킨다.
+ *
+ * @param {Element,String} Element
+
+ * @return {Element} Element
+ */
+OG.renderer.RaphaelRenderer.prototype.putInnerShapeToPool = function (element) {
+    var me = this;
+    var root = me.getRootGroup();
+
+    if (!me.isLane(element) && !me.isPool(element)) {
+        return element;
+    }
+
+    var geometry = element.shape.geom;
+    var envelope = geometry.getBoundary();
+
+    //캔버스 하위 shape 중 그룹 가능한 것의 집합.
+    var rootInnderShape = [];
+    var childs = me.getChilds(root);
+    $.each(childs, function (index, child) {
+        if (!me.isEdge(child) && child.id != element.id) {
+            rootInnderShape.push(child);
+        }
+    });
+    $.each(rootInnderShape, function(index, innderShape){
+        var boundary = innderShape.shape.geom.getBoundary();
+        if (envelope.isContainsAll(boundary.getVertices())) {
+            element.appendChild(innderShape);
+        }
+    });
+}
+
+
+/**
  * 신규 Lane 또는 Pool 이 캔버스상에서 드래그하여 그려지도록 사전작업을 수행한다.
  *
  * @param {Element,String} Element
@@ -7315,7 +7354,7 @@ OG.renderer.RaphaelRenderer.prototype.setDropablePool = function (element) {
     $(root).data('correctionConditions', calculateDropCorrectionConditions());
 
     return element;
-}
+};
 
 /**
  * 신규 Lane 또는 Pool 드랍모드를 해제한다.
@@ -7326,4 +7365,4 @@ OG.renderer.RaphaelRenderer.prototype.offDropablePool = function () {
     var root = me.getRootGroup();
     $(root).data('newPool', false);
     $(root).data('poolInnderShape', []);
-}
+};

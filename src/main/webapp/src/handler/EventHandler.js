@@ -1600,6 +1600,10 @@ OG.handler.EventHandler.prototype = {
                         if (isConnectMode) {
                             if (isConnectable && !isEdge) {
                                 var target = me._RENDERER.getTargetfromVirtualEdge();
+
+                                if (target.id === element.id) {
+                                    return;
+                                }
                                 me._RENDERER.removeAllVirtualEdge();
                                 me._RENDERER._CANVAS.connect(target, element, null, null);
                                 renderer.addHistory();
