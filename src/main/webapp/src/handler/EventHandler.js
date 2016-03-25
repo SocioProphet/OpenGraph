@@ -707,7 +707,7 @@ OG.handler.EventHandler.prototype = {
                                 removeGroupInnerGuides(child);
                             }
                         })
-                    }
+                    };
 
                     var findParentGuideTarget = function (target) {
                         //부모가 루트일때는 루프를 중단.
@@ -718,16 +718,16 @@ OG.handler.EventHandler.prototype = {
                             if (moveTarget.id === target.id) {
                                 newTargetElement = target;
                             }
-                        })
+                        });
                         findParentGuideTarget(renderer.getParent(target));
-                    }
+                    };
 
                     $.each(moveTargets, function (index, moveTarget) {
                         var moveElm = renderer.getElementById(moveTarget.id);
                         if (renderer.isGroup(moveElm)) {
                             removeGroupInnerGuides(moveElm);
                         }
-                    })
+                    });
 
                     if (dragTargetGuideLost) {
                         findParentGuideTarget(element);
@@ -3618,7 +3618,11 @@ OG.handler.EventHandler.prototype = {
     bringToFront: function () {
         var me = this, root = $(me._RENDERER.getRootGroup());
         $(me._RENDERER.getRootElement()).find("[_selected=true]").each(function (index, item) {
-            root[0].appendChild(item);
+            var moveTarget = item;
+            if (me._RENDERER.isLane(item)) {
+                moveTarget = me._RENDERER.getRootLane(item);
+            }
+            root[0].appendChild(moveTarget);
             me.selectShape(item);
         });
         me._RENDERER.addHistory();
@@ -3630,7 +3634,11 @@ OG.handler.EventHandler.prototype = {
     sendToBack: function () {
         var me = this, root = $(me._RENDERER.getRootGroup());
         $(me._RENDERER.getRootElement()).find("[_selected=true]").each(function (index, item) {
-            root[0].insertBefore(item, root[0].children[0]);
+            var moveTarget = item;
+            if (me._RENDERER.isLane(item)) {
+                moveTarget = me._RENDERER.getRootLane(item);
+            }
+            root[0].insertBefore(moveTarget, root[0].children[0]);
             me.selectShape(item);
         });
         me._RENDERER.addHistory();
@@ -3642,8 +3650,12 @@ OG.handler.EventHandler.prototype = {
     bringForward: function () {
         var me = this, root = $(me._RENDERER.getRootGroup());
         $(me._RENDERER.getRootElement()).find("[_selected=true]").each(function (index, item) {
-            var length = $(item).prevAll().length;
-            root[0].insertBefore(item, root[0].children[length + 1]);
+            var moveTarget = item;
+            if (me._RENDERER.isLane(item)) {
+                moveTarget = me._RENDERER.getRootLane(item);
+            }
+            var length = $(moveTarget).prevAll().length;
+            root[0].insertBefore(moveTarget, root[0].children[length + 1]);
         });
         me._RENDERER.addHistory();
     },
@@ -3654,8 +3666,12 @@ OG.handler.EventHandler.prototype = {
     sendBackward: function () {
         var me = this, root = $(me._RENDERER.getRootGroup());
         $(me._RENDERER.getRootElement()).find("[_selected=true]").each(function (index, item) {
-            var length = $(item).prevAll().length;
-            root[0].insertBefore(item, root[0].children[length - 2]);
+            var moveTarget = item;
+            if (me._RENDERER.isLane(item)) {
+                moveTarget = me._RENDERER.getRootLane(item);
+            }
+            var length = $(moveTarget).prevAll().length;
+            root[0].insertBefore(moveTarget, root[0].children[length - 2]);
             me.selectShape(item);
         });
         me._RENDERER.addHistory();
