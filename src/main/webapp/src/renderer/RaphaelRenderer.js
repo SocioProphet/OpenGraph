@@ -2178,7 +2178,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         geometry = rElement ? rElement.node.shape.geom : null,
         envelope,
         group, guide,
-        _bBoxRect, _line, _linePath1, _linePath2,
+        _bBoxRect, _line, _linePath1, _linePath2,_rect,
         _upperLeft, _upperRight, _lowerLeft, _lowerRight, _leftCenter, _upperCenter, _rightCenter, _lowerCenter,
         _ulRect, _urRect, _lwlRect, _lwrRect, _lcRect, _ucRect, _rcRect, _lwcRect,
         _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2),
@@ -2394,6 +2394,23 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         controllers.push(_line);
     }
 
+    function _drawRect() {
+        _rect = me._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
+        _rect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_RECT_AREA);
+
+        group.appendChild(_rect);
+
+        me._add(_rect, rElement.id + OG.Constants.GUIDE_SUFFIX.RECT);
+
+        guide.rect = _rect.node;
+        controllers.push(_rect);
+    }
+
+    function _redrawRect() {
+        _rect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.RECT);
+        controllers.push(_rect);
+    }
+
     function _drawLaneQuarter(divideCount) {
         _qUpper = me._PAPER.image("resources/images/symbol/quarter-upper.png", 0, 0, _ctrlSize, _ctrlSize);
         _qUpper.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
@@ -2524,9 +2541,11 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
                 _redrawLaneQuarter(me.enableDivideCount(element));
             }
             if (isLane && me.isTopGroup(element) && _isConnectable) {
+                _redrawRect();
                 _redrawLine();
             }
             if (!isLane && _isConnectable) {
+                _redrawRect();
                 _redrawLine();
             }
             _redrawTrash();
@@ -2555,9 +2574,11 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
                 _drawLaneQuarter(me.enableDivideCount(element));
             }
             if (isLane && me.isTopGroup(element) && _isConnectable) {
+                _drawRect();
                 _drawLine();
             }
             if (!isLane && _isConnectable) {
+                _drawRect();
                 _drawLine();
             }
 
@@ -5271,6 +5292,7 @@ OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
  */
 OG.renderer.RaphaelRenderer.prototype.removeAllVirtualEdge = function () {
     $(this.getRootGroup()).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, false);
+    $(this.getRootGroup()).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, false);
     return this.remove(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
 };
 

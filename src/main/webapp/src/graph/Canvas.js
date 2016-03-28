@@ -527,6 +527,14 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-opacity": 0.2,
                 cursor: "pointer"
             },
+            GUIDE_RECT_AREA: {
+                stroke: "black",
+                fill: "#ffffff",
+                "fill-opacity": 0,
+                "stroke-width": 1,
+                "stroke-opacity": 1,
+                cursor: "pointer"
+            },
             RUBBER_BAND: {stroke: "#0000FF", opacity: 0.2, fill: "#0077FF"},
             DROP_OVER_BBOX: {stroke: "#0077FF", fill: "none", opacity: 0.3, "shape-rendering": "crispEdges"},
             LABEL: {"font-size": 12, "font-color": "black", "fill": "white"},

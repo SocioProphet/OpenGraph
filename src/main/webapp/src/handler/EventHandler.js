@@ -873,6 +873,27 @@ OG.handler.EventHandler.prototype = {
                         $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'active');
                     }
                 });
+
+                $(guide.rect).bind({
+                    click: function (event) {
+                        eventOffset = me._getOffset(event);
+                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                        if (virtualEdge) {
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'created');
+                        }
+                    }
+                });
+
+                $(guide.rect).draggable({
+                    start: function (event) {
+                        me.deselectAll();
+                        me._RENDERER.removeAllConnectGuide();
+                        me._RENDERER.removeAllVirtualEdge();
+                        eventOffset = me._getOffset(event);
+                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                        $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'active');
+                    }
+                });
             }
         }
     },
@@ -1757,7 +1778,7 @@ OG.handler.EventHandler.prototype = {
         };
 
         // 배경클릭한 경우 deselect 하도록
-        $(rootEle).bind("click", function () {
+        $(rootEle).bind("click", function (event) {
             if (!$(this).data("dragBox")) {
                 me.deselectAll();
                 renderer.removeRubberBand(rootEle);
@@ -1767,6 +1788,7 @@ OG.handler.EventHandler.prototype = {
             //가상선 액티브인 경우 삭제
             root = renderer.getRootGroup();
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+            var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
             if (isConnectMode) {
                 if (isConnectMode === 'created') {
                     $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'active');
@@ -1775,11 +1797,29 @@ OG.handler.EventHandler.prototype = {
                     renderer.removeAllVirtualEdge();
                 }
             }
+            if (isRectMode) {
+                if (isRectMode === 'created') {
+                    $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'active');
+                }
+                if (isRectMode === 'active') {
+                    //새로운 것 만드는 과정
+                    var eventOffset = me._getOffset(event);
+
+                    var target = me._RENDERER.getTargetfromVirtualEdge();
+                    renderer.removeAllVirtualEdge();
+                    var shapeId = $(target).attr('_shape_id');
+                    var newShape;
+                    eval('newShape = new '+shapeId + '()');
+                    var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [100, 100]);
+                    renderer._CANVAS.connect(target, rectShape, null, null);
+                }
+            }
         });
 
         $(rootEle).bind("mousemove", function (event) {
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
-            if (isConnectMode === 'active') {
+            var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+            if (isConnectMode === 'active' || isRectMode === 'active') {
                 eventOffset = me._getOffset(event);
                 renderer.updateVirtualEdge(eventOffset.x, eventOffset.y);
             }
@@ -1815,7 +1855,8 @@ OG.handler.EventHandler.prototype = {
             // 마우스 영역 드래그하여 선택 처리
             $(rootEle).bind("mousedown", function (event) {
                 var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
-                if (isConnectMode === 'active') {
+                var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+                if (isConnectMode === 'active' || isRectMode === 'active') {
                     return;
                 }
                 var eventOffset = me._getOffset(event);
@@ -1824,7 +1865,8 @@ OG.handler.EventHandler.prototype = {
             });
             $(rootEle).bind("mousemove", function (event) {
                 var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
-                if (isConnectMode === 'active') {
+                var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+                if (isConnectMode === 'active' || isRectMode === 'active') {
                     $(this).removeData("dragBox_first");
                     return;
                 }
@@ -1848,7 +1890,8 @@ OG.handler.EventHandler.prototype = {
             });
             $(rootEle).bind("mouseup", function (event) {
                 var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
-                if (isConnectMode === 'active') {
+                var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+                if (isConnectMode === 'active' || isRectMode === 'active') {
                     return;
                 }
                 if ("start" == $(this).data("rubber_band_status")) {
