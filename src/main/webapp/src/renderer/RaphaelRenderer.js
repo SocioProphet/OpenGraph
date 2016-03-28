@@ -1873,7 +1873,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
  * @return {Element} 연결된 Edge 엘리먼트
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label) {
+OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label, preventTrigger) {
 
     var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
@@ -1994,7 +1994,9 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
 
     if (fromShape && toShape) {
         // connectShape event fire
-        $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
+        if(!preventTrigger){
+            $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
+        }
     }
     me.trimConnectInnerVertice(edge);
     me.trimConnectIntersection(edge);

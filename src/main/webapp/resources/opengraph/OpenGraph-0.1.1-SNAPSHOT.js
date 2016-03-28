@@ -17729,7 +17729,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
  * @return {Element} 연결된 Edge 엘리먼트
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label) {
+OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label, preventTrigger) {
 
     var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
@@ -17850,7 +17850,9 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
 
     if (fromShape && toShape) {
         // connectShape event fire
-        $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
+        if(!preventTrigger){
+            $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
+        }
     }
     me.trimConnectInnerVertice(edge);
     me.trimConnectIntersection(edge);
@@ -24604,15 +24606,18 @@ OG.handler.EventHandler.prototype = {
                     renderer.removeAllVirtualEdge();
                     var shapeId = $(target).attr('_shape_id');
                     var newShape;
-                    eval('newShape = new '+shapeId + '()');
+                    eval('newShape = new ' + shapeId + '()');
 
-                    var style = console.log(target.shape.geom.style);
+                    var style = target.shape.geom.style;
                     var boundary = renderer.getBoundary(target);
                     var width = boundary.getWidth();
                     var height = boundary.getHeight();
 
                     var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                    renderer._CANVAS.connect(target, rectShape, null, null);
+                    $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
+
+                    renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+
                 }
             }
         });
@@ -29705,7 +29710,7 @@ OG.graph.Canvas.prototype = {
      * @param {String} label Label
      * @return {Element} 연결된 Edge 엘리먼트
      */
-    connect: function (fromElement, toElement, style, label, fromP, toP) {
+    connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger) {
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
         if (fromP) {
@@ -29732,7 +29737,7 @@ OG.graph.Canvas.prototype = {
 
 
         // connect
-        edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label);
+        edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, preventTrigger);
 
         if (edge) {
             this._HANDLER.setClickSelectable(edge, edge.shape.SELECTABLE);

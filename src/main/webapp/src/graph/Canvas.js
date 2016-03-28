@@ -852,7 +852,7 @@ OG.graph.Canvas.prototype = {
      * @param {String} label Label
      * @return {Element} 연결된 Edge 엘리먼트
      */
-    connect: function (fromElement, toElement, style, label, fromP, toP) {
+    connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger) {
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
         if (fromP) {
@@ -879,7 +879,7 @@ OG.graph.Canvas.prototype = {
 
 
         // connect
-        edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label);
+        edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, preventTrigger);
 
         if (edge) {
             this._HANDLER.setClickSelectable(edge, edge.shape.SELECTABLE);
