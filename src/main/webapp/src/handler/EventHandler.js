@@ -853,25 +853,29 @@ OG.handler.EventHandler.prototype = {
 
         if (isConnectable) {
             if (!isEdge) {
-                $(guide.line).bind({
-                    click: function (event) {
-                        eventOffset = me._getOffset(event);
-                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
-                        if (virtualEdge) {
-                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'created');
+                $.each(guide.line, function (i, line) {
+                    $(line.node).bind({
+                        click: function (event) {
+                            eventOffset = me._getOffset(event);
+                            virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                            if (virtualEdge) {
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'created');
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT, line.text);
+                            }
                         }
-                    }
-                });
+                    });
 
-                $(guide.line).draggable({
-                    start: function (event) {
-                        me.deselectAll();
-                        me._RENDERER.removeAllConnectGuide();
-                        me._RENDERER.removeAllVirtualEdge();
-                        eventOffset = me._getOffset(event);
-                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
-                        $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'active');
-                    }
+                    $(line.node).draggable({
+                        start: function (event) {
+                            me.deselectAll();
+                            me._RENDERER.removeAllConnectGuide();
+                            me._RENDERER.removeAllVirtualEdge();
+                            eventOffset = me._getOffset(event);
+                            virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'active');
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT, line.text);
+                        }
+                    });
                 });
 
                 $(guide.rect).bind({
@@ -1616,6 +1620,7 @@ OG.handler.EventHandler.prototype = {
                     if (element.shape) {
                         var isConnectable = me._isConnectable(element.shape);
                         var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+                        var connectText = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT);
                         var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
                         var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
 
@@ -1627,7 +1632,7 @@ OG.handler.EventHandler.prototype = {
                                     return;
                                 }
                                 me._RENDERER.removeAllVirtualEdge();
-                                me._RENDERER._CANVAS.connect(target, element, null, null);
+                                me._RENDERER._CANVAS.connect(target, element, null, connectText)
                                 renderer.addHistory();
                             } else {
                                 me._RENDERER.removeAllVirtualEdge();

@@ -6738,7 +6738,9 @@ OG.common.Constants = {
 		CTL_H: "_GUIDE_CTL_H_",
 		CTL_V: "_GUIDE_CTL_V_",
 		LINE : "_GUIDE_LINE",
+		LINE_TEXT : "_GUIDE_LINE_TEXT",
 		LINE_CONNECT_MODE: "LINE_CONNECT_MODE",
+		LINE_CONNECT_TEXT: "LINE_CONNECT_TEXT",
 		LINE_VIRTUAL_EDGE: "LINE_VIRTUAL_EDGE",
 		RECT_CONNECT_MODE: "RECT_CONNECT_MODE",
 		TRASH: "_GUIDE_TRASH",
@@ -16451,7 +16453,7 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
 
         rect = this._PAPER.rect(bBox.x - LABEL_PADDING / 2, bBox.y - LABEL_PADDING / 2,
             bBox.width + LABEL_PADDING, bBox.height + LABEL_PADDING);
-        rect.attr({stroke: "none", fill: this._CANVAS_COLOR, 'fill-opacity': 0});
+        rect.attr({stroke: "none", fill: this._CANVAS_COLOR, 'fill-opacity': 1});
         this._add(rect);
         group.node.appendChild(rect.node);
     }
@@ -17305,7 +17307,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
  */
 OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, style) {
     var rElement = this._getREleById(OG.Util.isElement(shapeElement) ? shapeElement.id : shapeElement),
-        element, labelElement, envelope, _style = {}, size, beforeText, beforeEvent,
+        element, labelElement, envelope, _style = {}, size, beforeText, beforeEvent,position,
         /**
          * 라인(꺽은선)의 중심위치를 반환한다.
          *
@@ -17385,7 +17387,11 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
                     break;
             }
             size = [envelope.getWidth(), envelope.getHeight()];
-            // }
+
+            if(element.shape instanceof OG.shape.EdgeShape){
+                var centerOfEdge = getCenterOfEdge(element);
+                position = [centerOfEdge.x, centerOfEdge.y];
+            }
 
             labelElement = this._drawLabel(
                 position,
@@ -17850,7 +17856,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
 
     if (fromShape && toShape) {
         // connectShape event fire
-        if(!preventTrigger){
+        if (!preventTrigger) {
             $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
         }
     }
@@ -18036,7 +18042,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         geometry = rElement ? rElement.node.shape.geom : null,
         envelope,
         group, guide,
-        _bBoxRect, _line, _linePath1, _linePath2,_rect,
+        _bBoxRect, _line, _linePath1, _linePath2, _rect,
         _upperLeft, _upperRight, _lowerLeft, _lowerRight, _leftCenter, _upperCenter, _rightCenter, _lowerCenter,
         _ulRect, _urRect, _lwlRect, _lwrRect, _lcRect, _ucRect, _rcRect, _lwcRect,
         _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2),
@@ -18056,6 +18062,13 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         }
         var from = [x, (y + _ctrlSize - 8) + marginTop];
         var to = [x + _ctrlSize, y + marginTop];
+        var path = 'M' + from[0] + ' ' + from[1] + 'L' + to[0] + ' ' + to[1];
+        return path;
+    };
+
+    var createTextLinePath = function (x, y) {
+        var from = [x, (y + 4)];
+        var to = [x + _ctrlSize, (y + 4)];
         var path = 'M' + from[0] + ' ' + from[1] + 'L' + to[0] + ' ' + to[1];
         return path;
     };
@@ -18241,7 +18254,13 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         me._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
         me._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
 
-        guide.line = _line.node;
+        if (!guide.line) {
+            guide.line = [];
+        }
+        guide.line.push({
+            node: _line.node,
+            text: ''
+        });
         controllers.push(_line);
     }
 
@@ -18249,6 +18268,48 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         _line = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
         _linePath1 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
         _linePath2 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
+        controllers.push(_line);
+    }
+
+    function _drawTextLine(i, text) {
+        var minText = text;
+        if(text.length > 3){
+            minText = text.substring(0,3) + '..';
+        }
+        _line = me._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
+        _linePath1 = me._PAPER.path(createTextLinePath(0, 0));
+        _linePath2 = me._PAPER.text(0, 0, minText, _ctrlSize);
+        _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+
+        if (!isEssensia) {
+            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+        }
+        if (isEssensia) {
+            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
+        }
+
+        group.appendChild(_linePath1);
+        group.appendChild(_linePath2);
+        group.appendChild(_line);
+
+        me._add(_line, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i);
+        me._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i + '1');
+        me._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i + '2');
+
+        if (!guide.line) {
+            guide.line = [];
+        }
+        guide.line.push({
+            node: _line.node,
+            text: text
+        });
+        controllers.push(_line);
+    }
+
+    function _redrawTextLine(i, text) {
+        _line = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i);
+        _linePath1 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i + '1');
+        _linePath2 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i + '2');
         controllers.push(_line);
     }
 
@@ -18386,7 +18447,19 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
                 me._getREleById(controller.id + '1').attr({'path': createLinePath(x, y, 0)});
                 me._getREleById(controller.id + '2').attr({'path': createLinePath(x, y, 8)});
             }
+
+            //텍스트 라인일경우 하위 라인까지 함께 재배치
+            if (controller.id.indexOf(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT) != -1) {
+                var index = controller.id.replace(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT, '');
+                me._getREleById(controller.id + '1').attr({'path': createTextLinePath(x, y)});
+                me._getREleById(controller.id + '2').attr({x: x + 10, y: y + 16});
+            }
         });
+    }
+
+    var textList = me.getTextListInController(element);
+    if (!textList) {
+        textList = [];
     }
 
     //기존에 가이드가 있을 경우
@@ -18404,7 +18477,13 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             }
             if (!isLane && _isConnectable) {
                 _redrawRect();
-                _redrawLine();
+                if (textList.length) {
+                    $.each(textList, function (i, text) {
+                        _redrawTextLine(i, text);
+                    })
+                } else {
+                    _redrawLine();
+                }
             }
             _redrawTrash();
         }
@@ -18433,11 +18512,21 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             }
             if (isLane && me.isTopGroup(element) && _isConnectable) {
                 _drawRect();
-                _drawLine();
+                if (textList.length) {
+
+                } else {
+                    _drawLine();
+                }
             }
             if (!isLane && _isConnectable) {
                 _drawRect();
-                _drawLine();
+                if (textList.length) {
+                    $.each(textList, function (i, text) {
+                        _drawTextLine(i, text);
+                    })
+                } else {
+                    _drawLine();
+                }
             }
 
             _drawTrash();
@@ -18450,7 +18539,6 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         }
         if (group) {
             me.getRootGroup().appendChild(group.node);
-            //group.insertAfter(rElement);
         }
         // selected 속성값 설정
         $(rElement.node).attr("_selected", "true");
@@ -19609,6 +19697,45 @@ OG.renderer.RaphaelRenderer.prototype.setShapeStyle = function (element, style) 
         element.shapeStyle = element.shapeStyle || {};
         OG.Util.apply(element.shapeStyle, style || {});
         this.redrawShape(element);
+    }
+};
+
+/**
+ * Shape 의 선 연결 커스텀 컨트롤러를 설정한다.
+ *
+ * @param {Element,String} element Element 또는 ID
+ * @param {Array} textList 텍스트 리스트
+ * @override
+ */
+
+OG.renderer.RaphaelRenderer.prototype.setTextListInController = function (element, textList) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (rElement && element.shape && element.shape.geom) {
+        var data = this._CANVAS.getCustomData(element);
+        if (!data) {
+            data = {}
+        }
+        data['textLineController'] = textList;
+        this._CANVAS.setCustomData(element, data);
+    }
+};
+
+/**
+ * Shape 의 선 연결 커스텀 컨트롤러를 가져온다.
+ *
+ * @param {Element,String} element Element 또는 ID
+ * @override
+ */
+
+OG.renderer.RaphaelRenderer.prototype.getTextListInController = function (element) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (rElement && element.shape && element.shape.geom) {
+        var data = this._CANVAS.getCustomData(element);
+        if (data) {
+            return data['textLineController'];
+        } else {
+            return null;
+        }
     }
 };
 
@@ -22423,7 +22550,7 @@ OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
         }
         //양쪽 루트그룹의 아이디가 틀리면 대쉬어래이 처리
         if (fromRoot.id !== toRoot.id) {
-            me.setShapeStyle(element, {"arrow-start": "open_oval","stroke-dasharray": '- '});
+            me.setShapeStyle(element, {"arrow-start": "open_oval", "stroke-dasharray": '- '});
             return;
         }
     }
@@ -23650,25 +23777,29 @@ OG.handler.EventHandler.prototype = {
 
         if (isConnectable) {
             if (!isEdge) {
-                $(guide.line).bind({
-                    click: function (event) {
-                        eventOffset = me._getOffset(event);
-                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
-                        if (virtualEdge) {
-                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'created');
+                $.each(guide.line, function (i, line) {
+                    $(line.node).bind({
+                        click: function (event) {
+                            eventOffset = me._getOffset(event);
+                            virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                            if (virtualEdge) {
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'created');
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT, line.text);
+                            }
                         }
-                    }
-                });
+                    });
 
-                $(guide.line).draggable({
-                    start: function (event) {
-                        me.deselectAll();
-                        me._RENDERER.removeAllConnectGuide();
-                        me._RENDERER.removeAllVirtualEdge();
-                        eventOffset = me._getOffset(event);
-                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
-                        $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'active');
-                    }
+                    $(line.node).draggable({
+                        start: function (event) {
+                            me.deselectAll();
+                            me._RENDERER.removeAllConnectGuide();
+                            me._RENDERER.removeAllVirtualEdge();
+                            eventOffset = me._getOffset(event);
+                            virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'active');
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT, line.text);
+                        }
+                    });
                 });
 
                 $(guide.rect).bind({
@@ -24413,6 +24544,7 @@ OG.handler.EventHandler.prototype = {
                     if (element.shape) {
                         var isConnectable = me._isConnectable(element.shape);
                         var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+                        var connectText = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT);
                         var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
                         var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
 
@@ -24424,7 +24556,7 @@ OG.handler.EventHandler.prototype = {
                                     return;
                                 }
                                 me._RENDERER.removeAllVirtualEdge();
-                                me._RENDERER._CANVAS.connect(target, element, null, null);
+                                me._RENDERER._CANVAS.connect(target, element, null, connectText)
                                 renderer.addHistory();
                             } else {
                                 me._RENDERER.removeAllVirtualEdge();
@@ -29703,6 +29835,25 @@ OG.graph.Canvas.prototype = {
     },
 
     /**
+     * Shape 의 선 연결 커스텀 컨트롤러를 설정한다.
+     *
+     * @param {Element} shapeElement Shape DOM element
+     * @param {Array} textList 텍스트 리스트
+     */
+    setTextListInController: function (shapeElement, textList) {
+        this._RENDERER.setTextListInController(shapeElement, textList);
+    },
+
+    /**
+     * Shape 의 선 연결 커스텀 컨트롤러를 가져온다.
+     *
+     * @param {Element} shapeElement Shape DOM element
+     */
+    getTextListInController: function (shapeElement) {
+        this._RENDERER.getTextListInController(shapeElement);
+    },
+
+    /**
      * Shape 의 Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
      *
      * @param {Element,String} shapeElement Shape DOM element or ID
@@ -29886,7 +30037,7 @@ OG.graph.Canvas.prototype = {
      * @param {Element} element
      */
     collapse: function (element) {
-        this._RENDERERDERER.collapse(element);
+        this._RENDERER.collapse(element);
     },
 
     /**

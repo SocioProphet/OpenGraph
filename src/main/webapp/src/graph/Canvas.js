@@ -822,6 +822,25 @@ OG.graph.Canvas.prototype = {
     },
 
     /**
+     * Shape 의 선 연결 커스텀 컨트롤러를 설정한다.
+     *
+     * @param {Element} shapeElement Shape DOM element
+     * @param {Array} textList 텍스트 리스트
+     */
+    setTextListInController: function (shapeElement, textList) {
+        this._RENDERER.setTextListInController(shapeElement, textList);
+    },
+
+    /**
+     * Shape 의 선 연결 커스텀 컨트롤러를 가져온다.
+     *
+     * @param {Element} shapeElement Shape DOM element
+     */
+    getTextListInController: function (shapeElement) {
+        this._RENDERER.getTextListInController(shapeElement);
+    },
+
+    /**
      * Shape 의 Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
      *
      * @param {Element,String} shapeElement Shape DOM element or ID
@@ -1005,7 +1024,7 @@ OG.graph.Canvas.prototype = {
      * @param {Element} element
      */
     collapse: function (element) {
-        this._RENDERERDERER.collapse(element);
+        this._RENDERER.collapse(element);
     },
 
     /**
