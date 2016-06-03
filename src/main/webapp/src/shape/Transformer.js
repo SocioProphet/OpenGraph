@@ -14,6 +14,11 @@ OG.shape.Transformer = function (label) {
     this.SHAPE_ID = 'OG.shape.Transformer';
     this.label = label;
     this.CONNECTABLE = false;
+    this.MOVABLE = true;
+    this.RESIZABLE = false;
+    this.SELF_CONNECTABLE = false;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
 }
 OG.shape.Transformer.prototype = new OG.shape.GroupShape();
 OG.shape.Transformer.superclass = OG.shape.GroupShape;

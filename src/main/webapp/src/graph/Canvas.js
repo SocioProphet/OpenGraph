@@ -101,7 +101,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         SELF_CONNECTABLE: true,
 
         /**
-         * 드래그하여 연결시 대상 없을 경우 자동으로 Shape 복사하여 연결 처리 여부
+         * 가이드에 자기자신을 복사하는 컨트롤러 여부.
          */
         CONNECT_CLONEABLE: true,
 
@@ -109,6 +109,32 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * 드래그하여 연결시 연결대상 있는 경우에만 Edge 드로잉 처리 여부
          */
         CONNECT_REQUIRED: true,
+
+        /**
+         * 드래그하여 연결시 그룹을 건너뛸때 스타일 변경 여부
+         */
+        CONNECT_STYLE_CHANGE: true,
+        CONNECT_STYLE_CHANGE_: {
+            GEOM: true,
+            TEXT: true,
+            HTML: true,
+            IMAGE: true,
+            EDGE: true,
+            GROUP: true
+        },
+
+        /**
+         * 가이드에 삭제 컨트롤러 여부
+         */
+        DELETABLE: true,
+        DELETABLE_: {
+            GEOM: true,
+            TEXT: true,
+            HTML: true,
+            IMAGE: true,
+            EDGE: true,
+            GROUP: true
+        },
 
         /**
          * 라벨 수정여부
@@ -659,6 +685,7 @@ OG.graph.Canvas.prototype = {
      * - collapsible        : 최소화 가능여부(디폴트 true)
      * - enableHotKey       : 핫키 가능여부(디폴트 true)
      * - enableContextMenu  : 마우스 우클릭 메뉴 가능여부(디폴트 true)
+     * - autoExtensional  : 캔버스 자동 확장 기능(디폴트 true)
      * </pre>
      *
      * @param {Object} config JSON 포맷의 configuration
@@ -679,6 +706,7 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.GROUP_COLLAPSIBLE = config.collapsible === undefined ? this._CONFIG.GROUP_COLLAPSIBLE : config.collapsible;
             this._CONFIG.ENABLE_HOTKEY = config.enableHotKey === undefined ? this._CONFIG.ENABLE_HOTKEY : config.enableHotKey;
             this._CONFIG.ENABLE_CONTEXTMENU = config.enableContextMenu === undefined ? this._CONFIG.ENABLE_CONTEXTMENU : config.enableContextMenu;
+            this._CONFIG.AUTO_EXTENSIONAL = config.autoExtensional === undefined ? this._CONFIG.AUTO_EXTENSIONAL : config.autoExtensional;
         }
 
         this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE);
@@ -773,30 +801,47 @@ OG.graph.Canvas.prototype = {
         return element;
     },
 
-    drawTransformer: function (position, type, input, output, id) {
+    /**
+     * Transfomer Shape 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
+     *
+     * @example
+     * canvas.drawTransformer([100, 100], 'label' ['str1','str2'],['out']);
+     *
+     * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
+     * @param {String} label Label
+     * @param {String[]} inputs 인풋에 위치할 리스트
+     * @param {String[]} outputs 아웃풋에 위치할 리스트
+     * @param {String} id Element ID 지정 (Optional)
+     * @return {Element} Group DOM Element with geometry
+     */
+    drawTransformer: function (position, label, inputs, outputs, id) {
         var me = this, shape, element, style, envelope, i, toShape, fromShape, toElement, fromElement, textShape, textElement;
-        id = 'OG_4779';
-        shape = new OG.shape.Transformer(type);
-        element = me.drawShape(position, shape, [90, 22 + (input * 20)], style, id);
+        shape = new OG.shape.Transformer(label);
+
+        if(!Array.isArray(inputs) || !Array.isArray(outputs)){
+            return null;
+        }
+        var lines = Math.max(inputs.length, outputs.length);
+        element = me.drawShape(position, shape, [120, 30 + (lines * 25)], style, id);
         envelope = element.shape.geom.getBoundary();
 
-        for (i = 0; i < input; i++) {
-            textShape = new OG.shape.bpmn.M_Text('in' + (i + 1));
-            textElement = me.drawShape([envelope.getUpperLeft().x + 25, envelope.getUpperLeft().y + (i * 20) + 30], textShape, [50, 20]);
+        $.each(inputs, function (idx, input) {
+            textShape = new OG.shape.bpmn.M_Text(input);
+            textElement = me.drawShape([envelope.getUpperLeft().x + 35, envelope.getUpperLeft().y + (idx * 25) + 40], textShape, [50, 20]);
             element.appendChild(textElement);
             toShape = new OG.shape.To();
-            toElement = me.drawShape([envelope.getUpperLeft().x + 10, envelope.getUpperLeft().y + (i * 20) + 30], toShape, [5, 5], {"r": 5});
+            toElement = me.drawShape([envelope.getUpperLeft().x + 15, envelope.getUpperLeft().y + (idx * 25) + 40], toShape, [5, 5], {"r": 5});
             element.appendChild(toElement);
-        }
+        });
 
-        for (i = 0; i < output; i++) {
-            textShape = new OG.shape.bpmn.M_Text('out' + (i + 1));
-            textElement = me.drawShape([envelope.getUpperRight().x - 30, envelope.getUpperRight().y + (i * 20) + 30], textShape, [50, 20]);
+        $.each(outputs, function (idx, output) {
+            textShape = new OG.shape.bpmn.M_Text(output);
+            textElement = me.drawShape([envelope.getUpperRight().x - 35, envelope.getUpperRight().y + (idx * 25) + 40], textShape, [50, 20]);
             element.appendChild(textElement);
             fromShape = new OG.shape.From();
-            fromElement = me.drawShape([envelope.getUpperRight().x - 10, envelope.getUpperRight().y + (i * 20) + 30], fromShape, [5, 5], {"r": 5});
+            fromElement = me.drawShape([envelope.getUpperRight().x - 15, envelope.getUpperRight().y + (idx * 25) + 40], fromShape, [5, 5], {"r": 5});
             element.appendChild(fromElement);
-        }
+        });
 
         if (!id) {
             this._RENDERER.addHistory();

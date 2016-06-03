@@ -4812,6 +4812,18 @@ OG.handler.EventHandler.prototype = {
             (me._CONFIG.MOVABLE && me._CONFIG.MOVABLE_[shape.TYPE] && shape.MOVABLE);
     },
 
+    _isDeletable: function (shape) {
+        var me = this;
+        return (me._CONFIG.DELETABLE && shape.DELETABLE) &&
+            (me._CONFIG.DELETABLE && me._CONFIG.DELETABLE_[shape.TYPE] && shape.DELETABLE);
+    },
+
+    _isConnectStyleChangable: function (shape) {
+        var me = this;
+        return (me._CONFIG.CONNECT_STYLE_CHANGE && shape.CONNECT_STYLE_CHANGE) &&
+            (me._CONFIG.CONNECT_STYLE_CHANGE && me._CONFIG.CONNECT_STYLE_CHANGE_[shape.TYPE] && shape.CONNECT_STYLE_CHANGE);
+    },
+
     _isResizable: function (shape) {
         var me = this;
         return (me._CONFIG.SELECTABLE && shape.SELECTABLE) &&
