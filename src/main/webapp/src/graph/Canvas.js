@@ -939,8 +939,6 @@ OG.graph.Canvas.prototype = {
         // draw edge
         edge = this._RENDERER.drawShape(null, new OG.EdgeShape(fromPosition, toPosition));
         edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
-        // edge 방위 설정
-
 
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, preventTrigger);

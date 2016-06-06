@@ -20,6 +20,7 @@ OG.shape.From = function (label) {
 	this.LABEL_EDITABLE = false;
 	this.DELETABLE = false;
 	this.CONNECT_STYLE_CHANGE = false;
+	this.ENABLE_TO = false;
 };
 OG.shape.From.prototype = new OG.shape.GeomShape();
 OG.shape.From.superclass = OG.shape.GeomShape;

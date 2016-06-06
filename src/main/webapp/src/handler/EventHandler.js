@@ -1632,8 +1632,17 @@ OG.handler.EventHandler.prototype = {
                                     return;
                                 }
                                 me._RENDERER.removeAllVirtualEdge();
-                                me._RENDERER._CANVAS.connect(target, element, null, connectText)
-                                renderer.addHistory();
+                                //From,To 가능여부 확인
+                                if (!me._isConnectableFrom(target.shape)) {
+                                    isConnectable = false;
+                                }
+                                if (!me._isConnectableTo(element.shape)) {
+                                    isConnectable = false;
+                                }
+                                if (isConnectable) {
+                                    me._RENDERER._CANVAS.connect(target, element, null, connectText)
+                                    renderer.addHistory();
+                                }
                             } else {
                                 me._RENDERER.removeAllVirtualEdge();
                             }
@@ -1654,11 +1663,19 @@ OG.handler.EventHandler.prototype = {
                             var width = boundary.getWidth();
                             var height = boundary.getHeight();
 
-                            var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                            $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
+                            //From,To 가능여부 확인
+                            if (!me._isConnectableFrom(target.shape)) {
+                                isConnectable = false;
+                            }
+                            if (!me._isConnectableTo(target.shape)) {
+                                isConnectable = false;
+                            }
+                            if (isConnectable) {
+                                var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
+                                $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
 
-                            renderer._CANVAS.connect(target, rectShape, null, null, null, null);
-
+                                renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                            }
                         }
                     }
                 }
@@ -1844,11 +1861,20 @@ OG.handler.EventHandler.prototype = {
                     var width = boundary.getWidth();
                     var height = boundary.getHeight();
 
-                    var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                    $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
+                    //From,To 가능여부 확인
+                    var isConnectable = me._isConnectable(target.shape);
+                    if (!me._isConnectableFrom(target.shape)) {
+                        isConnectable = false;
+                    }
+                    if (!me._isConnectableTo(target.shape)) {
+                        isConnectable = false;
+                    }
+                    if (isConnectable) {
+                        var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
+                        $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
 
-                    renderer._CANVAS.connect(target, rectShape, null, null, null, null);
-
+                        renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                    }
                 }
             }
         });
@@ -4791,6 +4817,16 @@ OG.handler.EventHandler.prototype = {
         return me._CONFIG.CONNECTABLE && shape.CONNECTABLE;
     },
 
+    _isConnectableFrom: function (shape) {
+        var me = this;
+        return shape.ENABLE_FROM;
+    },
+
+    _isConnectableTo: function (shape) {
+        var me = this;
+        return shape.ENABLE_TO;
+    },
+
     _isSelfConnectable: function (shape) {
         var me = this;
         return me._CONFIG.SELF_CONNECTABLE && shape.SELF_CONNECTABLE;
@@ -5633,11 +5669,18 @@ OG.handler.EventHandler.prototype = {
                                     if (connectableDirection && frontElement) {
                                         var point = [newX, newY];
                                         var terminal = renderer.createTerminalString(frontElement, point);
-                                        if (connectableDirection === 'from') {
-                                            renderer.connect(terminal, null, element, element.shape.geom.style);
-                                        }
-                                        if (connectableDirection === 'to') {
-                                            renderer.connect(null, terminal, element, element.shape.geom.style);
+                                        var isConnectable = me._isConnectable(frontElement.shape);
+                                        if(isConnectable){
+                                            if (connectableDirection === 'from') {
+                                                if (me._isConnectableFrom(frontElement.shape)) {
+                                                    renderer.connect(terminal, null, element, element.shape.geom.style);
+                                                }
+                                            }
+                                            if (connectableDirection === 'to') {
+                                                if (me._isConnectableTo(frontElement.shape)) {
+                                                    renderer.connect(null, terminal, element, element.shape.geom.style);
+                                                }
+                                            }
                                         }
                                     }
                                     if (connectableDirection && !frontElement) {
