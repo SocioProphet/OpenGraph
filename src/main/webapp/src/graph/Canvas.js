@@ -814,15 +814,16 @@ OG.graph.Canvas.prototype = {
      * @param {String} id Element ID 지정 (Optional)
      * @return {Element} Group DOM Element with geometry
      */
-    drawTransformer: function (position, label, inputs, outputs, id) {
+    drawTransformer: function (position, label, inputs, outputs, drawData, id) {
         var me = this, shape, element, style, envelope, i, toShape, fromShape, toElement, fromElement, textShape, textElement;
         shape = new OG.shape.Transformer(label);
 
-        if(!Array.isArray(inputs) || !Array.isArray(outputs)){
+        if (!Array.isArray(inputs) || !Array.isArray(outputs)) {
             return null;
         }
         var lines = Math.max(inputs.length, outputs.length);
         element = me.drawShape(position, shape, [120, 30 + (lines * 25)], style, id);
+
         envelope = element.shape.geom.getBoundary();
 
         $.each(inputs, function (idx, input) {
@@ -832,6 +833,11 @@ OG.graph.Canvas.prototype = {
             toShape = new OG.shape.To();
             toElement = me.drawShape([envelope.getUpperLeft().x + 15, envelope.getUpperLeft().y + (idx * 25) + 40], toShape, [5, 5], {"r": 5});
             element.appendChild(toElement);
+            var data = JSON.parse(JSON.stringify(drawData));
+            data['type'] = 'input';
+            data['name'] = input;
+            data['parentId'] = element.id;
+            me.setCustomData(toElement, data);
         });
 
         $.each(outputs, function (idx, output) {
@@ -841,6 +847,11 @@ OG.graph.Canvas.prototype = {
             fromShape = new OG.shape.From();
             fromElement = me.drawShape([envelope.getUpperRight().x - 15, envelope.getUpperRight().y + (idx * 25) + 40], fromShape, [5, 5], {"r": 5});
             element.appendChild(fromElement);
+            var data = JSON.parse(JSON.stringify(drawData));
+            data['type'] = 'output';
+            data['name'] = output;
+            data['parentId'] = element.id;
+            me.setCustomData(fromElement, data);
         });
 
         if (!id) {
