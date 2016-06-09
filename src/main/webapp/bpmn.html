@@ -208,8 +208,10 @@
                 groupDropable: true,
                 collapsible: true,
                 enableHotKey: true,
-                enableContextMenu: true
+                enableContextMenu: true,
+                useSlider: true
             });
+            //canvas.addSlider();
 
             $(".icon_shape").draggable({
                 start: function () {
@@ -228,9 +230,11 @@
                     var shapeInfo = $('#canvas').data('DRAG_SHAPE'), shape, element;
                     if (shapeInfo) {
                         shape = eval('new ' + shapeInfo._shape_id + '()');
-                        element = canvas.drawShape([
-                                    event.pageX - $('#canvas')[0].offsetLeft + $('#canvas')[0].scrollLeft,
-                                    event.pageY - $('#canvas')[0].offsetTop + $('#canvas')[0].scrollTop],
+                        var dropX = event.pageX - $('#canvas')[0].offsetLeft + $('#canvas')[0].scrollLeft;
+                        var dropY = event.pageY - $('#canvas')[0].offsetTop + $('#canvas')[0].scrollTop;
+                        dropX = dropX / canvas._CONFIG.SCALE;
+                        dropY = dropY / canvas._CONFIG.SCALE;
+                        element = canvas.drawShape([dropX, dropY],
                                 shape, [parseInt(shapeInfo._width, 10), parseInt(shapeInfo._height, 10)]);
                         $('#canvas').removeData('DRAG_SHAPE');
                     }
@@ -291,7 +295,7 @@
             var ellipseShape = canvas.drawShape([203, 405], new OG.EllipseShape('label'), [103, 53]);
             var edge = canvas.connect(circleShape, ellipseShape, null, '');
 
-            canvas.setTextListInController(circleShape,['200123','40012323']);
+            canvas.setTextListInController(circleShape, ['200123', '40012323']);
 
         });
 

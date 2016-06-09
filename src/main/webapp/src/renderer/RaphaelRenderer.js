@@ -2715,26 +2715,28 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
-
-    var me = this, path;
+//console.log(position);
+    //console.log(canvas._CONFIG.SCALE);
+    var me = this, path,pathX,pathY;
 
     if (!position) {
         return;
     }
     if (position.x) {
+        pathX = position.x * me._CONFIG.SCALE;
         this.removeStickGuide('vertical');
-        path = this._PAPER.path("M" + position.x + ",0L" + position.x + ",10000");
+        path = this._PAPER.path("M" + pathX + ",0L" + pathX + ",10000");
         this._stickGuideX = path;
     }
     if (position.y) {
+        pathY = position.y * me._CONFIG.SCALE;
         this.removeStickGuide('horizontal');
-        path = this._PAPER.path("M0," + position.y + "L10000," + position.y);
+        path = this._PAPER.path("M0," + pathY + "L10000," + pathY);
         this._stickGuideY = path;
     }
     path.attr("stroke-width", "2");
     path.attr("stroke", "#FFCC50");
     path.attr("opacity", "0.7");
-
 };
 
 OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (direction) {

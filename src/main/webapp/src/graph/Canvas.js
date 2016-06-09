@@ -55,6 +55,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         HISTORY_SIZE: 100,
 
         /**
+         * 확대/축소 슬라이더
+         */
+        USE_SLIDER: true,
+
+        /**
          * 클릭선택 가능여부
          */
         SELECTABLE: true,
@@ -685,7 +690,8 @@ OG.graph.Canvas.prototype = {
      * - collapsible        : 최소화 가능여부(디폴트 true)
      * - enableHotKey       : 핫키 가능여부(디폴트 true)
      * - enableContextMenu  : 마우스 우클릭 메뉴 가능여부(디폴트 true)
-     * - autoExtensional  : 캔버스 자동 확장 기능(디폴트 true)
+     * - autoExtensional    : 캔버스 자동 확장 기능(디폴트 true)
+     * - useSlider          : 확대축소 슬라이더 사용 여부
      * </pre>
      *
      * @param {Object} config JSON 포맷의 configuration
@@ -707,6 +713,7 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.ENABLE_HOTKEY = config.enableHotKey === undefined ? this._CONFIG.ENABLE_HOTKEY : config.enableHotKey;
             this._CONFIG.ENABLE_CONTEXTMENU = config.enableContextMenu === undefined ? this._CONFIG.ENABLE_CONTEXTMENU : config.enableContextMenu;
             this._CONFIG.AUTO_EXTENSIONAL = config.autoExtensional === undefined ? this._CONFIG.AUTO_EXTENSIONAL : config.autoExtensional;
+            this._CONFIG.USE_SLIDER = config.useSlider === undefined ? this._CONFIG.USE_SLIDER : config.useSlider;
         }
 
         this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE);
@@ -744,6 +751,32 @@ OG.graph.Canvas.prototype = {
      */
     getEventHandler: function () {
         return this._HANDLER;
+    },
+
+    /**
+     * 확대 축소 슬라이더를 설치한다.
+     */
+    addSlider: function () {
+        var canvasDiv = $(this.getContainer());
+        canvasDiv.find('.scaleSlider').remove();
+        var slider = $('<input type="range" orient="vertical" class="scaleSlider"/>');
+        slider.css({
+            position: 'absolute',
+            top: '5px',
+            left: '5px',
+            'writing-mode': 'bt-lr', /* IE */
+            '-webkit-appearance': 'slider-vertical', /* WebKit */
+            'width': '8px',
+            'height': '175px'
+        });
+        canvasDiv.append(slider);
+    },
+    /**
+     * 확대 축소 슬라이더를 삭제한다.
+     */
+    removeSlider: function () {
+        var canvasDiv = $(this.getContainer());
+        canvasDiv.find('.scaleSlider').remove();
     },
 
     /**
