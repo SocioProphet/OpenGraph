@@ -1222,6 +1222,17 @@ OG.graph.Canvas.prototype = {
     ,
 
     /**
+     * 연결된 터미널의 vertices 를 초기화한다.
+     *
+     * @param {Element} edge Edge Shape
+     * @return {Element} 연결된 Edge 엘리먼트
+     * @override
+     */
+    reconnect: function (edge) {
+        return this._RENDERER.reconnect(edge);
+    },
+
+    /**
      * 두개의 Shape 을 Edge 로 연결한다.
      *
      * @param {Element} fromElement from Shape Element
