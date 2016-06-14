@@ -5498,6 +5498,9 @@ OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
             });
         }
     }
+
+    //슬라이더가 있을경우 슬라이더 업데이트
+    me._CANVAS.updateSlider();
 };
 
 /**

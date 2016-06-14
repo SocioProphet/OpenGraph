@@ -211,7 +211,13 @@
                 enableContextMenu: true,
                 useSlider: true
             });
-            //canvas.addSlider();
+
+            canvas.addSlider({
+                slider: $("#canvas_slider"),
+                width: 200,
+                height: 300,
+                appendTo: "body"
+            });
 
             $(".icon_shape").draggable({
                 start: function () {
@@ -230,8 +236,8 @@
                     var shapeInfo = $('#canvas').data('DRAG_SHAPE'), shape, element;
                     if (shapeInfo) {
                         shape = eval('new ' + shapeInfo._shape_id + '()');
-                        var dropX = event.pageX - $('#canvas')[0].offsetLeft + $('#canvas')[0].scrollLeft;
-                        var dropY = event.pageY - $('#canvas')[0].offsetTop + $('#canvas')[0].scrollTop;
+                        var dropX = event.pageX - $('#canvas').offset().left + $('#canvas')[0].scrollLeft;
+                        var dropY = event.pageY - $('#canvas').offset().top + $('#canvas')[0].scrollTop;
                         dropX = dropX / canvas._CONFIG.SCALE;
                         dropY = dropY / canvas._CONFIG.SCALE;
                         element = canvas.drawShape([dropX, dropY],
@@ -463,13 +469,17 @@
                  _shape_id="OG.shape.essencia.ActivityArrow" _width="100" _height="100"/>
 
 
-            <!--<img src="images/event_start.png" class="icon_shape" _shape_type="GEOM"-->
-            <!--_shape_id="OG.shape.bpmn." _width="100" _height="100"/>-->
-
         </div>
     </div>
 </div>
+<!--<div class="ui-layout-center" id="canvas_cover" style="overflow: hidden">-->
+<!--<div id="canvas" style="cursor: default;width:100%;height:100%;overflow: scroll"></div>-->
+<!--<div id="canvas_slider"></div>-->
+<!--</div>-->
+
 <div class="ui-layout-center" id="canvas" style="cursor: default;"/>
+<div id="canvas_slider"></div>
+
 <script type="text/javascript">
     $(function () {
         $('#imgGroup').find('img').each(function (index, img) {
