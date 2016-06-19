@@ -7,7 +7,7 @@
  *
  * @param {String} image 이미지 URL
  * @param {String} label 라벨 [Optional]
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.shape.ImageShape = function (image, label) {
 	OG.shape.ImageShape.superclass.call(this);

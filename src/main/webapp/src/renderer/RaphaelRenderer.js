@@ -12,7 +12,7 @@
  * @param {String} backgroundColor 캔버스 배경색
  * @param {String} backgroundImage 캔버스 배경이미지
  * @param {Object} config Configuration
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.renderer.RaphaelRenderer = function (container, containerSize, backgroundColor, backgroundImage, config) {
     OG.renderer.RaphaelRenderer.superclass.call(this, arguments);
@@ -595,7 +595,7 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
 
         rect = this._PAPER.rect(bBox.x - LABEL_PADDING / 2, bBox.y - LABEL_PADDING / 2,
             bBox.width + LABEL_PADDING, bBox.height + LABEL_PADDING);
-        rect.attr({stroke: "none", fill: this._CANVAS_COLOR, 'fill-opacity': 0});
+        rect.attr({stroke: "none", fill: this._CANVAS_COLOR, 'fill-opacity': 1});
         this._add(rect);
         group.node.appendChild(rect.node);
     }
@@ -618,14 +618,15 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
  * @param {Number[]} size Shape Width, Height
  * @param {OG.geometry.Style,Object} style 스타일
  * @param {String} id Element ID 지정
+ * @param {Boolean} preventDrop Lane, Pool 생성 drop 모드 수행 방지
  * @return {Element} Group DOM Element with geometry
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, size, style, id) {
+OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, size, style, id, preventDrop) {
     var width = size ? size[0] : 100,
         height = size ? size[1] : 100,
         groupNode, geometry, text, image, html,
-        me = this, change = false;
+        me = this;
 
     if (shape instanceof OG.shape.GeomShape) {
         geometry = shape.createShape();
@@ -799,9 +800,14 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         setGroup();
     }
 
-    //TODO Shape 의 위치를 수정하고 Root 에 마우스 드래그시 알 수 있도록 데이터를 삽입한다.
+    //신규 Lane 또는 Pool 이 그려졌을 경우 처리
     if (!id && (me.isLane(groupNode) || me.isPool(groupNode))) {
-
+        //if (preventDrop) {
+        //    me.putInnerShapeToPool(groupNode);
+        //} else {
+        //    me.setDropablePool(groupNode);
+        //}
+        me.putInnerShapeToPool(groupNode);
     }
 
     if ($(shape).attr('auto_draw') == 'yes') {
@@ -1244,56 +1250,6 @@ OG.renderer.RaphaelRenderer.prototype.drawEdge = function (line, style, id, isSe
         vertices = line.getVertices(),
         from = vertices[0], to = vertices[vertices.length - 1],
         points = [], edge, edge_direction;
-    //getArrayOfOrthogonal_1 = function (from, to, isHorizontal) {
-    //    if (isHorizontal) {
-    //        return [
-    //            [from[0], from[1]],
-    //            [to[0], from[1]],
-    //            [to[0], to[1]]
-    //        ];
-    //    } else {
-    //        return [
-    //            [from[0], from[1]],
-    //            [from[0], to[1]],
-    //            [to[0], to[1]]
-    //        ];
-    //    }
-    //},
-    //getArrayOfOrthogonal_2 = function (from, to, isHorizontal) {
-    //    if (isHorizontal) {
-    //        if (pointOfInflection && pointOfInflection["x"] > 0) {
-    //            return [
-    //                [from[0], from[1]],
-    //                [from[0] + pointOfInflection["x"], from[1]],
-    //                [from[0] + pointOfInflection["x"], to[1]],
-    //                [to[0], to[1]]
-    //            ];
-    //        } else {
-    //            return [
-    //                [from[0], from[1]],
-    //                [OG.Util.round((from[0] + to[0]) / 2), from[1]],
-    //                [OG.Util.round((from[0] + to[0]) / 2), to[1]],
-    //                [to[0], to[1]]
-    //            ];
-    //        }
-    //    } else {
-    //        if (pointOfInflection && pointOfInflection["y"] > 0) {
-    //            return [
-    //                [from[0], from[1]],
-    //                [from[0], from[1] + pointOfInflection["y"]],
-    //                [to[0], from[1] + pointOfInflection["y"]],
-    //                [to[0], to[1]]
-    //            ];
-    //        } else {
-    //            return [
-    //                [from[0], from[1]],
-    //                [from[0], OG.Util.round((from[1] + to[1]) / 2)],
-    //                [to[0], OG.Util.round((from[1] + to[1]) / 2)],
-    //                [to[0], to[1]]
-    //            ];
-    //        }
-    //    }
-    //};
 
     OG.Util.apply(_style, (style instanceof OG.geometry.Style) ? style.map : style || {},
         OG.Util.apply({}, line.style.map, me._CONFIG.DEFAULT_STYLE.EDGE));
@@ -1330,455 +1286,6 @@ OG.renderer.RaphaelRenderer.prototype.drawEdge = function (line, style, id, isSe
             case OG.Constants.EDGE_TYPE.PLAIN:
                 edge_direction = this._adjustEdgeDirection([from.x, from.y], [to.x, to.y]);
                 points = [from, to];
-                //if (edge_direction[0] === "e") {
-                //    switch (edge_direction[1]) {
-                //        case "e":
-                //            if (from.x <= to.x) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                //                    true
-                //                );
-                //                points.push([to.x, to.y]);
-                //            } else {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                ));
-                //            }
-                //            break;
-                //        case "w":
-                //            if (from.x <= to.x) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    true
-                //                );
-                //            } else {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                //                    false
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            }
-                //            break;
-                //        case "s":
-                //            if (from.x <= to.x && from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                //                    true
-                //                );
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x <= to.x && from.y > to.y) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    true
-                //                );
-                //            } else if (from.x > to.x && from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                //                    false
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x > to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                ));
-                //            }
-                //            break;
-                //        case "n":
-                //            if (from.x <= to.x && from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    true
-                //                );
-                //            } else if (from.x <= to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                //                    false
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x > to.x && from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                ));
-                //            } else if (from.x > to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x + me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                //                    false
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            }
-                //            break;
-                //    }
-                //} else if (edge_direction[0] === "w") {
-                //    switch (edge_direction[1]) {
-                //        case "e":
-                //            if (from.x <= to.x) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                //                    false
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    true
-                //                );
-                //            }
-                //            break;
-                //        case "w":
-                //            if (from.x <= to.x) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                ));
-                //
-                //            } else {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                //                    true
-                //                );
-                //                points.push([to.x, to.y]);
-                //            }
-                //            break;
-                //        case "s":
-                //            if (from.x <= to.x && from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                //                    false
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x <= to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                ));
-                //            } else if (from.x > to.x && from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                //                    true
-                //                );
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x > to.x && from.y > to.y) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    true
-                //                );
-                //            }
-                //            break;
-                //        case "n":
-                //            if (from.x <= to.x && from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                ));
-                //            } else if (from.x <= to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x - me._CONFIG.EDGE_PADDING, from.y],
-                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                //                    false
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x > to.x && from.y <= to.y) {
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    true
-                //                ));
-                //            } else if (from.x > to.x && from.y > to.y) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                //                    true
-                //                );
-                //                points.push([to.x, to.y]);
-                //            }
-                //            break;
-                //    }
-                //} else if (edge_direction[0] === "s") {
-                //    switch (edge_direction[1]) {
-                //        case "e":
-                //            if (from.x <= to.x && from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                //                    false
-                //                );
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x <= to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                //                    true
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x > to.x && from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                );
-                //            } else if (from.x > to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                //                    [to.x, to.y],
-                //                    true
-                //                ));
-                //            }
-                //            break;
-                //        case "w":
-                //            if (from.x <= to.x && from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                );
-                //            } else if (from.x <= to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                //                    [to.x, to.y],
-                //                    true
-                //                ));
-                //            } else if (from.x > to.x && from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                //                    false
-                //                );
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x > to.x && from.y > to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                //                    true
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            }
-                //            break;
-                //        case "s":
-                //            if (from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                //                    false
-                //                );
-                //                points.push([to.x, to.y]);
-                //            } else {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                //                    [to.x, to.y],
-                //                    true
-                //                ));
-                //            }
-                //            break;
-                //        case "n":
-                //            if (from.y <= to.y) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                );
-                //            } else {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x, from.y + me._CONFIG.EDGE_PADDING],
-                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                //                    true
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            }
-                //            break;
-                //    }
-                //} else if (edge_direction[0] === "n") {
-                //    switch (edge_direction[1]) {
-                //        case "e":
-                //            if (from.x <= to.x && from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                //                    true
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x <= to.x && from.y > to.y) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x + me._CONFIG.EDGE_PADDING, to.y],
-                //                    false
-                //                );
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x > to.x && from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                //                    [to.x, to.y],
-                //                    true
-                //                ));
-                //            } else if (from.x > to.x && from.y > to.y) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                );
-                //            }
-                //            break;
-                //        case "w":
-                //            if (from.x <= to.x && from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                //                    [to.x, to.y],
-                //                    true
-                //                ));
-                //            } else if (from.x <= to.x && from.y > to.y) {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                );
-                //            } else if (from.x > to.x && from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                //                    true
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else if (from.x > to.x && from.y > to.y) {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x - me._CONFIG.EDGE_PADDING, to.y],
-                //                    false
-                //                );
-                //                points.push([to.x, to.y]);
-                //            }
-                //            break;
-                //        case "s":
-                //            if (from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_2(
-                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                //                    [to.x, to.y + me._CONFIG.EDGE_PADDING],
-                //                    true
-                //                ));
-                //                points.push([to.x, to.y]);
-                //            } else {
-                //                points = getArrayOfOrthogonal_2(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y],
-                //                    false
-                //                );
-                //            }
-                //            break;
-                //        case "n":
-                //            if (from.y <= to.y) {
-                //                points = [
-                //                    [from.x, from.y]
-                //                ];
-                //                points = points.concat(getArrayOfOrthogonal_1(
-                //                    [from.x, from.y - me._CONFIG.EDGE_PADDING],
-                //                    [to.x, to.y],
-                //                    true
-                //                ));
-                //            } else {
-                //                points = getArrayOfOrthogonal_1(
-                //                    [from.x, from.y],
-                //                    [to.x, to.y - me._CONFIG.EDGE_PADDING],
-                //                    false
-                //                );
-                //                points.push([to.x, to.y]);
-                //            }
-                //            break;
-                //    }
-                //}
                 break;
             case OG.Constants.EDGE_TYPE.BEZIER:
 
@@ -1942,7 +1449,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
  */
 OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, style) {
     var rElement = this._getREleById(OG.Util.isElement(shapeElement) ? shapeElement.id : shapeElement),
-        element, labelElement, envelope, _style = {}, size, beforeText, beforeEvent,
+        element, labelElement, envelope, _style = {}, size, beforeText, beforeEvent, position,
         /**
          * 라인(꺽은선)의 중심위치를 반환한다.
          *
@@ -2022,7 +1529,11 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
                     break;
             }
             size = [envelope.getWidth(), envelope.getHeight()];
-            // }
+
+            if (element.shape instanceof OG.shape.EdgeShape) {
+                var centerOfEdge = getCenterOfEdge(element);
+                position = [centerOfEdge.x, centerOfEdge.y];
+            }
 
             labelElement = this._drawLabel(
                 position,
@@ -2355,6 +1866,73 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
     }
 };
 
+
+/**
+ * 연결된 터미널의 vertices 를 초기화하여 재연결한다.
+ *
+ * @param {Element} edge Edge Shape
+ * @return {Element} 연결된 Edge 엘리먼트
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.reconnect = function (edge) {
+
+    var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
+    if (rEdge) {
+        edge = rEdge.node;
+    } else {
+        return null;
+    }
+
+    var from, to;
+    var me = this, fromShape, toShape, fromXY, toXY,
+        isSelf;
+
+    from = $(edge).attr("_from");
+    to = $(edge).attr("_to");
+    if (from) {
+        fromShape = this._getShapeFromTerminal(from);
+    }
+    if (to) {
+        toShape = this._getShapeFromTerminal(to);
+    }
+    if (!fromShape || !toShape) {
+        return edge;
+    }
+
+    // 연결 포지션 초기화
+    from = this.createDefaultTerminalString(fromShape);
+    to = this.createDefaultTerminalString(toShape);
+
+    fromXY = this._getPositionFromTerminal(from);
+    toXY = this._getPositionFromTerminal(to);
+
+    // 연결 노드 정보 설정
+    $(edge).attr("_from", from);
+    $(edge).attr("_to", to);
+
+
+    var geometry = edge.shape.geom;
+    var vertices = geometry.getVertices();
+    var newVertieces = [vertices[0], vertices[vertices.length - 1]];
+
+    newVertieces[0].x = fromXY.x;
+    newVertieces[0].y = fromXY.y;
+
+    newVertieces[1].x = toXY.x;
+    newVertieces[1].y = toXY.y;
+
+
+    // 라인 드로잉
+    edge = this.drawEdge(new OG.PolyLine(newVertieces), edge.shape.geom.style, edge ? edge.id : null);
+
+    me.trimConnectInnerVertice(edge);
+    me.trimConnectIntersection(edge);
+    me.trimEdge(edge);
+    me.checkBridgeEdge(edge);
+
+    return edge;
+};
+
 /**
  * 두개의 터미널을 연결하고, 속성정보에 추가한다.
  *
@@ -2366,7 +1944,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
  * @return {Element} 연결된 Edge 엘리먼트
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label) {
+OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label, preventTrigger) {
 
     var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
@@ -2413,13 +1991,13 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         toXY = this._getPositionFromTerminal(to);
     }
 
+    //셀프 커넥션 처리
     isSelf = fromShape && toShape && fromShape.id === toShape.id;
     if (isSelf) {
         fromXY = toXY = fromShape.shape.geom.getBoundary().getRightCenter();
     }
 
     if (fromShape && toShape) {
-
         if (fromShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain" || toShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain") {
             _style["arrow-end"] = "none";
         } else if (fromShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain_Module" || toShape.attributes._shape_id.value == "OG.shape.bpmn.Value_Chain_Module") {
@@ -2434,7 +2012,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         $(this._PAPER.canvas).trigger(beforeEvent);
         if (beforeEvent.isPropagationStopped()) {
             this.remove(edge);
-            return false;
+            return null;
         }
     }
 
@@ -2487,7 +2065,9 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
 
     if (fromShape && toShape) {
         // connectShape event fire
-        $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
+        if (!preventTrigger) {
+            $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
+        }
     }
     me.trimConnectInnerVertice(edge);
     me.trimConnectIntersection(edge);
@@ -2671,18 +2251,21 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         geometry = rElement ? rElement.node.shape.geom : null,
         envelope,
         group, guide,
-        _bBoxRect, _line, _linePath1, _linePath2,
+        _bBoxRect, _line, _linePath1, _linePath2, _rect,
         _upperLeft, _upperRight, _lowerLeft, _lowerRight, _leftCenter, _upperCenter, _rightCenter, _lowerCenter,
         _ulRect, _urRect, _lwlRect, _lwrRect, _lcRect, _ucRect, _rcRect, _lwcRect,
         _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2),
         _ctrlSize = me._CONFIG.GUIDE_LINE_SIZE,
         _ctrlMargin = me._CONFIG.GUIDE_LINE_MARGIN,
-        _trash, isEdge, isEssensia, controllers = [], _isConnectable, isLane,
+        _trash, isEdge, isEssensia, controllers = [], isLane,
         _qUpper, _qLow, _qBisector, _qThirds;
 
-    if (rElement && me._CONFIG.CONNECTABLE && rElement.node.shape.CONNECTABLE) {
-        _isConnectable = true;
-    }
+
+    var _isConnectable = rElement && me._CANVAS._HANDLER._isConnectable(element.shape);
+    var _isConnectCloneable = rElement && me._CANVAS._HANDLER._isConnectCloneable(element.shape);
+    var _isDeletable = rElement && me._CANVAS._HANDLER._isDeletable(element.shape);
+    var _isResizable = rElement && me._CANVAS._HANDLER._isResizable(element.shape);
+
 
     var createLinePath = function (x, y, idx) {
         var marginTop = 0;
@@ -2691,6 +2274,13 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         }
         var from = [x, (y + _ctrlSize - 8) + marginTop];
         var to = [x + _ctrlSize, y + marginTop];
+        var path = 'M' + from[0] + ' ' + from[1] + 'L' + to[0] + ' ' + to[1];
+        return path;
+    };
+
+    var createTextLinePath = function (x, y) {
+        var from = [x, (y + 4)];
+        var to = [x + _ctrlSize, (y + 4)];
         var path = 'M' + from[0] + ' ' + from[1] + 'L' + to[0] + ' ' + to[1];
         return path;
     };
@@ -2762,6 +2352,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
     }
 
     function _drawGuide() {
+        if (!_isResizable) {
+            return;
+        }
         _ulRect = me._PAPER.rect(_upperLeft.x - _hSize, _upperLeft.y - _hSize, _size, _size);
         _urRect = me._PAPER.rect(_upperRight.x - _hSize, _upperRight.y - _hSize, _size, _size);
         _lwlRect = me._PAPER.rect(_lowerLeft.x - _hSize, _lowerLeft.y - _hSize, _size, _size);
@@ -2809,6 +2402,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
     }
 
     function _redrawGuide() {
+        if (!_isResizable) {
+            return;
+        }
         _ulRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UL);
         _urRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.UR);
         _lwlRect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LWL);
@@ -2829,6 +2425,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
     }
 
     function _drawTrash() {
+        if (!_isDeletable) {
+            return;
+        }
         _trash = me._PAPER.image("resources/images/symbol/trash.svg", 0, 0, _ctrlSize, _ctrlSize);
         _trash.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
         group.appendChild(_trash);
@@ -2848,11 +2447,17 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
     }
 
     function _redrawTrash() {
+        if (!_isDeletable) {
+            return;
+        }
         _trash = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
         controllers.push(_trash);
     }
 
     function _drawLine() {
+        if (!_isConnectable) {
+            return;
+        }
         _line = me._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
         _linePath1 = me._PAPER.path(createLinePath(0, 0, 0));
         _linePath2 = me._PAPER.path(createLinePath(0, 0, 8));
@@ -2876,15 +2481,95 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         me._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
         me._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
 
-        guide.line = _line.node;
+        if (!guide.line) {
+            guide.line = [];
+        }
+        guide.line.push({
+            node: _line.node,
+            text: ''
+        });
         controllers.push(_line);
     }
 
     function _redrawLine() {
+        if (!_isConnectable) {
+            return;
+        }
         _line = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE);
         _linePath1 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '1');
         _linePath2 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE + '2');
         controllers.push(_line);
+    }
+
+    function _drawTextLine(i, text) {
+        if (!_isConnectable) {
+            return;
+        }
+        var minText = text;
+        if (text.length > 3) {
+            minText = text.substring(0, 3) + '..';
+        }
+        _line = me._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
+        _linePath1 = me._PAPER.path(createTextLinePath(0, 0));
+        _linePath2 = me._PAPER.text(0, 0, minText, _ctrlSize);
+        _line.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+
+        if (!isEssensia) {
+            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE);
+        }
+        if (isEssensia) {
+            _linePath1.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_ESSENSIA);
+        }
+
+        group.appendChild(_linePath1);
+        group.appendChild(_linePath2);
+        group.appendChild(_line);
+
+        me._add(_line, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i);
+        me._add(_linePath1, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i + '1');
+        me._add(_linePath2, rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i + '2');
+
+        if (!guide.line) {
+            guide.line = [];
+        }
+        guide.line.push({
+            node: _line.node,
+            text: text
+        });
+        controllers.push(_line);
+    }
+
+    function _redrawTextLine(i, text) {
+        if (!_isConnectable) {
+            return;
+        }
+        _line = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i);
+        _linePath1 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i + '1');
+        _linePath2 = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT + i + '2');
+        controllers.push(_line);
+    }
+
+    function _drawRect() {
+        if (!_isConnectCloneable) {
+            return;
+        }
+        _rect = me._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
+        _rect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_RECT_AREA);
+
+        group.appendChild(_rect);
+
+        me._add(_rect, rElement.id + OG.Constants.GUIDE_SUFFIX.RECT);
+
+        guide.rect = _rect.node;
+        controllers.push(_rect);
+    }
+
+    function _redrawRect() {
+        if (!_isConnectCloneable) {
+            return;
+        }
+        _rect = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.RECT);
+        controllers.push(_rect);
     }
 
     function _drawLaneQuarter(divideCount) {
@@ -3004,7 +2689,19 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
                 me._getREleById(controller.id + '1').attr({'path': createLinePath(x, y, 0)});
                 me._getREleById(controller.id + '2').attr({'path': createLinePath(x, y, 8)});
             }
+
+            //텍스트 라인일경우 하위 라인까지 함께 재배치
+            if (controller.id.indexOf(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT) != -1) {
+                var index = controller.id.replace(rElement.id + OG.Constants.GUIDE_SUFFIX.LINE_TEXT, '');
+                me._getREleById(controller.id + '1').attr({'path': createTextLinePath(x, y)});
+                me._getREleById(controller.id + '2').attr({x: x + 10, y: y + 16});
+            }
         });
+    }
+
+    var textList = me.getTextListInController(element);
+    if (!textList) {
+        textList = [];
     }
 
     //기존에 가이드가 있을 경우
@@ -3016,11 +2713,15 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             if (isLane) {
                 _redrawLaneQuarter(me.enableDivideCount(element));
             }
-            if (isLane && me.isTopGroup(element) && _isConnectable) {
-                _redrawLine();
-            }
-            if (!isLane && _isConnectable) {
-                _redrawLine();
+            if (!isLane) {
+                _redrawRect();
+                if (textList.length) {
+                    $.each(textList, function (i, text) {
+                        _redrawTextLine(i, text);
+                    })
+                } else {
+                    _redrawLine();
+                }
             }
             _redrawTrash();
         }
@@ -3047,13 +2748,16 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             if (isLane) {
                 _drawLaneQuarter(me.enableDivideCount(element));
             }
-            if (isLane && me.isTopGroup(element) && _isConnectable) {
-                _drawLine();
+            if (!isLane) {
+                _drawRect();
+                if (textList.length) {
+                    $.each(textList, function (i, text) {
+                        _drawTextLine(i, text);
+                    })
+                } else {
+                    _drawLine();
+                }
             }
-            if (!isLane && _isConnectable) {
-                _drawLine();
-            }
-
             _drawTrash();
         }
         _setControllerPosition();
@@ -3064,7 +2768,6 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         }
         if (group) {
             me.getRootGroup().appendChild(group.node);
-            //group.insertAfter(rElement);
         }
         // selected 속성값 설정
         $(rElement.node).attr("_selected", "true");
@@ -3079,26 +2782,28 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
-
-    var me = this, path;
+//console.log(position);
+    //console.log(canvas._CONFIG.SCALE);
+    var me = this, path, pathX, pathY;
 
     if (!position) {
         return;
     }
     if (position.x) {
+        pathX = position.x * me._CONFIG.SCALE;
         this.removeStickGuide('vertical');
-        path = this._PAPER.path("M" + position.x + ",0L" + position.x + ",10000");
+        path = this._PAPER.path("M" + pathX + ",0L" + pathX + ",10000");
         this._stickGuideX = path;
     }
     if (position.y) {
+        pathY = position.y * me._CONFIG.SCALE;
         this.removeStickGuide('horizontal');
-        path = this._PAPER.path("M0," + position.y + "L10000," + position.y);
+        path = this._PAPER.path("M0," + pathY + "L10000," + pathY);
         this._stickGuideY = path;
     }
     path.attr("stroke-width", "2");
     path.attr("stroke", "#FFCC50");
     path.attr("opacity", "0.7");
-
 };
 
 OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (direction) {
@@ -4227,6 +3932,45 @@ OG.renderer.RaphaelRenderer.prototype.setShapeStyle = function (element, style) 
 };
 
 /**
+ * Shape 의 선 연결 커스텀 컨트롤러를 설정한다.
+ *
+ * @param {Element,String} element Element 또는 ID
+ * @param {Array} textList 텍스트 리스트
+ * @override
+ */
+
+OG.renderer.RaphaelRenderer.prototype.setTextListInController = function (element, textList) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (rElement && element.shape && element.shape.geom) {
+        var data = this._CANVAS.getCustomData(element);
+        if (!data) {
+            data = {}
+        }
+        data['textLineController'] = textList;
+        this._CANVAS.setCustomData(element, data);
+    }
+};
+
+/**
+ * Shape 의 선 연결 커스텀 컨트롤러를 가져온다.
+ *
+ * @param {Element,String} element Element 또는 ID
+ * @override
+ */
+
+OG.renderer.RaphaelRenderer.prototype.getTextListInController = function (element) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (rElement && element.shape && element.shape.geom) {
+        var data = this._CANVAS.getCustomData(element);
+        if (data) {
+            return data['textLineController'];
+        } else {
+            return null;
+        }
+    }
+};
+
+/**
  * ID에 해당하는 Element 를 최상단 레이어로 이동한다.
  *
  * @param {Element,String} element Element 또는 ID
@@ -4871,13 +4615,18 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
                     spots.push(spot.node);
                 }
             }
-        })
+        });
 
         return spots;
+    };
+
+    // 스팟이 이미 존재하는 경우에는 가이드만 새로 만든다.
+    if (me.getSpots(element).length > 0) {
+        return null;
     }
 
-    if (me.getSpots(element).length > 0) {
-        // 스팟이 이미 존재하는 경우에는 가이드만 새로 만든다.
+    // 선택할수 없는 엘리먼트일경우 패스.
+    if (!me._CANVAS._HANDLER._isSelectable(element.shape)) {
         return null;
     }
 
@@ -5557,7 +5306,7 @@ OG.renderer.RaphaelRenderer.prototype.createDefaultTerminalString = function (el
         }
     }
     return terminal;
-}
+};
 
 /**
  * 터미널로부터 부모 Shape element 로의 퍼센테이지 좌표를 반환한다.
@@ -5764,6 +5513,7 @@ OG.renderer.RaphaelRenderer.prototype.getTargetfromVirtualEdge = function () {
  */
 OG.renderer.RaphaelRenderer.prototype.removeAllVirtualEdge = function () {
     $(this.getRootGroup()).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, false);
+    $(this.getRootGroup()).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, false);
     return this.remove(OG.Constants.GUIDE_SUFFIX.LINE_VIRTUAL_EDGE);
 };
 
@@ -5805,6 +5555,19 @@ OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
 
     me._CONFIG.HISTORY = history;
     me._CONFIG.HISTORY_INDEX = historyIndex;
+
+
+    //캔버스가 서버로부터 받은 데이터를 적용시키는 과정이 아닐 경우 브로드캐스트 수행.
+    if (me._CANVAS.getRemotable()) {
+        if (!me._CANVAS.getRemoteDuring()) {
+            OG.RemoteHandler.broadCastCanvas(me._CANVAS, function (canvas) {
+
+            });
+        }
+    }
+
+    //슬라이더가 있을경우 슬라이더 업데이트
+    me._CANVAS.updateSlider();
 };
 
 /**
@@ -5916,6 +5679,26 @@ OG.renderer.RaphaelRenderer.prototype.isVerticalLane = function (element) {
 };
 
 /**
+ * 도형의 HorizontalPoolShape 타입 여부를 판별한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {boolean} true false
+ */
+OG.renderer.RaphaelRenderer.prototype.isHorizontalPool = function (element) {
+    return element.shape instanceof OG.shape.HorizontalPoolShape;
+};
+
+/**
+ * 도형의 VerticalPoolShape 타입 여부를 판별한다.
+ *
+ * @param {Element,String} Element Element 또는 ID
+ * @return {boolean} true false
+ */
+OG.renderer.RaphaelRenderer.prototype.isVerticalPool = function (element) {
+    return element.shape instanceof OG.shape.VerticalPoolShape;
+};
+
+/**
  * Lane 타입 도형 하위의 Lane 타입들을 리턴한다.
  *
  * @param {Element,String} Element Element 또는 ID
@@ -5984,7 +5767,7 @@ OG.renderer.RaphaelRenderer.prototype.enableDivideCount = function (element) {
 };
 
 /**
- * Lane 의 타이틀 영역을 제외한 boundary 를 리턴한다.
+ * Lane,Pool 의 타이틀 영역을 제외한 boundary 를 리턴한다.
  *
  * @param {Element,String} Element Element 또는 ID
  * @param {OG.geometry.Envelope} boundary
@@ -6006,17 +5789,17 @@ OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element
     var height = boundary.getHeight();
     var newUpperLeft, newWidth, newHeight;
 
-    if (!me.isLane(element)) {
+    if (!me.isLane(element) && !me.isPool(element)) {
         return boundary;
     }
 
-    if (me.isHorizontalLane(element)) {
+    if (me.isHorizontalLane(element) || me.isHorizontalPool(element)) {
         newUpperLeft = new OG.geometry.Coordinate(upperLeft.x + titleSize, upperLeft.y);
         newWidth = width - titleSize;
         newHeight = height;
     }
 
-    if (me.isVerticalLane(element)) {
+    if (me.isVerticalLane(element) || me.isVerticalPool(element)) {
         newUpperLeft = new OG.geometry.Coordinate(upperLeft.x, upperLeft.y + titleSize);
         newWidth = width;
         newHeight = height - titleSize;
@@ -6071,7 +5854,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 if (i === quarterLength - 1) {
                     _height = _height + (targetArea.getHeight() % quarterLength);
                 }
-                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.HorizontalLaneShape(), [_width, _height], null, null, element.id);
+                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.HorizontalLaneShape(), [_width, _height], null, null, element.id, true);
                 divedLanes.push(newLane);
             }
 
@@ -6083,7 +5866,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 if (i === quarterLength - 1) {
                     _width = _width + (targetArea.getWidth() % quarterLength);
                 }
-                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.VerticalLaneShape(), [_width, _height], null, null, element.id);
+                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.VerticalLaneShape(), [_width, _height], null, null, element.id, true);
                 divedLanes.push(newLane);
             }
             me.fitLaneOrder(element);
@@ -6115,7 +5898,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 var x = targetUpperLeft.x;
                 var y = targetUpperLeft.y;
                 var shape = me.isHorizontalLane(element) ? new OG.HorizontalLaneShape() : new OG.VerticalLaneShape();
-                standardLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, element.id);
+                standardLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, element.id, true);
                 divedLanes.push(standardLane);
             }
 
@@ -6216,8 +5999,8 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                         lanesToMove.push(baseLane);
                     }
                 }
-            })
-            var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, parent.id);
+            });
+            var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, parent.id, true);
             divedLanes.push(newLane);
             $.each(lanesToMove, function (index, laneToMove) {
                 me.move(laneToMove, moveOffset);
@@ -6232,6 +6015,8 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
     }
+
+    me.offDropablePool();
 };
 
 /**
@@ -6339,7 +6124,7 @@ OG.renderer.RaphaelRenderer.prototype.getRootLane = function (element) {
         }
     }
     return rootLane;
-}
+};
 
 /**
  * Lane 의 BaseLane 으로부터 자신의 순서를 구한다.
@@ -6925,12 +6710,49 @@ OG.renderer.RaphaelRenderer.prototype.fitLaneOrder = function (element) {
 };
 
 /**
+ * Shape 가 소속된 의 최상위 그룹 앨리먼트를 반환한다.
+ * 그룹이 소속이 아닌 앨리먼트는 자신을 반환한다.
+ *
+ * @param {Element,String} Element 또는 ID
+ * @return {Element} Element
+ */
+OG.renderer.RaphaelRenderer.prototype.getRootGroupOfShape = function (element) {
+    var me = this;
+    var rootGroup;
+    var parent;
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return null;
+    }
+    element = rElement.node;
+
+    if (!me.getParent(element)) {
+        return element;
+    }
+
+    while (!rootGroup) {
+        if (!parent) {
+            parent = element;
+        }
+        if (me.getRootGroup().id === parent.id) {
+            rootGroup = null;
+            break;
+        }
+        if (me.isTopGroup(parent)) {
+            rootGroup = parent;
+        } else {
+            parent = me.getParent(parent);
+        }
+    }
+    return rootGroup;
+};
+/**
  * Edge 가 Gourp 사이를 넘어가는 경우 스타일에 변화를 준다.
  *
  * @param {Element,String} Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
-    var me = this;
+    var me = this, fromStyleChangable, toStyleChangable;
     var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
 
     if (!rElement) {
@@ -6942,32 +6764,45 @@ OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
         return;
     }
 
-    var getRootOfShape = function (_element) {
-        var parent = _element.parentElement;
-        if (me.isLane(parent)) {
-            return me.getRootLane(parent);
-        }
-        return parent;
-    };
-
     var from = $(element).attr("_from");
     var to = $(element).attr("_to");
     var fromShape, toShape, fromRoot, toRoot;
     if (from) {
         fromShape = this._getShapeFromTerminal(from);
-        fromRoot = getRootOfShape(fromShape);
+        fromRoot = me.getRootGroupOfShape(fromShape);
+        fromStyleChangable = me._CANVAS._HANDLER._isConnectStyleChangable(fromShape.shape);
     }
     if (to) {
         toShape = this._getShapeFromTerminal(to);
-        toRoot = getRootOfShape(toShape);
+        toRoot = me.getRootGroupOfShape(toShape);
+        toStyleChangable = me._CANVAS._HANDLER._isConnectStyleChangable(toShape.shape);
     }
 
     if (fromShape && toShape && fromRoot && toRoot) {
+        //양쪽 모두 루트 캔버스 하위의 엘리먼트라면 기본 처리한다.
+        if (fromRoot.id === fromShape.id && toShape.id === toRoot.id) {
+            me.setShapeStyle(element, {"stroke-dasharray": ''});
+            return;
+        }
+        //양쪽 모두 Lane 으로 부터 파생되었으면 기본 처리한다.
+        if (me.isLane(fromRoot) && me.isLane(toRoot)) {
+            me.setShapeStyle(element, {"stroke-dasharray": ''});
+            return;
+        }
+
+        //둘중 한쪽이 스타일 변경 방지 처리가 되어있으면 기본 처리한다.
+        if (!fromStyleChangable || !toStyleChangable) {
+            me.setShapeStyle(element, {"stroke-dasharray": ''});
+            return;
+        }
+
+        //양쪽 루트그룹의 아이디가 틀리면 대쉬어래이 처리
         if (fromRoot.id !== toRoot.id) {
-            me.setShapeStyle(element, {"stroke-dasharray": '- '});
+            me.setShapeStyle(element, {"arrow-start": "open_oval", "stroke-dasharray": '- '});
             return;
         }
     }
+
     me.setShapeStyle(element, {"stroke-dasharray": ''});
 };
 /**
@@ -7090,7 +6925,7 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) 
     return mostFrontElement;
 };
 
-//trimEdgeDirection
+
 /**
  * 신규 Edge 의 vertices 를 연결대상 도형에 따라 설정한다
  *
@@ -7159,4 +6994,180 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
     }
 
     return me.drawEdge(new OG.PolyLine(points), edge.shape.geom.style, edge.id);
+};
+
+/**
+ * Lane 또는 Pool 내부 도형들을 그룹에 포함시킨다.
+ *
+ * @param {Element,String} Element
+
+ * @return {Element} Element
+ */
+OG.renderer.RaphaelRenderer.prototype.putInnerShapeToPool = function (element) {
+    var me = this;
+    var root = me.getRootGroup();
+    var rootLane;
+
+    if (!me.isLane(element) && !me.isPool(element)) {
+        return element;
+    }
+    if (me.isLane(element)) {
+        rootLane = me.getRootLane(element);
+    } else {
+        rootLane = element;
+    }
+
+    var geometry = rootLane.shape.geom;
+    var envelope = geometry.getBoundary();
+
+    //캔버스 하위 shape 중 그룹 가능한 것의 집합.
+    var rootInnderShape = [];
+    var childs = me.getChilds(root);
+    $.each(childs, function (index, child) {
+        if (!me.isEdge(child) && child.id != element.id) {
+            rootInnderShape.push(child);
+        }
+    });
+    $.each(rootInnderShape, function (index, innderShape) {
+        var boundary = innderShape.shape.geom.getBoundary();
+        if (envelope.isContainsAll(boundary.getVertices())) {
+            rootLane.appendChild(innderShape);
+        }
+    });
+}
+
+
+/**
+ * 신규 Lane 또는 Pool 이 캔버스상에서 드래그하여 그려지도록 사전작업을 수행한다.
+ *
+ * @param {Element,String} Element
+
+ * @return {Element} Element
+ */
+OG.renderer.RaphaelRenderer.prototype.setDropablePool = function (element) {
+    var me = this;
+    var root = me.getRootGroup();
+
+    if (!me.isLane(element) && !me.isPool(element)) {
+        return element;
+    }
+
+    var geometry = element.shape.geom;
+
+    //캔버스 하위 shape 중 그룹 가능한 것의 집합.
+    var rootInnderShape = [];
+    var childs = me.getChilds(root);
+    $.each(childs, function (index, child) {
+        if (!me.isLane(child) && !me.isPool(child) && !me.isEdge(child)) {
+            rootInnderShape.push(child);
+        }
+    });
+
+    var poolDefaultSize = me._CONFIG.POOL_DEFAULT_SIZE;
+    var space = 30;
+    var boundary = geometry.getBoundary();
+    var centroid = boundary.getCentroid();
+    var poolSize = {};
+
+    var calculateDropCorrectionConditions = function () {
+
+        var correctionConditions = [];
+        if (!rootInnderShape.length) {
+            return correctionConditions;
+        }
+
+        var childArea = me.getBoundaryOfElements(rootInnderShape);
+        var elementArea = me.getBoundary(element);
+
+        var center = childArea.getCentroid();
+        var widthEnable = (elementArea.getWidth() / 2) - ((childArea.getWidth() / 2) + space);
+        var heightEnable = (elementArea.getHeight() / 2) - ((childArea.getHeight() / 2) + space);
+        if (widthEnable < 0) {
+            widthEnable = 0;
+        }
+        if (heightEnable < 0) {
+            heightEnable = 0;
+        }
+
+        correctionConditions.push({
+            condition: {
+                maxX: center.x + widthEnable
+            },
+            fixedPosition: {
+                x: center.x + widthEnable
+            }
+        });
+        correctionConditions.push({
+            condition: {
+                minX: center.x - widthEnable
+            },
+            fixedPosition: {
+                x: center.x - widthEnable
+            }
+        });
+        correctionConditions.push({
+            condition: {
+                maxY: center.y + heightEnable
+            },
+            fixedPosition: {
+                y: center.y + heightEnable
+            }
+        });
+        correctionConditions.push({
+            condition: {
+                minY: center.y - heightEnable
+            },
+            fixedPosition: {
+                y: center.y - heightEnable
+            }
+        });
+        return correctionConditions;
+    };
+
+
+    if (me.isVerticalLane(element) || me.isVerticalPool(element)) {
+        poolSize.width = poolDefaultSize[1];
+        poolSize.height = poolDefaultSize[0];
+    } else {
+        poolSize.width = poolDefaultSize[0];
+        poolSize.height = poolDefaultSize[1];
+    }
+
+    if (rootInnderShape.length) {
+        var childArea = me.getBoundaryOfElements(rootInnderShape);
+        centroid = childArea.getCentroid();
+
+        if (poolSize.width < childArea.getWidth() + (space * 2)) {
+            poolSize.width = childArea.getWidth() + (space * 2);
+        }
+        if (poolSize.height < childArea.getHeight() + (space * 2)) {
+            poolSize.height = childArea.getHeight() + (space * 2);
+        }
+    }
+
+    var originalStyle = JSON.parse(JSON.stringify(geometry.style.map));
+    geometry.moveCentroid([centroid.x, centroid.y]);
+    geometry.resizeBox(poolSize.width, poolSize.height);
+    geometry.style.map['stroke-width'] = 2;
+    geometry.style.map['stroke'] = '#FFCC50';
+
+    element = this.redrawShape(element);
+
+    $(element).data('originalStyle', originalStyle);
+    $(root).data('newPool', element);
+    $(root).data('poolInnderShape', rootInnderShape);
+    $(root).data('correctionConditions', calculateDropCorrectionConditions());
+
+    return element;
+};
+
+/**
+ * 신규 Lane 또는 Pool 드랍모드를 해제한다.
+ *
+ */
+OG.renderer.RaphaelRenderer.prototype.offDropablePool = function () {
+    var me = this;
+    var root = me.getRootGroup();
+    $(root).data('newPool', false);
+    $(root).data('poolInnderShape', []);
 };

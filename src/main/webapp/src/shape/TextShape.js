@@ -6,7 +6,7 @@
  * @requires OG.common.*, OG.geometry.*
  *
  * @param {String} text 텍스트
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.shape.TextShape = function (text) {
 	OG.shape.TextShape.superclass.call(this);

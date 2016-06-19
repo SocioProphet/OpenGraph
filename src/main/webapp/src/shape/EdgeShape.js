@@ -10,7 +10,7 @@
  * @param {String} label 라벨 [Optional]
  * @param {String} fromLabel 시작점 라벨 [Optional]
  * @param {String} toLabel 끝점 라벨 [Optional]
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.shape.EdgeShape = function (from, to, label, fromLabel, toLabel) {
 	OG.shape.EdgeShape.superclass.call(this);

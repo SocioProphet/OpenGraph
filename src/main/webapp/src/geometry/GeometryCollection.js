@@ -13,7 +13,7 @@
  * var collection = new OG.geometry.GeometryCollection([geom1, geom2, geom3]);
  *
  * @param geometries {OG.geometry.Geometry[]} 공간 기하 객체 Array
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.GeometryCollection = function (geometries) {
 

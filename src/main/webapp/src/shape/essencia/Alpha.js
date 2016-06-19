@@ -6,7 +6,7 @@
  * @requires OG.common.*, OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.shape.essencia.Alpha = function (label) {
     OG.shape.essencia.Alpha.superclass.call(this);

@@ -4,7 +4,7 @@
  * @class
  * @requires OG.common.*, OG.geometry.*
  *
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.shape.IShape = function () {
 	/**
@@ -63,13 +63,31 @@ OG.shape.IShape = function () {
 	this.CONNECTABLE = true;
 
 	/**
+	 * From 연결 가능여부 (From(Shape) => To)
+	 * @type Boolean
+	 */
+	this.ENABLE_FROM = true;
+
+	/**
+	 * To 연결 가능여부 (From => To(Shape))
+	 * @type Boolean
+	 */
+	this.ENABLE_TO = true;
+
+	/**
+	 * TO 연결 가능여부
+	 * @type Boolean
+	 */
+	this.ENABLE_FROM = true;
+
+	/**
 	 * Self 연결 가능여부
 	 * @type Boolean
 	 */
 	this.SELF_CONNECTABLE = true;
 
 	/**
-	 * 드래그하여 연결시 대상 없을 경우 자동으로 Shape 복사하여 연결 처리 여부
+	 * 가이드에 자기자신을 복사하는 컨트롤러 여부.
 	 * @type Boolean
 	 */
 	this.CONNECT_CLONEABLE = true;
@@ -79,6 +97,18 @@ OG.shape.IShape = function () {
 	 * @type Boolean
 	 */
 	this.CONNECT_REQUIRED = true;
+
+	/**
+	 * 드래그하여 연결시 그룹을 건너뛸때 스타일 변경 여부
+	 * @type Boolean
+	 */
+	this.CONNECT_STYLE_CHANGE = true;
+
+	/**
+	 * 가이드에 삭제 컨트롤러 여부
+	 * @type Boolean
+	 */
+	this.DELETABLE = true;
 
 	/**
 	 * 라벨 수정여부

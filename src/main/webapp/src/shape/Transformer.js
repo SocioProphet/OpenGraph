@@ -6,7 +6,7 @@
  * @requires OG.common.*, OG.geometry.*, OG.shape.bpmn.A_Task
  *
  * @param {String} label 라벨 [Optional]
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.shape.Transformer = function (label) {
     OG.shape.Transformer.superclass.call(this);
@@ -14,6 +14,11 @@ OG.shape.Transformer = function (label) {
     this.SHAPE_ID = 'OG.shape.Transformer';
     this.label = label;
     this.CONNECTABLE = false;
+    this.MOVABLE = true;
+    this.RESIZABLE = false;
+    this.SELF_CONNECTABLE = false;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
 }
 OG.shape.Transformer.prototype = new OG.shape.GroupShape();
 OG.shape.Transformer.superclass = OG.shape.GroupShape;

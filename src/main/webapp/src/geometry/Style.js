@@ -11,7 +11,7 @@
  * });
  *
  * @param {Object} style 키:값 매핑된 스타일 프라퍼티 정보
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Style = function (style) {
 	var DEFAULT_STYLE = {}, _style = {};

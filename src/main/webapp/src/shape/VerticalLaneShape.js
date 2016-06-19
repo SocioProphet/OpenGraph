@@ -6,7 +6,7 @@
  * @requires OG.common.*, OG.geometry.*
  *
  * @param {String} label 라벨
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.shape.VerticalLaneShape = function (label) {
 	OG.shape.VerticalLaneShape.superclass.call(this, label);

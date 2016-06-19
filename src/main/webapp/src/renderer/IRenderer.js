@@ -9,7 +9,7 @@
  * @param {String} backgroundColor 캔버스 배경색
  * @param {String} backgroundImage 캔버스 배경이미지
  * @param {Object} config Configuration
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.renderer.IRenderer = function (container, containerSize, backgroundColor, backgroundImage, config) {
     this._CONFIG = null;

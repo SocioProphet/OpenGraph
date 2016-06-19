@@ -9,7 +9,7 @@
  * var geom = new OG.geometry.Point([20, 5]);
  *
  * @param {OG.geometry.Coordinate} coordinate 좌표값
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Point = function (coordinate) {
 

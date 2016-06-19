@@ -10,7 +10,7 @@
  *
  * @param {OG.geometry.Coordinate} center Circle 중심 좌표
  * @param {Number} radius radius 반경
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Circle = function (center, radius) {
 

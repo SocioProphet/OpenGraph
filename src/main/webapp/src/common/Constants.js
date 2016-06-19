@@ -33,7 +33,7 @@ OG.shape.essencia = {};
  *
  * @class
  *
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.common.Constants = {
 
@@ -144,9 +144,13 @@ OG.common.Constants = {
 		CTL_H: "_GUIDE_CTL_H_",
 		CTL_V: "_GUIDE_CTL_V_",
 		LINE : "_GUIDE_LINE",
+		LINE_TEXT : "_GUIDE_LINE_TEXT",
 		LINE_CONNECT_MODE: "LINE_CONNECT_MODE",
+		LINE_CONNECT_TEXT: "LINE_CONNECT_TEXT",
 		LINE_VIRTUAL_EDGE: "LINE_VIRTUAL_EDGE",
+		RECT_CONNECT_MODE: "RECT_CONNECT_MODE",
 		TRASH: "_GUIDE_TRASH",
+		RECT: "_GUIDE_RECT",
 		QUARTER_UPPER: "QUARTER_UPPER",
 		QUARTER_LOW: "QUARTER_LOW",
 		QUARTER_BISECTOR: "QUARTER_BISECTOR",

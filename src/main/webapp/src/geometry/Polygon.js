@@ -9,7 +9,7 @@
  * var geom = new OG.geometry.Polygon([[20, 5], [30, 15], [40, 25], [50, 15], [60, 5], [20, 5]]);
  *
  * @param {OG.geometry.Coordinate[]} vertices Line Vertex 좌표 Array
- * @author <a href="mailto:hrkenshin@gmail.com">Seungbaek Lee</a>
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
 OG.geometry.Polygon = function (vertices) {
 
