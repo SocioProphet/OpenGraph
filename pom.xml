@@ -405,6 +405,17 @@
             <snapshots>
             </snapshots>
         </repository>
+        <repository>
+            <id>org.central</id>
+            <name>Open Cloud Engine Maven Repository</name>
+            <url>http://maven.opencloudengine.org/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
