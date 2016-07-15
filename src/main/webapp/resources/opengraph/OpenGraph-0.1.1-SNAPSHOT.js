@@ -12792,6 +12792,51 @@ OG.shape.bpmn.E_Intermediate_Error.prototype.createShape = function () {
 
 	return this.geom;
 };
+OG.shape.bpmn.E_Intermediate_Escalation = function (label) {
+    OG.shape.bpmn.E_Intermediate_Escalation.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.bpmn.E_Intermediate_Escalation';
+    this.label = label;
+};
+OG.shape.bpmn.E_Intermediate_Escalation.prototype = new OG.shape.bpmn.Event();
+OG.shape.bpmn.E_Intermediate_Escalation.superclass = OG.shape.bpmn.Event;
+OG.shape.bpmn.E_Intermediate_Escalation.prototype.constructor = OG.shape.bpmn.E_Intermediate_Escalation;
+OG.E_Intermediate_Escalation = OG.shape.bpmn.E_Intermediate_Escalation;
+
+/**
+ * 드로잉할 Shape 을 생성하여 반환한다.
+ *
+ * @return {OG.geometry.Geometry} Shape 정보
+ * @override
+ */
+OG.shape.bpmn.E_Intermediate_Escalation.prototype.createShape = function () {
+    var geom1, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Polygon([
+        [20, 80],
+        [50, 20],
+        [80, 80],
+        [50, 50]
+    ]);
+
+    geomCollection.push(new OG.geometry.Circle([50, 50], 50));
+    geomCollection.push(new OG.geometry.Circle([50, 50], 40));
+    geomCollection.push(geom1);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        // "stroke" : "#969149",
+        "stroke-width" : 1.5,
+        fill : "white",
+        "fill-opacity" : 1
+    });
+
+    return this.geom;
+};
 /**
  * BPMN : Link Intermediate Event Shape
  *
@@ -12900,6 +12945,70 @@ OG.shape.bpmn.E_Intermediate_Message.prototype.createShape = function () {
 	});
 
 	return this.geom;
+};
+OG.shape.bpmn.E_Intermediate_MessageFill = function (label) {
+    OG.shape.bpmn.E_Intermediate_MessageFill.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.bpmn.E_Intermediate_MessageFill';
+    this.label = label;
+};
+OG.shape.bpmn.E_Intermediate_MessageFill.prototype = new OG.shape.bpmn.Event();
+OG.shape.bpmn.E_Intermediate_MessageFill.superclass = OG.shape.bpmn.Event;
+OG.shape.bpmn.E_Intermediate_MessageFill.prototype.constructor = OG.shape.bpmn.E_Intermediate_MessageFill;
+OG.E_Intermediate_MessageFill = OG.shape.bpmn.E_Intermediate_MessageFill;
+
+/**
+ * 드로잉할 Shape 을 생성하여 반환한다.
+ *
+ * @return {OG.geometry.Geometry} Shape 정보
+ * @override
+ */
+OG.shape.bpmn.E_Intermediate_MessageFill.prototype.createShape = function () {
+    var geom1, geom2, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.PolyLine([
+        [20, 25],
+        [50, 45],
+        [80, 25],
+        [20, 25]
+    ]);
+    geom1.style = new OG.geometry.Style({
+        "fill"        : "black",
+        "fill-opacity": 1
+    });
+
+    geom2 = new OG.geometry.PolyLine([
+        [20, 35],
+        [20, 70],
+        [80, 70],
+        [80, 35],
+        [50, 55],
+        [20, 35]
+    ]);
+    geom2.style = new OG.geometry.Style({
+        "fill"        : "black",
+        "fill-opacity": 1
+    });
+
+
+    geomCollection.push(new OG.geometry.Circle([50, 50], 50));
+    geomCollection.push(new OG.geometry.Circle([50, 50], 45));
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        "stroke" : "black",
+        "stroke-width" : 1,
+        fill : "white",
+        "fill-opacity" : 1
+    });
+
+    return this.geom;
 };
 /**
  * BPMN : Multiple Intermediate Event Shape
@@ -13912,6 +14021,85 @@ OG.shape.bpmn.M_Text.prototype.createShape = function () {
 
 	return this.geom;
 };
+OG.shape.bpmn.ParallelMultiple = function (label) {
+    OG.shape.bpmn.ParallelMultiple.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.bpmn.ParallelMultiple';
+    this.label = label;
+};
+OG.shape.bpmn.ParallelMultiple.prototype = new OG.shape.GeomShape();
+OG.shape.bpmn.ParallelMultiple.superclass = OG.shape.GeomShape;
+OG.shape.bpmn.ParallelMultiple.prototype.constructor = OG.shape.bpmn.ParallelMultiple;
+OG.ParallelMultiple = OG.shape.bpmn.ParallelMultiple;
+
+/**
+ * 드로잉할 Shape 을 생성하여 반환한다.
+ *
+ * @return {OG.geometry.Geometry} Shape 정보
+ * @override
+ */
+OG.shape.bpmn.ParallelMultiple.prototype.createShape = function () {
+    var geom1, geom2, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Circle([50, 50], 50);
+    geom2 = new OG.geometry.Circle([50, 50], 40);
+    geom3 = new OG.Polygon([
+        [20, 40],
+        [20, 60],
+        [40, 60],
+        [40, 80],
+        [60, 80],
+        [60, 60],
+        [80, 60],
+        [80, 40],
+        [60, 40],
+        [60, 20],
+        [40, 20],
+        [40, 40]
+    ]);
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+    geomCollection.push(geom3);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        "stroke-width": 1.5,
+        "stroke" : "#969149",
+        fill: "white",
+        "fill-opacity": 1
+    });
+
+    return this.geom;
+};
+OG.shape.bpmn.ScopeActivity = function (label) {
+    OG.shape.bpmn.ScopeActivity.superclass.call(this);
+
+    this.GROUP_COLLAPSIBLE = false;
+    this.CONNECTABLE = true;
+    this.Events = [];
+
+    this.SHAPE_ID = 'OG.shape.bpmn.ScopeActivity';
+    this.label = label;
+};
+
+OG.shape.bpmn.ScopeActivity.prototype = new OG.shape.bpmn.M_Group();
+OG.shape.bpmn.ScopeActivity.superclass = OG.shape.bpmn.M_Group;
+OG.shape.bpmn.ScopeActivity.prototype.constructor = OG.shape.bpmn.ScopeActivity;
+OG.ScopeActivity = OG.shape.bpmn.ScopeActivity;
+
+
+OG.shape.bpmn.ScopeActivity.prototype.layoutChild = function () {
+    for(var event in this.Events){
+        //TODO:
+        //var shapeOfEvent = event.shape;
+        //shapeOfEvent.x = .... ;
+    }
+}
 /**
  * BPMN : Signal Activity Shape
  *
@@ -13965,6 +14153,91 @@ OG.shape.bpmn.Signal.prototype.createShape = function () {
         "stroke" : "#969149",
         fill: "white",
         "fill-opacity": 1
+    });
+
+    return this.geom;
+};
+OG.shape.bpmn.Value_Chain = function (label) {
+    OG.shape.bpmn.Value_Chain.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.bpmn.Value_Chain';
+    this.label = label;
+    this.HaveButton = true;
+    this.LoopType = "None";
+    this.inclusion = false;
+
+};
+OG.shape.bpmn.Value_Chain.prototype = new OG.shape.GeomShape();
+OG.shape.bpmn.Value_Chain.superclass = OG.shape.GeomShape;
+OG.shape.bpmn.Value_Chain.prototype.constructor = OG.shape.bpmn.Value_Chain;
+OG.Value_Chain = OG.shape.bpmn.Value_Chain;
+
+/**
+ * 드로잉할 Shape 을 생성하여 반환한다.
+ *
+ * @return {OG.geometry.Geometry} Shape 정보
+ * @override
+ */
+OG.shape.bpmn.Value_Chain.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Polygon([
+        [0, 0],
+        [10, 50],
+        [0, 100],
+        [90, 100],
+        [100, 50],
+        [90, 0]
+    ]);
+
+    this.geom.style = new OG.geometry.Style({
+        fill: "#FFFFFF-#9FD7FF",
+        "fill-opacity": 1,
+        "stroke": '#9FD7FF'
+    });
+
+    return this.geom;
+};
+OG.shape.bpmn.Value_Chain_Module = function (label) {
+    OG.shape.bpmn.Value_Chain_Module.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.bpmn.Value_Chain_Module';
+    this.label = label;
+    this.HaveButton = true;
+    this.LoopType = "None";
+    this.inclusion = false;
+
+};
+OG.shape.bpmn.Value_Chain_Module.prototype = new OG.shape.bpmn.Value_Chain();
+OG.shape.bpmn.Value_Chain_Module.superclass = OG.shape.bpmn.Value_Chain;
+OG.shape.bpmn.Value_Chain_Module.prototype.constructor = OG.shape.bpmn.Value_Chain_Module;
+OG.Value_Chain_Module = OG.shape.bpmn.Value_Chain_Module;
+
+/**
+ * 드로잉할 Shape 을 생성하여 반환한다.
+ *
+ * @return {OG.geometry.Geometry} Shape 정보
+ * @override
+ */
+OG.shape.bpmn.Value_Chain_Module.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Polygon([
+        [0, 0],
+        [0, 100],
+        [90, 100],
+        [100, 50],
+        [90, 0]
+    ]);
+
+    this.geom.style = new OG.geometry.Style({
+        fill: "#FFFFFF-#9FD7FF",
+        "fill-opacity": 1,
+        "stroke": '#9FD7FF'
     });
 
     return this.geom;
@@ -22162,10 +22435,16 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
     var tLeft = toBoundary.getLeftCenter().x;
     var tRight = toBoundary.getRightCenter().x;
 
-    if (tRight < fLeft || tLeft > fRight) {
+    if (tLeft > fRight) {
         points.push([fromP.x, fromP.y]);
-        points.push([fromP.x + ((toP.x - fromP.x) / 2), fromP.y]);
-        points.push([fromP.x + ((toP.x - fromP.x) / 2), toP.y]);
+        points.push([fRight + ((tLeft - fRight) / 2), fromP.y]);
+        points.push([fRight + ((tLeft - fRight) / 2), toP.y]);
+        points.push([toP.x, toP.y]);
+
+    } else if(fRight < tLeft) {
+        points.push([fromP.x, fromP.y]);
+        points.push([fLeft + ((fLeft - tRight) / 2), fromP.y]);
+        points.push([fLeft + ((fLeft - tRight) / 2), toP.y]);
         points.push([toP.x, toP.y]);
 
     } else {
