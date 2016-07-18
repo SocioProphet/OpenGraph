@@ -121,6 +121,8 @@
                                 <include>shape/ImageShape.js</include>
                                 <include>shape/EdgeShape.js</include>
                                 <include>shape/*.js</include>
+                                <include>shape/essencia/Activity.js</include>
+                                <include>shape/essencia/*.js</include>
                                 <include>shape/bpmn/A_Task.js</include>
                                 <include>shape/bpmn/Event.js</include>
                                 <include>shape/bpmn/E_End.js</include>
@@ -161,6 +163,8 @@
                                 <include>shape/ImageShape-min.js</include>
                                 <include>shape/EdgeShape-min.js</include>
                                 <include>shape/*.js</include>
+                                <include>shape/essencia/Activity-min.js</include>
+                                <include>shape/essencia/*.js</include>
                                 <include>shape/bpmn/A_Task-min.js</include>
                                 <include>shape/bpmn/Event-min.js</include>
                                 <include>shape/bpmn/E_End-min.js</include>
@@ -207,6 +211,8 @@
                                 <include>shape/ImageShape-min.js</include>
                                 <include>shape/EdgeShape-min.js</include>
                                 <include>shape/*.js</include>
+                                <include>shape/essencia/Activity-min.js</include>
+                                <include>shape/essencia/*.js</include>
                                 <include>shape/bpmn/A_Task-min.js</include>
                                 <include>shape/bpmn/Event-min.js</include>
                                 <include>shape/bpmn/E_End-min.js</include>
