@@ -1785,9 +1785,9 @@ OG.handler.EventHandler.prototype = {
                             var dr = newRp - rP;
 
                             //다른 selected 엘리먼트 리사이즈용 변수
-                            var stBoundary,stUp,stLwp,stLp,stRp,
-                                newStUp,newStLwp,newStLp,newStRp,
-                                stDu,stDlw,stDl,stDr;
+                            var stBoundary, stUp, stLwp, stLp, stRp,
+                                newStUp, newStLwp, newStLp, newStRp,
+                                stDu, stDlw, stDl, stDr;
 
                             $(this).css({"position": "absolute", "left": "0px", "top": "0px"});
                             if (element && element.shape.geom) {
@@ -1805,7 +1805,7 @@ OG.handler.EventHandler.prototype = {
 
                                 //선택된 다른 엘리먼트들의 리사이즈 처리
                                 $.each(me._getSelectedElement(), function (idx, selected) {
-                                    if(selected.id === element.id){
+                                    if (selected.id === element.id) {
                                         return;
                                     }
                                     if (renderer.isShape(selected) && !renderer.isEdge(selected)) {
@@ -2436,6 +2436,9 @@ OG.handler.EventHandler.prototype = {
         var renderer = me._RENDERER;
 
         $.contextMenu({
+            position: function (opt, x, y) {
+                opt.$menu.css({top: y + 10, left: x + 10});
+            },
             selector: '#' + me._RENDERER.getRootElement().id,
             build: function ($trigger, e) {
                 var root = me._RENDERER.getRootGroup(), copiedElement = $(root).data("copied");
@@ -3873,6 +3876,9 @@ OG.handler.EventHandler.prototype = {
     enableShapeContextMenu: function () {
         var me = this;
         $.contextMenu({
+            position: function (opt, x, y) {
+                opt.$menu.css({top: y + 10, left: x + 10});
+            },
             selector: '#' + me._RENDERER.getRootElement().id + ' [_type=SHAPE]',
             build: function ($trigger, event) {
                 $(me._RENDERER.getContainer()).focus();
