@@ -1602,11 +1602,6 @@ OG.handler.EventHandler.prototype = {
                 }
             });
 
-            //$.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
-            //    fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
-            //});
-
-            //console.log(correctionConditions,conditionsPassCandidates);
             $.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
                 fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
                 var guidePosition = conditionsPassCandidate.guidePosition;
@@ -5404,15 +5399,21 @@ OG.handler.EventHandler.prototype = {
             var isConnectable;
             var vertices = element.shape.geom.getVertices();
             if ($(spot).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
-                var index = $(spot).data("index");
-                if (index || index === 0) {
-                    if (index === 0) {
-                        isConnectable = 'from'
-                    }
-                    if (index === vertices.length - 1) {
-                        isConnectable = 'to'
-                    }
+                if($(spot).data("start")){
+                    isConnectable = 'from';
                 }
+                if($(spot).data("end")){
+                    isConnectable = 'to';
+                }
+                //var index = $(spot).data("index");
+                //if (index || index === 0) {
+                //    if (index === 0) {
+                //        isConnectable = 'from'
+                //    }
+                //    if (index === vertices.length - 1) {
+                //        isConnectable = 'to'
+                //    }
+                //}
             }
             return isConnectable;
         };
@@ -5792,7 +5793,6 @@ OG.handler.EventHandler.prototype = {
                                     var vertices = element.shape.geom.getVertices();
 
                                     var analysisPosition = correctionConditionAnalysis(spot, {x: newX, y: newY});
-
                                     if ($(this).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
                                         newX = analysisPosition.x;
                                         newY = analysisPosition.y;
@@ -5844,7 +5844,7 @@ OG.handler.EventHandler.prototype = {
                                             renderer.removeHighlight(otherElement, enableStyle);
                                             renderer.removeConnectGuide(otherElement);
                                         }
-                                    })
+                                    });
                                 },
                                 stop: function (event) {
                                     $(root).data(OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_EVENT_DRAG, false);
@@ -5893,14 +5893,9 @@ OG.handler.EventHandler.prototype = {
                                             renderer.setAttr(spot, {y: newY - (height / 2)});
                                         }
                                     }
-
                                     renderer.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
                                     renderer.removeConnectGuide(element);
                                     renderer.removeVirtualSpot(element);
-
-                                    renderer.trimConnectInnerVertice(element);
-                                    renderer.trimConnectIntersection(element);
-                                    renderer.trimEdge(element);
 
                                     var connectableDirection = isConnectableSpot(spot);
                                     var frontElement = renderer.getFrontForCoordinate([eventOffset.x, eventOffset.y]);
@@ -5927,6 +5922,11 @@ OG.handler.EventHandler.prototype = {
                                     if (connectableDirection && !frontElement) {
                                         renderer.disconnectOneWay(element, connectableDirection);
                                     }
+
+                                    renderer.trimConnectInnerVertice(element);
+                                    renderer.trimConnectIntersection(element);
+                                    renderer.trimEdge(element);
+
                                     renderer.addHistory();
                                 }
                             });

@@ -2794,8 +2794,6 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
-//console.log(position);
-    //console.log(canvas._CONFIG.SCALE);
     var me = this, path, pathX, pathY;
 
     if (!position) {
@@ -4563,6 +4561,12 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
             spot.attr(spotCircleStyle);
             me._add(spot);
             rElement.appendChild(spot);
+            if (i == 0) {
+                $(spot.node).data('start', true);
+            }
+            if (i == vertices.length - 1) {
+                $(spot.node).data('end', true);
+            }
             $(spot.node).data('index', i);
             $(spot.node).data('vertice', vertices[i]);
             $(spot.node).data('parent', rElement);
@@ -5014,11 +5018,12 @@ OG.renderer.RaphaelRenderer.prototype.trimEdge = function (element) {
     if (orgVerticesLength !== vertices.length) {
         element.shape.geom.setVertices(vertices);
         element = me.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
+
         me.drawLabel(element);
         me.drawEdgeLabel(element, null, 'FROM');
         me.drawEdgeLabel(element, null, 'TO');
     }
-}
+};
 
 /**
  * Edge Element의 연결 정보가 있을 경우 연결대상과 꼭지점의 다중 중복을 정리한다.
@@ -5073,7 +5078,7 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (elemen
                 vertices.splice(firstExternalVerticeIdx + 1, startVerticeIdx - (firstExternalVerticeIdx + 1));
             }
         }
-    }
+    };
     if (fromShape) {
         for (var i = 0; i < vertices.length; i++) {
             if (i == 0) {
@@ -5202,8 +5207,11 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectIntersection = function (elemen
     me.drawEdgeLabel(element, null, 'FROM');
     me.drawEdgeLabel(element, null, 'TO');
 
+    $(element).attr("_from", from);
+    $(element).attr("_to", to);
+
     return element;
-}
+};
 
 /**
  * ID에 해당하는 Element 의 바운더리 영역을 리턴한다.
@@ -6989,7 +6997,7 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
         points.push([fRight + ((tLeft - fRight) / 2), toP.y]);
         points.push([toP.x, toP.y]);
 
-    } else if(fRight < tLeft) {
+    } else if (fRight < tLeft) {
         points.push([fromP.x, fromP.y]);
         points.push([fLeft + ((fLeft - tRight) / 2), fromP.y]);
         points.push([fLeft + ((fLeft - tRight) / 2), toP.y]);
