@@ -273,8 +273,12 @@
             //Draw the Circle
 
             var intervalLine = setInterval(function () {
+                //오픈그래프 요소.
                 var allEdges = canvas._RENDERER.getAllEdges();
+
                 var edge, vertices, transition, circle;
+
+                //d3 컴포넌트 시작.
                 for (var i = 0; i < allEdges.length; i++) {
                     transition = null;
                     circle = null;
@@ -283,6 +287,7 @@
                     //var transition, circle;
                     $.each(vertices, function (index, vertice) {
                         if (index == 0) {
+                            //오픈그래프 객체가 d3의 circle 객체로 컨버젼되었음.
                             circle = svgContainer.append("circle")
                                     .attr("cx", vertice.x)
                                     .attr("cy", vertice.y)
@@ -321,6 +326,8 @@
 
                 var svg = svgContainer
                         .selectAll("svg")
+
+                    //빅테이터 형식의 cvs 파일의 데이터를 d3 가 해석하여 줌.
                         .data(data)
                         .enter()
                         .append("svg")

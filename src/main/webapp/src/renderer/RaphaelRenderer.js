@@ -1981,12 +1981,12 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
         toTerminal = $(edge).attr("_to");
     }
 
-    if (from) {
+    if (fromTerminal) {
         fromShape = this._getShapeFromTerminal(fromTerminal);
         fromXY = this._getPositionFromTerminal(fromTerminal);
     }
 
-    if (to) {
+    if (toTerminal) {
         toShape = this._getShapeFromTerminal(toTerminal);
         toXY = this._getPositionFromTerminal(toTerminal);
     }
@@ -2057,12 +2057,12 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
     this.disconnect(edge);
 
     // 연결 노드 정보 설정
-    if (from) {
-        $(edge).attr("_from", from);
+    if (fromTerminal) {
+        $(edge).attr("_from", fromTerminal);
         addAttrValues(fromShape, "_toedge", edge.id);
     }
-    if (to) {
-        $(edge).attr("_to", to);
+    if (toTerminal) {
+        $(edge).attr("_to", toTerminal);
         addAttrValues(toShape, "_fromedge", edge.id);
     }
 
@@ -4924,7 +4924,7 @@ OG.renderer.RaphaelRenderer.prototype.selectSpot = function (spot) {
             }
         });
     }
-}
+};
 
 /**
  * Edge의 하위 엘리먼트들을 제거한다.
