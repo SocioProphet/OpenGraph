@@ -1602,11 +1602,6 @@ OG.handler.EventHandler.prototype = {
                 }
             });
 
-            //$.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
-            //    fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
-            //});
-
-            //console.log(correctionConditions,conditionsPassCandidates);
             $.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
                 fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
                 var guidePosition = conditionsPassCandidate.guidePosition;
@@ -1785,9 +1780,9 @@ OG.handler.EventHandler.prototype = {
                             var dr = newRp - rP;
 
                             //다른 selected 엘리먼트 리사이즈용 변수
-                            var stBoundary,stUp,stLwp,stLp,stRp,
-                                newStUp,newStLwp,newStLp,newStRp,
-                                stDu,stDlw,stDl,stDr;
+                            var stBoundary, stUp, stLwp, stLp, stRp,
+                                newStUp, newStLwp, newStLp, newStRp,
+                                stDu, stDlw, stDl, stDr;
 
                             $(this).css({"position": "absolute", "left": "0px", "top": "0px"});
                             if (element && element.shape.geom) {
@@ -1805,7 +1800,7 @@ OG.handler.EventHandler.prototype = {
 
                                 //선택된 다른 엘리먼트들의 리사이즈 처리
                                 $.each(me._getSelectedElement(), function (idx, selected) {
-                                    if(selected.id === element.id){
+                                    if (selected.id === element.id) {
                                         return;
                                     }
                                     if (renderer.isShape(selected) && !renderer.isEdge(selected)) {
@@ -2436,6 +2431,9 @@ OG.handler.EventHandler.prototype = {
         var renderer = me._RENDERER;
 
         $.contextMenu({
+            position: function (opt, x, y) {
+                opt.$menu.css({top: y + 10, left: x + 10});
+            },
             selector: '#' + me._RENDERER.getRootElement().id,
             build: function ($trigger, e) {
                 var root = me._RENDERER.getRootGroup(), copiedElement = $(root).data("copied");
@@ -3873,6 +3871,9 @@ OG.handler.EventHandler.prototype = {
     enableShapeContextMenu: function () {
         var me = this;
         $.contextMenu({
+            position: function (opt, x, y) {
+                opt.$menu.css({top: y + 10, left: x + 10});
+            },
             selector: '#' + me._RENDERER.getRootElement().id + ' [_type=SHAPE]',
             build: function ($trigger, event) {
                 $(me._RENDERER.getContainer()).focus();
@@ -5398,15 +5399,21 @@ OG.handler.EventHandler.prototype = {
             var isConnectable;
             var vertices = element.shape.geom.getVertices();
             if ($(spot).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
-                var index = $(spot).data("index");
-                if (index || index === 0) {
-                    if (index === 0) {
-                        isConnectable = 'from'
-                    }
-                    if (index === vertices.length - 1) {
-                        isConnectable = 'to'
-                    }
+                if($(spot).data("start")){
+                    isConnectable = 'from';
                 }
+                if($(spot).data("end")){
+                    isConnectable = 'to';
+                }
+                //var index = $(spot).data("index");
+                //if (index || index === 0) {
+                //    if (index === 0) {
+                //        isConnectable = 'from'
+                //    }
+                //    if (index === vertices.length - 1) {
+                //        isConnectable = 'to'
+                //    }
+                //}
             }
             return isConnectable;
         };
@@ -5786,7 +5793,6 @@ OG.handler.EventHandler.prototype = {
                                     var vertices = element.shape.geom.getVertices();
 
                                     var analysisPosition = correctionConditionAnalysis(spot, {x: newX, y: newY});
-
                                     if ($(this).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
                                         newX = analysisPosition.x;
                                         newY = analysisPosition.y;
@@ -5838,7 +5844,7 @@ OG.handler.EventHandler.prototype = {
                                             renderer.removeHighlight(otherElement, enableStyle);
                                             renderer.removeConnectGuide(otherElement);
                                         }
-                                    })
+                                    });
                                 },
                                 stop: function (event) {
                                     $(root).data(OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_EVENT_DRAG, false);
@@ -5887,14 +5893,9 @@ OG.handler.EventHandler.prototype = {
                                             renderer.setAttr(spot, {y: newY - (height / 2)});
                                         }
                                     }
-
                                     renderer.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
                                     renderer.removeConnectGuide(element);
                                     renderer.removeVirtualSpot(element);
-
-                                    renderer.trimConnectInnerVertice(element);
-                                    renderer.trimConnectIntersection(element);
-                                    renderer.trimEdge(element);
 
                                     var connectableDirection = isConnectableSpot(spot);
                                     var frontElement = renderer.getFrontForCoordinate([eventOffset.x, eventOffset.y]);
@@ -5921,6 +5922,11 @@ OG.handler.EventHandler.prototype = {
                                     if (connectableDirection && !frontElement) {
                                         renderer.disconnectOneWay(element, connectableDirection);
                                     }
+
+                                    renderer.trimConnectInnerVertice(element);
+                                    renderer.trimConnectIntersection(element);
+                                    renderer.trimEdge(element);
+
                                     renderer.addHistory();
                                 }
                             });

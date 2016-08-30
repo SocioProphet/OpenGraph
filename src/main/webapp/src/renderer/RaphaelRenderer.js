@@ -2057,12 +2057,12 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
     this.disconnect(edge);
 
     // 연결 노드 정보 설정
-    if (fromTerminal) {
-        $(edge).attr("_from", fromTerminal);
+    if (from) {
+        $(edge).attr("_from", from);
         addAttrValues(fromShape, "_toedge", edge.id);
     }
-    if (toTerminal) {
-        $(edge).attr("_to", toTerminal);
+    if (to) {
+        $(edge).attr("_to", to);
         addAttrValues(toShape, "_fromedge", edge.id);
     }
 
