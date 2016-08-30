@@ -1936,15 +1936,15 @@ OG.renderer.RaphaelRenderer.prototype.reconnect = function (edge) {
 /**
  * 두개의 터미널을 연결하고, 속성정보에 추가한다.
  *
- * @param {Element,Number[]} from 시작점
- * @param {Element,Number[]} to 끝점
+ * @param {Element,Number[]} from 시작점 (fromTerminal)
+ * @param {Element,Number[]} to 끝점 (toTerminal)
  * @param {Element} edge Edge Shape
  * @param {OG.geometry.Style,Object} style 스타일
  * @param {String} label Label
  * @return {Element} 연결된 Edge 엘리먼트
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label, preventTrigger) {
+OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTerminal, edge, style, label, preventTrigger) {
 
     var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
@@ -1974,21 +1974,21 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     OG.Util.apply(_style, (style instanceof OG.geometry.Style) ? style.map : style || {}, me._CONFIG.DEFAULT_STYLE.EDGE);
 
 
-    if (!from) {
-        from = $(edge).attr("_from");
+    if (!fromTerminal) {
+        fromTerminal = $(edge).attr("_from");
     }
-    if (!to) {
-        to = $(edge).attr("_to");
+    if (!toTerminal) {
+        toTerminal = $(edge).attr("_to");
     }
 
     if (from) {
-        fromShape = this._getShapeFromTerminal(from);
-        fromXY = this._getPositionFromTerminal(from);
+        fromShape = this._getShapeFromTerminal(fromTerminal);
+        fromXY = this._getPositionFromTerminal(fromTerminal);
     }
 
     if (to) {
-        toShape = this._getShapeFromTerminal(to);
-        toXY = this._getPositionFromTerminal(to);
+        toShape = this._getShapeFromTerminal(toTerminal);
+        toXY = this._getPositionFromTerminal(toTerminal);
     }
 
     //셀프 커넥션 처리
@@ -2019,12 +2019,12 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     var geometry = edge.shape.geom;
     var vertices = geometry.getVertices();
 
-    if (from) {
+    if (fromTerminal) {
         vertices[0].x = fromXY.x
         vertices[0].y = fromXY.y
     }
 
-    if (to) {
+    if (toTerminal) {
         vertices[vertices.length - 1].x = toXY.x
         vertices[vertices.length - 1].y = toXY.y
     }
@@ -2034,8 +2034,11 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         isEssensia = $(fromShape).attr("_shape_id").indexOf('OG.shape.essencia') !== -1;
     }
     if (!isEssensia) {
-        edge.shape.geom.style.map['arrow-start'] = 'none';
-        edge.shape.geom.style.map['arrow-end'] = 'block';
+        // 디폴트 스타일이 정해져 있지 않다면 화살표로 그린다.
+        if(typeof style == 'undefined' || style == null || style.length == 0 || style == '') {
+            edge.shape.geom.style.map['arrow-start'] = 'none';
+            edge.shape.geom.style.map['arrow-end'] = 'block';
+        }
         edge = this.drawEdge(new OG.PolyLine(vertices), edge.shape.geom.style, edge ? edge.id : null, isSelf);
     }
     if (isEssensia) {
@@ -2054,12 +2057,12 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     this.disconnect(edge);
 
     // 연결 노드 정보 설정
-    if (from) {
-        $(edge).attr("_from", from);
+    if (fromTerminal) {
+        $(edge).attr("_from", fromTerminal);
         addAttrValues(fromShape, "_toedge", edge.id);
     }
-    if (to) {
-        $(edge).attr("_to", to);
+    if (toTerminal) {
+        $(edge).attr("_to", toTerminal);
         addAttrValues(toShape, "_fromedge", edge.id);
     }
 
@@ -6977,10 +6980,10 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
         points.push([fRight + ((tLeft - fRight) / 2), toP.y]);
         points.push([toP.x, toP.y]);
 
-    } else if(fRight < tLeft) {
+    } else if(fLeft > tRight) {
         points.push([fromP.x, fromP.y]);
-        points.push([fLeft + ((fLeft - tRight) / 2), fromP.y]);
-        points.push([fLeft + ((fLeft - tRight) / 2), toP.y]);
+        points.push([fLeft + ((tRight - fLeft) / 2), fromP.y]);
+        points.push([fLeft + ((tRight - fLeft) / 2), toP.y]);
         points.push([toP.x, toP.y]);
 
     } else {
