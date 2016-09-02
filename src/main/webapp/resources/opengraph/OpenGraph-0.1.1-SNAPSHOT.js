@@ -4390,6 +4390,9 @@ window.Raphael.svg && function (R) {
             }
         },
         setFillAndStroke = function (o, params, size) {
+            if(!o.node.style){
+                o.node.style = {};
+            }
             var node = o.node,
                 attrs = o.attrs,
                 vis = node.style.visibility;
@@ -10060,7 +10063,7 @@ OG.geometry.GeometryCollection.prototype.getVertices = function () {
 	return vertices;
 };
 OG.geometry.GeometryCollection.prototype.getVerticess = function(){
-	console.log(1231234);
+
 };
 
 /**
@@ -15826,14 +15829,18 @@ OG.renderer.IRenderer.prototype = {
      * @return {boolean} true false
      */
     isTopGroup: function (element) {
-        if (!element || !element.parentElement) {
+        var parent = element.parentElement;
+        if(!parent){
+            parent = element.parentNode;
+        }
+        if (!element || !parent) {
             return false;
         }
         if (!element.shape instanceof OG.shape.GroupShape) {
             return false;
         }
 
-        if (element.parentElement.id === this.getRootGroup().id) {
+        if (parent.id === this.getRootGroup().id) {
             return true;
         }
         return false;
@@ -15846,13 +15853,17 @@ OG.renderer.IRenderer.prototype = {
      * @return {Element} Element  엘리먼트
      */
     getParent: function (element) {
-        if (!element || !element.parentElement) {
+        var parent = element.parentElement;
+        if(!parent){
+            parent = element.parentNode;
+        }
+        if (!element || !parent) {
             return null;
         }
-        if (element.parentElement.id === this.getRootGroup().id) {
+        if (parent.id === this.getRootGroup().id) {
             return null;
         }
-        return element.parentElement;
+        return parent;
     },
 
     /**
@@ -15881,7 +15892,11 @@ OG.renderer.IRenderer.prototype = {
      * @return {boolean} true false
      */
     isGroup: function (element) {
-        if (!element || !element.parentElement) {
+        var parent = element.parentElement;
+        if(!parent){
+            parent = element.parentNode;
+        }
+        if (!element || !parent) {
             return false;
         }
         if (element.id === this.getRootGroup().id) {
@@ -17915,15 +17930,15 @@ OG.renderer.RaphaelRenderer.prototype.reconnect = function (edge) {
 /**
  * 두개의 터미널을 연결하고, 속성정보에 추가한다.
  *
- * @param {Element,Number[]} from 시작점
- * @param {Element,Number[]} to 끝점
+ * @param {Element,Number[]} from 시작점 (fromTerminal)
+ * @param {Element,Number[]} to 끝점 (toTerminal)
  * @param {Element} edge Edge Shape
  * @param {OG.geometry.Style,Object} style 스타일
  * @param {String} label Label
  * @return {Element} 연결된 Edge 엘리먼트
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style, label, preventTrigger) {
+OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTerminal, edge, style, label, preventTrigger) {
 
     var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
@@ -17933,7 +17948,7 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         return null;
     }
 
-    var me = this, _style = {}, fromShape, toShape, fromXY, toXY, fromAttr, toAttr,
+    var me = this, _style = {}, fromShape, toShape, fromXY, toXY,
         isSelf, beforeEvent,
         addAttrValues = function (element, name, value) {
             var attrValue = $(element).attr(name),
@@ -17952,32 +17967,22 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
 
     OG.Util.apply(_style, (style instanceof OG.geometry.Style) ? style.map : style || {}, me._CONFIG.DEFAULT_STYLE.EDGE);
 
-    if (!from) {
-        from = $(edge).attr("_from");
+
+    if (!fromTerminal) {
+        fromTerminal = $(edge).attr("_from");
     }
-    if (!to) {
-        to = $(edge).attr("_to");
+    if (!toTerminal) {
+        toTerminal = $(edge).attr("_to");
     }
 
-    if (from) {
-        fromShape = this._getShapeFromTerminal(from);
-        fromXY = this._getPositionFromTerminal(from);
+    if (fromTerminal) {
+        fromShape = this._getShapeFromTerminal(fromTerminal);
+        fromXY = this._getPositionFromTerminal(fromTerminal);
     }
 
-    if (to) {
-        toShape = this._getShapeFromTerminal(to);
-        toXY = this._getPositionFromTerminal(to);
-    }
-
-    //재연결 여부를 판단하여 이벤트 트리거 발생을 방지한다.
-    fromAttr = $(edge).attr("_from");
-    toAttr = $(edge).attr("_to");
-    if (fromShape && toShape && fromAttr && toAttr) {
-        var fromShapeId = fromAttr.substring(0, fromAttr.indexOf(OG.Constants.TERMINAL));
-        var toShapeId = toAttr.substring(0, toAttr.indexOf(OG.Constants.TERMINAL));
-        if ((fromShapeId == fromShape.id) && (toShapeId == toShape.id)) {
-            preventTrigger = true;
-        }
+    if (toTerminal) {
+        toShape = this._getShapeFromTerminal(toTerminal);
+        toXY = this._getPositionFromTerminal(toTerminal);
     }
 
     //셀프 커넥션 처리
@@ -17997,25 +18002,23 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
             _style["arrow-end"] = "block-wide-long";
         }
 
-        if (!preventTrigger) {
-            beforeEvent = jQuery.Event("beforeConnectShape", {edge: edge, fromShape: fromShape, toShape: toShape});
-            $(this._PAPER.canvas).trigger(beforeEvent);
-            if (beforeEvent.isPropagationStopped()) {
-                this.remove(edge);
-                return null;
-            }
+        beforeEvent = jQuery.Event("beforeConnectShape", {edge: edge, fromShape: fromShape, toShape: toShape});
+        $(this._PAPER.canvas).trigger(beforeEvent);
+        if (beforeEvent.isPropagationStopped()) {
+            this.remove(edge);
+            return null;
         }
     }
 
     var geometry = edge.shape.geom;
     var vertices = geometry.getVertices();
 
-    if (from) {
+    if (fromTerminal) {
         vertices[0].x = fromXY.x
         vertices[0].y = fromXY.y
     }
 
-    if (to) {
+    if (toTerminal) {
         vertices[vertices.length - 1].x = toXY.x
         vertices[vertices.length - 1].y = toXY.y
     }
@@ -18025,8 +18028,11 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
         isEssensia = $(fromShape).attr("_shape_id").indexOf('OG.shape.essencia') !== -1;
     }
     if (!isEssensia) {
-        edge.shape.geom.style.map['arrow-start'] = 'none';
-        edge.shape.geom.style.map['arrow-end'] = 'block';
+        // 디폴트 스타일이 정해져 있지 않다면 화살표로 그린다.
+        if(typeof style == 'undefined' || style == null || style.length == 0 || style == '') {
+            edge.shape.geom.style.map['arrow-start'] = 'none';
+            edge.shape.geom.style.map['arrow-end'] = 'block';
+        }
         edge = this.drawEdge(new OG.PolyLine(vertices), edge.shape.geom.style, edge ? edge.id : null, isSelf);
     }
     if (isEssensia) {
@@ -18045,12 +18051,12 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (from, to, edge, style,
     this.disconnect(edge);
 
     // 연결 노드 정보 설정
-    if (from) {
-        $(edge).attr("_from", from);
+    if (fromTerminal) {
+        $(edge).attr("_from", fromTerminal);
         addAttrValues(fromShape, "_toedge", edge.id);
     }
-    if (to) {
-        $(edge).attr("_to", to);
+    if (toTerminal) {
+        $(edge).attr("_to", toTerminal);
         addAttrValues(toShape, "_fromedge", edge.id);
     }
 
@@ -18773,8 +18779,6 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
-//console.log(position);
-    //console.log(canvas._CONFIG.SCALE);
     var me = this, path, pathX, pathY;
 
     if (!position) {
@@ -20912,7 +20916,7 @@ OG.renderer.RaphaelRenderer.prototype.selectSpot = function (spot) {
             }
         });
     }
-}
+};
 
 /**
  * Edge의 하위 엘리먼트들을 제거한다.
@@ -22968,10 +22972,10 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
         points.push([fRight + ((tLeft - fRight) / 2), toP.y]);
         points.push([toP.x, toP.y]);
 
-    } else if(fRight < tLeft) {
+    } else if(fLeft > tRight) {
         points.push([fromP.x, fromP.y]);
-        points.push([fLeft + ((fLeft - tRight) / 2), fromP.y]);
-        points.push([fLeft + ((fLeft - tRight) / 2), toP.y]);
+        points.push([fLeft + ((tRight - fLeft) / 2), fromP.y]);
+        points.push([fLeft + ((tRight - fLeft) / 2), toP.y]);
         points.push([toP.x, toP.y]);
 
     } else {
@@ -24092,7 +24096,14 @@ OG.handler.EventHandler.prototype = {
                         // ungrouping
                         var addToGroupArray = [];
                         $.each(eleArray, function (idx, ele) {
-                            if (ele.parentElement.id !== root.id) {
+                            /**
+                             * IE 10,11 use parentNode instead parentElement
+                             */
+                            var parentNode = ele.parentElement;
+                            if(!parentNode){
+                                parentNode = ele.parentNode;
+                            }
+                            if (parentNode.id !== root.id) {
                                 addToGroupArray.push(ele);
                             }
                         });
@@ -24772,11 +24783,6 @@ OG.handler.EventHandler.prototype = {
                 }
             });
 
-            //$.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
-            //    fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
-            //});
-
-            //console.log(correctionConditions,conditionsPassCandidates);
             $.each(conditionsPassCandidates, function (index, conditionsPassCandidate) {
                 fixedPosition = calculateFixedPosition(conditionsPassCandidate.fixedPosition);
                 var guidePosition = conditionsPassCandidate.guidePosition;
@@ -28574,15 +28580,21 @@ OG.handler.EventHandler.prototype = {
             var isConnectable;
             var vertices = element.shape.geom.getVertices();
             if ($(spot).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
-                var index = $(spot).data("index");
-                if (index || index === 0) {
-                    if (index === 0) {
-                        isConnectable = 'from'
-                    }
-                    if (index === vertices.length - 1) {
-                        isConnectable = 'to'
-                    }
+                if($(spot).data("start")){
+                    isConnectable = 'from';
                 }
+                if($(spot).data("end")){
+                    isConnectable = 'to';
+                }
+                //var index = $(spot).data("index");
+                //if (index || index === 0) {
+                //    if (index === 0) {
+                //        isConnectable = 'from'
+                //    }
+                //    if (index === vertices.length - 1) {
+                //        isConnectable = 'to'
+                //    }
+                //}
             }
             return isConnectable;
         };
@@ -28962,7 +28974,6 @@ OG.handler.EventHandler.prototype = {
                                     var vertices = element.shape.geom.getVertices();
 
                                     var analysisPosition = correctionConditionAnalysis(spot, {x: newX, y: newY});
-
                                     if ($(this).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
                                         newX = analysisPosition.x;
                                         newY = analysisPosition.y;
@@ -29014,7 +29025,7 @@ OG.handler.EventHandler.prototype = {
                                             renderer.removeHighlight(otherElement, enableStyle);
                                             renderer.removeConnectGuide(otherElement);
                                         }
-                                    })
+                                    });
                                 },
                                 stop: function (event) {
                                     $(root).data(OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_EVENT_DRAG, false);
@@ -29063,14 +29074,9 @@ OG.handler.EventHandler.prototype = {
                                             renderer.setAttr(spot, {y: newY - (height / 2)});
                                         }
                                     }
-
                                     renderer.drawEdge(new OG.PolyLine(vertices), element.shape.geom.style, element.id);
                                     renderer.removeConnectGuide(element);
                                     renderer.removeVirtualSpot(element);
-
-                                    renderer.trimConnectInnerVertice(element);
-                                    renderer.trimConnectIntersection(element);
-                                    renderer.trimEdge(element);
 
                                     var connectableDirection = isConnectableSpot(spot);
                                     var frontElement = renderer.getFrontForCoordinate([eventOffset.x, eventOffset.y]);
@@ -29097,6 +29103,11 @@ OG.handler.EventHandler.prototype = {
                                     if (connectableDirection && !frontElement) {
                                         renderer.disconnectOneWay(element, connectableDirection);
                                     }
+
+                                    renderer.trimConnectInnerVertice(element);
+                                    renderer.trimConnectIntersection(element);
+                                    renderer.trimEdge(element);
+
                                     renderer.addHistory();
                                 }
                             });
