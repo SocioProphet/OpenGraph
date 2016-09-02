@@ -7019,10 +7019,12 @@ OG.common.Util = {
         return (/firefox/).test(navigator.userAgent.toLowerCase());
     },
     isIE: function () {
-        if (navigator.appName == 'Microsoft Internet Explorer' || !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv 11/)) || $.browser.msie == 1) {
+        if (navigator.appName == 'Microsoft Internet Explorer' || !!(navigator.userAgent.match(/Trident/) || navigator.userAgent.match(/rv 11/))) {
             return true;
+
+        } else {
+            return false;
         }
-        return false;
     },
     isIE6: function () {
         return OG.Util.isIE() && (/msie 6/).test(navigator.userAgent.toLowerCase());
