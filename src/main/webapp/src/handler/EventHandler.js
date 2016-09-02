@@ -922,7 +922,14 @@ OG.handler.EventHandler.prototype = {
                         // ungrouping
                         var addToGroupArray = [];
                         $.each(eleArray, function (idx, ele) {
-                            if (ele.parentElement.id !== root.id) {
+                            /**
+                             * IE 10,11 use parentNode instead parentElement
+                             */
+                            var parentNode = ele.parentElement;
+                            if(!parentNode){
+                                parentNode = ele.parentNode;
+                            }
+                            if (parentNode.id !== root.id) {
                                 addToGroupArray.push(ele);
                             }
                         });

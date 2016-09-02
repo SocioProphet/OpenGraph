@@ -49,7 +49,7 @@ OG.geometry.GeometryCollection.prototype.getVertices = function () {
 	return vertices;
 };
 OG.geometry.GeometryCollection.prototype.getVerticess = function(){
-	console.log(1231234);
+
 };
 
 /**

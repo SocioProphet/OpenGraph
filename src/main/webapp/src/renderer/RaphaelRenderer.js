@@ -2785,8 +2785,6 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
-//console.log(position);
-    //console.log(canvas._CONFIG.SCALE);
     var me = this, path, pathX, pathY;
 
     if (!position) {
