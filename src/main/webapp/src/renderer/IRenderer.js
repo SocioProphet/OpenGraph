@@ -1112,10 +1112,10 @@ OG.renderer.IRenderer.prototype = {
      */
     getChilds: function (element) {
         var childShapes = [];
-        if (!element || !element.children) {
+        if (!element || OG.Util.isIE() ? !element.childNodes : !element.children) {
             return childShapes;
         }
-        $.each(element.children, function (index, child) {
+        $.each(OG.Util.isIE() ? element.childNodes : element.children, function (index, child) {
             if ($(child).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
                 childShapes.push(child);
             }

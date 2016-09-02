@@ -15874,10 +15874,10 @@ OG.renderer.IRenderer.prototype = {
      */
     getChilds: function (element) {
         var childShapes = [];
-        if (!element || !element.children) {
+        if (!element || OG.Util.isIE() ? !element.childNodes : !element.children) {
             return childShapes;
         }
-        $.each(element.children, function (index, child) {
+        $.each(OG.Util.isIE() ? element.childNodes : element.children, function (index, child) {
             if ($(child).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
                 childShapes.push(child);
             }
@@ -27226,7 +27226,7 @@ OG.handler.EventHandler.prototype = {
             if (me._RENDERER.isLane(item)) {
                 moveTarget = me._RENDERER.getRootLane(item);
             }
-            root[0].insertBefore(moveTarget, root[0].children[0]);
+            root[0].insertBefore(moveTarget, OG.Util.isIE() ? root[0].childNodes[0] : root[0].children[0]);
             me.selectShape(item);
         });
         me._RENDERER.addHistory();
@@ -27243,7 +27243,7 @@ OG.handler.EventHandler.prototype = {
                 moveTarget = me._RENDERER.getRootLane(item);
             }
             var length = $(moveTarget).prevAll().length;
-            root[0].insertBefore(moveTarget, root[0].children[length + 1]);
+            root[0].insertBefore(moveTarget, OG.Util.isIE() ? root[0].childNodes[length + 1] : root[0].children[length + 1]);
         });
         me._RENDERER.addHistory();
     },
@@ -27259,7 +27259,7 @@ OG.handler.EventHandler.prototype = {
                 moveTarget = me._RENDERER.getRootLane(item);
             }
             var length = $(moveTarget).prevAll().length;
-            root[0].insertBefore(moveTarget, root[0].children[length - 2]);
+            root[0].insertBefore(moveTarget, OG.Util.isIE() ? root[0].childNodes[length - 2] : root[0].children[length - 2]);
             me.selectShape(item);
         });
         me._RENDERER.addHistory();
