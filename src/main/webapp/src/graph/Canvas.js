@@ -22,6 +22,14 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 
     this._CONFIG = {
         /**
+         * 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부
+         */
+        CHECK_BRIDGE_EDGE: true,
+        /**
+         * 스틱 가이드 생성 여부
+         */
+        STICK_GUIDE: true,
+        /**
          * 슬라이더
          */
         SLIDER: null,
@@ -696,6 +704,8 @@ OG.graph.Canvas.prototype = {
      * - enableContextMenu  : 마우스 우클릭 메뉴 가능여부(디폴트 true)
      * - autoExtensional    : 캔버스 자동 확장 기능(디폴트 true)
      * - useSlider          : 확대축소 슬라이더 사용 여부
+     * - stickGuide         : 스틱 가이드 표시 여부
+     * - checkBridgeEdge    : 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부
      * </pre>
      *
      * @param {Object} config JSON 포맷의 configuration
@@ -718,6 +728,8 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.ENABLE_CONTEXTMENU = config.enableContextMenu === undefined ? this._CONFIG.ENABLE_CONTEXTMENU : config.enableContextMenu;
             this._CONFIG.AUTO_EXTENSIONAL = config.autoExtensional === undefined ? this._CONFIG.AUTO_EXTENSIONAL : config.autoExtensional;
             this._CONFIG.USE_SLIDER = config.useSlider === undefined ? this._CONFIG.USE_SLIDER : config.useSlider;
+            this._CONFIG.STICK_GUIDE = config.stickGuide === undefined ? this._CONFIG.STICK_GUIDE : config.stickGuide;
+            this._CONFIG.CHECK_BRIDGE_EDGE = config.checkBridgeEdge === undefined ? this._CONFIG.CHECK_BRIDGE_EDGE : config.checkBridgeEdge;
         }
 
         this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE);
@@ -1243,9 +1255,13 @@ OG.graph.Canvas.prototype = {
      * @param {Element} toElement to Shape Element
      * @param {OG.geometry.Style,Object} style 스타일
      * @param {String} label Label
-     * @return {Element} 연결된 Edge 엘리먼트
+     * @param fromP fromElement 와 연결될 터미널 좌표(optional)
+     * @param toP toElement 와 연결될 터미널 좌표(optional)
+     * @param preventTrigger 참 일 경우 이벤트 발생을 방지
+     * @param id 연결선의 아이디
+     * @returns {*|Element}
      */
-    connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger) {
+    connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger, id) {
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
         if (fromP) {
@@ -1266,7 +1282,7 @@ OG.graph.Canvas.prototype = {
         toPosition = [toPosition.x, toPosition.y];
 
         // draw edge
-        edge = this._RENDERER.drawShape(null, new OG.EdgeShape(fromPosition, toPosition));
+        edge = this._RENDERER.drawShape(null, new OG.EdgeShape(fromPosition, toPosition), null, style, id);
         edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
 
         // connect
@@ -1554,7 +1570,7 @@ OG.graph.Canvas.prototype = {
      * @return {Number[]} Canvas Width, Height
      */
     getCanvasSize: function () {
-        this._RENDERER.getCanvasSize();
+        return this._RENDERER.getCanvasSize();
     }
     ,
 

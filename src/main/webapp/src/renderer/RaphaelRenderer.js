@@ -1846,7 +1846,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
             }
             edge.shape.geom.setVertices(vertices);
             return edgeId;
-        }
+        };
     edgeId = $(element).attr("_fromedge");
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
@@ -2789,6 +2789,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
+    if(!this._CONFIG.STICK_GUIDE){
+        return;
+    }
     var me = this, path, pathX, pathY;
 
     if (!position) {
@@ -2812,6 +2815,9 @@ OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
 };
 
 OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (direction) {
+    if(!this._CONFIG.STICK_GUIDE){
+        return;
+    }
     if (!direction) {
         return;
     }
@@ -2827,12 +2833,15 @@ OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (direction) {
             this._stickGuideY = null;
         }
     }
-}
+};
 
 OG.renderer.RaphaelRenderer.prototype.removeAllStickGuide = function () {
+    if(!this._CONFIG.STICK_GUIDE){
+        return;
+    }
     this.removeStickGuide('vertical');
     this.removeStickGuide('horizontal');
-}
+};
 
 /**
  * ID에 해당하는 Element 의 Move & Resize 용 가이드를 제거한다.
@@ -4644,7 +4653,7 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
             y: _upperLeft.y - me._CONFIG.DEFAULT_STYLE.CONNECT_GUIDE_BBOX_EXPEND,
             width: envelope.getWidth() + me._CONFIG.DEFAULT_STYLE.CONNECT_GUIDE_BBOX_EXPEND * 2,
             height: envelope.getHeight() + me._CONFIG.DEFAULT_STYLE.CONNECT_GUIDE_BBOX_EXPEND * 2
-        }
+        };
 
         this._remove(this._getREleById(rElement.id + OG.Constants.CONNECT_GUIDE_SUFFIX.BBOX));
         _connectBoxRect = this._PAPER.rect(expendBoundary.x, expendBoundary.y, expendBoundary.width, expendBoundary.height);
@@ -6757,6 +6766,9 @@ OG.renderer.RaphaelRenderer.prototype.getRootGroupOfShape = function (element) {
  * @param {Element,String} Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
+    if(!this._CONFIG.CHECK_BRIDGE_EDGE){
+        return;
+    }
     var me = this, fromStyleChangable, toStyleChangable;
     var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
 

@@ -17330,7 +17330,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
             }
             edge.shape.geom.setVertices(vertices);
             return edgeId;
-        }
+        };
     edgeId = $(element).attr("_fromedge");
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
@@ -18273,6 +18273,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
+    if(!this._CONFIG.STICK_GUIDE){
+        return;
+    }
     var me = this, path, pathX, pathY;
 
     if (!position) {
@@ -18296,6 +18299,9 @@ OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
 };
 
 OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (direction) {
+    if(!this._CONFIG.STICK_GUIDE){
+        return;
+    }
     if (!direction) {
         return;
     }
@@ -18311,12 +18317,15 @@ OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (direction) {
             this._stickGuideY = null;
         }
     }
-}
+};
 
 OG.renderer.RaphaelRenderer.prototype.removeAllStickGuide = function () {
+    if(!this._CONFIG.STICK_GUIDE){
+        return;
+    }
     this.removeStickGuide('vertical');
     this.removeStickGuide('horizontal');
-}
+};
 
 /**
  * ID에 해당하는 Element 의 Move & Resize 용 가이드를 제거한다.
@@ -20128,7 +20137,7 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
             y: _upperLeft.y - me._CONFIG.DEFAULT_STYLE.CONNECT_GUIDE_BBOX_EXPEND,
             width: envelope.getWidth() + me._CONFIG.DEFAULT_STYLE.CONNECT_GUIDE_BBOX_EXPEND * 2,
             height: envelope.getHeight() + me._CONFIG.DEFAULT_STYLE.CONNECT_GUIDE_BBOX_EXPEND * 2
-        }
+        };
 
         this._remove(this._getREleById(rElement.id + OG.Constants.CONNECT_GUIDE_SUFFIX.BBOX));
         _connectBoxRect = this._PAPER.rect(expendBoundary.x, expendBoundary.y, expendBoundary.width, expendBoundary.height);
@@ -22241,6 +22250,9 @@ OG.renderer.RaphaelRenderer.prototype.getRootGroupOfShape = function (element) {
  * @param {Element,String} Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
+    if(!this._CONFIG.CHECK_BRIDGE_EDGE){
+        return;
+    }
     var me = this, fromStyleChangable, toStyleChangable;
     var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
 
@@ -23611,7 +23623,7 @@ OG.handler.EventHandler.prototype = {
                             me.setConnectable(selected, guide, me._isConnectable(selected.shape));
                             renderer.toFront(guide.group);
                         }
-                    })
+                    });
 
                     renderer.removeAllConnectGuide();
                     renderer.toFrontEdges();
@@ -28080,21 +28092,15 @@ OG.handler.EventHandler.prototype = {
                 if($(spot).data("end")){
                     isConnectable = 'to';
                 }
-                //var index = $(spot).data("index");
-                //if (index || index === 0) {
-                //    if (index === 0) {
-                //        isConnectable = 'from'
-                //    }
-                //    if (index === vertices.length - 1) {
-                //        isConnectable = 'to'
-                //    }
-                //}
             }
             return isConnectable;
         };
 
         $(element).bind({
             mousemove: function (event) {
+                if(!me._isConnectable(element.shape)){
+                    return;
+                }
 
                 var isShape = $(element).attr("_type") === OG.Constants.NODE_TYPE.SHAPE;
                 var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
@@ -28257,6 +28263,9 @@ OG.handler.EventHandler.prototype = {
                 }
             },
             mouseout: function (event) {
+                if(!me._isConnectable(element.shape)){
+                    return;
+                }
                 var isShape = $(element).attr("_type") === OG.Constants.NODE_TYPE.SHAPE;
                 var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
                 var isDragging = $(root).data(OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_EVENT_DRAG);
@@ -28307,6 +28316,9 @@ OG.handler.EventHandler.prototype = {
                 event.stopImmediatePropagation();
             },
             mouseover: function (event) {
+                if(!me._isConnectable(element.shape)){
+                    return;
+                }
                 var guide;
                 //마우스가 어떠한 shape 에 접근할 때
 
@@ -29082,6 +29094,14 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 
     this._CONFIG = {
         /**
+         * 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부
+         */
+        CHECK_BRIDGE_EDGE: true,
+        /**
+         * 스틱 가이드 생성 여부
+         */
+        STICK_GUIDE: true,
+        /**
          * 슬라이더
          */
         SLIDER: null,
@@ -29756,6 +29776,8 @@ OG.graph.Canvas.prototype = {
      * - enableContextMenu  : 마우스 우클릭 메뉴 가능여부(디폴트 true)
      * - autoExtensional    : 캔버스 자동 확장 기능(디폴트 true)
      * - useSlider          : 확대축소 슬라이더 사용 여부
+     * - stickGuide         : 스틱 가이드 표시 여부
+     * - checkBridgeEdge    : 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부
      * </pre>
      *
      * @param {Object} config JSON 포맷의 configuration
@@ -29778,6 +29800,8 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.ENABLE_CONTEXTMENU = config.enableContextMenu === undefined ? this._CONFIG.ENABLE_CONTEXTMENU : config.enableContextMenu;
             this._CONFIG.AUTO_EXTENSIONAL = config.autoExtensional === undefined ? this._CONFIG.AUTO_EXTENSIONAL : config.autoExtensional;
             this._CONFIG.USE_SLIDER = config.useSlider === undefined ? this._CONFIG.USE_SLIDER : config.useSlider;
+            this._CONFIG.STICK_GUIDE = config.stickGuide === undefined ? this._CONFIG.STICK_GUIDE : config.stickGuide;
+            this._CONFIG.CHECK_BRIDGE_EDGE = config.checkBridgeEdge === undefined ? this._CONFIG.CHECK_BRIDGE_EDGE : config.checkBridgeEdge;
         }
 
         this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE);
@@ -30303,9 +30327,13 @@ OG.graph.Canvas.prototype = {
      * @param {Element} toElement to Shape Element
      * @param {OG.geometry.Style,Object} style 스타일
      * @param {String} label Label
-     * @return {Element} 연결된 Edge 엘리먼트
+     * @param fromP fromElement 와 연결될 터미널 좌표(optional)
+     * @param toP toElement 와 연결될 터미널 좌표(optional)
+     * @param preventTrigger 참 일 경우 이벤트 발생을 방지
+     * @param id 연결선의 아이디
+     * @returns {*|Element}
      */
-    connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger) {
+    connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger, id) {
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
         if (fromP) {
@@ -30326,7 +30354,7 @@ OG.graph.Canvas.prototype = {
         toPosition = [toPosition.x, toPosition.y];
 
         // draw edge
-        edge = this._RENDERER.drawShape(null, new OG.EdgeShape(fromPosition, toPosition));
+        edge = this._RENDERER.drawShape(null, new OG.EdgeShape(fromPosition, toPosition), null, style, id);
         edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
 
         // connect
@@ -30614,7 +30642,7 @@ OG.graph.Canvas.prototype = {
      * @return {Number[]} Canvas Width, Height
      */
     getCanvasSize: function () {
-        this._RENDERER.getCanvasSize();
+        return this._RENDERER.getCanvasSize();
     }
     ,
 
