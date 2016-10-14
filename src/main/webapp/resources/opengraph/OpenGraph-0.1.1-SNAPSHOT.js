@@ -15868,6 +15868,18 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
     text_anchor = _style["text-anchor"] || 'middle';
     _style["text-anchor"] = 'middle';
 
+    //라벨 최대,최소 적용
+    if (me._CONFIG.LABEL_MIN_SIZE && size[0]) {
+        if (size[0] < me._CONFIG.LABEL_MIN_SIZE) {
+            size[0] = me._CONFIG.LABEL_MIN_SIZE;
+        }
+    }
+    if (me._CONFIG.LABEL_MAX_SIZE && size[1]) {
+        if (size[1] > me._CONFIG.LABEL_MAX_SIZE) {
+            size[1] = me._CONFIG.LABEL_MAX_SIZE;
+        }
+    }
+
     //익스 일때
     if (OG.Util.isIE()) {
         element = this._PAPER.text(position[0], position[1], text, size);
@@ -15898,7 +15910,7 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
     // Boundary Box
     geom = new OG.Rectangle([left, top], width, height);
 
-    if (navigator.userAgent.toLowerCase().indexOf("mozilla") != -1) {
+    if (!OG.Util.isIE()) {
         if (_style["label-direction"] === 'vertical') {
             // Text Horizontal Align
             switch (text_anchor) {
@@ -15967,7 +15979,7 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
             }
         }
     }
-    else if (navigator.userAgent.toLowerCase().indexOf("msie") != -1) {
+    else if (OG.Util.isIE()) {
         if (_style["label-direction"] === 'vertical') {
             // Text Horizontal Align
             switch (text_anchor) {
@@ -29453,6 +29465,16 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         GROUP_INNER_SAPCE: 10,
 
         /**
+         * 라벨 최소 크기(IE)
+         */
+        LABEL_MIN_SIZE: 100,
+
+        /**
+         * 라벨 최대 크기(IE)
+         */
+        LABEL_MAX_SIZE: 300,
+
+        /**
          * 디폴트 스타일 정의
          */
         DEFAULT_STYLE: {
@@ -29476,7 +29498,6 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-width": 1.5,
                 "stroke-opacity": 1,
                 "edge-type": "plain",
-                "edge-direction": "c c",
                 "arrow-start": "none",
                 "arrow-end": "block",
                 "stroke-dasharray": "",

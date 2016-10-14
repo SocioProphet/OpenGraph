@@ -383,6 +383,16 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         GROUP_INNER_SAPCE: 10,
 
         /**
+         * 라벨 최소 크기(IE)
+         */
+        LABEL_MIN_SIZE: 100,
+
+        /**
+         * 라벨 최대 크기(IE)
+         */
+        LABEL_MAX_SIZE: 300,
+
+        /**
          * 디폴트 스타일 정의
          */
         DEFAULT_STYLE: {
@@ -406,7 +416,6 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-width": 1.5,
                 "stroke-opacity": 1,
                 "edge-type": "plain",
-                "edge-direction": "c c",
                 "arrow-start": "none",
                 "arrow-end": "block",
                 "stroke-dasharray": "",
