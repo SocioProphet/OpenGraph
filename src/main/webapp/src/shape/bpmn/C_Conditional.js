@@ -3,12 +3,14 @@
  *
  * @class
  * @extends OG.shape.EdgeShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.C_Conditional = function (from, to, label) {
     OG.shape.bpmn.C_Conditional.superclass.call(this, from, to, label);
@@ -45,7 +47,8 @@ OG.shape.bpmn.C_Conditional.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.EdgeShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표

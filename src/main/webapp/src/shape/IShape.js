@@ -2,7 +2,8 @@
  * 도형, 텍스트, 이미지 등의 드로잉 될 Object 의 정보를 저장하는 Shape 정보 최상위 인터페이스
  *
  * @class
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */

@@ -5,9 +5,12 @@
  *
  * @class
  * @extends OG.renderer.IRenderer
- * @requires OG.common.*, OG.geometry.*, OG.shape.*, raphael-2.1.0
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.*
+ * @requires raphael-2.1.0
  *
- * @param {HTMLElement,String} container 컨테이너 DOM element or ID
+ * @param {HTMLElement|String} container 컨테이너 DOM element or ID
  * @param {Number[]} containerSize 컨테이너 Width, Height
  * @param {String} backgroundColor 캔버스 배경색
  * @param {String} backgroundImage 캔버스 배경이미지
@@ -136,7 +139,7 @@ OG.renderer.RaphaelRenderer.prototype._getREleById = function (id) {
  *
  * @param {Element} groupElement Group DOM Element
  * @param {OG.geometry.Geometry} geometry 기하 객체
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {Object} parentStyle Geometry Collection 인 경우 상위 Geometry 스타일
  * @return {Element}
  * @private
@@ -351,7 +354,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {String} text 텍스트
  * @param {Number[]} size Text Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @param {Boolean} isEdge 라인여부(라인인 경우 라벨이 가려지지 않도록)
  * @return {Element} DOM Element
@@ -626,7 +629,7 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {OG.shape.IShape} shape Shape
  * @param {Number[]} size Shape Width, Height
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @param {Boolean} preventDrop Lane, Pool 생성 drop 모드 수행 방지
  * @return {Element} Group DOM Element with geometry
@@ -834,7 +837,7 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
  * Geometry 를 캔버스에 드로잉한다.
  *
  * @param {OG.geometry.Geometry} geometry 기하 객체
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @return {Element} Group DOM Element with geometry
  * @override
  */
@@ -884,7 +887,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGeom = function (geometry, style, id) 
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {String} text 텍스트
  * @param {Number[]} size Text Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @return {Element} DOM Element
  * @override
@@ -1022,7 +1025,7 @@ OG.renderer.RaphaelRenderer.prototype.drawText = function (position, text, size,
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {String} html 임베드 HTML String
  * @param {Number[]} size Image Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @return {Element} DOM Element
  * @override
@@ -1117,7 +1120,7 @@ OG.renderer.RaphaelRenderer.prototype.drawHtml = function (position, html, size,
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {String} imgSrc 이미지경로
  * @param {Number[]} size Image Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @return {Element} DOM Element
  * @override
@@ -1247,8 +1250,8 @@ OG.renderer.RaphaelRenderer.prototype._getPointOfInflectionFromEdge = function (
  * OG.geometry.Line 타입인 경우 EdgeType 에 따라 Path 를 자동으로 계산하며,
  * OG.geometry.PolyLine 인 경우는 주어진 Path 그대로 drawing 한다.
  *
- * @param {OG.geometry.Line,OG.geometry.PolyLine} line 또는 polyLine
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Line|OG.geometry.PolyLine} line 또는 polyLine
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @param {Boolean} isSelf 셀프 연결 여부
  * @return {Element} Group DOM Element with geometry
@@ -1451,9 +1454,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
 /**
  * Shape 의 Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
  *
- * @param {Element,String} shapeElement Shape DOM element or ID
+ * @param {Element|String} shapeElement Shape DOM element or ID
  * @param {String} text 텍스트
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @return {Element} DOM Element
  * @override
  */
@@ -1573,7 +1576,7 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
 /**
  * Edge 의 from, to Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
  *
- * @param {Element,String} shapeElement Shape DOM element or ID
+ * @param {Element|String} shapeElement Shape DOM element or ID
  * @param {String} text 텍스트
  * @param {String} type 유형(FROM or TO)
  * @return {Element} DOM Element
@@ -1945,17 +1948,16 @@ OG.renderer.RaphaelRenderer.prototype.reconnect = function (edge) {
 
 /**
  * 두개의 터미널을 연결하고, 속성정보에 추가한다.
- *
- * @param {Element,Number[]} from 시작점 (fromTerminal)
- * @param {Element,Number[]} to 끝점 (toTerminal)
+ * @param {Element|Number[]} fromTerminal 시작점 (fromTerminal)
+ * @param {Element|Number[]} toTerminal 끝점 (toTerminal)
  * @param {Element} edge Edge Shape
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} label Label
- * @return {Element} 연결된 Edge 엘리먼트
+ * @param {Boolean} preventTrigger 이벤트 트리거 발생 막기
+ * @returns {Element} 연결된 Edge 엘리먼트
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTerminal, edge, style, label, preventTrigger) {
-
     var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
     if (rEdge) {
@@ -2238,7 +2240,7 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
 /**
  * ID에 해당하는 Element 의 Drop Over 가이드를 드로잉한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.drawDropOverGuide = function (element) {
@@ -2795,7 +2797,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
 /**
  * ID에 해당하는 Element 의 Stick 용 가이드를 드로잉한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
@@ -2856,7 +2858,7 @@ OG.renderer.RaphaelRenderer.prototype.removeAllStickGuide = function () {
 /**
  * ID에 해당하는 Element 의 Move & Resize 용 가이드를 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.removeGuide = function (element) {
@@ -2891,7 +2893,7 @@ OG.renderer.RaphaelRenderer.prototype.removeAllGuide = function () {
 /**
  * ID에 해당하는 Edge Element 의 Move & Resize 용 가이드를 드로잉한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Object}
  * @override
  */
@@ -3069,7 +3071,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
  *
  * @param {Number[]} position 드로잉할 위치 좌표(좌상단)
  * @param {Number[]} size Text Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @return {Element} DOM Element
  * @override
  */
@@ -3112,7 +3114,7 @@ OG.renderer.RaphaelRenderer.prototype.removeRubberBand = function (root) {
 /**
  * ID에 해당하는 Element 의 Collapse 가이드를 드로잉한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element}
  * @override
  */
@@ -3827,7 +3829,7 @@ OG.renderer.RaphaelRenderer.prototype.alignTop = function () {
 /**
  * Shape 을 캔버스에서 관련된 모두를 삭제한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
@@ -3864,7 +3866,7 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
 /**
  * ID에 해당하는 Element 를 캔버스에서 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.remove = function (element) {
@@ -3876,7 +3878,7 @@ OG.renderer.RaphaelRenderer.prototype.remove = function (element) {
 /**
  * 하위 엘리먼트만 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.removeChild = function (element) {
@@ -3911,7 +3913,7 @@ OG.renderer.RaphaelRenderer.prototype.getElementByPoint = function (position) {
 /**
  * 엘리먼트에 속성값을 설정한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} attribute 속성값
  * @override
  */
@@ -3925,7 +3927,7 @@ OG.renderer.RaphaelRenderer.prototype.setAttr = function (element, attribute) {
 /**
  * 엘리먼트 속성값을 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {String} attrName 속성이름
  * @return {Object} attribute 속성값
  * @override
@@ -3941,7 +3943,7 @@ OG.renderer.RaphaelRenderer.prototype.getAttr = function (element, attrName) {
 /**
  * Shape 의 스타일을 변경한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} style 스타일
  * @override
  */
@@ -3958,7 +3960,7 @@ OG.renderer.RaphaelRenderer.prototype.setShapeStyle = function (element, style) 
 /**
  * Shape 의 선 연결 커스텀 컨트롤러를 설정한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Array} textList 텍스트 리스트
  * @override
  */
@@ -3978,7 +3980,7 @@ OG.renderer.RaphaelRenderer.prototype.setTextListInController = function (elemen
 /**
  * Shape 의 선 연결 커스텀 컨트롤러를 가져온다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 
@@ -3997,7 +3999,7 @@ OG.renderer.RaphaelRenderer.prototype.getTextListInController = function (elemen
 /**
  * ID에 해당하는 Element 를 최상단 레이어로 이동한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.toFront = function (element) {
@@ -4010,7 +4012,7 @@ OG.renderer.RaphaelRenderer.prototype.toFront = function (element) {
 /**
  * ID에 해당하는 Element 를 최하단 레이어로 이동한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.toBack = function (element) {
@@ -4135,7 +4137,7 @@ OG.renderer.RaphaelRenderer.prototype.setScale = function (scale) {
 /**
  * ID에 해당하는 Element 를 캔버스에서 show 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.show = function (element) {
@@ -4148,7 +4150,7 @@ OG.renderer.RaphaelRenderer.prototype.show = function (element) {
 /**
  * ID에 해당하는 Element 를 캔버스에서 hide 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.hide = function (element) {
@@ -4161,8 +4163,8 @@ OG.renderer.RaphaelRenderer.prototype.hide = function (element) {
 /**
  * Source Element 를 Target Element 아래에 append 한다.
  *
- * @param {Element,String} srcElement Element 또는 ID
- * @param {Element,String} targetElement Element 또는 ID
+ * @param {Element|String} srcElement Element 또는 ID
+ * @param {Element|String} targetElement Element 또는 ID
  * @return {Element} Source Element
  * @override
  */
@@ -4178,8 +4180,8 @@ OG.renderer.RaphaelRenderer.prototype.appendChild = function (srcElement, target
 /**
  * Source Element 를 Target Element 이후에 insert 한다.
  *
- * @param {Element,String} srcElement Element 또는 ID
- * @param {Element,String} targetElement Element 또는 ID
+ * @param {Element|String} srcElement Element 또는 ID
+ * @param {Element|String} targetElement Element 또는 ID
  * @return {Element} Source Element
  * @override
  */
@@ -4195,8 +4197,8 @@ OG.renderer.RaphaelRenderer.prototype.insertAfter = function (srcElement, target
 /**
  * Source Element 를 Target Element 이전에 insert 한다.
  *
- * @param {Element,String} srcElement Element 또는 ID
- * @param {Element,String} targetElement Element 또는 ID
+ * @param {Element|String} srcElement Element 또는 ID
+ * @param {Element|String} targetElement Element 또는 ID
  * @return {Element} Source Element
  * @override
  */
@@ -4212,7 +4214,7 @@ OG.renderer.RaphaelRenderer.prototype.insertBefore = function (srcElement, targe
 /**
  * 해당 Element 를 가로, 세로 Offset 만큼 이동한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number[]} offset [가로, 세로]
  * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
  * @return {Element} Element
@@ -4262,7 +4264,7 @@ OG.renderer.RaphaelRenderer.prototype.move = function (element, offset, excludeE
 /**
  * 주어진 중심좌표로 해당 Element 를 이동한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number[]} position [x, y]
  * @return {Element} Element
  * @override
@@ -4291,7 +4293,7 @@ OG.renderer.RaphaelRenderer.prototype.moveCentroid = function (element, position
 /**
  * 중심 좌표를 기준으로 주어진 각도 만큼 회전한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number} angle 각도
  * @return {Element} Element
  * @override
@@ -4342,7 +4344,7 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle) {
 /**
  * 상, 하, 좌, 우 외곽선을 이동한 만큼 리사이즈 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
  * @return {Element} Element
  * @override
@@ -4389,7 +4391,7 @@ OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset) {
 /**
  * 중심좌표는 고정한 채 Bounding Box 의 width, height 를 리사이즈 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number[]} size [Width, Height]
  * @return {Element} Element
  * @override
@@ -4420,7 +4422,7 @@ OG.renderer.RaphaelRenderer.prototype.resizeBox = function (element, size) {
 /**
  * 노드 Element 를 복사한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} Element
  * @override
  */
@@ -4449,7 +4451,7 @@ OG.renderer.RaphaelRenderer.prototype.getElementById = function (id) {
 /**
  * 해당 엘리먼트의 BoundingBox 영역 정보를 반환한다.
  *
- * @param {Element,String} element
+ * @param {Element|String} element
  * @return {Object} {width, height, x, y, x2, y2}
  * @override
  */
@@ -4695,7 +4697,7 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
 /**
  * ID에 해당하는 Element 의 Connect Guide 를 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.removeConnectGuide = function (element) {
     var me = this;
@@ -4725,7 +4727,7 @@ OG.renderer.RaphaelRenderer.prototype.removeAllConnectGuide = function () {
 /**
  * ID에 해당하는 Element 이외의 모든 Connect Guide 를 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.removeOtherConnectGuide = function (element) {
 
@@ -4742,7 +4744,7 @@ OG.renderer.RaphaelRenderer.prototype.removeOtherConnectGuide = function (elemen
 /**
  * Element 내부의 Spot 들을 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Array} Spot Element Array
  */
 OG.renderer.RaphaelRenderer.prototype.getSpots = function (element) {
@@ -4760,7 +4762,7 @@ OG.renderer.RaphaelRenderer.prototype.getSpots = function (element) {
 /**
  * Element 내부의 변곡점 Spot 들만 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Array} Spot Element Array
  */
 OG.renderer.RaphaelRenderer.prototype.getCircleSpots = function (element) {
@@ -4783,7 +4785,7 @@ OG.renderer.RaphaelRenderer.prototype.getCircleSpots = function (element) {
  *
  * @param {Number} x 이벤트의 캔버스 기준 x 좌표
  * @param {Number} x 이벤트의 캔버스 기준 y 좌표
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} Spot Element
  */
 OG.renderer.RaphaelRenderer.prototype.createVirtualSpot = function (x, y, element) {
@@ -4895,7 +4897,7 @@ OG.renderer.RaphaelRenderer.prototype.createVirtualSpot = function (x, y, elemen
 /**
  * Element 내부의 가상 변곡점 스팟을 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} Spot Element
  */
 OG.renderer.RaphaelRenderer.prototype.getVirtualSpot = function (element) {
@@ -4912,7 +4914,7 @@ OG.renderer.RaphaelRenderer.prototype.getVirtualSpot = function (element) {
 /**
  * Element 내부의 가상 변곡점 스팟을 삭제한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} Spot Element
  */
 OG.renderer.RaphaelRenderer.prototype.removeVirtualSpot = function (element) {
@@ -4929,7 +4931,7 @@ OG.renderer.RaphaelRenderer.prototype.removeVirtualSpot = function (element) {
 /**
  * Element 내부의 Spot 중 선택한 스팟을 제외하고 모두 삭제하고, 가이드라인도 삭제한다.
  *
- * @param {Element,String} 선택한 spot Element 또는 ID
+ * @param {Element|String} 선택한 spot Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.selectSpot = function (spot) {
     var me = this;
@@ -4976,7 +4978,7 @@ OG.renderer.RaphaelRenderer.prototype._removeEdgeChild = function (rElement) {
 /**
  * 하위 엘리먼트들을 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Array} Array Element
  */
 OG.renderer.RaphaelRenderer.prototype.getChildNodes = function (element) {
@@ -4996,7 +4998,7 @@ OG.renderer.RaphaelRenderer.prototype.getChildNodes = function (element) {
  * Edge Element 내부의 패스중 나열된 두 꼭지점이 매우 짧은 선일 경우 하나의 꼭지점으로 정리한다.
  * Edge Element 내부의 패스중 나열된 세 꼭지점이 평행에 가까울 경우 하나의 선분으로 정리한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.trimEdge = function (element) {
     var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
@@ -5036,7 +5038,7 @@ OG.renderer.RaphaelRenderer.prototype.trimEdge = function (element) {
  * Edge Element의 연결 정보가 있을 경우 연결대상과 꼭지점의 다중 중복을 정리한다.
  * 다중 중복 정리 후 Edge 의 모양이 직선인 경우 새로운 plain 을 제작한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} element
  */
 OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (element) {
@@ -5160,7 +5162,7 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (elemen
 /**
  * Edge Element의 연결 정보가 있을 경우 선분과 연결대상의 연결점을 자연스럽게 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} element
  */
 OG.renderer.RaphaelRenderer.prototype.trimConnectIntersection = function (element) {
@@ -5220,7 +5222,7 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectIntersection = function (elemen
 /**
  * ID에 해당하는 Element 의 바운더리 영역을 리턴한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {OG.geometry.Envelope} Envelope 영역
  */
 OG.renderer.RaphaelRenderer.prototype.getBoundary = function (element) {
@@ -5237,7 +5239,7 @@ OG.renderer.RaphaelRenderer.prototype.getBoundary = function (element) {
 /**
  * Element 에 하이라이트 속성을 부여한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} highlight HIGHLIGHT 속성 집합.
  */
 OG.renderer.RaphaelRenderer.prototype.setHighlight = function (element, highlight) {
@@ -5263,7 +5265,7 @@ OG.renderer.RaphaelRenderer.prototype.setHighlight = function (element, highligh
 /**
  * Element 에 하이라이트 속성을 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} highlight HIGHLIGHT 속성 집합.
  */
 OG.renderer.RaphaelRenderer.prototype.removeHighlight = function (element, highlight) {
@@ -5292,7 +5294,7 @@ OG.renderer.RaphaelRenderer.prototype.removeHighlight = function (element, highl
 /**
  * 터미널 문자열을 생성한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {Array} point 연결 좌표정보 [x,y]
  *
  * @return {String} terminal 터미널 문자열
@@ -5314,7 +5316,7 @@ OG.renderer.RaphaelRenderer.prototype.createTerminalString = function (element, 
 /**
  * 디폴트 터미널 문자열을 생성한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  *
  * @return {String} terminal 터미널 문자열
  */
@@ -5335,7 +5337,7 @@ OG.renderer.RaphaelRenderer.prototype.createDefaultTerminalString = function (el
 /**
  * 터미널로부터 부모 Shape element 로의 퍼센테이지 좌표를 반환한다.
  *
- * @param {Element,String} terminal 터미널 Element or ID
+ * @param {Element|String} terminal 터미널 Element or ID
  * @return {Array} [px,py]
  * @private
  */
@@ -5352,7 +5354,7 @@ OG.renderer.RaphaelRenderer.prototype._getPercentageFromTerminal = function (ter
 /**
  * 터미널로부터 좌표를 반환한다.
  *
- * @param {Element,String} terminal 터미널 Element or ID
+ * @param {Element|String} terminal 터미널 Element or ID
  * @return {OG.geometry.Coordinate} 좌표
  * @private
  */
@@ -5411,7 +5413,7 @@ OG.renderer.RaphaelRenderer.prototype.removeAllEdgeGuide = function () {
  *
  * @param {Number} x 이벤트의 캔버스 기준 x 좌표
  * @param {Number} x 이벤트의 캔버스 기준 y 좌표
- * @param {Element,String} targetEle Element 또는 ID
+ * @param {Element|String} targetEle Element 또는 ID
  * @return {Element} Edge Element
  */
 OG.renderer.RaphaelRenderer.prototype.createVirtualEdge = function (x, y, targetEle) {
@@ -5633,7 +5635,7 @@ OG.renderer.RaphaelRenderer.prototype.redo = function () {
 /**
  * 도형의 Lane 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isLane = function (element) {
@@ -5651,7 +5653,7 @@ OG.renderer.RaphaelRenderer.prototype.isLane = function (element) {
 /**
  * 도형의 Pool 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isPool = function (element) {
@@ -5668,7 +5670,7 @@ OG.renderer.RaphaelRenderer.prototype.isPool = function (element) {
 /**
  * 도형의 ScopeActivity 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
@@ -5685,7 +5687,7 @@ OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
 /**
  * 도형의 HorizontalLaneShape 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
@@ -5695,7 +5697,7 @@ OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
 /**
  * 도형의 VerticalLaneShape 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isVerticalLane = function (element) {
@@ -5705,7 +5707,7 @@ OG.renderer.RaphaelRenderer.prototype.isVerticalLane = function (element) {
 /**
  * 도형의 HorizontalPoolShape 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isHorizontalPool = function (element) {
@@ -5715,7 +5717,7 @@ OG.renderer.RaphaelRenderer.prototype.isHorizontalPool = function (element) {
 /**
  * 도형의 VerticalPoolShape 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isVerticalPool = function (element) {
@@ -5725,7 +5727,7 @@ OG.renderer.RaphaelRenderer.prototype.isVerticalPool = function (element) {
 /**
  * Lane 타입 도형 하위의 Lane 타입들을 리턴한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Array} childsLanes
  */
 OG.renderer.RaphaelRenderer.prototype.getChildLane = function (element) {
@@ -5747,7 +5749,7 @@ OG.renderer.RaphaelRenderer.prototype.getChildLane = function (element) {
 /**
  * Lane 타입이 내부적으로 분기가 가능한 수를 리턴한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Number} 0,1,2
  */
 OG.renderer.RaphaelRenderer.prototype.enableDivideCount = function (element) {
@@ -5793,7 +5795,7 @@ OG.renderer.RaphaelRenderer.prototype.enableDivideCount = function (element) {
 /**
  * Lane,Pool 의 타이틀 영역을 제외한 boundary 를 리턴한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {OG.geometry.Envelope} boundary
  */
 OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element) {
@@ -5840,7 +5842,7 @@ OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element
 /**
  * Lane 을 분기한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {String} quarterOrder 분기 명령
  */
 OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrder) {
@@ -6048,7 +6050,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
  * Base Lane 은 자식 Lane 을 가지지 않는 Lane 을 뜻함.
  * 반환하는 Array 는 좌표상의 값을 기준으로 정렬되어 있는 상태이다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Array} childBaseLanes
  */
 OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
@@ -6116,7 +6118,7 @@ OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
 /**
  * Lane 의 최상위 Lane 을 반환한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Element} Lane Element
  */
 OG.renderer.RaphaelRenderer.prototype.getRootLane = function (element) {
@@ -6153,7 +6155,7 @@ OG.renderer.RaphaelRenderer.prototype.getRootLane = function (element) {
 /**
  * Lane 의 BaseLane 으로부터 자신의 순서를 구한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Number} index
  */
 OG.renderer.RaphaelRenderer.prototype.getIndexOfLane = function (element) {
@@ -6185,7 +6187,7 @@ OG.renderer.RaphaelRenderer.prototype.getIndexOfLane = function (element) {
 /**
  * Lane 의 최상위 Lane 으로부터 Depth를 구한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Number} depth
  */
 OG.renderer.RaphaelRenderer.prototype.getDepthOfLane = function (element) {
@@ -6215,7 +6217,7 @@ OG.renderer.RaphaelRenderer.prototype.getDepthOfLane = function (element) {
 /**
  * Lane 의 BaseLane 영역을 기준으로 전체 Lane 의 구조를 재정립한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.reEstablishLane = function (element) {
     var me = this;
@@ -6345,7 +6347,7 @@ OG.renderer.RaphaelRenderer.prototype.getBoundaryOfElements = function (elements
  * Lane 의 baseLane 들 중
  * Lane의 주어진 direction 과 BaseLane 의 주어진 direction 이 가장 가까운 BaseLane 의 인덱스를 반환한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {String} direction
  * @return {Number} index
  */
@@ -6410,7 +6412,7 @@ OG.renderer.RaphaelRenderer.prototype.getNearestBaseLaneIndexAsDirection = funct
  * Group 의 내부 도형들의 Boundary를 반환한다.
  * Lane 이면 최상위 Lane의 내부 도형들의 Boundary를 반환한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {OG.geometry.Envelope} Envelope 영역
  */
 OG.renderer.RaphaelRenderer.prototype.getBoundaryOfInnerShapesGroup = function (element) {
@@ -6445,7 +6447,7 @@ OG.renderer.RaphaelRenderer.prototype.getBoundaryOfInnerShapesGroup = function (
 /**
  * Lane 의 BaseLane 중 길이가 가장 작은 Lane 을 반환한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {Element} baseLane
  */
 OG.renderer.RaphaelRenderer.prototype.getSmallestBaseLane = function (element) {
@@ -6491,7 +6493,7 @@ OG.renderer.RaphaelRenderer.prototype.getSmallestBaseLane = function (element) {
 /**
  * Lane 을 리사이즈한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
  */
 OG.renderer.RaphaelRenderer.prototype.resizeLane = function (element, offset) {
@@ -6587,7 +6589,7 @@ OG.renderer.RaphaelRenderer.prototype.resizeLane = function (element, offset) {
 /**
  * Lane 을 삭제한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.removeLaneShape = function (element) {
     var me = this;
@@ -6678,7 +6680,7 @@ OG.renderer.RaphaelRenderer.prototype.removeLaneShape = function (element) {
 /**
  * Lane 내부 도형들을 구한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfLane = function (element) {
     var me = this;
@@ -6710,7 +6712,7 @@ OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfLane = function (element) 
 /**
  * Lane 의 내부 도형들을 앞으로 이동시킨다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.fitLaneOrder = function (element) {
     var me = this;
@@ -6737,7 +6739,7 @@ OG.renderer.RaphaelRenderer.prototype.fitLaneOrder = function (element) {
  * Shape 가 소속된 의 최상위 그룹 앨리먼트를 반환한다.
  * 그룹이 소속이 아닌 앨리먼트는 자신을 반환한다.
  *
- * @param {Element,String} Element 또는 ID
+ * @param {Element|String} Element 또는 ID
  * @return {Element} Element
  */
 OG.renderer.RaphaelRenderer.prototype.getRootGroupOfShape = function (element) {
@@ -6773,7 +6775,7 @@ OG.renderer.RaphaelRenderer.prototype.getRootGroupOfShape = function (element) {
 /**
  * Edge 가 Gourp 사이를 넘어가는 경우 스타일에 변화를 준다.
  *
- * @param {Element,String} Element 또는 ID
+ * @param {Element|String} Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
     if (!this._CONFIG.CHECK_BRIDGE_EDGE) {
@@ -6846,7 +6848,7 @@ OG.renderer.RaphaelRenderer.prototype.checkAllBridgeEdge = function () {
 /**
  * Group 내부의 모든 shape 을 리턴한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfGroup = function (element) {
     var me = this;
@@ -6956,9 +6958,9 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) 
 /**
  * 신규 Edge 의 vertices 를 연결대상 도형에 따라 설정한다
  *
- * @param {Element,String} Edge Element 또는 ID
- * @param {Element,String} FromShape Element 또는 ID
- * @param {Element,String} ToShape Element 또는 ID
+ * @param {Element|String} Edge Element 또는 ID
+ * @param {Element|String} FromShape Element 또는 ID
+ * @param {Element|String} ToShape Element 또는 ID
  * @return {Element} Edge Element
  */
 OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromShape, toShape) {
@@ -7032,7 +7034,7 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
 /**
  * Lane 또는 Pool 내부 도형들을 그룹에 포함시킨다.
  *
- * @param {Element,String} Element
+ * @param {Element|String} Element
 
  * @return {Element} Element
  */
@@ -7073,7 +7075,7 @@ OG.renderer.RaphaelRenderer.prototype.putInnerShapeToPool = function (element) {
 /**
  * 신규 Lane 또는 Pool 이 캔버스상에서 드래그하여 그려지도록 사전작업을 수행한다.
  *
- * @param {Element,String} Element
+ * @param {Element|String} Element
 
  * @return {Element} Element
  */

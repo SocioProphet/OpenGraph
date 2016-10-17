@@ -8126,130 +8126,130 @@ OG.Style = OG.geometry.Style;
  */
 OG.geometry.Coordinate = function (x, y) {
 
-	/**
-	 * x좌표
-	 * @type Number
-	 */
-	this.x = undefined;
+    /**
+     * x좌표
+     * @type Number
+     */
+    this.x = undefined;
 
-	/**
-	 * y좌표
-	 * @type Number
-	 */
-	this.y = undefined;
+    /**
+     * y좌표
+     * @type Number
+     */
+    this.y = undefined;
 
-	// Array 좌표를 OG.geometry.Coordinate 로 변환
-	if (arguments.length === 1 && x.constructor === Array) {
-		this.x = x[0];
-		this.y = x[1];
-	} else if (arguments.length === 2 && typeof x === "number" && typeof y === "number") {
-		this.x = x;
-		this.y = y;
-	} else if (arguments.length !== 0) {
-		throw new OG.ParamError();
-	}
+    // Array 좌표를 OG.geometry.Coordinate 로 변환
+    if (arguments.length === 1 && x.constructor === Array) {
+        this.x = x[0];
+        this.y = x[1];
+    } else if (arguments.length === 2 && typeof x === "number" && typeof y === "number") {
+        this.x = x;
+        this.y = y;
+    } else if (arguments.length !== 0) {
+        throw new OG.ParamError();
+    }
 };
 OG.geometry.Coordinate.prototype = {
 
-	/**
-	 * 주어진 좌표와의 거리를 계산한다.
-	 *
-	 * @example
-	 * coordinate.distance([10, 10]);
-	 * or
-	 * coordinate.distance(new OG.Coordinate(10, 10));
-	 *
-	 *
-	 * @param {OG.geometry.Coordinate,Number[]} coordinate 좌표값
-	 * @return {Number} 좌표간의 거리값
-	 */
-	distance: function (coordinate) {
-		if (coordinate.constructor === Array) {
-			coordinate = new OG.geometry.Coordinate(coordinate[0], coordinate[1]);
-		}
+    /**
+     * 주어진 좌표와의 거리를 계산한다.
+     *
+     * @example
+     * coordinate.distance([10, 10]);
+     * or
+     * coordinate.distance(new OG.Coordinate(10, 10));
+     *
+     *
+     * @param {OG.geometry.Coordinate|Number[]} coordinate 좌표값
+     * @return {Number} 좌표간의 거리값
+     */
+    distance: function (coordinate) {
+        if (coordinate.constructor === Array) {
+            coordinate = new OG.geometry.Coordinate(coordinate[0], coordinate[1]);
+        }
 
-		var dx = this.x - coordinate.x, dy = this.y - coordinate.y;
-		return OG.Util.round(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)));
-	},
+        var dx = this.x - coordinate.x, dy = this.y - coordinate.y;
+        return OG.Util.round(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)));
+    },
 
-	/**
-	 * 가로, 세로 Offset 만큼 좌표를 이동한다.
-	 *
-	 * @param {Number} offsetX 가로 Offset
-	 * @param {Number} offsetY 세로 Offset
-	 * @return {OG.geometry.Coordinate} 이동된 좌표
-	 */
-	move: function (offsetX, offsetY) {
-		this.x += offsetX;
-		this.y += offsetY;
+    /**
+     * 가로, 세로 Offset 만큼 좌표를 이동한다.
+     *
+     * @param {Number} offsetX 가로 Offset
+     * @param {Number} offsetY 세로 Offset
+     * @return {OG.geometry.Coordinate} 이동된 좌표
+     */
+    move: function (offsetX, offsetY) {
+        this.x += offsetX;
+        this.y += offsetY;
 
-		return this;
-	},
+        return this;
+    },
 
-	/**
-	 * 기준 좌표를 기준으로 주어진 각도 만큼 회전한다.
-	 *
-	 * @example
-	 * coordinate.rotate(90, [10,10]);
-	 * or
-	 * coordinate.rotate(90, new OG.Coordinate(10, 10));
-	 *
-	 * @param {Number} angle 회전 각도
-	 * @param {OG.geometry.Coordinate,Number[]} origin 기준 좌표
-	 * @return {OG.geometry.Coordinate} 회전된 좌표
-	 */
-	rotate: function (angle, origin) {
-		if (origin.constructor === Array) {
-			origin = new OG.geometry.Coordinate(origin[0], origin[1]);
-		}
+    /**
+     * 기준 좌표를 기준으로 주어진 각도 만큼 회전한다.
+     *
+     * @example
+     * coordinate.rotate(90, [10,10]);
+     * or
+     * coordinate.rotate(90, new OG.Coordinate(10, 10));
+     *
+     * @param {Number} angle 회전 각도
+     * @param {OG.geometry.Coordinate|Number[]} origin 기준 좌표
+     * @return {OG.geometry.Coordinate} 회전된 좌표
+     */
+    rotate: function (angle, origin) {
+        if (origin.constructor === Array) {
+            origin = new OG.geometry.Coordinate(origin[0], origin[1]);
+        }
 
-		angle *= Math.PI / 180;
-		var radius = this.distance(origin),
-			theta = angle + Math.atan2(this.y - origin.y, this.x - origin.x);
-		this.x = OG.Util.round(origin.x + (radius * Math.cos(theta)));
-		this.y = OG.Util.round(origin.y + (radius * Math.sin(theta)));
+        angle *= Math.PI / 180;
+        var radius = this.distance(origin),
+            theta = angle + Math.atan2(this.y - origin.y, this.x - origin.x);
+        this.x = OG.Util.round(origin.x + (radius * Math.cos(theta)));
+        this.y = OG.Util.round(origin.y + (radius * Math.sin(theta)));
 
-		return this;
-	},
+        return this;
+    },
 
-	/**
-	 * 주어진 좌표값과 같은지 비교한다.
-	 *
-	 * @example
-	 * coordinate.isEquals([10, 10]);
-	 * or
-	 * coordinate.isEquals(new OG.Coordinate(10, 10));
-	 *
-	 * @param {OG.geometry.Coordinate,Number[]} coordinate 좌표값
-	 * @return {Boolean} true:같음, false:다름
-	 */
-	isEquals: function (coordinate) {
-		if (coordinate.constructor === Array) {
-			coordinate = new OG.geometry.Coordinate(coordinate[0], coordinate[1]);
-		}
+    /**
+     * 주어진 좌표값과 같은지 비교한다.
+     *
+     * @example
+     * coordinate.isEquals([10, 10]);
+     * or
+     * coordinate.isEquals(new OG.Coordinate(10, 10));
+     *
+     * @param {OG.geometry.Coordinate|Number[]} coordinate 좌표값
+     * @return {Boolean} true:같음, false:다름
+     */
+    isEquals: function (coordinate) {
+        if (coordinate.constructor === Array) {
+            coordinate = new OG.geometry.Coordinate(coordinate[0], coordinate[1]);
+        }
 
-		if (coordinate && coordinate instanceof OG.geometry.Coordinate) {
-			if (this.x === coordinate.x && this.y === coordinate.y) {
-				return true;
-			}
-		}
+        if (coordinate && coordinate instanceof OG.geometry.Coordinate) {
+            if (this.x === coordinate.x && this.y === coordinate.y) {
+                return true;
+            }
+        }
 
-		return false;
-	},
+        return false;
+    },
 
-	/**
-	 * 객체 프라퍼티 정보를 JSON 스트링으로 반환한다.
-	 *
-	 * @return {String} 프라퍼티 정보
-	 * @override
-	 */
-	toString: function () {
-		var s = [];
-		s.push(this.x);
-		s.push(this.y);
+    /**
+     * 객체 프라퍼티 정보를 JSON 스트링으로 반환한다.
+     *
+     * @return {String} 프라퍼티 정보
+     * @override
+     */
+    toString: function () {
+        var s = [];
+        s.push(this.x);
+        s.push(this.y);
 
-		return "[" + s.join() + "]";
-	}
+        return "[" + s.join() + "]";
+    }
 };
 OG.geometry.Coordinate.prototype.constructor = OG.geometry.Coordinate;
 OG.Coordinate = OG.geometry.Coordinate;
@@ -8262,7 +8262,7 @@ OG.Coordinate = OG.geometry.Coordinate;
  * @example
  * var boundingBox = new OG.geometry.Envelope([50, 50], 200, 100);
  *
- * @param {OG.geometry.Coordinate,Number[]} upperLeft 기준 좌상단 좌표
+ * @param {OG.geometry.Coordinate|Number[]} upperLeft 기준 좌상단 좌표
  * @param {Number} width 너비
  * @param {Number} height 높이
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -8363,7 +8363,7 @@ OG.geometry.Envelope.prototype = {
 	/**
 	 * 주어진 좌표로 기준 좌상단 좌표를 설정한다. 새로 설정된 값으로 이동된다.
 	 *
-	 * @param {OG.geometry.Coordinate,Number[]} upperLeft 좌상단 좌표
+	 * @param {OG.geometry.Coordinate|Number[]} upperLeft 좌상단 좌표
 	 */
 	setUpperLeft: function (upperLeft) {
 		if (upperLeft.constructor === Array) {
@@ -8475,7 +8475,7 @@ OG.geometry.Envelope.prototype = {
 	/**
 	 * 주어진 좌표로 중심 좌표를 설정한다. 새로 설정된 값으로 이동된다.
 	 *
-	 * @param {OG.geometry.Coordinate,Number[]} centroid 중심좌표
+	 * @param {OG.geometry.Coordinate|Number[]} centroid 중심좌표
 	 */
 	setCentroid: function (centroid) {
 		if (centroid.constructor === Array) {
@@ -8548,7 +8548,7 @@ OG.geometry.Envelope.prototype = {
 	/**
 	 * 주어진 좌표값이 Envelope 영역에 포함되는지 비교한다.
 	 *
-	 * @param {OG.geometry.Coordinate,Number[]} coordinate 좌표값
+	 * @param {OG.geometry.Coordinate|Number[]} coordinate 좌표값
 	 * @return {Boolean} true:포함, false:비포함
 	 */
 	isContains: function (coordinate) {
@@ -8716,7 +8716,8 @@ OG.Envelope = OG.geometry.Envelope;
  * 공간 기하 객체(Spatial Geometry Object)의 최상위 추상 클래스
  *
  * @class
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
  *
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
@@ -8973,7 +8974,7 @@ OG.geometry.Geometry.prototype = {
     /**
      * 파라미터가 [x, y] 형식의 좌표 Array 이면 OG.geometry.Coordinate 인스턴스를 new 하여 반환한다.
      *
-     * @param {OG.geometry.Coordinate,Number[]} coordinate [x, y] 형식의 좌표 Array 또는 OG.geometry.Coordinate 인스턴스
+     * @param {OG.geometry.Coordinate|Number[]} coordinate [x, y] 형식의 좌표 Array 또는 OG.geometry.Coordinate 인스턴스
      * @return {OG.geometry.Coordinate}
      */
     convertCoordinate: function (coordinate) {
@@ -8995,7 +8996,7 @@ OG.geometry.Geometry.prototype = {
      * 포인트 P 로부터 라인 AB의 거리를 계산한다.
      * Note: NON-ROBUST!
      *
-     * @param {OG.geometry.Coordinate,Number[]} p 기준좌표
+     * @param {OG.geometry.Coordinate|Number[]} p 기준좌표
      * @param {OG.geometry.Coordinate[]} line 라인 시작좌표, 끝좌표 Array
      * @return {Number} 거리
      */
@@ -9260,7 +9261,7 @@ OG.geometry.Geometry.prototype = {
      * 포인트 P 로부터 라인 AB의 교차점을 계산한다.
      * Note: NON-ROBUST!
      *
-     * @param {OG.geometry.Coordinate,Number[]} p 기준좌표
+     * @param {OG.geometry.Coordinate|Number[]} p 기준좌표
      * @param {OG.geometry.Coordinate[]} line 라인 시작좌표, 끝좌표 Array
      * @return {OG.geometry.Coordinate} 교차점
      */
@@ -9385,7 +9386,9 @@ OG.geometry.Geometry.prototype.constructor = OG.geometry.Geometry;
  *
  * @class
  * @extends OG.geometry.Geometry
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
  *
  * @example
  * var geom = new OG.geometry.PolyLine([[20, 5], [30, 15], [40, 25], [50, 15]]);
@@ -9604,7 +9607,10 @@ OG.geometry.PolyLine.prototype.angleBetweenThreePoints = function (prev, center,
  *
  * @class
  * @extends OG.geometry.PolyLine
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry, OG.common.CurveUtil
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
+ * @requires OG.common.CurveUtil
  *
  * @example
  * var geom = new OG.geometry.Curve([[200, 100], [100, 300], [-100, -100], [-200, 100]]);
@@ -9684,7 +9690,9 @@ OG.geometry.Curve.prototype.toString = function () {
  *
  * @class
  * @extends OG.geometry.Curve
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
  *
  * @example
  * var geom = new OG.geometry.Ellipse([10, 10], 10, 5);
@@ -9793,7 +9801,10 @@ OG.geometry.Ellipse.prototype.toString = function () {
  *
  * @class
  * @extends OG.geometry.PolyLine
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry, OG.common.CurveUtil
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
+ * @requires OG.common.CurveUtil
  *
  * @example
  * var geom = new OG.geometry.BezierCurve([[200, 100], [100, 300], [-100, -100], [-200, 100]]);
@@ -9955,7 +9966,9 @@ OG.geometry.BezierCurve.prototype.reset = function () {
  *
  * @class
  * @extends OG.geometry.Ellipse
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
  *
  * @example
  * var geom = new OG.geometry.Circle([10, 10], 5);
@@ -10022,7 +10035,9 @@ OG.geometry.Circle.prototype.toString = function () {
  *
  * @class
  * @extends OG.geometry.Geometry
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
  *
  * @example
  * var geom1 = new OG.geometry.Point([20, 5]),
@@ -10205,7 +10220,9 @@ OG.geometry.GeometryCollection.prototype.toString = function () {
  *
  * @class
  * @extends OG.geometry.PolyLine
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
  *
  * @example
  * var geom = new OG.geometry.Line([20, 5], [30, 15]);
@@ -10252,7 +10269,9 @@ OG.geometry.Line.prototype.toString = function () {
  *
  * @class
  * @extends OG.geometry.Geometry
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
  *
  * @example
  * var geom = new OG.geometry.Point([20, 5]);
@@ -10404,7 +10423,9 @@ OG.geometry.Point.prototype.toString = function () {
  *
  * @class
  * @extends OG.geometry.PolyLine
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
  *
  * @example
  * var geom = new OG.geometry.Polygon([[20, 5], [30, 15], [40, 25], [50, 15], [60, 5], [20, 5]]);
@@ -10434,7 +10455,9 @@ OG.Polygon = OG.geometry.Polygon;
  *
  * @class
  * @extends OG.geometry.Polygon
- * @requires OG.geometry.Coordinate, OG.geometry.Envelope, OG.geometry.Geometry
+ * @requires OG.geometry.Coordinate
+ * @requires OG.geometry.Envelope
+ * @requires OG.geometry.Geometry
  *
  * @example
  * var geom = new OG.geometry.Rectangle([20, 5], 10, 10);
@@ -10493,7 +10516,8 @@ OG.geometry.Rectangle.prototype.toString = function () {
  * 도형, 텍스트, 이미지 등의 드로잉 될 Object 의 정보를 저장하는 Shape 정보 최상위 인터페이스
  *
  * @class
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
@@ -10645,7 +10669,8 @@ OG.IShape = OG.shape.IShape;
  *
  * @class
  * @extends OG.shape.IShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
  */
@@ -10676,7 +10701,8 @@ OG.shape.GeomShape.prototype.clone = function () {
  *
  * @class
  * @extends OG.shape.IShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} text 텍스트
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -10732,7 +10758,8 @@ OG.shape.TextShape.prototype.clone = function () {
  *
  * @class
  * @extends OG.shape.IShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} image 이미지 URL
  * @param {String} label 라벨 [Optional]
@@ -10791,7 +10818,8 @@ OG.shape.ImageShape.prototype.clone = function () {
  *
  * @class
  * @extends OG.shape.IShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표
@@ -10873,7 +10901,8 @@ OG.shape.EdgeShape.prototype.clone = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -10908,7 +10937,8 @@ OG.shape.CircleShape.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -10943,7 +10973,8 @@ OG.shape.EllipseShape.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -10986,7 +11017,8 @@ OG.shape.From.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.IShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11061,7 +11093,8 @@ OG.shape.GroupShape.prototype.clone = function () {
  *
  * @class
  * @extends OG.shape.GroupShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11103,7 +11136,8 @@ OG.shape.HorizontalLaneShape.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GroupShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11150,7 +11184,8 @@ OG.shape.HorizontalPoolShape.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.IShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} html 임베드 HTML String
  * @param {String} label 라벨 [Optional]
@@ -11209,7 +11244,8 @@ OG.shape.HtmlShape.prototype.clone = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11244,7 +11280,8 @@ OG.shape.RectangleShape.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11279,7 +11316,8 @@ OG.shape.SpotShape.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11322,7 +11360,9 @@ OG.shape.To.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.bpmn.A_Task
- * @requires OG.common.*, OG.geometry.*, OG.shape.bpmn.A_Task
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.bpmn.A_Task
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11364,7 +11404,8 @@ OG.shape.Transformer.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GroupShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11406,7 +11447,8 @@ OG.shape.VerticalLaneShape.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GroupShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨
  */
@@ -11448,7 +11490,8 @@ OG.shape.VerticalPoolShape.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11512,7 +11555,8 @@ OG.Event = OG.shape.bpmn.Event;
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11553,7 +11597,8 @@ OG.shape.bpmn.E_End.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11596,7 +11641,8 @@ OG.shape.bpmn.E_Intermediate.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11637,7 +11683,8 @@ OG.shape.bpmn.E_Start.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11678,7 +11725,9 @@ OG.shape.bpmn.G_Gateway.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.bpmn.A_Task
- * @requires OG.common.*, OG.geometry.*, OG.shape.bpmn.A_Task
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.bpmn.A_Task
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11703,7 +11752,9 @@ OG.A_HumanTask = OG.shape.bpmn.A_HumanTask;
  *
  * @class
  * @extends OG.shape.bpmn.A_Task
- * @requires OG.common.*, OG.geometry.*, OG.shape.bpmn.A_Task
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.bpmn.A_Task
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11728,7 +11779,9 @@ OG.A_LoopTask = OG.shape.bpmn.A_LoopTask;
  *
  * @class
  * @extends OG.shape.bpmn.A_Task
- * @requires OG.common.*, OG.geometry.*, OG.shape.bpmn.A_Task
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.bpmn.A_Task
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11753,7 +11806,9 @@ OG.A_ManualTask = OG.shape.bpmn.A_ManualTask;
  *
  * @class
  * @extends OG.shape.bpmn.A_Task
- * @requires OG.common.*, OG.geometry.*, OG.shape.bpmn.A_Task
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.bpmn.A_Task
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11778,7 +11833,9 @@ OG.A_MapperTask = OG.shape.bpmn.A_MapperTask;
  *
  * @class
  * @extends OG.shape.bpmn.A_Task
- * @requires OG.common.*, OG.geometry.*, OG.shape.bpmn.A_Task
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.bpmn.A_Task
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11802,7 +11859,8 @@ OG.A_ServiceTask = OG.shape.bpmn.A_ServiceTask;
  *
  * @class
  * @extends OG.shape.GroupShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11850,7 +11908,9 @@ OG.shape.bpmn.A_Subprocess.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.bpmn.A_Task
- * @requires OG.common.*, OG.geometry.*, OG.shape.bpmn.A_Task
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.bpmn.A_Task
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -11874,7 +11934,8 @@ OG.A_WebServiceTask = OG.shape.bpmn.A_WebServiceTask;
  *
  * @class
  * @extends OG.shape.EdgeShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표
@@ -11917,7 +11978,8 @@ OG.shape.bpmn.C_Association.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.EdgeShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표
@@ -11959,7 +12021,8 @@ OG.shape.bpmn.C_Conditional.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.EdgeShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표
@@ -12002,7 +12065,8 @@ OG.shape.bpmn.C_DataAssociation.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.EdgeShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표
@@ -12045,7 +12109,8 @@ OG.shape.bpmn.C_DataAssociation.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.EdgeShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표
@@ -12088,7 +12153,8 @@ OG.shape.bpmn.C_Message.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.EdgeShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {Number[]} from 와이어 시작 좌표
  * @param {Number[]} to 와이어 끝 좌표
@@ -12130,7 +12196,8 @@ OG.shape.bpmn.C_Sequence.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12176,7 +12243,8 @@ OG.shape.bpmn.D_Data.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12236,7 +12304,8 @@ OG.shape.bpmn.D_Store.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12295,7 +12364,8 @@ OG.shape.bpmn.E_End_Cancel.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12364,7 +12434,8 @@ OG.shape.bpmn.E_End_Compensation.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12421,7 +12492,8 @@ OG.shape.bpmn.E_End_Connector.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12483,7 +12555,8 @@ OG.shape.bpmn.E_End_Error.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12542,7 +12615,8 @@ OG.shape.bpmn.E_End_Link.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12615,7 +12689,8 @@ OG.shape.bpmn.E_End_Message.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12682,7 +12757,8 @@ OG.shape.bpmn.E_End_Multiple.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12745,7 +12821,8 @@ OG.shape.bpmn.E_Intermediate_Compensation.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12850,7 +12927,8 @@ OG.shape.bpmn.E_Intermediate_Escalation.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -12893,7 +12971,8 @@ OG.shape.bpmn.E_Intermediate_Link.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13023,7 +13102,8 @@ OG.shape.bpmn.E_Intermediate_MessageFill.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13079,7 +13159,8 @@ OG.shape.bpmn.E_Intermediate_Multiple.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13133,7 +13214,8 @@ OG.shape.bpmn.E_Intermediate_Rule.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13195,7 +13277,8 @@ OG.shape.bpmn.E_Intermediate_Timer.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13250,7 +13333,8 @@ OG.shape.bpmn.E_Start_Connector.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13305,7 +13389,8 @@ OG.shape.bpmn.E_Start_Error.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13359,7 +13444,8 @@ OG.shape.bpmn.E_Start_Link.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13424,7 +13510,8 @@ OG.shape.bpmn.E_Start_Message.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13484,7 +13571,8 @@ OG.shape.bpmn.E_Start_Multiple.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13538,7 +13626,8 @@ OG.shape.bpmn.E_Start_Rule.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13599,7 +13688,8 @@ OG.shape.bpmn.E_Start_Timer.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.bpmn.E_End
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13652,7 +13742,8 @@ OG.shape.bpmn.E_Terminate.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13722,7 +13813,8 @@ OG.shape.bpmn.G_Complex.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13780,7 +13872,8 @@ OG.shape.bpmn.G_Exclusive.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13832,7 +13925,8 @@ OG.shape.bpmn.G_Inclusive.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13941,7 +14035,8 @@ OG.shape.bpmn.M_Annotation.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -13992,7 +14087,8 @@ OG.shape.bpmn.M_Group.prototype.createShape = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -14113,7 +14209,8 @@ OG.shape.bpmn.ScopeActivity.prototype.layoutChild = function () {
  *
  * @class
  * @extends OG.shape.GeomShape
- * @requires OG.common.*, OG.geometry.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
@@ -14254,9 +14351,11 @@ OG.shape.bpmn.Value_Chain_Module.prototype.createShape = function () {
  * 도형의 Style 과 Shape 정보를 통해 캔버스에 렌더링 기능을 정의한 인터페이스
  *
  * @class
- * @requires OG.common.*, OG.geometry.*, OG.shape.*
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.*
  *
- * @param {HTMLElement,String} container 컨테이너 DOM element or ID
+ * @param {HTMLElement|String} container 컨테이너 DOM element or ID
  * @param {Number[]} containerSize 컨테이너 Width, Height
  * @param {String} backgroundColor 캔버스 배경색
  * @param {String} backgroundImage 캔버스 배경이미지
@@ -14407,7 +14506,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 터미널로부터 부모 Shape element 를 찾아 반환한다.
      *
-     * @param {Element,String} terminal 터미널 Element or ID
+     * @param {Element|String} terminal 터미널 Element or ID
      * @return {Element} Shape element
      * @private
      */
@@ -14429,7 +14528,7 @@ OG.renderer.IRenderer.prototype = {
      * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
      * @param {OG.shape.IShape} shape Shape
      * @param {Number[]} size Shape Width, Height
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} id Element ID 지정
      * @return {Element} Group DOM Element with geometry
      */
@@ -14441,7 +14540,7 @@ OG.renderer.IRenderer.prototype = {
      * Geometry 를 캔버스에 드로잉한다.
      *
      * @param {OG.geometry.Geometry} geometry 기하 객체
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @return {Element} Group DOM Element with geometry
      */
     drawGeom: function (geometry, style, id) {
@@ -14458,7 +14557,7 @@ OG.renderer.IRenderer.prototype = {
      * @param {Number[]} position 드로잉할 위치 좌표(스타일 'text-anchor': 'start' or 'middle' or 'end' 에 따라 기준이 다름)
      * @param {String} text 텍스트
      * @param {Number[]} size Text Width, Height, Angle
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} id Element ID 지정
      * @return {Element} DOM Element
      */
@@ -14475,7 +14574,7 @@ OG.renderer.IRenderer.prototype = {
      * @param {Number[]} position 드로잉할 위치 좌표(좌상단 기준)
      * @param {String} imgSrc 이미지경로
      * @param {Number[]} size Image Width, Height, Angle
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} id Element ID 지정
      * @return {Element} DOM Element
      */
@@ -14487,7 +14586,7 @@ OG.renderer.IRenderer.prototype = {
      * 라인을 캔버스에 드로잉한다.
      *
      * @param {OG.geometry.Line} line 라인
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} id Element ID 지정
      * @param {Boolean} isSelf 셀프 연결 여부
      * @return {Element} Group DOM Element with geometry
@@ -14499,7 +14598,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * Shape 의 Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
      *
-     * @param {Element,String} shapeElement Shape DOM element or ID
+     * @param {Element|String} shapeElement Shape DOM element or ID
      * @param {String} text 텍스트
      * @param {Object} style 스타일
      * @return {Element} DOM Element
@@ -14511,7 +14610,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * Edge 의 from, to Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
      *
-     * @param {Element,String} shapeElement Shape DOM element or ID
+     * @param {Element|String} shapeElement Shape DOM element or ID
      * @param {String} text 텍스트
      * @param {String} type 유형(FROM or TO)
      * @return {Element} DOM Element
@@ -14541,15 +14640,15 @@ OG.renderer.IRenderer.prototype = {
 
     /**
      * 두개의 터미널을 연결하고, 속성정보에 추가한다.
-     *
-     * @param {Element,Number[]} from 시작점
-     * @param {Element,Number[]} to 끝점
+     * @param {Element|Number[]} fromTerminal 시작점 (fromTerminal)
+     * @param {Element|Number[]} toTerminal 끝점 (toTerminal)
      * @param {Element} edge Edge Shape
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} label Label
-     * @return {Element} 연결된 Edge 엘리먼트
+     * @param {Boolean} preventTrigger 이벤트 트리거 발생 막기
+     * @returns {Element} 연결된 Edge 엘리먼트
      */
-    connect: function (from, to, edge, style, label) {
+    connect: function (fromTerminal, toTerminal, edge, style, label, preventTrigger) {
         throw new OG.NotImplementedException();
     },
 
@@ -14565,7 +14664,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 의 Edge 연결시 Drop Over 가이드를 드로잉한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     drawDropOverGuide: function (element) {
         throw new OG.NotImplementedException();
@@ -14574,7 +14673,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 의 Move & Resize 용 가이드를 드로잉한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Object}
      */
     drawGuide: function (element) {
@@ -14584,7 +14683,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 의 Move & Resize 용 가이드를 제거한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     removeGuide: function (element) {
         throw new OG.NotImplementedException();
@@ -14601,7 +14700,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 의 Connect Guide 를 제거한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     removeConnectGuide: function () {
         throw new OG.NotImplementedException();
@@ -14618,7 +14717,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 이외의 모든 Connect Guide 를 제거한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     removeOtherConnectGuide: function () {
         throw new OG.NotImplementedException();
@@ -14634,7 +14733,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Edge Element 의 Move & Resize 용 가이드를 드로잉한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Object}
      */
     drawEdgeGuide: function (element) {
@@ -14646,7 +14745,7 @@ OG.renderer.IRenderer.prototype = {
      *
      * @param {Number[]} position 드로잉할 위치 좌표(좌상단)
      * @param {Number[]} size Text Width, Height, Angle
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @return {Element} DOM Element
      */
     drawRubberBand: function (position, size, style) {
@@ -14666,7 +14765,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 의 Draggable 가이드를 드로잉한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element}
      * @override
      */
@@ -14676,7 +14775,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 의 Collapse 가이드를 드로잉한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element}
      */
     drawCollapseGuide: function (element) {
@@ -14750,7 +14849,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * Shape 을 캔버스에서 관련된 모두를 삭제한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     removeShape: function (element) {
         throw new OG.NotImplementedException();
@@ -14759,7 +14858,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 를 캔버스에서 제거한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     remove: function (element) {
         throw new OG.NotImplementedException();
@@ -14768,7 +14867,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 하위 엘리먼트만 제거한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     removeChild: function (element) {
         throw new OG.NotImplementedException();
@@ -14822,7 +14921,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 엘리먼트에 속성값을 설정한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Object} attribute 속성값
      */
     setAttr: function (element, attribute) {
@@ -14832,7 +14931,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 엘리먼트 속성값을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {String} attrName 속성이름
      * @return {Object} attribute 속성값
      */
@@ -14843,7 +14942,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * Shape 의 스타일을 변경한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Object} style 스타일
      */
     setShapeStyle: function (element, style) {
@@ -14853,7 +14952,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 를 최상단 레이어로 이동한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     toFront: function (element) {
         throw new OG.NotImplementedException();
@@ -14862,7 +14961,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 를 최하단 레이어로 이동한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     toBack: function (element) {
         throw new OG.NotImplementedException();
@@ -14928,7 +15027,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 를 캔버스에서 show 한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     show: function (element) {
         throw new OG.NotImplementedException();
@@ -14937,7 +15036,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * ID에 해당하는 Element 를 캔버스에서 hide 한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     hide: function (element) {
         throw new OG.NotImplementedException();
@@ -14946,8 +15045,8 @@ OG.renderer.IRenderer.prototype = {
     /**
      * Source Element 를 Target Element 아래에 append 한다.
      *
-     * @param {Element,String} srcElement Element 또는 ID
-     * @param {Element,String} targetElement Element 또는 ID
+     * @param {Element|String} srcElement Element 또는 ID
+     * @param {Element|String} targetElement Element 또는 ID
      * @return {Element} Source Element
      */
     appendChild: function (srcElement, targetElement) {
@@ -14957,8 +15056,8 @@ OG.renderer.IRenderer.prototype = {
     /**
      * Source Element 를 Target Element 이후에 insert 한다.
      *
-     * @param {Element,String} srcElement Element 또는 ID
-     * @param {Element,String} targetElement Element 또는 ID
+     * @param {Element|String} srcElement Element 또는 ID
+     * @param {Element|String} targetElement Element 또는 ID
      * @return {Element} Source Element
      */
     insertAfter: function (srcElement, targetElement) {
@@ -14968,8 +15067,8 @@ OG.renderer.IRenderer.prototype = {
     /**
      * Source Element 를 Target Element 이전에 insert 한다.
      *
-     * @param {Element,String} srcElement Element 또는 ID
-     * @param {Element,String} targetElement Element 또는 ID
+     * @param {Element|String} srcElement Element 또는 ID
+     * @param {Element|String} targetElement Element 또는 ID
      * @return {Element} Source Element
      */
     insertBefore: function (srcElement, targetElement) {
@@ -14979,7 +15078,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 해당 Element 를 가로, 세로 Offset 만큼 이동한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number[]} offset [가로, 세로]
      * @return {Element} Element
      */
@@ -14990,7 +15089,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 주어진 중심좌표로 해당 Element 를 이동한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number[]} position [x, y]
      * @return {Element} Element
      */
@@ -15001,7 +15100,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 중심 좌표를 기준으로 주어진 각도 만큼 회전한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number} angle 각도
      * @return {Element} Element
      */
@@ -15012,7 +15111,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 상, 하, 좌, 우 외곽선을 이동한 만큼 리사이즈 한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
      * @return {Element} Element
      */
@@ -15023,7 +15122,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 중심좌표는 고정한 채 Bounding Box 의 width, height 를 리사이즈 한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number[]} size [Width, Height]
      * @return {Element} Element
      */
@@ -15034,7 +15133,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 노드 Element 를 복사한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element} Element
      */
     clone: function (element) {
@@ -15074,7 +15173,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 해당 엘리먼트의 BoundingBox 영역 정보를 반환한다.
      *
-     * @param {Element,String} element
+     * @param {Element|String} element
      * @return {Object} {width, height, x, y, x2, y2}
      */
     getBBox: function (element) {
@@ -15164,7 +15263,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 연결된 이전 Edge Element 들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element[]} Previous Element's Array
      */
     getPrevEdges: function (element) {
@@ -15188,7 +15287,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 연결된 이후 Edge Element 들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element[]} Previous Element's Array
      */
     getNextEdges: function (element) {
@@ -15212,7 +15311,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 연결된 이전 노드 Element 들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element[]} Previous Element's Array
      */
     getPrevShapes: function (element) {
@@ -15237,7 +15336,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 연결된 이전 노드 Element ID들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {String[]} Previous Element Id's Array
      */
     getPrevShapeIds: function (element) {
@@ -15258,7 +15357,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 연결된 이후 노드 Element 들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element[]} Previous Element's Array
      */
     getNextShapes: function (element) {
@@ -15283,7 +15382,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 연결된 이후 노드 Element ID들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {String[]} Previous Element Id's Array
      */
     getNextShapeIds: function (element) {
@@ -15489,9 +15588,12 @@ OG.renderer.IRenderer.prototype.constructor = OG.renderer.IRenderer;
  *
  * @class
  * @extends OG.renderer.IRenderer
- * @requires OG.common.*, OG.geometry.*, OG.shape.*, raphael-2.1.0
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.*
+ * @requires raphael-2.1.0
  *
- * @param {HTMLElement,String} container 컨테이너 DOM element or ID
+ * @param {HTMLElement|String} container 컨테이너 DOM element or ID
  * @param {Number[]} containerSize 컨테이너 Width, Height
  * @param {String} backgroundColor 캔버스 배경색
  * @param {String} backgroundImage 캔버스 배경이미지
@@ -15620,7 +15722,7 @@ OG.renderer.RaphaelRenderer.prototype._getREleById = function (id) {
  *
  * @param {Element} groupElement Group DOM Element
  * @param {OG.geometry.Geometry} geometry 기하 객체
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {Object} parentStyle Geometry Collection 인 경우 상위 Geometry 스타일
  * @return {Element}
  * @private
@@ -15835,7 +15937,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {String} text 텍스트
  * @param {Number[]} size Text Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @param {Boolean} isEdge 라인여부(라인인 경우 라벨이 가려지지 않도록)
  * @return {Element} DOM Element
@@ -16110,7 +16212,7 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {OG.shape.IShape} shape Shape
  * @param {Number[]} size Shape Width, Height
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @param {Boolean} preventDrop Lane, Pool 생성 drop 모드 수행 방지
  * @return {Element} Group DOM Element with geometry
@@ -16318,7 +16420,7 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
  * Geometry 를 캔버스에 드로잉한다.
  *
  * @param {OG.geometry.Geometry} geometry 기하 객체
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @return {Element} Group DOM Element with geometry
  * @override
  */
@@ -16368,7 +16470,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGeom = function (geometry, style, id) 
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {String} text 텍스트
  * @param {Number[]} size Text Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @return {Element} DOM Element
  * @override
@@ -16506,7 +16608,7 @@ OG.renderer.RaphaelRenderer.prototype.drawText = function (position, text, size,
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {String} html 임베드 HTML String
  * @param {Number[]} size Image Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @return {Element} DOM Element
  * @override
@@ -16601,7 +16703,7 @@ OG.renderer.RaphaelRenderer.prototype.drawHtml = function (position, html, size,
  * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
  * @param {String} imgSrc 이미지경로
  * @param {Number[]} size Image Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @return {Element} DOM Element
  * @override
@@ -16731,8 +16833,8 @@ OG.renderer.RaphaelRenderer.prototype._getPointOfInflectionFromEdge = function (
  * OG.geometry.Line 타입인 경우 EdgeType 에 따라 Path 를 자동으로 계산하며,
  * OG.geometry.PolyLine 인 경우는 주어진 Path 그대로 drawing 한다.
  *
- * @param {OG.geometry.Line,OG.geometry.PolyLine} line 또는 polyLine
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Line|OG.geometry.PolyLine} line 또는 polyLine
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
  * @param {Boolean} isSelf 셀프 연결 여부
  * @return {Element} Group DOM Element with geometry
@@ -16935,9 +17037,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
 /**
  * Shape 의 Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
  *
- * @param {Element,String} shapeElement Shape DOM element or ID
+ * @param {Element|String} shapeElement Shape DOM element or ID
  * @param {String} text 텍스트
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @return {Element} DOM Element
  * @override
  */
@@ -17057,7 +17159,7 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
 /**
  * Edge 의 from, to Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
  *
- * @param {Element,String} shapeElement Shape DOM element or ID
+ * @param {Element|String} shapeElement Shape DOM element or ID
  * @param {String} text 텍스트
  * @param {String} type 유형(FROM or TO)
  * @return {Element} DOM Element
@@ -17429,17 +17531,16 @@ OG.renderer.RaphaelRenderer.prototype.reconnect = function (edge) {
 
 /**
  * 두개의 터미널을 연결하고, 속성정보에 추가한다.
- *
- * @param {Element,Number[]} from 시작점 (fromTerminal)
- * @param {Element,Number[]} to 끝점 (toTerminal)
+ * @param {Element|Number[]} fromTerminal 시작점 (fromTerminal)
+ * @param {Element|Number[]} toTerminal 끝점 (toTerminal)
  * @param {Element} edge Edge Shape
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} label Label
- * @return {Element} 연결된 Edge 엘리먼트
+ * @param {Boolean} preventTrigger 이벤트 트리거 발생 막기
+ * @returns {Element} 연결된 Edge 엘리먼트
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTerminal, edge, style, label, preventTrigger) {
-
     var isEssensia;
     var rEdge = this._getREleById(OG.Util.isElement(edge) ? edge.id : edge);
     if (rEdge) {
@@ -17722,7 +17823,7 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
 /**
  * ID에 해당하는 Element 의 Drop Over 가이드를 드로잉한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.drawDropOverGuide = function (element) {
@@ -18279,7 +18380,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
 /**
  * ID에 해당하는 Element 의 Stick 용 가이드를 드로잉한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} position
  */
 OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
@@ -18340,7 +18441,7 @@ OG.renderer.RaphaelRenderer.prototype.removeAllStickGuide = function () {
 /**
  * ID에 해당하는 Element 의 Move & Resize 용 가이드를 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.removeGuide = function (element) {
@@ -18375,7 +18476,7 @@ OG.renderer.RaphaelRenderer.prototype.removeAllGuide = function () {
 /**
  * ID에 해당하는 Edge Element 의 Move & Resize 용 가이드를 드로잉한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Object}
  * @override
  */
@@ -18553,7 +18654,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
  *
  * @param {Number[]} position 드로잉할 위치 좌표(좌상단)
  * @param {Number[]} size Text Width, Height, Angle
- * @param {OG.geometry.Style,Object} style 스타일
+ * @param {OG.geometry.Style|Object} style 스타일
  * @return {Element} DOM Element
  * @override
  */
@@ -18596,7 +18697,7 @@ OG.renderer.RaphaelRenderer.prototype.removeRubberBand = function (root) {
 /**
  * ID에 해당하는 Element 의 Collapse 가이드를 드로잉한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element}
  * @override
  */
@@ -19311,7 +19412,7 @@ OG.renderer.RaphaelRenderer.prototype.alignTop = function () {
 /**
  * Shape 을 캔버스에서 관련된 모두를 삭제한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
@@ -19348,7 +19449,7 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
 /**
  * ID에 해당하는 Element 를 캔버스에서 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.remove = function (element) {
@@ -19360,7 +19461,7 @@ OG.renderer.RaphaelRenderer.prototype.remove = function (element) {
 /**
  * 하위 엘리먼트만 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.removeChild = function (element) {
@@ -19395,7 +19496,7 @@ OG.renderer.RaphaelRenderer.prototype.getElementByPoint = function (position) {
 /**
  * 엘리먼트에 속성값을 설정한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} attribute 속성값
  * @override
  */
@@ -19409,7 +19510,7 @@ OG.renderer.RaphaelRenderer.prototype.setAttr = function (element, attribute) {
 /**
  * 엘리먼트 속성값을 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {String} attrName 속성이름
  * @return {Object} attribute 속성값
  * @override
@@ -19425,7 +19526,7 @@ OG.renderer.RaphaelRenderer.prototype.getAttr = function (element, attrName) {
 /**
  * Shape 의 스타일을 변경한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} style 스타일
  * @override
  */
@@ -19442,7 +19543,7 @@ OG.renderer.RaphaelRenderer.prototype.setShapeStyle = function (element, style) 
 /**
  * Shape 의 선 연결 커스텀 컨트롤러를 설정한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Array} textList 텍스트 리스트
  * @override
  */
@@ -19462,7 +19563,7 @@ OG.renderer.RaphaelRenderer.prototype.setTextListInController = function (elemen
 /**
  * Shape 의 선 연결 커스텀 컨트롤러를 가져온다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 
@@ -19481,7 +19582,7 @@ OG.renderer.RaphaelRenderer.prototype.getTextListInController = function (elemen
 /**
  * ID에 해당하는 Element 를 최상단 레이어로 이동한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.toFront = function (element) {
@@ -19494,7 +19595,7 @@ OG.renderer.RaphaelRenderer.prototype.toFront = function (element) {
 /**
  * ID에 해당하는 Element 를 최하단 레이어로 이동한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.toBack = function (element) {
@@ -19619,7 +19720,7 @@ OG.renderer.RaphaelRenderer.prototype.setScale = function (scale) {
 /**
  * ID에 해당하는 Element 를 캔버스에서 show 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.show = function (element) {
@@ -19632,7 +19733,7 @@ OG.renderer.RaphaelRenderer.prototype.show = function (element) {
 /**
  * ID에 해당하는 Element 를 캔버스에서 hide 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.hide = function (element) {
@@ -19645,8 +19746,8 @@ OG.renderer.RaphaelRenderer.prototype.hide = function (element) {
 /**
  * Source Element 를 Target Element 아래에 append 한다.
  *
- * @param {Element,String} srcElement Element 또는 ID
- * @param {Element,String} targetElement Element 또는 ID
+ * @param {Element|String} srcElement Element 또는 ID
+ * @param {Element|String} targetElement Element 또는 ID
  * @return {Element} Source Element
  * @override
  */
@@ -19662,8 +19763,8 @@ OG.renderer.RaphaelRenderer.prototype.appendChild = function (srcElement, target
 /**
  * Source Element 를 Target Element 이후에 insert 한다.
  *
- * @param {Element,String} srcElement Element 또는 ID
- * @param {Element,String} targetElement Element 또는 ID
+ * @param {Element|String} srcElement Element 또는 ID
+ * @param {Element|String} targetElement Element 또는 ID
  * @return {Element} Source Element
  * @override
  */
@@ -19679,8 +19780,8 @@ OG.renderer.RaphaelRenderer.prototype.insertAfter = function (srcElement, target
 /**
  * Source Element 를 Target Element 이전에 insert 한다.
  *
- * @param {Element,String} srcElement Element 또는 ID
- * @param {Element,String} targetElement Element 또는 ID
+ * @param {Element|String} srcElement Element 또는 ID
+ * @param {Element|String} targetElement Element 또는 ID
  * @return {Element} Source Element
  * @override
  */
@@ -19696,7 +19797,7 @@ OG.renderer.RaphaelRenderer.prototype.insertBefore = function (srcElement, targe
 /**
  * 해당 Element 를 가로, 세로 Offset 만큼 이동한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number[]} offset [가로, 세로]
  * @param {String[]} excludeEdgeId redraw 제외할 Edge ID
  * @return {Element} Element
@@ -19746,7 +19847,7 @@ OG.renderer.RaphaelRenderer.prototype.move = function (element, offset, excludeE
 /**
  * 주어진 중심좌표로 해당 Element 를 이동한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number[]} position [x, y]
  * @return {Element} Element
  * @override
@@ -19775,7 +19876,7 @@ OG.renderer.RaphaelRenderer.prototype.moveCentroid = function (element, position
 /**
  * 중심 좌표를 기준으로 주어진 각도 만큼 회전한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number} angle 각도
  * @return {Element} Element
  * @override
@@ -19826,7 +19927,7 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle) {
 /**
  * 상, 하, 좌, 우 외곽선을 이동한 만큼 리사이즈 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
  * @return {Element} Element
  * @override
@@ -19873,7 +19974,7 @@ OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset) {
 /**
  * 중심좌표는 고정한 채 Bounding Box 의 width, height 를 리사이즈 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Number[]} size [Width, Height]
  * @return {Element} Element
  * @override
@@ -19904,7 +20005,7 @@ OG.renderer.RaphaelRenderer.prototype.resizeBox = function (element, size) {
 /**
  * 노드 Element 를 복사한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} Element
  * @override
  */
@@ -19933,7 +20034,7 @@ OG.renderer.RaphaelRenderer.prototype.getElementById = function (id) {
 /**
  * 해당 엘리먼트의 BoundingBox 영역 정보를 반환한다.
  *
- * @param {Element,String} element
+ * @param {Element|String} element
  * @return {Object} {width, height, x, y, x2, y2}
  * @override
  */
@@ -20179,7 +20280,7 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
 /**
  * ID에 해당하는 Element 의 Connect Guide 를 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.removeConnectGuide = function (element) {
     var me = this;
@@ -20209,7 +20310,7 @@ OG.renderer.RaphaelRenderer.prototype.removeAllConnectGuide = function () {
 /**
  * ID에 해당하는 Element 이외의 모든 Connect Guide 를 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.removeOtherConnectGuide = function (element) {
 
@@ -20226,7 +20327,7 @@ OG.renderer.RaphaelRenderer.prototype.removeOtherConnectGuide = function (elemen
 /**
  * Element 내부의 Spot 들을 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Array} Spot Element Array
  */
 OG.renderer.RaphaelRenderer.prototype.getSpots = function (element) {
@@ -20244,7 +20345,7 @@ OG.renderer.RaphaelRenderer.prototype.getSpots = function (element) {
 /**
  * Element 내부의 변곡점 Spot 들만 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Array} Spot Element Array
  */
 OG.renderer.RaphaelRenderer.prototype.getCircleSpots = function (element) {
@@ -20267,7 +20368,7 @@ OG.renderer.RaphaelRenderer.prototype.getCircleSpots = function (element) {
  *
  * @param {Number} x 이벤트의 캔버스 기준 x 좌표
  * @param {Number} x 이벤트의 캔버스 기준 y 좌표
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} Spot Element
  */
 OG.renderer.RaphaelRenderer.prototype.createVirtualSpot = function (x, y, element) {
@@ -20379,7 +20480,7 @@ OG.renderer.RaphaelRenderer.prototype.createVirtualSpot = function (x, y, elemen
 /**
  * Element 내부의 가상 변곡점 스팟을 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} Spot Element
  */
 OG.renderer.RaphaelRenderer.prototype.getVirtualSpot = function (element) {
@@ -20396,7 +20497,7 @@ OG.renderer.RaphaelRenderer.prototype.getVirtualSpot = function (element) {
 /**
  * Element 내부의 가상 변곡점 스팟을 삭제한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} Spot Element
  */
 OG.renderer.RaphaelRenderer.prototype.removeVirtualSpot = function (element) {
@@ -20413,7 +20514,7 @@ OG.renderer.RaphaelRenderer.prototype.removeVirtualSpot = function (element) {
 /**
  * Element 내부의 Spot 중 선택한 스팟을 제외하고 모두 삭제하고, 가이드라인도 삭제한다.
  *
- * @param {Element,String} 선택한 spot Element 또는 ID
+ * @param {Element|String} 선택한 spot Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.selectSpot = function (spot) {
     var me = this;
@@ -20460,7 +20561,7 @@ OG.renderer.RaphaelRenderer.prototype._removeEdgeChild = function (rElement) {
 /**
  * 하위 엘리먼트들을 반환한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Array} Array Element
  */
 OG.renderer.RaphaelRenderer.prototype.getChildNodes = function (element) {
@@ -20480,7 +20581,7 @@ OG.renderer.RaphaelRenderer.prototype.getChildNodes = function (element) {
  * Edge Element 내부의 패스중 나열된 두 꼭지점이 매우 짧은 선일 경우 하나의 꼭지점으로 정리한다.
  * Edge Element 내부의 패스중 나열된 세 꼭지점이 평행에 가까울 경우 하나의 선분으로 정리한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.trimEdge = function (element) {
     var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
@@ -20520,7 +20621,7 @@ OG.renderer.RaphaelRenderer.prototype.trimEdge = function (element) {
  * Edge Element의 연결 정보가 있을 경우 연결대상과 꼭지점의 다중 중복을 정리한다.
  * 다중 중복 정리 후 Edge 의 모양이 직선인 경우 새로운 plain 을 제작한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} element
  */
 OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (element) {
@@ -20644,7 +20745,7 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (elemen
 /**
  * Edge Element의 연결 정보가 있을 경우 선분과 연결대상의 연결점을 자연스럽게 한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {Element} element
  */
 OG.renderer.RaphaelRenderer.prototype.trimConnectIntersection = function (element) {
@@ -20704,7 +20805,7 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectIntersection = function (elemen
 /**
  * ID에 해당하는 Element 의 바운더리 영역을 리턴한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @return {OG.geometry.Envelope} Envelope 영역
  */
 OG.renderer.RaphaelRenderer.prototype.getBoundary = function (element) {
@@ -20721,7 +20822,7 @@ OG.renderer.RaphaelRenderer.prototype.getBoundary = function (element) {
 /**
  * Element 에 하이라이트 속성을 부여한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} highlight HIGHLIGHT 속성 집합.
  */
 OG.renderer.RaphaelRenderer.prototype.setHighlight = function (element, highlight) {
@@ -20747,7 +20848,7 @@ OG.renderer.RaphaelRenderer.prototype.setHighlight = function (element, highligh
 /**
  * Element 에 하이라이트 속성을 제거한다.
  *
- * @param {Element,String} element Element 또는 ID
+ * @param {Element|String} element Element 또는 ID
  * @param {Object} highlight HIGHLIGHT 속성 집합.
  */
 OG.renderer.RaphaelRenderer.prototype.removeHighlight = function (element, highlight) {
@@ -20776,7 +20877,7 @@ OG.renderer.RaphaelRenderer.prototype.removeHighlight = function (element, highl
 /**
  * 터미널 문자열을 생성한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {Array} point 연결 좌표정보 [x,y]
  *
  * @return {String} terminal 터미널 문자열
@@ -20798,7 +20899,7 @@ OG.renderer.RaphaelRenderer.prototype.createTerminalString = function (element, 
 /**
  * 디폴트 터미널 문자열을 생성한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  *
  * @return {String} terminal 터미널 문자열
  */
@@ -20819,7 +20920,7 @@ OG.renderer.RaphaelRenderer.prototype.createDefaultTerminalString = function (el
 /**
  * 터미널로부터 부모 Shape element 로의 퍼센테이지 좌표를 반환한다.
  *
- * @param {Element,String} terminal 터미널 Element or ID
+ * @param {Element|String} terminal 터미널 Element or ID
  * @return {Array} [px,py]
  * @private
  */
@@ -20836,7 +20937,7 @@ OG.renderer.RaphaelRenderer.prototype._getPercentageFromTerminal = function (ter
 /**
  * 터미널로부터 좌표를 반환한다.
  *
- * @param {Element,String} terminal 터미널 Element or ID
+ * @param {Element|String} terminal 터미널 Element or ID
  * @return {OG.geometry.Coordinate} 좌표
  * @private
  */
@@ -20895,7 +20996,7 @@ OG.renderer.RaphaelRenderer.prototype.removeAllEdgeGuide = function () {
  *
  * @param {Number} x 이벤트의 캔버스 기준 x 좌표
  * @param {Number} x 이벤트의 캔버스 기준 y 좌표
- * @param {Element,String} targetEle Element 또는 ID
+ * @param {Element|String} targetEle Element 또는 ID
  * @return {Element} Edge Element
  */
 OG.renderer.RaphaelRenderer.prototype.createVirtualEdge = function (x, y, targetEle) {
@@ -21117,7 +21218,7 @@ OG.renderer.RaphaelRenderer.prototype.redo = function () {
 /**
  * 도형의 Lane 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isLane = function (element) {
@@ -21135,7 +21236,7 @@ OG.renderer.RaphaelRenderer.prototype.isLane = function (element) {
 /**
  * 도형의 Pool 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isPool = function (element) {
@@ -21152,7 +21253,7 @@ OG.renderer.RaphaelRenderer.prototype.isPool = function (element) {
 /**
  * 도형의 ScopeActivity 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
@@ -21169,7 +21270,7 @@ OG.renderer.RaphaelRenderer.prototype.isScopeActivity = function (element) {
 /**
  * 도형의 HorizontalLaneShape 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
@@ -21179,7 +21280,7 @@ OG.renderer.RaphaelRenderer.prototype.isHorizontalLane = function (element) {
 /**
  * 도형의 VerticalLaneShape 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isVerticalLane = function (element) {
@@ -21189,7 +21290,7 @@ OG.renderer.RaphaelRenderer.prototype.isVerticalLane = function (element) {
 /**
  * 도형의 HorizontalPoolShape 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isHorizontalPool = function (element) {
@@ -21199,7 +21300,7 @@ OG.renderer.RaphaelRenderer.prototype.isHorizontalPool = function (element) {
 /**
  * 도형의 VerticalPoolShape 타입 여부를 판별한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {boolean} true false
  */
 OG.renderer.RaphaelRenderer.prototype.isVerticalPool = function (element) {
@@ -21209,7 +21310,7 @@ OG.renderer.RaphaelRenderer.prototype.isVerticalPool = function (element) {
 /**
  * Lane 타입 도형 하위의 Lane 타입들을 리턴한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Array} childsLanes
  */
 OG.renderer.RaphaelRenderer.prototype.getChildLane = function (element) {
@@ -21231,7 +21332,7 @@ OG.renderer.RaphaelRenderer.prototype.getChildLane = function (element) {
 /**
  * Lane 타입이 내부적으로 분기가 가능한 수를 리턴한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Number} 0,1,2
  */
 OG.renderer.RaphaelRenderer.prototype.enableDivideCount = function (element) {
@@ -21277,7 +21378,7 @@ OG.renderer.RaphaelRenderer.prototype.enableDivideCount = function (element) {
 /**
  * Lane,Pool 의 타이틀 영역을 제외한 boundary 를 리턴한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {OG.geometry.Envelope} boundary
  */
 OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element) {
@@ -21324,7 +21425,7 @@ OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element
 /**
  * Lane 을 분기한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {String} quarterOrder 분기 명령
  */
 OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrder) {
@@ -21532,7 +21633,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
  * Base Lane 은 자식 Lane 을 가지지 않는 Lane 을 뜻함.
  * 반환하는 Array 는 좌표상의 값을 기준으로 정렬되어 있는 상태이다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Array} childBaseLanes
  */
 OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
@@ -21600,7 +21701,7 @@ OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
 /**
  * Lane 의 최상위 Lane 을 반환한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Element} Lane Element
  */
 OG.renderer.RaphaelRenderer.prototype.getRootLane = function (element) {
@@ -21637,7 +21738,7 @@ OG.renderer.RaphaelRenderer.prototype.getRootLane = function (element) {
 /**
  * Lane 의 BaseLane 으로부터 자신의 순서를 구한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Number} index
  */
 OG.renderer.RaphaelRenderer.prototype.getIndexOfLane = function (element) {
@@ -21669,7 +21770,7 @@ OG.renderer.RaphaelRenderer.prototype.getIndexOfLane = function (element) {
 /**
  * Lane 의 최상위 Lane 으로부터 Depth를 구한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {Number} depth
  */
 OG.renderer.RaphaelRenderer.prototype.getDepthOfLane = function (element) {
@@ -21699,7 +21800,7 @@ OG.renderer.RaphaelRenderer.prototype.getDepthOfLane = function (element) {
 /**
  * Lane 의 BaseLane 영역을 기준으로 전체 Lane 의 구조를 재정립한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.reEstablishLane = function (element) {
     var me = this;
@@ -21829,7 +21930,7 @@ OG.renderer.RaphaelRenderer.prototype.getBoundaryOfElements = function (elements
  * Lane 의 baseLane 들 중
  * Lane의 주어진 direction 과 BaseLane 의 주어진 direction 이 가장 가까운 BaseLane 의 인덱스를 반환한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {String} direction
  * @return {Number} index
  */
@@ -21894,7 +21995,7 @@ OG.renderer.RaphaelRenderer.prototype.getNearestBaseLaneIndexAsDirection = funct
  * Group 의 내부 도형들의 Boundary를 반환한다.
  * Lane 이면 최상위 Lane의 내부 도형들의 Boundary를 반환한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @return {OG.geometry.Envelope} Envelope 영역
  */
 OG.renderer.RaphaelRenderer.prototype.getBoundaryOfInnerShapesGroup = function (element) {
@@ -21929,7 +22030,7 @@ OG.renderer.RaphaelRenderer.prototype.getBoundaryOfInnerShapesGroup = function (
 /**
  * Lane 의 BaseLane 중 길이가 가장 작은 Lane 을 반환한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {Element} baseLane
  */
 OG.renderer.RaphaelRenderer.prototype.getSmallestBaseLane = function (element) {
@@ -21975,7 +22076,7 @@ OG.renderer.RaphaelRenderer.prototype.getSmallestBaseLane = function (element) {
 /**
  * Lane 을 리사이즈한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
  */
 OG.renderer.RaphaelRenderer.prototype.resizeLane = function (element, offset) {
@@ -22071,7 +22172,7 @@ OG.renderer.RaphaelRenderer.prototype.resizeLane = function (element, offset) {
 /**
  * Lane 을 삭제한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.removeLaneShape = function (element) {
     var me = this;
@@ -22162,7 +22263,7 @@ OG.renderer.RaphaelRenderer.prototype.removeLaneShape = function (element) {
 /**
  * Lane 내부 도형들을 구한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfLane = function (element) {
     var me = this;
@@ -22194,7 +22295,7 @@ OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfLane = function (element) 
 /**
  * Lane 의 내부 도형들을 앞으로 이동시킨다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.fitLaneOrder = function (element) {
     var me = this;
@@ -22221,7 +22322,7 @@ OG.renderer.RaphaelRenderer.prototype.fitLaneOrder = function (element) {
  * Shape 가 소속된 의 최상위 그룹 앨리먼트를 반환한다.
  * 그룹이 소속이 아닌 앨리먼트는 자신을 반환한다.
  *
- * @param {Element,String} Element 또는 ID
+ * @param {Element|String} Element 또는 ID
  * @return {Element} Element
  */
 OG.renderer.RaphaelRenderer.prototype.getRootGroupOfShape = function (element) {
@@ -22257,7 +22358,7 @@ OG.renderer.RaphaelRenderer.prototype.getRootGroupOfShape = function (element) {
 /**
  * Edge 가 Gourp 사이를 넘어가는 경우 스타일에 변화를 준다.
  *
- * @param {Element,String} Element 또는 ID
+ * @param {Element|String} Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.checkBridgeEdge = function (element) {
     if (!this._CONFIG.CHECK_BRIDGE_EDGE) {
@@ -22330,7 +22431,7 @@ OG.renderer.RaphaelRenderer.prototype.checkAllBridgeEdge = function () {
 /**
  * Group 내부의 모든 shape 을 리턴한다.
  *
- * @param {Element,String} Element Element 또는 ID
+ * @param {Element|String} Element Element 또는 ID
  */
 OG.renderer.RaphaelRenderer.prototype.getInnerShapesOfGroup = function (element) {
     var me = this;
@@ -22440,9 +22541,9 @@ OG.renderer.RaphaelRenderer.prototype.getFrontForBoundary = function (boundary) 
 /**
  * 신규 Edge 의 vertices 를 연결대상 도형에 따라 설정한다
  *
- * @param {Element,String} Edge Element 또는 ID
- * @param {Element,String} FromShape Element 또는 ID
- * @param {Element,String} ToShape Element 또는 ID
+ * @param {Element|String} Edge Element 또는 ID
+ * @param {Element|String} FromShape Element 또는 ID
+ * @param {Element|String} ToShape Element 또는 ID
  * @return {Element} Edge Element
  */
 OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromShape, toShape) {
@@ -22516,7 +22617,7 @@ OG.renderer.RaphaelRenderer.prototype.trimEdgeDirection = function (edge, fromSh
 /**
  * Lane 또는 Pool 내부 도형들을 그룹에 포함시킨다.
  *
- * @param {Element,String} Element
+ * @param {Element|String} Element
 
  * @return {Element} Element
  */
@@ -22557,7 +22658,7 @@ OG.renderer.RaphaelRenderer.prototype.putInnerShapeToPool = function (element) {
 /**
  * 신규 Lane 또는 Pool 이 캔버스상에서 드래그하여 그려지도록 사전작업을 수행한다.
  *
- * @param {Element,String} Element
+ * @param {Element|String} Element
 
  * @return {Element} Element
  */
@@ -29084,7 +29185,13 @@ OG.RemoteHandler.checkExpiredRemoteCanvas();
  * OpenGraph 캔버스 클래스
  *
  * @class
- * @requires OG.common.*, OG.geometry.*, OG.shape.*, OG.renderer.*, OG.handler.*, OG.layout.*, raphael-2.1.0
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ * @requires OG.shape.*
+ * @requires OG.renderer.*
+ * @requires OG.handler.*
+ * @requires OG.layout.*
+ * @requires raphael-2.1.0
  *
  * @example
  * var canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(./images/grid.gif)');
@@ -29094,7 +29201,7 @@ OG.RemoteHandler.checkExpiredRemoteCanvas();
  *
  * var edge = canvas.connect(circleShape, ellipseShape);
  *
- * @param {HTMLElement,String} container 컨테이너 DOM element or ID
+ * @param {HTMLElement|String} container 컨테이너 DOM element or ID
  * @param {Number[]} containerSize 컨테이너 Width, Height
  * @param {String} backgroundColor 캔버스 배경색
  * @param {String} backgroundImage 캔버스 배경이미지
@@ -30155,7 +30262,7 @@ OG.graph.Canvas.prototype = {
      * @param {Number[]} position 드로잉할 위치 좌표(중앙 기준)
      * @param {OG.shape.IShape} shape Shape
      * @param {Number[]} size Shape Width, Height
-     * @param {OG.geometry.Style,Object} style 스타일 (Optional)
+     * @param {OG.geometry.Style|Object} style 스타일 (Optional)
      * @param {String} id Element ID 지정 (Optional)
      * @param {String} parentId 부모 Element ID 지정 (Optional)
      * @param {Boolean} preventDrop Lane, Pool 생성 drop 모드 수행 방지
@@ -30306,9 +30413,9 @@ OG.graph.Canvas.prototype = {
     /**
      * Shape 의 Label 을 캔버스에 위치 및 사이즈 지정하여 드로잉한다.
      *
-     * @param {Element,String} shapeElement Shape DOM element or ID
+     * @param {Element|String} shapeElement Shape DOM element or ID
      * @param {String} text 텍스트
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @return {Element} DOM Element
      * @override
      */
@@ -30344,7 +30451,7 @@ OG.graph.Canvas.prototype = {
      *
      * @param {Element} fromElement from Shape Element
      * @param {Element} toElement to Shape Element
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} label Label
      * @param fromP fromElement 와 연결될 터미널 좌표(optional)
      * @param toP toElement 와 연결될 터미널 좌표(optional)
@@ -30397,7 +30504,7 @@ OG.graph.Canvas.prototype = {
      *
      * @param {String} fromTerminal from Terminal Id
      * @param {String} toTerminal to Terminal Id
-     * @param {OG.geometry.Style,Object} style 스타일
+     * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} label Label
      * @return {String} id 부여 할 아이디
      * @return {String} shapeId shapeId
@@ -30534,7 +30641,7 @@ OG.graph.Canvas.prototype = {
     /**
      * Shape 을 캔버스에서 관련된 모두를 삭제한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     removeShape: function (element) {
         this._RENDERER.removeShape(element);
@@ -30544,7 +30651,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 하위 엘리먼트만 제거한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     removeChild: function (element) {
         this._RENDERER.removeChild(element);
@@ -30554,7 +30661,7 @@ OG.graph.Canvas.prototype = {
     /**
      * ID에 해당하는 Element 의 Move & Resize 용 가이드를 제거한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     removeGuide: function (element) {
         this._RENDERER.removeGuide(element);
@@ -30615,7 +30722,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 엘리먼트에 속성값을 설정한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Object} attribute 속성값
      */
     setAttr: function (element, attribute) {
@@ -30626,7 +30733,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 엘리먼트 속성값을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {String} attrName 속성이름
      * @return {Object} attribute 속성값
      */
@@ -30638,7 +30745,7 @@ OG.graph.Canvas.prototype = {
     /**
      * ID에 해당하는 Element 를 최상단 레이어로 이동한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     toFront: function (element) {
         this._RENDERER.toFront(element);
@@ -30648,7 +30755,7 @@ OG.graph.Canvas.prototype = {
     /**
      * ID에 해당하는 Element 를 최하단 레이어로 이동한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     toBack: function (element) {
         this._RENDERER.toBack(element);
@@ -30721,7 +30828,7 @@ OG.graph.Canvas.prototype = {
     /**
      * ID에 해당하는 Element 를 캔버스에서 show 한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     show: function (element) {
         this._RENDERER.show(element);
@@ -30731,7 +30838,7 @@ OG.graph.Canvas.prototype = {
     /**
      * ID에 해당하는 Element 를 캔버스에서 hide 한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      */
     hide: function (element) {
         this._RENDERER.hide(element);
@@ -30741,8 +30848,8 @@ OG.graph.Canvas.prototype = {
     /**
      * Source Element 를 Target Element 아래에 append 한다.
      *
-     * @param {Element,String} srcElement Element 또는 ID
-     * @param {Element,String} targetElement Element 또는 ID
+     * @param {Element|String} srcElement Element 또는 ID
+     * @param {Element|String} targetElement Element 또는 ID
      * @return {Element} Source Element
      */
     appendChild: function (srcElement, targetElement) {
@@ -30753,8 +30860,8 @@ OG.graph.Canvas.prototype = {
     /**
      * Source Element 를 Target Element 이후에 insert 한다.
      *
-     * @param {Element,String} srcElement Element 또는 ID
-     * @param {Element,String} targetElement Element 또는 ID
+     * @param {Element|String} srcElement Element 또는 ID
+     * @param {Element|String} targetElement Element 또는 ID
      * @return {Element} Source Element
      */
     insertAfter: function (srcElement, targetElement) {
@@ -30765,8 +30872,8 @@ OG.graph.Canvas.prototype = {
     /**
      * Source Element 를 Target Element 이전에 insert 한다.
      *
-     * @param {Element,String} srcElement Element 또는 ID
-     * @param {Element,String} targetElement Element 또는 ID
+     * @param {Element|String} srcElement Element 또는 ID
+     * @param {Element|String} targetElement Element 또는 ID
      * @return {Element} Source Element
      */
     insertBefore: function (srcElement, targetElement) {
@@ -30777,7 +30884,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 해당 Element 를 가로, 세로 Offset 만큼 이동한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number[]} offset [가로, 세로]
      * @return {Element} Element
      */
@@ -30789,7 +30896,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 주어진 중심좌표로 해당 Element 를 이동한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number[]} position [x, y]
      * @return {Element} Element
      */
@@ -30801,7 +30908,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 중심 좌표를 기준으로 주어진 각도 만큼 회전한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number} angle 각도
      * @return {Element} Element
      */
@@ -30813,7 +30920,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 상, 하, 좌, 우 외곽선을 이동한 만큼 리사이즈 한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
      * @return {Element} Element
      */
@@ -30825,7 +30932,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 중심좌표는 고정한 채 Bounding Box 의 width, height 를 리사이즈 한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @param {Number[]} size [Width, Height]
      * @return {Element} Element
      */
@@ -30837,7 +30944,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 노드 Element 를 복사한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element} Element
      */
     clone: function (element) {
@@ -30883,7 +30990,7 @@ OG.graph.Canvas.prototype = {
     /**
      * Edge 엘리먼트와 연결된 fromShape, toShape 엘리먼트를 반환한다.
      *
-     * @param {Element,String} edgeElement Element 또는 ID
+     * @param {Element|String} edgeElement Element 또는 ID
      * @return {Object}
      */
     getRelatedElementsFromEdge: function (edgeElement) {
@@ -30915,7 +31022,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 해당 엘리먼트의 BoundingBox 영역 정보를 반환한다.
      *
-     * @param {Element,String} element
+     * @param {Element|String} element
      * @return {Object} {width, height, x, y, x2, y2}
      */
     getBBox: function (element) {
@@ -30966,7 +31073,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 주어진 Shape 엘리먼트에 커스텀 데이타를 저장한다.
      *
-     * @param {Element,String} shapeElement Shape DOM Element or ID
+     * @param {Element|String} shapeElement Shape DOM Element or ID
      * @param {Object} data JSON 포맷의 Object
      */
     setCustomData: function (shapeElement, data) {
@@ -30978,7 +31085,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 주어진 Shape 엘리먼트에 저장된 커스텀 데이터를 반환한다.
      *
-     * @param {Element,String} shapeElement Shape DOM Element or ID
+     * @param {Element|String} shapeElement Shape DOM Element or ID
      * @return {Object} JSON 포맷의 Object
      */
     getCustomData: function (shapeElement) {
@@ -30990,7 +31097,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 주어진 Shape 엘리먼트에 확장 커스텀 데이타를 저장한다.
      *
-     * @param {Element,String} shapeElement Shape DOM Element or ID
+     * @param {Element|String} shapeElement Shape DOM Element or ID
      * @param {Object} data JSON 포맷의 Object
      */
     setExtCustomData: function (shapeElement, data) {
@@ -31002,7 +31109,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 주어진 Shape 엘리먼트에 저장된 확장 커스텀 데이터를 반환한다.
      *
-     * @param {Element,String} shapeElement Shape DOM Element or ID
+     * @param {Element|String} shapeElement Shape DOM Element or ID
      * @return {Object} JSON 포맷의 Object
      */
     getExtCustomData: function (shapeElement) {
@@ -31167,7 +31274,7 @@ OG.graph.Canvas.prototype = {
     /**
      * OpenGraph XML 문자열로 부터 Shape 을 드로잉한다.
      *
-     * @param {String, Element} xml XML 문자열 또는 DOM Element
+     * @param {String| Element} xml XML 문자열 또는 DOM Element
      * @return {Object} {width, height, x, y, x2, y2}
      */
     loadXML: function (xml) {
@@ -31389,7 +31496,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 연결된 이전 Edge Element 들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element[]} Previous Element's Array
      */
     getPrevEdges: function (element) {
@@ -31400,7 +31507,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 연결된 이후 Edge Element 들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element[]} Previous Element's Array
      */
     getNextEdges: function (element) {
@@ -31411,7 +31518,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 연결된 이전 노드 Element 들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element[]} Previous Element's Array
      */
     getPrevShapes: function (element) {
@@ -31422,7 +31529,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 연결된 이전 노드 Element ID들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {String[]} Previous Element Id's Array
      */
     getPrevShapeIds: function (element) {
@@ -31433,7 +31540,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 연결된 이후 노드 Element 들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {Element[]} Previous Element's Array
      */
     getNextShapes: function (element) {
@@ -31444,7 +31551,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 연결된 이후 노드 Element ID들을 반환한다.
      *
-     * @param {Element,String} element Element 또는 ID
+     * @param {Element|String} element Element 또는 ID
      * @return {String[]} Previous Element Id's Array
      */
     getNextShapeIds: function (element) {
