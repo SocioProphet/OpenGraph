@@ -25,118 +25,20 @@
     <!-- Opengraph -->
     <script type="text/javascript" src="../opengraph/OpenGraph-0.1.1-SNAPSHOT.js"></script>
 
-    <script type="text/javascript" src="../src/raphael-2.1.0-custom.js"></script>
-    <script type="text/javascript" src="../src/common/Constants.js"></script>
-    <script type="text/javascript" src="../src/common/Util.js"></script>
-    <script type="text/javascript" src="../src/common/CurveUtil.js"></script>
-    <script type="text/javascript" src="../src/common/Exceptions.js"></script>
-    <script type="text/javascript" src="../src/common/HashMap.js"></script>
-    <script type="text/javascript" src="../src/common/JSON.js"></script>
-    <script type="text/javascript" src="../src/geometry/Style.js"></script>
-    <script type="text/javascript" src="../src/geometry/Coordinate.js"></script>
-    <script type="text/javascript" src="../src/geometry/Envelope.js"></script>
-    <script type="text/javascript" src="../src/geometry/Geometry.js"></script>
-    <script type="text/javascript" src="../src/geometry/PolyLine.js"></script>
-    <script type="text/javascript" src="../src/geometry/Curve.js"></script>
-    <script type="text/javascript" src="../src/geometry/Ellipse.js"></script>
-    <script type="text/javascript" src="../src/geometry/BezierCurve.js"></script>
-    <script type="text/javascript" src="../src/geometry/Circle.js"></script>
-    <script type="text/javascript" src="../src/geometry/GeometryCollection.js"></script>
-    <script type="text/javascript" src="../src/geometry/Line.js"></script>
-    <script type="text/javascript" src="../src/geometry/Point.js"></script>
-    <script type="text/javascript" src="../src/geometry/Polygon.js"></script>
-    <script type="text/javascript" src="../src/geometry/Rectangle.js"></script>
+    <script type="text/javascript" src="./lib/d3/d3.js"></script>
+    <script type="text/javascript" src="./factory-resource/bullet.js"></script>
 
-    <!--Shape-->
-    <script type="text/javascript" src="../src/shape/IShape.js"></script>
-    <script type="text/javascript" src="../src/shape/GeomShape.js"></script>
-    <script type="text/javascript" src="../src/shape/TextShape.js"></script>
-    <script type="text/javascript" src="../src/shape/ImageShape.js"></script>
-    <script type="text/javascript" src="../src/shape/EdgeShape.js"></script>
-    <script type="text/javascript" src="../src/shape/CircleShape.js"></script>
-    <script type="text/javascript" src="../src/shape/EllipseShape.js"></script>
-    <script type="text/javascript" src="../src/shape/GroupShape.js"></script>
-    <script type="text/javascript" src="../src/shape/HorizontalLaneShape.js"></script>
-    <script type="text/javascript" src="../src/shape/HorizontalPoolShape.js"></script>
-    <script type="text/javascript" src="../src/shape/HtmlShape.js"></script>
-    <script type="text/javascript" src="../src/shape/RectangleShape.js"></script>
-    <script type="text/javascript" src="../src/shape/VerticalLaneShape.js"></script>
-    <script type="text/javascript" src="../src/shape/VerticalPoolShape.js"></script>
-    <script type="text/javascript" src="../src/shape/Transformer.js"></script>
-
-    <!-- BPMN -->
-    <script type="text/javascript" src="../src/shape/bpmn/A_Subprocess.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/A_Task.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/A_MapperTask.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/A_HumanTask.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/A_ManualTask.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/A_LoopTask.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/A_ServiceTask.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/A_WebServiceTask.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/ParallelMultiple.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/C_Association.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/C_Conditional.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/C_DataAssociation.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/C_Message.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/C_Sequence.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/D_Data.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/D_Store.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/Event.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/Signal.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/Value_Chain.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/Value_Chain_Module.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_End.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_End_Connector.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_End_Cancel.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_End_Compensation.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_End_Error.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_End_Link.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_End_Message.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_End_Multiple.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_Compensation.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_Error.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_Link.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_Message.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_Multiple.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_Rule.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_Timer.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_MessageFill.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Intermediate_Escalation.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Start.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Start_Connector.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Start_Error.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Start_Link.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Start_Message.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Start_Multiple.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Start_Rule.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/E_Start_Timer.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/G_Gateway.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/G_Complex.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/G_Exclusive.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/G_Inclusive.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/G_Parallel.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/M_Annotation.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/M_Group.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/M_Text.js"></script>
-    <script type="text/javascript" src="../src/shape/bpmn/ScopeActivity.js"></script>
-
-    <script type="text/javascript" src="../src/renderer/IRenderer.js"></script>
-    <script type="text/javascript" src="../src/renderer/RaphaelRenderer.js"></script>
-    <script type="text/javascript" src="../src/handler/EventHandler.js"></script>
-    <script type="text/javascript" src="../src/graph/Canvas.js"></script>
+    <link rel="stylesheet" type="text/css" href="./factory-resource/factory.css"/>
 
     <style type="text/css">
         .ui-layout-center {
             padding: 0;
             overflow: scroll;
         }
-
         .ui-layout-west {
             padding: 0;
             overflow: hidden;
         }
-
         .ui-accordion .ui-accordion-content {
             padding: 2px;
             top: 0;
@@ -146,18 +48,15 @@
             position: relative;
             height: 600px;
         }
-
         .icon_shape {
             width: 20px;
             height: 20px;
             cursor: pointer;
         }
-
         .ui-accordion-content img {
             border: none;
             overflow: hidden;
         }
-
         .ui-accordion-content img:hover {
             border: 2px solid blue;
             margin: -2px;
@@ -176,12 +75,10 @@
                 fillSpace: false,
                 autoHeight: false
             });
-
             // Canvas
-            canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
+            canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(./factory-resource/blueprint-bg.png)');
             canvas._CONFIG.DEFAULT_STYLE.EDGE["edge-type"] = "plain";
             //plain , bezier , straight
-
             canvas.initConfig({
                 selectable: true,
                 dragSelectable: true,
@@ -196,18 +93,14 @@
                 collapsible: true,
                 enableHotKey: true,
                 enableContextMenu: true,
-                useSlider: true,
-                stickGuide: true,
-                checkBridgeEdge: true
+                useSlider: true
             });
-
             canvas.addSlider({
                 slider: $("#canvas_slider"),
                 width: 200,
                 height: 300,
                 appendTo: "body"
             });
-
             $(".icon_shape").draggable({
                 start: function () {
                     $('#canvas').data('DRAG_SHAPE', {
@@ -235,58 +128,112 @@
                     }
                 }
             });
-
-            canvas.onDivideLane(function (event, divideLane) {
+            var opengraphData;
+            $.ajax({
+                type: 'GET',
+                url: './factory-resource/factory.json',
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    opengraphData = data;
+                }
             });
-
-            // Shape 이 처음 Draw 되었을 때의 이벤트 리스너
-            canvas.onDrawShape(function (event, shapeElement) {
+            canvas.loadJSON(opengraphData);
+            var svg = canvas._RENDERER.getRootElement();
+            $(svg).css({
+                'background-size': '100%',
+                'background-repeat': 'no-repeat'
             });
-
-            // Undo 되었을 때의 이벤트 리스너
-            canvas.onUndo(function (event) {
+            var svgContainer = d3.select("#" + svg.id);
+            //Draw the Circle
+            var intervalLine = setInterval(function () {
+                var allEdges = canvas._RENDERER.getAllEdges();
+                var edge, vertices, transition, circle;
+                for (var i = 0; i < allEdges.length; i++) {
+                    transition = null;
+                    circle = null;
+                    edge = allEdges[i];
+                    vertices = edge.shape.geom.getVertices();
+                    //var transition, circle;
+                    $.each(vertices, function (index, vertice) {
+                        if (index == 0) {
+                            circle = svgContainer.append("circle")
+                                    .attr("cx", vertice.x)
+                                    .attr("cy", vertice.y)
+                                    .attr("r", 5)
+                                    .attr("fill", "black");
+                            return;
+                        }
+                        if (!transition) {
+                            transition = circle.transition();
+                        } else {
+                            transition = transition.transition();
+                        }
+                        transition = transition
+                                .duration(500)
+                                .attr("cx", vertice.x)
+                                .attr("cy", vertice.y)
+                        if (index == vertices.length - 1) {
+                            transition.remove();
+                        }
+                    });
+                }
+            }, 300);
+            var margin = {top: 5, right: 40, bottom: 20, left: 120},
+                    width = 960 - margin.left - margin.right,
+                    height = 50 - margin.top - margin.bottom;
+            var chart = d3.bullet()
+                    .width(width)
+                    .height(height);
+            d3.json("./factory-resource/bullets.json", function (error, data) {
+                if (error) throw error;
+                var svg = svgContainer
+                        .selectAll("svg")
+                        .data(data)
+                        .enter()
+                        .append("svg")
+                        .attr("class", "bullet")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                        .call(chart);
+                var title = svg.append("g")
+                        .style("text-anchor", "end")
+                        .attr("transform", "translate(-6," + height / 2 + ")");
+                title.append("text")
+                        .attr("class", "title")
+                        .text(function (d) {
+                            return d.title;
+                        });
+                title.append("text")
+                        .attr("class", "subtitle")
+                        .attr("dy", "1em")
+                        .text(function (d) {
+                            return d.subtitle;
+                        });
+                $('.bullet').each(function(index,bullet){
+                    console.log($(bullet));
+                    $(bullet).attr('y',(index * 40) + 400);
+                });
+                var intervalBullet = setInterval(function(){
+                    svg.datum(randomize).call(chart.duration(900));
+                },1000);
             });
-
-            // Redo 되었을 때의 이벤트 리스너
-            canvas.onRedo(function (event) {
-            });
-
-            // Shape 이 Redraw 되었을 때의 이벤트 리스너
-            canvas.onRedrawShape(function (event, shapeElement) {
-            });
-
-            // Shape 이 Remove 될 때의 이벤트 리스너
-            canvas.onRemoveShape(function (event, shapeElement) {
-            });
-
-            // Shape 이 Move 되었을 때의 이벤트 리스너
-            canvas.onMoveShape(function (event, shapeElement, offset) {
-            });
-
-            // Shape 이 Resize 되었을 때의 이벤트 리스너
-            canvas.onResizeShape(function (event, shapeElement, offset) {
-            });
-
-            // Shape 이 Connect 되었을 때의 이벤트 리스너
-            canvas.onConnectShape(function (event, edgeElement, fromElement, toElement) {
-            });
-
-            // Shape 이 Disconnect 되었을 때의 이벤트 리스너
-            canvas.onDisconnectShape(function (event, edgeElement, fromElement, toElement) {
-            });
-
-            //Simple example
-            var circleShape = canvas.drawShape([101, 107], new OG.CircleShape(), [101, 102]);
-            var ellipseShape = canvas.drawShape([203, 405], new OG.EllipseShape('label'), [103, 53]);
-            var edge = canvas.connect(circleShape, ellipseShape, null, '');
-
-            canvas.setTextListInController(circleShape, ['200123', '40012323']);
-
-            var textShape1 = new OG.TextShape("Text Here, Hello World!");
-            canvas.drawShape([300, 100], textShape1, [200, 100, 45], {'font-size': 10, 'text-anchor': 'start', 'vertical-align': 'middle'});
-
+            function randomize(d) {
+                if (!d.randomizer) d.randomizer = randomizer(d);
+                d.ranges = d.ranges.map(d.randomizer);
+                d.markers = d.markers.map(d.randomizer);
+                d.measures = d.measures.map(d.randomizer);
+                return d;
+            }
+            function randomizer(d) {
+                var k = d3.max(d.ranges) * .2;
+                return function (d) {
+                    return Math.max(0, d + k * (Math.random() - .5));
+                };
+            }
         });
-
         function save() {
             opengraphJSON = canvas.toJSON();
         }
@@ -295,12 +242,14 @@
 <body oncontextmenu="return false;">
 <div class="ui-layout-north">
     <input type="button" value="printXML" onclick="console.log($.parseXML(canvas.toXML()));"/>
-    <input type="button" value="printJSON" onclick="console.log(canvas.toJSON());"/>
+    <input type="button" value="printJSON"
+           onclick="console.log(canvas.toJSON());console.log(JSON.stringify(canvas.toJSON()));"/>
     <input type="button" value="clear" onclick="canvas.clear();"/>
     <input type="button" value="saveJSON" onclick="save();"/>
     <input type="button" value="loadJSON" onclick="canvas.loadJSON(opengraphJSON);"/>
     <input type="button" value="undo" onclick="canvas.undo();"/>
     <input type="button" value="redo" onclick="canvas.redo();"/>
+
 </div>
 <div class="ui-layout-west">
     <div id="accordion">
@@ -466,11 +415,9 @@
             _shape_id = _shape_id[_shape_id.length - 1];
             var text = $('<p>' + _shape_id + '</p>');
             var clearfix = $('<div></div>');
-
             $(img).after(text);
             text.after(clearfix);
             $(img).css('float', 'left');
-
             text.css('font-size', 10);
             text.css('float', 'left');
             clearfix.css('clear', 'both');
