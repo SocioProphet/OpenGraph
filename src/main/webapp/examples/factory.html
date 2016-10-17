@@ -26,9 +26,9 @@
     <script type="text/javascript" src="../opengraph/OpenGraph-0.1.1-SNAPSHOT.js"></script>
 
     <script type="text/javascript" src="./lib/d3/d3.js"></script>
-    <script type="text/javascript" src="./factory-resource/bullet.js"></script>
+    <script type="text/javascript" src="./factory/bullet.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="./factory-resource/factory.css"/>
+    <link rel="stylesheet" type="text/css" href="./factory/factory.css"/>
 
     <style type="text/css">
         .ui-layout-center {
@@ -76,7 +76,7 @@
                 autoHeight: false
             });
             // Canvas
-            canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(./factory-resource/blueprint-bg.png)');
+            canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(./factory/blueprint-bg.png)');
             canvas._CONFIG.DEFAULT_STYLE.EDGE["edge-type"] = "plain";
             //plain , bezier , straight
             canvas.initConfig({
@@ -131,7 +131,7 @@
             var opengraphData;
             $.ajax({
                 type: 'GET',
-                url: './factory-resource/factory.json',
+                url: './factory/factory.json',
                 dataType: 'json',
                 async: false,
                 success: function (data) {
@@ -185,7 +185,7 @@
             var chart = d3.bullet()
                     .width(width)
                     .height(height);
-            d3.json("./factory-resource/bullets.json", function (error, data) {
+            d3.json("./factory/bullets.json", function (error, data) {
                 if (error) throw error;
                 var svg = svgContainer
                         .selectAll("svg")
