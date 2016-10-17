@@ -6622,7 +6622,10 @@ OG.shape = {};
 /** @namespace */
 OG.shape.bpmn = {};
 
-/** @namespace */
+/**
+ * @namespace
+ * @private
+ */
 OG.shape.essencia = {};
 
 /**
@@ -7689,6 +7692,7 @@ OG.CurveUtil = OG.common.CurveUtil;
  *
  * @param {String} message 메시지
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.common.NotSupportedException = function (message) {
 	/**
@@ -7712,6 +7716,7 @@ OG.NotSupportedException = OG.common.NotSupportedException;
  *
  * @param {String} message 메시지
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.common.NotImplementedException = function (message) {
 	/**
@@ -7735,6 +7740,7 @@ OG.NotImplementedException = OG.common.NotImplementedException;
  *
  * @param {String} message 메시지
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.common.ParamError = function (message) {
 	/**
@@ -10978,6 +10984,7 @@ OG.shape.EllipseShape.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.From = function (label) {
 	OG.shape.From.superclass.call(this);
@@ -11321,6 +11328,7 @@ OG.shape.SpotShape.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.To = function (label) {
 	OG.shape.To.superclass.call(this);
@@ -11366,6 +11374,7 @@ OG.shape.To.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.Transformer = function (label) {
     OG.shape.Transformer.superclass.call(this);
@@ -11495,6 +11504,7 @@ OG.shape.VerticalPoolShape.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.A_Task = function (label) {
     OG.shape.bpmn.A_Task.superclass.call(this);
@@ -11560,6 +11570,7 @@ OG.Event = OG.shape.bpmn.Event;
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_End = function (label) {
     OG.shape.bpmn.E_End.superclass.call(this);
@@ -11602,6 +11613,7 @@ OG.shape.bpmn.E_End.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Intermediate = function (label) {
 	OG.shape.bpmn.E_Intermediate.superclass.call(this);
@@ -11646,6 +11658,7 @@ OG.shape.bpmn.E_Intermediate.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Start = function (label) {
 	OG.shape.bpmn.E_Start.superclass.call(this);
@@ -11688,6 +11701,7 @@ OG.shape.bpmn.E_Start.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.G_Gateway = function (label) {
 	OG.shape.bpmn.G_Gateway.superclass.call(this);
@@ -11731,6 +11745,7 @@ OG.shape.bpmn.G_Gateway.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.A_HumanTask = function (label) {
     OG.shape.bpmn.A_HumanTask.superclass.call(this);
@@ -11758,6 +11773,7 @@ OG.A_HumanTask = OG.shape.bpmn.A_HumanTask;
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.A_LoopTask = function (label) {
     OG.shape.bpmn.A_LoopTask.superclass.call(this);
@@ -11785,6 +11801,7 @@ OG.A_LoopTask = OG.shape.bpmn.A_LoopTask;
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.A_ManualTask = function (label) {
     OG.shape.bpmn.A_ManualTask.superclass.call(this);
@@ -11812,6 +11829,7 @@ OG.A_ManualTask = OG.shape.bpmn.A_ManualTask;
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.A_MapperTask = function (label) {
     OG.shape.bpmn.A_MapperTask.superclass.call(this);
@@ -11839,6 +11857,7 @@ OG.A_MapperTask = OG.shape.bpmn.A_MapperTask;
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.A_ServiceTask = function (label) {
     OG.shape.bpmn.A_HumanTask.superclass.call(this);
@@ -11864,6 +11883,7 @@ OG.A_ServiceTask = OG.shape.bpmn.A_ServiceTask;
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.A_Subprocess = function (label) {
     OG.shape.bpmn.A_Subprocess.superclass.call(this);
@@ -11914,6 +11934,7 @@ OG.shape.bpmn.A_Subprocess.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.A_WebServiceTask = function (label) {
     OG.shape.bpmn.A_WebServiceTask.superclass.call(this);
@@ -11941,6 +11962,7 @@ OG.A_WebServiceTask = OG.shape.bpmn.A_WebServiceTask;
  * @param {Number[]} to 와이어 끝 좌표
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.C_Association = function (from, to, label) {
     OG.shape.bpmn.C_Association.superclass.call(this, from, to, label);
@@ -11985,6 +12007,7 @@ OG.shape.bpmn.C_Association.prototype.createShape = function () {
  * @param {Number[]} to 와이어 끝 좌표
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.C_Conditional = function (from, to, label) {
     OG.shape.bpmn.C_Conditional.superclass.call(this, from, to, label);
@@ -12072,6 +12095,7 @@ OG.shape.bpmn.C_DataAssociation.prototype.createShape = function () {
  * @param {Number[]} to 와이어 끝 좌표
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.C_DataAssociation = function (from, to, label) {
     OG.shape.bpmn.C_DataAssociation.superclass.call(this, from, to, label);
@@ -12116,6 +12140,7 @@ OG.shape.bpmn.C_DataAssociation.prototype.createShape = function () {
  * @param {Number[]} to 와이어 끝 좌표
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.C_Message = function (from, to, label) {
     OG.shape.bpmn.C_Message.superclass.call(this, from, to, label);
@@ -12160,6 +12185,7 @@ OG.shape.bpmn.C_Message.prototype.createShape = function () {
  * @param {Number[]} to 와이어 끝 좌표
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.C_Sequence = function (from, to, label) {
     OG.shape.bpmn.C_Sequence.superclass.call(this, from, to, label);
@@ -12201,6 +12227,7 @@ OG.shape.bpmn.C_Sequence.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.D_Data = function (label) {
     OG.shape.bpmn.D_Data.superclass.call(this);
@@ -12248,6 +12275,7 @@ OG.shape.bpmn.D_Data.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.D_Store = function (label) {
     OG.shape.bpmn.D_Store.superclass.call(this);
@@ -12309,6 +12337,7 @@ OG.shape.bpmn.D_Store.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_End_Cancel = function (label) {
     OG.shape.bpmn.E_End_Cancel.superclass.call(this);
@@ -12369,6 +12398,7 @@ OG.shape.bpmn.E_End_Cancel.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_End_Compensation = function (label) {
     OG.shape.bpmn.E_End_Compensation.superclass.call(this);
@@ -12439,6 +12469,7 @@ OG.shape.bpmn.E_End_Compensation.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_End_Connector = function (label) {
     OG.shape.bpmn.E_End_Connector.superclass.call(this);
@@ -12497,6 +12528,7 @@ OG.shape.bpmn.E_End_Connector.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_End_Error = function (label) {
     OG.shape.bpmn.E_End_Error.superclass.call(this);
@@ -12560,6 +12592,7 @@ OG.shape.bpmn.E_End_Error.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_End_Link = function (label) {
     OG.shape.bpmn.E_End_Link.superclass.call(this);
@@ -12620,6 +12653,7 @@ OG.shape.bpmn.E_End_Link.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_End_Message = function (label) {
 	OG.shape.bpmn.E_End_Message.superclass.call(this);
@@ -12694,6 +12728,7 @@ OG.shape.bpmn.E_End_Message.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_End_Multiple = function (label) {
 	OG.shape.bpmn.E_End_Multiple.superclass.call(this);
@@ -12762,6 +12797,7 @@ OG.shape.bpmn.E_End_Multiple.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Intermediate_Compensation = function (label) {
 	OG.shape.bpmn.E_Intermediate_Compensation.superclass.call(this);
@@ -12826,6 +12862,7 @@ OG.shape.bpmn.E_Intermediate_Compensation.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Intermediate_Error = function (label) {
 	OG.shape.bpmn.E_Intermediate_Error.superclass.call(this);
@@ -12932,6 +12969,7 @@ OG.shape.bpmn.E_Intermediate_Escalation.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Intermediate_Link = function (label) {
 	OG.shape.bpmn.E_Intermediate_Link.superclass.call(this);
@@ -12976,6 +13014,7 @@ OG.shape.bpmn.E_Intermediate_Link.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Intermediate_Message = function (label) {
 	OG.shape.bpmn.E_Intermediate_Message.superclass.call(this);
@@ -13107,6 +13146,7 @@ OG.shape.bpmn.E_Intermediate_MessageFill.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Intermediate_Multiple = function (label) {
 	OG.shape.bpmn.E_Intermediate_Multiple.superclass.call(this);
@@ -13164,6 +13204,7 @@ OG.shape.bpmn.E_Intermediate_Multiple.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Intermediate_Rule = function (label) {
 	OG.shape.bpmn.E_Intermediate_Rule.superclass.call(this);
@@ -13219,6 +13260,7 @@ OG.shape.bpmn.E_Intermediate_Rule.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Intermediate_Timer = function (label) {
 	OG.shape.bpmn.E_Intermediate_Timer.superclass.call(this);
@@ -13282,6 +13324,7 @@ OG.shape.bpmn.E_Intermediate_Timer.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Start_Connector = function (label) {
     OG.shape.bpmn.E_Start_Connector.superclass.call(this);
@@ -13338,6 +13381,7 @@ OG.shape.bpmn.E_Start_Connector.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Start_Error = function (label) {
     OG.shape.bpmn.E_Start_Error.superclass.call(this);
@@ -13394,6 +13438,7 @@ OG.shape.bpmn.E_Start_Error.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Start_Link = function (label) {
 	OG.shape.bpmn.E_Start_Link.superclass.call(this);
@@ -13449,6 +13494,7 @@ OG.shape.bpmn.E_Start_Link.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Start_Message = function (label) {
 	OG.shape.bpmn.E_Start_Message.superclass.call(this);
@@ -13515,6 +13561,7 @@ OG.shape.bpmn.E_Start_Message.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Start_Multiple = function (label) {
 	OG.shape.bpmn.E_Start_Multiple.superclass.call(this);
@@ -13576,6 +13623,7 @@ OG.shape.bpmn.E_Start_Multiple.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Start_Rule = function (label) {
 	OG.shape.bpmn.E_Start_Rule.superclass.call(this);
@@ -13631,6 +13679,7 @@ OG.shape.bpmn.E_Start_Rule.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Start_Timer = function (label) {
 	OG.shape.bpmn.E_Start_Timer.superclass.call(this);
@@ -13693,6 +13742,7 @@ OG.shape.bpmn.E_Start_Timer.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.E_Terminate = function (label) {
 	OG.shape.bpmn.E_Terminate.superclass.call(this, label);
@@ -13747,6 +13797,7 @@ OG.shape.bpmn.E_Terminate.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.G_Complex = function (label) {
 	OG.shape.bpmn.G_Complex.superclass.call(this);
@@ -13818,6 +13869,7 @@ OG.shape.bpmn.G_Complex.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.G_Exclusive = function (label) {
 	OG.shape.bpmn.G_Exclusive.superclass.call(this);
@@ -13877,6 +13929,7 @@ OG.shape.bpmn.G_Exclusive.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.G_Inclusive = function (label) {
 	OG.shape.bpmn.G_Inclusive.superclass.call(this);
@@ -13930,6 +13983,7 @@ OG.shape.bpmn.G_Inclusive.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.G_Parallel = function (label) {
 	OG.shape.bpmn.G_Parallel.superclass.call(this);
@@ -14040,6 +14094,7 @@ OG.shape.bpmn.M_Annotation.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.M_Group = function (label) {
     OG.shape.bpmn.M_Group.superclass.call(this);
@@ -14092,6 +14147,7 @@ OG.shape.bpmn.M_Group.prototype.createShape = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.M_Text = function (label) {
 	OG.shape.bpmn.M_Text.superclass.call(this);
@@ -14214,6 +14270,7 @@ OG.shape.bpmn.ScopeActivity.prototype.layoutChild = function () {
  *
  * @param {String} label 라벨 [Optional]
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.shape.bpmn.Signal = function (label) {
     OG.shape.bpmn.Signal.superclass.call(this);
@@ -28750,6 +28807,7 @@ OG.EventHandler = OG.handler.EventHandler;
  * var user = new OG.handler.RemoteUser(key, name, sessionId);
  *
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
 OG.handler.RemoteUser = function (key, name, sessionId) {
 
@@ -28794,14 +28852,21 @@ OG.handler.RemoteUser.prototype = {
 OG.handler.RemoteUser.prototype.constructor = OG.handler.RemoteUser;
 OG.RemoteUser = OG.handler.RemoteUser();
 /**
+ * Remote Repository
+ *
+ * @type {{}}
+ * @private
+ */
+OG.handler.RemoteRepo = {};
+/**
  * Remote Handler
  *
  * @class
  * @requires OG.*
  *
  * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
  */
-OG.handler.RemoteRepo = {};
 OG.handler.RemoteHandler = function () {
     this._REPO = OG.handler.RemoteRepo;
     this._CLASSNAME = 'org.uengine.opengraph.RemoteService';

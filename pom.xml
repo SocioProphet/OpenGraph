@@ -68,9 +68,6 @@
                     <directoryRoots>
                         <directoryRoot>${javascript.src.dir}</directoryRoot>
                     </directoryRoots>
-                    <!--<sourceFiles>-->
-                        <!--<sourceFile>${basedir}/src/main/webapp/resources/opengraph/OpenGraph-0.1.1-SNAPSHOT.js</sourceFile>-->
-                    <!--</sourceFiles>-->
                 </configuration>
                 <executions>
                     <execution>
@@ -103,7 +100,7 @@
                     <aggregations>
                         <aggregation>
                             <insertNewLine>true</insertNewLine>
-                            <output>${basedir}/src/main/webapp/resources/opengraph/${project.build.finalName}.js
+                            <output>${basedir}/src/main/webapp/opengraph/${project.build.finalName}.js
                             </output>
                             <inputDir>${javascript.src.dir}</inputDir>
                             <includes>
@@ -143,7 +140,7 @@
                         </aggregation>
                         <aggregation>
                             <insertNewLine>false</insertNewLine>
-                            <output>${basedir}/src/main/webapp/resources/opengraph/${project.build.finalName}-min.js
+                            <output>${basedir}/src/main/webapp/opengraph/${project.build.finalName}-min.js
                             </output>
                             <inputDir>${project.build.directory}/yuicompress</inputDir>
                             <includes>
@@ -183,7 +180,7 @@
                         </aggregation>
                         <aggregation>
                             <insertNewLine>false</insertNewLine>
-                            <output>${basedir}/src/main/webapp/resources/opengraph/${project.build.finalName}-All.js
+                            <output>${basedir}/src/main/webapp/opengraph/${project.build.finalName}-All.js
                             </output>
                             <inputDir>${project.build.directory}/yuicompress</inputDir>
                             <includes>
