@@ -107,7 +107,7 @@ new OG.Canvas(div 아이디, 캔버스 사이즈, 백그라운드 컬러, 백그
 </script>
 ```
 
-[](images/tutorial/tu-1.png)
+![](images/tutorial/tu-1.png)
 
 ### 도형 그리기
 
@@ -124,7 +124,7 @@ canvas.drawShape(좌표[x,y], 도형 , 도형 사이즈[가로,세로]);
 </script>
 ```
 
-[](images/tutorial/tu-2.png)
+![](images/tutorial/tu-2.png)
 
 여기서 캔버스의 drawShape 메소드를 통해서 도형을 그릴때, 그려야 할 도형으로 new OG.CircleShape() 를 선언하였습니다.
 
@@ -138,7 +138,7 @@ Shape 에 대한 종류와 커스터마이징에 대해서는 [Shape](shape.md) 
 
 처음 circleShape 를 클릭하여 보면 다음의 아이콘들이 나타납니다.
 
-[](images/tutorial/tu-3.png)
+![](images/tutorial/tu-3.png)
 
 두 개의 도형을 연결하기 위해 하나의 도형을 캔버스에 더 그려보도록 합니다.
 
@@ -154,7 +154,7 @@ Shape 에 대한 종류와 커스터마이징에 대해서는 [Shape](shape.md) 
 
 처음 circleShape 의 클릭하여 선연결 모양의 아이콘을 클릭 또는 드래그 하여, ellipseShape 를 클릭하거나 마우스 업을 실행하여 보십시오.
 
-[](images/tutorial/tu-4.png)
+![](images/tutorial/tu-4.png)
 
 위와 같은 이벤트를 프로그램적으로 처리할 수 있습니다.
 
