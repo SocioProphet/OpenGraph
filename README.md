@@ -9,6 +9,8 @@ JavaScript graph visualization library for workflow, BPM, org charts, UML, ER, n
    - Canvas
       - [Canvas](document/canvas.md)
       - [Event](document/event.md)
+   - Renderer
+      - [Renderer](document/renderer.md)
    - Element
       - [Element](document/element.md)
       - [Shape](document/shape.md)
