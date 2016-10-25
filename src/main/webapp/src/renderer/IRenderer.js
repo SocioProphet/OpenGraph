@@ -619,6 +619,24 @@ OG.renderer.IRenderer.prototype = {
     },
 
     /**
+     * ID에 해당하는 Element 를 앞으로 한단계 이동한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     */
+    bringForward: function(element){
+        throw new OG.NotImplementedException();
+    },
+
+    /**
+     * ID에 해당하는 Element 를 뒤로 한단계 이동한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     */
+    sendBackward: function(element){
+        throw new OG.NotImplementedException();
+    },
+
+    /**
      * 랜더러 캔버스의 사이즈(Width, Height)를 반환한다.
      *
      * @return {Number[]} Canvas Width, Height

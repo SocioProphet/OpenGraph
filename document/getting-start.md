@@ -171,6 +171,59 @@ canvas.connect(선행 도형, 후행 도형);
 </script>
 ```
 
+### 줌 패널
+
+줌 패널을 추가하기 위해서는 줌 패널로 사용할 div 를 하나 선언합니다.
+
+```
+<body>
+
+<div id="canvas" style="cursor: default;"></div>
+<div id="canvas_slider"></div>
+</body>
+```
+
+이후에 스크립트에서 슬라이더를 추가하는 명령어를 수행해줍니다.
+
+```
+<script type="text/javascript">
+        $(document).ready(function () {
+            var canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
+            canvas.addSlider({
+                            slider: $("#canvas_slider"),
+                            width: 200,
+                            height: 300,
+                            appendTo: "body"
+                        });
+            
+            var circleShape = canvas.drawShape([100, 100], new OG.CircleShape(), [100, 100]);
+            var ellipseShape = canvas.drawShape([200, 300], new OG.EllipseShape('label'), [100, 50]);
+            var edge = canvas.connect(circleShape, ellipseShape);
+        });
+</script>
+```
+
+![](images/tutorial/tu-5.png)
+
+줌 패널의 기능을 canvas.setScale(0 ~ 1) 을 통해 프로그램적으로 수행할 수 있습니다.
+
+```
+<script type="text/javascript">
+        $(document).ready(function () {
+            var canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
+            canvas.addSlider({
+                            slider: $("#canvas_slider"),
+                            width: 200,
+                            height: 300,
+                            appendTo: "body"
+                        });
+            canvas.setScale(0.51);
+        });
+</script>
+```
+
+![](images/tutorial/tu-6.png)
+
 
 
 

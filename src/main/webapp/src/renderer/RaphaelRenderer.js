@@ -4023,6 +4023,50 @@ OG.renderer.RaphaelRenderer.prototype.toBack = function (element) {
 };
 
 /**
+ * ID에 해당하는 Element 를 앞으로 한단계 이동한다.
+ *
+ * @param {Element|String} element Element 또는 ID
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.bringForward = function(element){
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return;
+    }
+    element = rElement.node;
+    var me = this, root = $(me.getRootGroup());
+    if (me.isLane(element)) {
+        element = me._RENDERER.getRootLane(element);
+    }
+    var length = $(element).prevAll().length;
+    root[0].insertBefore(element, OG.Util.isIE() ? root[0].childNodes[length + 1] : root[0].children[length + 1]);
+};
+
+/**
+ * ID에 해당하는 Element 를 뒤로 한단계 이동한다.
+ *
+ * @param {Element|String} element Element 또는 ID
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.sendBackward = function (element) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return;
+    }
+    element = rElement.node;
+    var me = this, root = $(me.getRootGroup());
+    if (me.isLane(element)) {
+        element = me.getRootLane(element);
+    }
+    var length = $(element).prevAll().length;
+    var depth = length - 2;
+    if(depth < 0){
+        depth = 0;
+    }
+    root[0].insertBefore(element, OG.Util.isIE() ? root[0].childNodes[depth] : root[0].children[depth]);
+};
+
+/**
  * 랜더러 캔버스의 사이즈(Width, Height)를 반환한다.
  *
  * @return {Number[]} Canvas Width, Height

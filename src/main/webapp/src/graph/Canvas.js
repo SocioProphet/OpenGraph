@@ -1236,8 +1236,8 @@ OG.graph.Canvas.prototype = {
      * @return {Element} DOM Element
      * @override
      */
-    drawLabel: function (shapeElement, text, style, position) {
-        return this._RENDERER.drawLabel(shapeElement, text, style, position);
+    drawLabel: function (shapeElement, text, style) {
+        return this._RENDERER.drawLabel(shapeElement, text, style);
     }
     ,
 
@@ -1270,8 +1270,8 @@ OG.graph.Canvas.prototype = {
      * @param {Element} toElement to Shape Element
      * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} label Label
-     * @param fromP fromElement 와 연결될 터미널 좌표(optional)
-     * @param toP toElement 와 연결될 터미널 좌표(optional)
+     * @param fromP fromElement 와 연결될 터미널 좌표 [x,y](optional)
+     * @param toP toElement 와 연결될 터미널 좌표 [x,y](optional)
      * @param preventTrigger 참 일 경우 이벤트 발생을 방지
      * @param id 연결선의 아이디
      * @returns {*|Element}
@@ -1578,6 +1578,24 @@ OG.graph.Canvas.prototype = {
         this._RENDERER.toBack(element);
     }
     ,
+
+    /**
+     * ID에 해당하는 Element 를 앞으로 한단계 이동한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     */
+    bringForward: function(element){
+        this._RENDERER.bringForward(element);
+    },
+
+    /**
+     * ID에 해당하는 Element 를 뒤로 한단계 이동한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     */
+    sendBackward: function(element){
+        this._RENDERER.sendBackward(element);
+    },
 
     /**
      * 랜더러 캔버스의 사이즈(Width, Height)를 반환한다.

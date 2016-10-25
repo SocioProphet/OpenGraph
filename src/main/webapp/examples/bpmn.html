@@ -135,6 +135,47 @@
                 }
             });
 
+            //라벨이 Draw 되었을 때의 이벤트 리스너
+            canvas.onDrawLabel(function (event, shapeElement, labelText) {
+
+            });
+
+            //라벨이 Change 되었을 때의 이벤트 리스너
+            canvas.onLabelChanged(function(event, shapeElement, afterText, beforeText){
+
+            });
+
+            //라벨이 Change 되기전 이벤트 리스너
+            canvas.onBeforeLabelChange(function(event, shapeElement, afterText, beforeText){
+
+            });
+
+            //Shape 이 Rotate 될 때의 이벤트 리스너
+            canvas.onRotateShape(function(event, element, angle){
+
+            });
+
+            //Shape 이 Connect 되기전 이벤트 리스너
+            canvas.onBeforeConnectShape(function(event, edgeElement, fromElement, toElement){
+
+            });
+
+            //Shape 이 Remove 되기전 이벤트 리스너
+            canvas.onBeforeRemoveShape(function(event, element){
+
+            });
+
+            //Shape 이 Grouping 되었을 때의 이벤트 리스너
+            canvas.onGroup(function(event, groupElement){
+
+            });
+
+            //Shape 이 UnGrouping 되었을 때의 이벤트 리스너
+            canvas.onUnGroup(function(event, ungroupedElements){
+
+            });
+
+            //Lane 이 divide 되었을 때의 이벤트 리스너
             canvas.onDivideLane(function (event, divideLane) {
             });
 
@@ -182,7 +223,11 @@
             canvas.setTextListInController(circleShape, ['200123', '40012323']);
 
             var textShape1 = new OG.TextShape("Text Here, Hello World!");
-            canvas.drawShape([300, 100], textShape1, [200, 100, 45], {'font-size': 10, 'text-anchor': 'start', 'vertical-align': 'middle'});
+            canvas.drawShape([300, 100], textShape1, [200, 100, 45], {
+                'font-size': 10,
+                'text-anchor': 'start',
+                'vertical-align': 'middle'
+            });
 
         });
 
@@ -206,11 +251,13 @@
         <h3><a href="#">BPMN</a></h3>
 
         <div id="imgGroup">
-            <img src="resources/images/symbol/event_start.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.E_Start"
+            <img src="resources/images/symbol/event_start.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.E_Start"
                  _width="30" _height="30"/>
             <img src="resources/images/symbol/event_intermediate.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.E_Intermediate" _width="30" _height="30"/>
-            <img src="resources/images/symbol/event_end.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.E_End"
+            <img src="resources/images/symbol/event_end.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.E_End"
                  _width="30" _height="30"/>
             <img src="resources/images/symbol/message_start.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.E_Start_Message" _width="30" _height="30"/>
@@ -222,7 +269,8 @@
                  _shape_id="OG.shape.bpmn.E_Start_Link" _width="30" _height="30"/>
             <img src="resources/images/symbol/link_intermediate.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.E_Intermediate_Link" _width="30" _height="30"/>
-            <img src="resources/images/symbol/link_end.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.E_End_Link"
+            <img src="resources/images/symbol/link_end.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.E_End_Link"
                  _width="30" _height="30"/>
             <img src="resources/images/symbol/multiple_start.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.E_Start_Multiple" _width="30" _height="30"/>
@@ -244,13 +292,15 @@
                  _shape_id="OG.shape.bpmn.E_End_Compensation" _width="30" _height="30"/><br/>
             <img src="resources/images/symbol/error_intermediate.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.E_Intermediate_Error" _width="30" _height="30"/>
-            <img src="resources/images/symbol/error_end.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.E_End_Error"
+            <img src="resources/images/symbol/error_end.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.E_End_Error"
                  _width="30" _height="30"/>
             <img src="resources/images/symbol/cancel_end.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.E_End_Cancel" _width="30" _height="30"/>
             <img src="resources/images/symbol/event_terminate.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.E_Terminate" _width="30" _height="30"/><br/>
-            <img src="resources/images/symbol/gateway.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.G_Gateway"
+            <img src="resources/images/symbol/gateway.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.G_Gateway"
                  _width="40" _height="40"/>
             <img src="resources/images/symbol/gateway_exclusive.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.G_Exclusive" _width="40" _height="40"/>
@@ -260,15 +310,19 @@
                  _shape_id="OG.shape.bpmn.G_Complex" _width="40" _height="40"/>
             <img src="resources/images/symbol/gateway_inclusive.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.G_Inclusive" _width="40" _height="40"/><br/>
-            <img src="resources/images/symbol/task.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.A_Task"
+            <img src="resources/images/symbol/task.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.A_Task"
                  _width="70" _height="50"/>
             <img src="resources/images/symbol/subprocess.png" class="icon_shape" _shape_type="GROUP"
                  _shape_id="OG.shape.bpmn.A_Subprocess" _width="200" _height="150"/>
-            <img src="resources/images/symbol/data_object.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.D_Data"
+            <img src="resources/images/symbol/data_object.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.D_Data"
                  _width="50" _height="50"/>
-            <img src="resources/images/symbol/data_store.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.D_Store"
+            <img src="resources/images/symbol/data_store.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.D_Store"
                  _width="50" _height="50"/>
-            <img src="resources/images/symbol/group.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.M_Group"
+            <img src="resources/images/symbol/group.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.M_Group"
                  _width="50" _height="50"/><br/>
             <img src="resources/images/symbol/connector_sequence.png" class="icon_shape" _shape_type="EDGE"
                  _shape_id="OG.shape.bpmn.C_Sequence" _width="200" _height="150"/>
@@ -282,7 +336,8 @@
                  _shape_id="OG.shape.bpmn.C_Association" _width="200" _height="150"/><br/>
             <img src="resources/images/symbol/annotation.png" class="icon_shape" _shape_type="GEOM"
                  _shape_id="OG.shape.bpmn.M_Annotation" _width="70" _height="30"/>
-            <img src="resources/images/symbol/text.png" class="icon_shape" _shape_type="GEOM" _shape_id="OG.shape.bpmn.M_Text"
+            <img src="resources/images/symbol/text.png" class="icon_shape" _shape_type="GEOM"
+                 _shape_id="OG.shape.bpmn.M_Text"
                  _width="50" _height="30"/>
             <img src="resources/images/symbol/horizontal_lane.png" class="icon_shape" _shape_type="GROUP"
                  _shape_id="OG.shape.HorizontalLaneShape" _width="100" _height="100"/>

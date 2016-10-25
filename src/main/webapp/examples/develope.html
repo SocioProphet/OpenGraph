@@ -276,14 +276,9 @@
             });
 
             //Simple example
-            var circleShape = canvas.drawShape([101, 107], new OG.CircleShape(), [101, 102]);
-            var ellipseShape = canvas.drawShape([203, 405], new OG.EllipseShape('label'), [103, 53]);
-            var edge = canvas.connect(circleShape, ellipseShape, null, '');
-
-            canvas.setTextListInController(circleShape, ['200123', '40012323']);
-
-            var textShape1 = new OG.TextShape("Text Here, Hello World!");
-            canvas.drawShape([300, 100], textShape1, [200, 100, 45], {'font-size': 10, 'text-anchor': 'start', 'vertical-align': 'middle'});
+            var rectShape1 = canvas.drawShape([200, 200], new OG.RectangleShape(), [200, 200]);
+            var rectShape = canvas.drawShape([200, 200], new OG.RectangleShape(), [200, 200]);
+            canvas.resizeBox(rectShape,[150,150]);
 
         });
 
