@@ -1107,8 +1107,8 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 부모 엘리먼트를 반환한다. 부모가 루트일때는 반환하지 않는다.
      *
-     * @param {Element} Element  엘리먼트
-     * @return {Element} Element  엘리먼트
+     * @param {Element} element  엘리먼트
+     * @return {Element} element  엘리먼트
      */
     getParent: function (element) {
         var parent = element.parentElement;
@@ -1127,8 +1127,8 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 그룹의 하위 엘리먼트를 반환한다.
      *
-     * @param {Element} Element  엘리먼트
-     * @return {Element} Element  엘리먼트
+     * @param {Element} element  엘리먼트
+     * @returns {Array} Elements
      */
     getChilds: function (element) {
         var childShapes = [];
@@ -1146,7 +1146,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 그룹의 Shape 인지 반환한다. RootGroup 일 경우는 제외.
      *
-     * @param {Element} Element  엘리먼트
+     * @param {Element} element  엘리먼트
      * @return {boolean} true false
      */
     isGroup: function (element) {
@@ -1190,7 +1190,7 @@ OG.renderer.IRenderer.prototype = {
             if ($(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
                 edges.push(element);
             }
-        })
+        });
         return edges;
     },
     /**

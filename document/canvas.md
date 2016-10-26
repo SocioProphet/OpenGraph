@@ -1,5 +1,5 @@
-Canvas
-======
+Canvas Drawing
+==============
 
 오픈그래프의 캔버스 객체는 다음을 선언함으로써 얻을 수 있습니다.
 
@@ -1255,6 +1255,76 @@ canvas.insertAfter(element,parent);
 canvas.insertBefore(element,parent);
 ```
 
+## move
+
+도형을 이동시킬 수 있는 방법은 두가지가 있습니다.
+
+하나는 move 메소드를 통해 x,y 각각 이동할 증분을 설정하는 방법 입니다. (- 값도 가능합니다.)
+
+```
+var rectShape = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100]);
+canvas.move(rectShape,[30,50]);
+```
+
+![](images/canvas/move-1.png)
+
+또 다른 하나는 moveCentroid 메소드를 통해 중심 좌표를 설정하면, 도형이 중심좌표가 주어진 중심좌표와 일치하게 이동되게 됩니다. 
+
+```
+var rectShape = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100]);
+canvas.moveCentroid(rectShape,[150,130]);
+```
+
+![](images/canvas/move-2.png)
+
+## rotate
+
+도형의 기울기에 관한 메소드입니다.
+
+```
+/**
+* 중심 좌표를 기준으로 주어진 각도 만큼 회전한다.
+*
+* @param {Element|String} element Element 또는 ID
+* @param {Number} angle 각도
+* @return {Element} Element
+*/
+var rectShape = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100]);
+canvas.rotate(rectShape,30);
+```
+
+![](images/canvas/rotate.png)
+
+## resize
+
+도형의 크기 조절에 관한 메소드입니다.
+
+```
+/**
+* 상, 하, 좌, 우 외곽선을 이동한 만큼 리사이즈 한다.
+*
+* @param {Element|String} element Element 또는 ID
+* @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
+* @return {Element} Element
+*/
+
+var rectShape = canvas.drawShape([200, 200], new OG.RectangleShape(), [200, 200]);
+canvas.resize(rectShape,[50,50,-50,-50]);
+```
+
+![](images/canvas/resize.png)
+
+
+또 다른 방법으로는 resizeBox 메소드를 사용하여 중심좌표는 고정한 채, 가로와 세로 크기를 변경하는 방법입니다.
+
+```
+var rectShape = canvas.drawShape([200, 200], new OG.RectangleShape(), [200, 200]);
+canvas.resizeBox(rectShape,[150,150]);
+```
+
+![](images/canvas/resize-2.png)
+
+
 ## align
 
 다음은 캔버스의 도형들의 align 상태에 관한 예제입니다.
@@ -1348,78 +1418,23 @@ align 관련 메소드들은 선택된 도형들 기준으로만 적용되며, �
  
 ![](images/canvas/algin-5.png)
 
-## move
+## undo && redo
 
-도형을 이동시킬 수 있는 방법은 두가지가 있습니다.
+사용자에 의해 편집된 오픈그래프의 상태를 undo , redo 합니다.
 
-하나는 move 메소드를 통해 x,y 각각 이동할 증분을 설정하는 방법 입니다. (- 값도 가능합니다.)
-
-```
-var rectShape = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100]);
-canvas.move(rectShape,[30,50]);
-```
-
-![](images/canvas/move-1.png)
-
-또 다른 하나는 moveCentroid 메소드를 통해 중심 좌표를 설정하면, 도형이 중심좌표가 주어진 중심좌표와 일치하게 이동되게 됩니다. 
-
-```
-var rectShape = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100]);
-canvas.moveCentroid(rectShape,[150,130]);
-```
-
-![](images/canvas/move-2.png)
-
-## rotate
-
-도형의 기울기에 관한 메소드입니다.
+프로그램적으로 오픈그래프에 그려진 객체들은 undo , redo 되지 않습니다.
 
 ```
 /**
-* 중심 좌표를 기준으로 주어진 각도 만큼 회전한다.
-*
-* @param {Element|String} element Element 또는 ID
-* @param {Number} angle 각도
-* @return {Element} Element
+* 캔버스 undo.
 */
-var rectShape = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100]);
-canvas.rotate(rectShape,30);
-```
+canvas.undo();
 
-![](images/canvas/rotate.png)
-
-## resize
-
-도형의 크기 조절에 관한 메소드입니다.
-
-```
 /**
-* 상, 하, 좌, 우 외곽선을 이동한 만큼 리사이즈 한다.
-*
-* @param {Element|String} element Element 또는 ID
-* @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
-* @return {Element} Element
+* 캔버스 redo.
 */
-
-var rectShape = canvas.drawShape([200, 200], new OG.RectangleShape(), [200, 200]);
-canvas.resize(rectShape,[50,50,-50,-50]);
+canvas.redo();
 ```
-
-![](images/canvas/resize.png)
-
-
-또 다른 방법으로는 resizeBox 메소드를 사용하여 중심좌표는 고정한 채, 가로와 세로 크기를 변경하는 방법입니다.
-
-```
-var rectShape = canvas.drawShape([200, 200], new OG.RectangleShape(), [200, 200]);
-canvas.resizeBox(rectShape,[150,150]);
-```
-
-![](images/canvas/resize-2.png)
-
-
-
-
 
 
 

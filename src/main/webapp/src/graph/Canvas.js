@@ -1788,6 +1788,16 @@ OG.graph.Canvas.prototype = {
     ,
 
     /**
+     * ID에 해당하는 Element 의 바운더리 영역을 리턴한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     * @return {OG.geometry.Envelope} Envelope 영역
+     */
+    getBoundary: function(element){
+        return this._RENDERER.getBoundary(element);
+    },
+
+    /**
      * ID로 Node Element 를 반환한다.
      *
      * @param {String} id
@@ -1853,6 +1863,43 @@ OG.graph.Canvas.prototype = {
         }
     }
     ,
+    /**
+     * 부모 엘리먼트를 반환한다. 부모가 루트일때는 반환하지 않는다.
+     *
+     * @param {Element} Element  엘리먼트
+     * @return {Element} Element  엘리먼트
+     */
+    getParent: function(element){
+       return this._RENDERER.getParent(element);
+    },
+
+    /**
+     * 그룹의 하위 엘리먼트를 반환한다.
+     *
+     * @param {Element} element  엘리먼트
+     * @returns {Array} Elements
+     */
+    getChilds: function(element){
+        return this._RENDERER.getChilds(element);
+    },
+
+    /**
+     * 캔버스의 모든 Shape 들을 리턴
+     *
+     * @return {Array} Elements
+     */
+    getAllShapes: function(){
+        return this._RENDERER.getAllShapes();
+    },
+
+    /**
+     * 캔버스의 모든 Edge를 리턴
+     *
+     * @return {Array} Edge Elements
+     */
+    getAllEdges: function(){
+        return this._RENDERER.getAllEdges();
+    },
 
     /**
      * 해당 엘리먼트의 BoundingBox 영역 정보를 반환한다.
@@ -2419,7 +2466,7 @@ OG.graph.Canvas.prototype = {
     ,
 
     /**
-     * Undo 되었을때의 이벤트 리스너
+     * Redo 되었을때의 이벤트 리스너
      *
      * @param {Function} callbackFunc 콜백함수(event)
      */
@@ -2433,11 +2480,11 @@ OG.graph.Canvas.prototype = {
     /**
      * Lane 이 divide 되었을 때의 이벤트 리스너
      *
-     * @param {Function} callbackFunc 콜백함수(event, shapeElement)
+     * @param {Function} callbackFunc 콜백함수(event, dividedLane)
      */
     onDivideLane: function (callbackFunc) {
-        $(this.getRootElement()).bind('divideLane', function (event, divideLanes) {
-            callbackFunc(event, divideLanes);
+        $(this.getRootElement()).bind('divideLane', function (event, dividedLane) {
+            callbackFunc(event, dividedLane);
         });
     }
     ,
