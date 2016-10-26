@@ -276,18 +276,20 @@
             });
 
             //Simple example
-            var originalShape = canvas.drawShape([200, 200], new OG.CircleShape(), [150, 150]);
-
-            canvas.onResizeShape(function(event, shapeElement, offset){
-                console.log(offset);
-//                var boundary = canvas.getBoundary(shapeElement);
-//                var copyShape = canvas.drawShape(
-//                        [boundary.getCentroid().x - (offset[0] * 2), boundary.getCentroid().y - (offset[1] * 2)],
-//                        new OG.CircleShape(),
-//                        [150, 150]);
-//                canvas.setShapeStyle(copyShape, {stroke: 'blue'});
-            });
-            var circleShape = canvas.drawShape([200, 200], new OG.CircleShape(), [150, 150]);
+            var element1 = canvas.drawShape([400, 300], new OG.RectangleShape(), [400, 300]);
+            var element = canvas.drawShape([400, 300], new OG.EllipseShape(), [400, 300]);
+            var boundary = canvas.getBoundary(element);
+            console.log(boundary.getWidth());
+            console.log(boundary.getHeight());
+            console.log(boundary.getCentroid().x, boundary.getCentroid().y);
+            console.log(boundary.getUpperLeft().x,boundary.getUpperLeft().y);
+            console.log(boundary.getUpperCenter().x,boundary.getUpperCenter().y);
+            console.log(boundary.getUpperRight().x,boundary.getUpperRight().y);
+            console.log(boundary.getLeftCenter().x,boundary.getLeftCenter().y);
+            console.log(boundary.getRightCenter().x,boundary.getRightCenter().y);
+            console.log(boundary.getLowerLeft().x,boundary.getLowerLeft().y);
+            console.log(boundary.getLowerCenter().x,boundary.getLowerCenter().y);
+            console.log(boundary.getLowerRight().x,boundary.getLowerRight().y);
         });
 
         function save() {

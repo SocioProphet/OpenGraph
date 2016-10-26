@@ -150,9 +150,9 @@ var circleShape = canvas.drawShape([200, 200], new OG.CircleShape(), [150, 150])
 canvas.drawLabel(circleShape,'Label1');
 canvas.drawLabel(circleShape,'blackList');
 
-![](images/canvas/label-3.png)
-
 ```
+
+![](images/canvas/label-3.png)
 
 ## onRemoveShape && onBeforeRemoveShape
 

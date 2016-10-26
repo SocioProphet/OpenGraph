@@ -1436,5 +1436,32 @@ canvas.undo();
 canvas.redo();
 ```
 
+## getBoundary
+
+getBoundary 메소드는 OG.geometry.Envelope 라는 도형의 바운더리 영역 객체를 리턴합니다.
+
+바운더리 영역은 도형을 둘러싼 최소크기의 직사각형 영역을 의미합니다.
+
+다음 예제는 getBoundary 메소드 를 통해 얻은 OG.geometry.Envelope 객체에서 어떻게 값들을 가져올 수 있는지에 대한 예제입니다. 
+
+```
+var element = canvas.drawShape([400, 300], new OG.EllipseShape(), [400, 300]);
+var boundary = canvas.getBoundary(element);
+console.log(boundary.getWidth());
+console.log(boundary.getHeight());
+console.log(boundary.getCentroid().x, boundary.getCentroid().y);
+console.log(boundary.getUpperLeft().x,boundary.getUpperLeft().y);
+console.log(boundary.getUpperCenter().x,boundary.getUpperCenter().y);
+console.log(boundary.getUpperRight().x,boundary.getUpperRight().y);
+console.log(boundary.getLeftCenter().x,boundary.getLeftCenter().y);
+console.log(boundary.getRightCenter().x,boundary.getRightCenter().y);
+console.log(boundary.getLowerLeft().x,boundary.getLowerLeft().y);
+console.log(boundary.getLowerCenter().x,boundary.getLowerCenter().y);
+console.log(boundary.getLowerRight().x,boundary.getLowerRight().y);
+```
+
+![](images/canvas/boundary.png)
+
+
 
 
