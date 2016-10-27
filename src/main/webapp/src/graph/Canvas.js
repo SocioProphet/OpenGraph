@@ -1584,7 +1584,7 @@ OG.graph.Canvas.prototype = {
      *
      * @param {Element|String} element Element 또는 ID
      */
-    bringForward: function(element){
+    bringForward: function (element) {
         this._RENDERER.bringForward(element);
     },
 
@@ -1593,7 +1593,7 @@ OG.graph.Canvas.prototype = {
      *
      * @param {Element|String} element Element 또는 ID
      */
-    sendBackward: function(element){
+    sendBackward: function (element) {
         this._RENDERER.sendBackward(element);
     },
 
@@ -1793,7 +1793,7 @@ OG.graph.Canvas.prototype = {
      * @param {Element|String} element Element 또는 ID
      * @return {OG.geometry.Envelope} Envelope 영역
      */
-    getBoundary: function(element){
+    getBoundary: function (element) {
         return this._RENDERER.getBoundary(element);
     },
 
@@ -1869,8 +1869,8 @@ OG.graph.Canvas.prototype = {
      * @param {Element} Element  엘리먼트
      * @return {Element} Element  엘리먼트
      */
-    getParent: function(element){
-       return this._RENDERER.getParent(element);
+    getParent: function (element) {
+        return this._RENDERER.getParent(element);
     },
 
     /**
@@ -1879,7 +1879,7 @@ OG.graph.Canvas.prototype = {
      * @param {Element} element  엘리먼트
      * @returns {Array} Elements
      */
-    getChilds: function(element){
+    getChilds: function (element) {
         return this._RENDERER.getChilds(element);
     },
 
@@ -1888,7 +1888,7 @@ OG.graph.Canvas.prototype = {
      *
      * @return {Array} Elements
      */
-    getAllShapes: function(){
+    getAllShapes: function () {
         return this._RENDERER.getAllShapes();
     },
 
@@ -1897,7 +1897,7 @@ OG.graph.Canvas.prototype = {
      *
      * @return {Array} Edge Elements
      */
-    getAllEdges: function(){
+    getAllEdges: function () {
         return this._RENDERER.getAllEdges();
     },
 

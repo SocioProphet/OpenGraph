@@ -276,20 +276,78 @@
             });
 
             //Simple example
-            var element1 = canvas.drawShape([400, 300], new OG.RectangleShape(), [400, 300]);
-            var element = canvas.drawShape([400, 300], new OG.EllipseShape(), [400, 300]);
-            var boundary = canvas.getBoundary(element);
-            console.log(boundary.getWidth());
-            console.log(boundary.getHeight());
-            console.log(boundary.getCentroid().x, boundary.getCentroid().y);
-            console.log(boundary.getUpperLeft().x,boundary.getUpperLeft().y);
-            console.log(boundary.getUpperCenter().x,boundary.getUpperCenter().y);
-            console.log(boundary.getUpperRight().x,boundary.getUpperRight().y);
-            console.log(boundary.getLeftCenter().x,boundary.getLeftCenter().y);
-            console.log(boundary.getRightCenter().x,boundary.getRightCenter().y);
-            console.log(boundary.getLowerLeft().x,boundary.getLowerLeft().y);
-            console.log(boundary.getLowerCenter().x,boundary.getLowerCenter().y);
-            console.log(boundary.getLowerRight().x,boundary.getLowerRight().y);
+//            var element1 = canvas.drawShape([400, 300], new OG.RectangleShape(), [400, 300]);
+//            var element = canvas.drawShape([400, 300], new OG.EllipseShape(), [400, 300]);
+//            var boundary = canvas.getBoundary(element);
+
+
+//            OG.shape.CustomShape = function (label) {
+//                OG.shape.CustomShape.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.CustomShape';
+//                this.label = label;
+//            };
+//            OG.shape.CustomShape.prototype = new OG.shape.GeomShape();
+//            OG.shape.CustomShape.superclass = OG.shape.GeomShape;
+//            OG.shape.CustomShape.prototype.constructor = OG.shape.CustomShape;
+//            OG.CustomShape = OG.shape.CustomShape;
+//
+//            /**
+//             * 드로잉할 Shape 을 생성하여 반환한다.
+//             *
+//             * @return {OG.geometry.Geometry} Shape 정보
+//             * @override
+//             */
+//            OG.shape.CustomShape.prototype.createShape = function () {
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                var geom1 = new OG.geometry.Point([20, 5]),
+//                        geom2 = new OG.geometry.Line([20, 15], [30, 15]);
+//                        //geom3 = new OG.geometry.PolyLine([[20, 5], [30, 15], [40, 25], [50, 15]]);
+//
+//                var collection = new OG.geometry.GeometryCollection([geom1, geom2]);
+//
+//                this.geom = collection;
+//                return this.geom;
+//            };
+//            canvas.drawShape([400, 300], new OG.shape.CustomShape(), [400, 300]);
+
+            //canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
+
+            var shape = new OG.CircleShape();
+            shape.createShape = function () {
+                if (this.geom) {
+                    return this.geom;
+                }
+
+                var geom1, geom2, geomCollection = [];
+                if (this.geom) {
+                    return this.geom;
+                }
+
+                geom1 = new OG.geometry.Circle([50, 50], 50);
+                geom2 = new OG.geometry.Line([0, 50], [100, 50]);
+
+                geomCollection.push(geom1);
+                geomCollection.push(geom2);
+                this.geom = new OG.geometry.GeometryCollection(geomCollection);
+
+                return this.geom;
+            };
+            canvas.drawShape([400, 300], shape, [400, 300]);
+
+
+//            $(element).click(function () {
+//                canvas.setShapeStyle(this, {'stroke': 'red'})
+//            });
+
+//            var geom = element.shape.geom;
+//            geom.style.map.stroke = 'red';
+//            geom.move(200,0);
+//            canvas.getRenderer().redrawShape(element);
+
         });
 
         function save() {
