@@ -31,12 +31,13 @@ var element5 = canvas.drawShape(null, edgeShape2, null, {
     'stroke-dasharray': '-',
     'stroke-width': 4
 });
-
 ```
 
 ![](images/geometry/geometry-1.png)
 
+
 각각의 Shape 가 Geometry 공간 기하 객체를 어떻게 호출하는지에 대해 살펴보기 위헤 오픈그래프에서 제공하는 기본 Shape 중 하나인  CircleShape 의 코드를 살펴보도록 하겠습니다.
+
 
 ```
 /**
@@ -117,7 +118,7 @@ shape.createShape = function () {
 canvas.drawShape([400, 300], shape, [400, 300]);
 ```
 
-![](images/geometry/geometry-1.png)
+![](images/geometry/geometry-2.png)
 
 예제에서는 GeometryCollection 이라는 geometry 가 사용되었습니다.
  
