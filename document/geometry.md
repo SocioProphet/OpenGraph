@@ -124,36 +124,34 @@ canvas.drawShape([400, 300], shape, [400, 300]);
 GeometryCollection 은 다수의 geometry 를 혼합하여 그려야 할 경우 사용됩니다.
 
 이제 오픈그래프에서 어떠한 geometry 들을 사용할 수 있고, 사용법은 어떻게 되는지 살펴보도록 합니다. 
- 
-
-
-
-
-
-geometry 설명
 
 point
+
 coordinate
+
 envelope
+
 style
+
 geometry
+
 geometryCollection
+
 polygon
+
 Rectangle
+
 PolyLine
+
 Line
+
 Curve
+
 BezierCurve
+
 Ellipse
+
 Circle
 
-geometry 를 활용한,
-엘리먼트 리드로우
-엣지 리드로우
+geometry 를 활용한,엘리먼트 리드로우엣지 리드로우
 
-
-
-
-.
-.
-.
