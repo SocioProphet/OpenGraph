@@ -124,35 +124,173 @@ canvas.drawShape([400, 300], shape, [400, 300]);
  
 GeometryCollection 은 다수의 geometry 를 혼합하여 그려야 할 경우 사용됩니다.
 
-이제 오픈그래프에서 어떠한 geometry 들을 사용할 수 있고, 사용법은 어떻게 되는지 살펴보도록 합니다. 
+이어지는 내용은 오픈그래프에서 사용할 수 있는 geometry 목록과 그 사용법에 대한 기술입니다.   
 
-point
+## Point
 
-coordinate
+```
+/**
+* Point 공간 기하 객체(Spatial Geometry Object)
+*
+* @class
+* @extends OG.geometry.Geometry
+* @requires OG.geometry.Coordinate
+* @requires OG.geometry.Envelope
+* @requires OG.geometry.Geometry
+*
+* @example
+* var geom = new OG.geometry.Point([20, 5]);
+*
+* @param {OG.geometry.Coordinate} coordinate 좌표값
+* @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+*/
 
-envelope
+Example
+for (var i = 0; i < 100; i++) {
+    var shape = new OG.GeomShape();
+    shape.SHAPE_ID = 'OG.shape.PointExample';
+    shape.createShape = function () {
+        if (this.geom) {
+            return this.geom;
+        }
+        this.geom = new OG.geometry.Point([0, 0]);
+        return this.geom;
+    };
+    var x = (i % 10) * 20 + 100;
+    var y = (Math.floor(i / 10) * 20) + 100;
+    console.log(x,y);
+    canvas.drawShape([x, y], shape, [0, 0]);
+}
+```
 
-style
+![](images/geometry/geometry-point.png)
 
-geometry
+## Coordinate
 
-geometryCollection
+Coordinate 는 오픈그래프의 2차원 좌표계를 나타내는 기하 객체로써, 도형의 각 꼭지점을 표현하거나 Boundary 영역을 표현하는데 사용됩니다.
 
-polygon
+```
+/**
+ * 2차원 좌표계에서의 좌표값
+ *
+ * @example
+ * var coordinate1 = new OG.geometry.Coordinate(10, 10);
+ * or
+ * var coordinate2 = new OG.geometry.Coordinate([20, 20]);
+ *
+ * @class
+ *
+ * @param {Number} x x좌표
+ * @param {Number} y y좌표
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ */
+```
 
-Rectangle
+예제를 통해 다음의 두 도형을 그려보도록 합니다.
 
-PolyLine
+```
+var rectElement = canvas.drawShape([200, 200], new OG.RectangleShape, [150, 150]);
+var ellipseElement = canvas.drawShape([500, 200], new OG.EllipseShape, [150, 110]);
 
-Line
+var rectVertices = rectElement.shape.geom.getVertices();
+var ellipseVertices = ellipseElement.shape.geom.getVertices();
 
-Curve
+//print rectElement vertices
+$.each(rectVertices, function(index, vertice){
+    if(vertice instanceof OG.Coordinate){
+        console.log(vertice.x , vertice.y);
+    }
+});
 
-BezierCurve
+//print ellipseElement vertices
+$.each(ellipseVertices, function(index, vertice){
+    if(vertice instanceof OG.Coordinate){
+        console.log(vertice.x , vertice.y);
+    }
+});
+```
 
-Ellipse
+![](images/geometry/geometry-coodinate.png)
 
-Circle
+geometry 기하 객체 클래스의 getVertices 메소드는 기하객체가 가지고 있는 모든 꼭지점을 리턴합니다.
 
-geometry 를 활용한,엘리먼트 리드로우엣지 리드로우
+getVertices 메소드로 두 도형의 꼭지점들을 출력해보면, 
+직사각형 모양의 rectElement 는 5개(선분이 사각형 모양을 그리기 위해서는 시작점으로 되돌아와야 하기 때문에 꼭지점이 하나 더 붙습니다.) 인 반면
+타원 모양의 ellipseElement 는 매우 많은 꼭지점들을 출력하는 것을 알 수 있습니다.
+
+각 꼭지점의 리턴값은 OG.geometry.Coordinate 이며, x 프로퍼티와 y 프로퍼티로 값을 가져올 수 있습니다.
+ 
+geometry 기하 객체의 vertices 를 이루고 있는 Coordinate 를 변경 또는 추가 할 경우 커스텀한 도형을 그릴 수 있습니다.
+ 
+다음 예제를 통해 편행사변형과 랜덤한 변을 가진 사각형을 그려볼 수 있도록 합니다.
+
+```
+var element1 = canvas.drawShape([200, 200], new OG.RectangleShape('Rect1'), [150, 150]);
+var element2 = canvas.drawShape([500, 200], new OG.RectangleShape('Rect2'), [150, 150]);
+
+//평행사변형 만들기
+var vertices = element1.shape.geom.getVertices();
+vertices[1] = new OG.Coordinate(vertices[1].x + 50, vertices[1].y);
+vertices[3] = new OG.Coordinate(vertices[3].x - 50, vertices[3].y);
+canvas.getRenderer().redrawShape(element1);
+
+
+//랜덤 모양 만들기
+vertices = element2.shape.geom.getVertices();
+var newVertices = [];
+
+newVertices[0] = vertices[0];
+newVertices[100] = vertices[4];
+for (var i = 1; i < 100; i++) {
+    var x, y;
+    if (i < 25) {
+        x = vertices[0].x + Math.floor(((vertices[1].x - vertices[0].x) / 25) * i);
+        y = vertices[0].y + Math.floor(Math.random() * 10) - 5;
+        newVertices[i] = new OG.Coordinate(x, y);
+    }
+    else if (i < 50) {
+        x = vertices[1].x + Math.floor(Math.random() * 10) - 5;
+        y = vertices[1].y + Math.floor(((vertices[2].y - vertices[1].y) / 25) * (i - 25));
+        newVertices[i] = new OG.Coordinate(x, y);
+    }
+    else if (i < 75) {
+        x = vertices[2].x - Math.floor(((vertices[2].x - vertices[3].x) / 25) * (i - 50));
+        y = vertices[2].y + Math.floor(Math.random() * 10) - 5;
+        newVertices[i] = new OG.Coordinate(x, y);
+    }
+    else if (i < 100) {
+        x = vertices[3].x + Math.floor(Math.random() * 10) - 5;
+        y = vertices[3].y - Math.floor(((vertices[3].y - vertices[4].y) / 25) * (i - 75));
+        newVertices[i] = new OG.Coordinate(x, y);
+    }
+}
+element2.shape.geom.vertices = newVertices;
+canvas.getRenderer().redrawShape(element2);
+```
+
+![](images/geometry/geometry-coodinate2.png)
+
+## Envelope
+
+## Style
+
+## Geometry
+
+## GeometryCollection
+
+## Polygon
+
+## Rectangle
+
+## PolyLine
+
+## Line
+
+## Curve
+
+## BezierCurve
+
+## Ellipse
+
+## Circle
 
