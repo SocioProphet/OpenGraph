@@ -466,7 +466,7 @@ shape.createShape = function () {
 var customShape = canvas.drawShape([400, 300], shape, [400, 300]);
 ```
 
-![](images/geometry/geometry-collection.png)
+![](images/geometry/geom-collection.png)
 
 
 ## Polygon
@@ -514,7 +514,7 @@ var customShape = canvas.drawShape([400, 300], shape, [400, 300]);
 
 ```
 
-![](images/geometry/geometry-polygon.png)
+![](images/geometry/geom-polygon.png)
 
 ## Rectangle
 
@@ -563,7 +563,7 @@ shape.createShape = function () {
 var customShape = canvas.drawShape([400, 300], shape, [400, 200]);
 ```
 
-![](images/geometry/geometry-rect.png)
+![](images/geometry/geom-rect.png)
 
 ## PolyLine
 
@@ -642,7 +642,7 @@ shape.createShape = function () {
 var customShape = canvas.drawShape([400, 300], shape, [400, 200]);
 ```
 
-![](images/geometry/geometry-polyline.png)
+![](images/geometry/geom-polyline.png)
  
  
 ## Line
@@ -728,7 +728,7 @@ shape.createShape = function () {
 var customShape = canvas.drawShape([400, 300], shape, [400, 200]);
 ```
 
-![](images/geometry/geometry-curve.png)
+![](images/geometry/geom-curve.png)
 
 ## BezierCurve
 
@@ -777,7 +777,7 @@ var customShape = canvas.drawShape([300, 100], shape);
 
 ```
 
-![](images/geometry/geometry-bezier.png)
+![](images/geometry/geom-bezier.png)
 
 ## Ellipse
 
@@ -826,7 +826,7 @@ shape.createShape = function () {
 var customShape = canvas.drawShape([300, 200], shape, [200, 200]);
 ```
 
-![](images/geometry/geometry-ellipse.png)
+![](images/geometry/geom-ellipse.png)
 
 ## Circle
 
