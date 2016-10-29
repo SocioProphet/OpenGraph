@@ -10596,16 +10596,10 @@ OG.shape.IShape = function () {
 	this.ENABLE_TO = true;
 
 	/**
-	 * TO 연결 가능여부
-	 * @type Boolean
-	 */
-	this.ENABLE_FROM = true;
-
-	/**
 	 * Self 연결 가능여부
 	 * @type Boolean
 	 */
-	this.SELF_CONNECTABLE = true;
+	this.SELF_CONNECTABLE = false;
 
 	/**
 	 * 가이드에 자기자신을 복사하는 컨트롤러 여부.
@@ -14981,6 +14975,24 @@ OG.renderer.IRenderer.prototype = {
     },
 
     /**
+     * ID에 해당하는 Element 를 앞으로 한단계 이동한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     */
+    bringForward: function(element){
+        throw new OG.NotImplementedException();
+    },
+
+    /**
+     * ID에 해당하는 Element 를 뒤로 한단계 이동한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     */
+    sendBackward: function(element){
+        throw new OG.NotImplementedException();
+    },
+
+    /**
      * 랜더러 캔버스의 사이즈(Width, Height)를 반환한다.
      *
      * @return {Number[]} Canvas Width, Height
@@ -15451,8 +15463,8 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 부모 엘리먼트를 반환한다. 부모가 루트일때는 반환하지 않는다.
      *
-     * @param {Element} Element  엘리먼트
-     * @return {Element} Element  엘리먼트
+     * @param {Element} element  엘리먼트
+     * @return {Element} element  엘리먼트
      */
     getParent: function (element) {
         var parent = element.parentElement;
@@ -15471,8 +15483,8 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 그룹의 하위 엘리먼트를 반환한다.
      *
-     * @param {Element} Element  엘리먼트
-     * @return {Element} Element  엘리먼트
+     * @param {Element} element  엘리먼트
+     * @returns {Array} Elements
      */
     getChilds: function (element) {
         var childShapes = [];
@@ -15490,7 +15502,7 @@ OG.renderer.IRenderer.prototype = {
     /**
      * 그룹의 Shape 인지 반환한다. RootGroup 일 경우는 제외.
      *
-     * @param {Element} Element  엘리먼트
+     * @param {Element} element  엘리먼트
      * @return {boolean} true false
      */
     isGroup: function (element) {
@@ -15534,7 +15546,7 @@ OG.renderer.IRenderer.prototype = {
             if ($(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
                 edges.push(element);
             }
-        })
+        });
         return edges;
     },
     /**
@@ -19619,6 +19631,50 @@ OG.renderer.RaphaelRenderer.prototype.toBack = function (element) {
 };
 
 /**
+ * ID에 해당하는 Element 를 앞으로 한단계 이동한다.
+ *
+ * @param {Element|String} element Element 또는 ID
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.bringForward = function(element){
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return;
+    }
+    element = rElement.node;
+    var me = this, root = $(me.getRootGroup());
+    if (me.isLane(element)) {
+        element = me._RENDERER.getRootLane(element);
+    }
+    var length = $(element).prevAll().length;
+    root[0].insertBefore(element, OG.Util.isIE() ? root[0].childNodes[length + 1] : root[0].children[length + 1]);
+};
+
+/**
+ * ID에 해당하는 Element 를 뒤로 한단계 이동한다.
+ *
+ * @param {Element|String} element Element 또는 ID
+ * @override
+ */
+OG.renderer.RaphaelRenderer.prototype.sendBackward = function (element) {
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return;
+    }
+    element = rElement.node;
+    var me = this, root = $(me.getRootGroup());
+    if (me.isLane(element)) {
+        element = me.getRootLane(element);
+    }
+    var length = $(element).prevAll().length;
+    var depth = length - 2;
+    if(depth < 0){
+        depth = 0;
+    }
+    root[0].insertBefore(element, OG.Util.isIE() ? root[0].childNodes[depth] : root[0].children[depth]);
+};
+
+/**
  * 랜더러 캔버스의 사이즈(Width, Height)를 반환한다.
  *
  * @return {Number[]} Canvas Width, Height
@@ -21439,7 +21495,7 @@ OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element
  * Lane 을 분기한다.
  *
  * @param {Element|String} Element Element 또는 ID
- * @param {String} quarterOrder 분기 명령
+ * @param {String} quarterOrder 분기 명령 QUARTER_UPPER | QUARTER_LOW | QUARTER_BISECTOR | QUARTER_THIRDS
  */
 OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrder) {
     var divedLanes = [];
@@ -21639,6 +21695,8 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
     }
 
     me.offDropablePool();
+
+    return divedLanes;
 };
 
 /**
@@ -30440,8 +30498,8 @@ OG.graph.Canvas.prototype = {
      * @return {Element} DOM Element
      * @override
      */
-    drawLabel: function (shapeElement, text, style, position) {
-        return this._RENDERER.drawLabel(shapeElement, text, style, position);
+    drawLabel: function (shapeElement, text, style) {
+        return this._RENDERER.drawLabel(shapeElement, text, style);
     }
     ,
 
@@ -30474,8 +30532,8 @@ OG.graph.Canvas.prototype = {
      * @param {Element} toElement to Shape Element
      * @param {OG.geometry.Style|Object} style 스타일
      * @param {String} label Label
-     * @param fromP fromElement 와 연결될 터미널 좌표(optional)
-     * @param toP toElement 와 연결될 터미널 좌표(optional)
+     * @param fromP fromElement 와 연결될 터미널 좌표 [x,y](optional)
+     * @param toP toElement 와 연결될 터미널 좌표 [x,y](optional)
      * @param preventTrigger 참 일 경우 이벤트 발생을 방지
      * @param id 연결선의 아이디
      * @returns {*|Element}
@@ -30784,6 +30842,24 @@ OG.graph.Canvas.prototype = {
     ,
 
     /**
+     * ID에 해당하는 Element 를 앞으로 한단계 이동한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     */
+    bringForward: function (element) {
+        this._RENDERER.bringForward(element);
+    },
+
+    /**
+     * ID에 해당하는 Element 를 뒤로 한단계 이동한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     */
+    sendBackward: function (element) {
+        this._RENDERER.sendBackward(element);
+    },
+
+    /**
      * 랜더러 캔버스의 사이즈(Width, Height)를 반환한다.
      *
      * @return {Number[]} Canvas Width, Height
@@ -30974,6 +31050,16 @@ OG.graph.Canvas.prototype = {
     ,
 
     /**
+     * ID에 해당하는 Element 의 바운더리 영역을 리턴한다.
+     *
+     * @param {Element|String} element Element 또는 ID
+     * @return {OG.geometry.Envelope} Envelope 영역
+     */
+    getBoundary: function (element) {
+        return this._RENDERER.getBoundary(element);
+    },
+
+    /**
      * ID로 Node Element 를 반환한다.
      *
      * @param {String} id
@@ -31039,6 +31125,43 @@ OG.graph.Canvas.prototype = {
         }
     }
     ,
+    /**
+     * 부모 엘리먼트를 반환한다. 부모가 루트일때는 반환하지 않는다.
+     *
+     * @param {Element} Element  엘리먼트
+     * @return {Element} Element  엘리먼트
+     */
+    getParent: function (element) {
+        return this._RENDERER.getParent(element);
+    },
+
+    /**
+     * 그룹의 하위 엘리먼트를 반환한다.
+     *
+     * @param {Element} element  엘리먼트
+     * @returns {Array} Elements
+     */
+    getChilds: function (element) {
+        return this._RENDERER.getChilds(element);
+    },
+
+    /**
+     * 캔버스의 모든 Shape 들을 리턴
+     *
+     * @return {Array} Elements
+     */
+    getAllShapes: function () {
+        return this._RENDERER.getAllShapes();
+    },
+
+    /**
+     * 캔버스의 모든 Edge를 리턴
+     *
+     * @return {Array} Edge Elements
+     */
+    getAllEdges: function () {
+        return this._RENDERER.getAllEdges();
+    },
 
     /**
      * 해당 엘리먼트의 BoundingBox 영역 정보를 반환한다.
@@ -31605,7 +31728,7 @@ OG.graph.Canvas.prototype = {
     ,
 
     /**
-     * Undo 되었을때의 이벤트 리스너
+     * Redo 되었을때의 이벤트 리스너
      *
      * @param {Function} callbackFunc 콜백함수(event)
      */
@@ -31619,11 +31742,11 @@ OG.graph.Canvas.prototype = {
     /**
      * Lane 이 divide 되었을 때의 이벤트 리스너
      *
-     * @param {Function} callbackFunc 콜백함수(event, shapeElement)
+     * @param {Function} callbackFunc 콜백함수(event, dividedLane)
      */
     onDivideLane: function (callbackFunc) {
-        $(this.getRootElement()).bind('divideLane', function (event, divideLanes) {
-            callbackFunc(event, divideLanes);
+        $(this.getRootElement()).bind('divideLane', function (event, dividedLane) {
+            callbackFunc(event, dividedLane);
         });
     }
     ,
