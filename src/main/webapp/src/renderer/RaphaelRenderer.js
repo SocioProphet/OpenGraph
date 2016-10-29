@@ -5887,7 +5887,7 @@ OG.renderer.RaphaelRenderer.prototype.getExceptTitleLaneArea = function (element
  * Lane 을 분기한다.
  *
  * @param {Element|String} Element Element 또는 ID
- * @param {String} quarterOrder 분기 명령
+ * @param {String} quarterOrder 분기 명령 QUARTER_UPPER | QUARTER_LOW | QUARTER_BISECTOR | QUARTER_THIRDS
  */
 OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrder) {
     var divedLanes = [];
@@ -6087,6 +6087,8 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
     }
 
     me.offDropablePool();
+
+    return divedLanes;
 };
 
 /**

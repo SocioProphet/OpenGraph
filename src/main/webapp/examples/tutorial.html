@@ -23,29 +23,87 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            var canvas = new OG.Canvas('canvas', [400, 400], 'white', 'url(resources/images/symbol/grid.gif)');
+            OG.shape.CustomCollection = function (label) {
+                OG.shape.CustomCollection.superclass.call(this);
 
-            var circleShape = canvas.drawShape([101, 107], new OG.CircleShape(), [101, 102]);
-            var ellipseShape = canvas.drawShape([203, 205], new OG.EllipseShape('label'), [103, 53]);
-            var edge = canvas.connect(circleShape, ellipseShape, null, '');
+                this.SHAPE_ID = 'OG.shape.CustomCollection';
+                this.label = label;
+            };
+            OG.shape.CustomCollection.prototype = new OG.shape.GeomShape();
+            OG.shape.CustomCollection.superclass = OG.shape.GeomShape;
+            OG.shape.CustomCollection.prototype.constructor = OG.shape.CustomCollection;
+            OG.CustomCollection = OG.shape.CustomCollection;
 
-            canvas._HANDLER.selectShapes([circleShape,ellipseShape]);
+            OG.shape.CustomCollection.prototype.createShape = function () {
+                if (this.geom) {
+                    return this.geom;
+                }
 
-            $('#alignLeft').click(function(){
-                canvas.alignLeft();
-            });
+                var geomCollection = [];
+                if (this.geom) {
+                    return this.geom;
+                }
 
-            $('#alignRight').click(function(){
-                canvas.alignRight();
-            });
+                for (var i = 0; i < 36; i++) {
+                    var geom = new OG.geometry.Curve([[500, 200], [400, 400 - i * 2], [200, 0 + i * 2], [100, 200]]);
+                    geomCollection.push(geom);
+                }
+                for (var i = 0; i < 15; i++) {
+                    geomCollection.push(new OG.geometry.Circle([300, 200], i * 2));
+                }
 
-            $('#alignTop').click(function(){
-                canvas.alignTop();
-            });
+                this.geom = new OG.geometry.GeometryCollection(geomCollection);
 
-            $('#alignBottom').click(function(){
-                canvas.alignBottom();
-            });
+                this.geom.style = new OG.geometry.Style({
+                    'cursor': 'default',
+                    'stroke': '#d9534f',
+                    'stroke-width': '1',
+                    'fill': 'none',
+                    'fill-opacity': 0
+                });
+                return this.geom;
+            };
+
+            OG.shape.CustomCollection.prototype.animation = function(canvas, element){
+                var count = 0;
+                var command = 'plus';
+                var interval = setInterval(function(){
+                    if(command == 'plus' && count > 10){
+                        command = 'minus';
+                    }else if(command == 'minus' && count < 1){
+                        command = 'plus';
+                    }
+                    if(command == 'plus'){
+                        count++;
+                    }else{
+                        count--;
+                    }
+                    var geomCollection = [];
+                    for (var i = 0; i < 36; i++) {
+                        var geom = new OG.geometry.Curve([[500, 200], [400, 400 - i * count], [200, 0 + i * count], [100, 200]]);
+                        geomCollection.push(geom);
+                    }
+                    for (var i = 0; i < 15; i++) {
+                        geomCollection.push(new OG.geometry.Circle([300, 200], i * count));
+                    }
+                    element.shape.geom = new OG.geometry.GeometryCollection(geomCollection);
+                    element.shape.geom.style = new OG.geometry.Style({
+                        'cursor': 'default',
+                        'stroke': '#d9534f',
+                        'stroke-width': '1',
+                        'fill': 'none',
+                        'fill-opacity': 0
+                    });
+
+                    canvas.getRenderer().redrawShape(element);
+                },100);
+            };
+
+            var canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
+
+            var shape = new OG.CustomCollection();
+            var customShape = canvas.drawShape([400, 300], shape, [400, 300]);
+            customShape.shape.animation(canvas, customShape);
 
         });
 
@@ -53,12 +111,7 @@
 </head>
 <body>
 
-<button id="alignLeft">alignLeft</button>
-<button id="alignRight">alignRight</button>
-<button id="alignTop">alignTop</button>
-<button id="alignBottom">alignBottom</button>
 <div id="canvas" style="cursor: default;"></div>
-<div id="canvas_slider"></div>
 
 </body>
 </html>
