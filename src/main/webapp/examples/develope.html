@@ -276,16 +276,84 @@
             });
 
             //Simple example
-            var fromElement = canvas.drawShape([200,200],new OG.RectangleShape('From'),[150,150]);
-            var toElement = canvas.drawShape([600,200],new OG.RectangleShape('To'),[150,150]);
+//            var fromElement = canvas.drawShape([200,200],new OG.RectangleShape('From'),[150,150]);
+//            var toElement = canvas.drawShape([600,200],new OG.RectangleShape('To'),[150,150]);
+//
+//            var edgeShape = new OG.shape.EdgeShape([100, 100], [700, 300], 'edge');
+//            var edgeElement = canvas.drawShape(null, edgeShape);
+//
+//            var fromTerminal = canvas.getRenderer().createDefaultTerminalString(fromElement);
+//            var toTerminal = canvas.getRenderer().createDefaultTerminalString(toElement);
+//
+//            canvas.getRenderer().connect(fromTerminal,toTerminal,edgeElement);
+            OG.shape.SwitchGear = function (label) {
+                OG.shape.SwitchGear.superclass.call(this);
 
-            var edgeShape = new OG.shape.EdgeShape([100, 100], [700, 300], 'edge');
-            var edgeElement = canvas.drawShape(null, edgeShape);
+                this.SHAPE_ID = 'OG.shape.SwitchGear';
+                this.label = label;
+            };
+            OG.shape.SwitchGear.prototype = new OG.shape.GeomShape();
+            OG.shape.SwitchGear.superclass = OG.shape.GeomShape;
+            OG.shape.SwitchGear.prototype.constructor = OG.shape.SwitchGear;
+            OG.SwitchGear = OG.shape.SwitchGear;
 
-            var fromTerminal = canvas.getRenderer().createDefaultTerminalString(fromElement);
-            var toTerminal = canvas.getRenderer().createDefaultTerminalString(toElement);
+            OG.shape.SwitchGear.prototype.createShape = function () {
+                if (this.geom) {
+                    return this.geom;
+                }
 
-            canvas.getRenderer().connect(fromTerminal,toTerminal,edgeElement);
+                var geomCollection = [];
+                if (this.geom) {
+                    return this.geom;
+                }
+
+                var line1 = new OG.geometry.Line([-100, 10], [100, 10]);
+                var line2 = new OG.geometry.Line([-100, -10], [100, -10]);
+                geomCollection.push(line1);
+                geomCollection.push(line2);
+
+                this.geom = new OG.geometry.GeometryCollection(geomCollection);
+
+                this.geom.style = new OG.geometry.Style({
+                    'cursor': 'default',
+                    'stroke': '#d9534f',
+                    'stroke-width': '3',
+                    'fill': 'none',
+                    'fill-opacity': 0
+                });
+                return this.geom;
+            };
+
+            var shape = new OG.SwitchGear();
+            var switchElement = canvas.drawShape([400, 300], shape, [400, 50]);
+
+
+            OG.shape.SwitchGear = function (label) {
+                OG.shape.SwitchGear.superclass.call(this);
+
+                this.CONNECTABLE = true;
+                this.SHAPE_ID = 'OG.shape.SwitchGear';
+                this.label = label;
+            };
+            OG.shape.SwitchGear.prototype = new OG.shape.GroupShape();
+            OG.shape.SwitchGear.superclass = OG.shape.GroupShape;
+            OG.shape.SwitchGear.prototype.constructor = OG.shape.SwitchGear;
+            OG.SwitchGear = OG.shape.SwitchGear;
+
+
+            var shape = new OG.SwitchGear('Switch Name');
+            var switchGear = canvas.drawShape([400, 300], shape, [400, 300]);
+            //label-angle
+            canvas.setShapeStyle(switchGear,{'font-size': 20,'text-anchor': 'middle'});
+            canvas.appendChild(switchElement,switchGear);
+
+            //var textShape1 = new OG.TextShape("Swich Name");
+            var textShape2 = new OG.TextShape("P1BBA01,11kV,2000A");
+
+            //canvas.drawShape([400, 300], textShape1, [0, 0], {'font-size': 20, 'text-anchor': 'middle', 'vertical-align': 'middle'});
+            canvas.drawShape([400, 250], textShape2, [400, 0], {'font-size': 15, 'text-anchor': 'end', 'vertical-align': 'top'});
+
+
         });
 
         function save() {

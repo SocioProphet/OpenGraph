@@ -391,7 +391,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         /**
          * 라벨 최소 크기(IE)
          */
-        LABEL_MIN_SIZE: 100,
+        LABEL_MIN_SIZE: 0,
 
         /**
          * 라벨 최대 크기(IE)
@@ -877,7 +877,7 @@ OG.graph.Canvas.prototype = {
             'overflow-x': 'hidden',
             'overflow-y': 'auto'
         });
-        sliderImage = $('<img class="sliderImage" src=""/>');
+        sliderImage = $('<canvas class="sliderImage"></canvas>');
         sliderImage.css({
             position: 'absolute',
             top: '0px',
@@ -898,7 +898,7 @@ OG.graph.Canvas.prototype = {
             background: 'transparent'
         });
 
-//네비게이터가 이동되었을경우의 이벤트
+        //네비게이터가 이동되었을경우의 이벤트
         onNavigatorMove = function () {
             var svg, svgW, svgH, imgW, imgH, xRate, yRate, xOffset, yOffset, sliderX, sliderY;
             svg = me._RENDERER.getRootElement();
@@ -984,20 +984,20 @@ OG.graph.Canvas.prototype = {
         sliderImageWrapper.append(sliderImage);
         sliderImageWrapper.append(sliderNavigator);
 
-//캔버스 삭제시 슬라이더도 삭제
+        //캔버스 삭제시 슬라이더도 삭제
         $(container).on("remove", function () {
             me.removeSlider();
         });
 
-//기존에 등록된 슬라이더 삭제
+        //기존에 등록된 슬라이더 삭제
         if (this._CONFIG.SLIDER) {
             me.removeSlider();
         }
 
-//슬라이더를 캔버스에 등록
+        //슬라이더를 캔버스에 등록
         this._CONFIG.SLIDER = slider;
 
-//슬라이더 업데이트
+        //슬라이더 업데이트
         this.updateSlider(this._CONFIG.SCALE * 100);
     },
     updateNavigatior: function () {
@@ -1046,6 +1046,7 @@ OG.graph.Canvas.prototype = {
         var sliderBar = slider.find('.scaleSlider');
         var sliderImage = slider.find('.sliderImage');
         var sliderNavigator = slider.find('.sliderNavigator');
+        var sliderImageWrapper = slider.find('.sliderImageWrapper');
 
         sliderText.html(val);
         sliderBar.val(val);
@@ -1053,9 +1054,17 @@ OG.graph.Canvas.prototype = {
 
         var svg = me._RENDERER.getRootElement();
         var svgData = new XMLSerializer().serializeToString(svg);
-        var srcURL = "data:image/svg+xml;utf-8," + svgData;
-        sliderImage.attr('src', srcURL);
 
+        var image = new Image();
+        image.src = 'data:image/svg+xml;utf-8,' + svgData;
+        image.onload = function() {
+            var canvas = document.getElementById(sliderImage.attr('id'));
+            canvas.width = sliderImageWrapper.width();
+            canvas.height = sliderImageWrapper.width() * image.height / image.width;
+            var context = canvas.getContext('2d');
+            context.drawImage(image, 0, 0, sliderImageWrapper.width(), sliderImageWrapper.width() * image.height / image.width);
+            $(image).remove();
+        };
         me.updateNavigatior();
     }
     ,

@@ -16001,29 +16001,15 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
             size[0] = me._CONFIG.LABEL_MIN_SIZE;
         }
     }
-    if (me._CONFIG.LABEL_MAX_SIZE && size[1]) {
-        if (size[1] > me._CONFIG.LABEL_MAX_SIZE) {
-            size[1] = me._CONFIG.LABEL_MAX_SIZE;
+    if (me._CONFIG.LABEL_MAX_SIZE && size[0]) {
+        if (size[0] > me._CONFIG.LABEL_MAX_SIZE) {
+            size[0] = me._CONFIG.LABEL_MAX_SIZE;
         }
     }
 
-    //익스 일때
-    if (OG.Util.isIE()) {
-        element = this._PAPER.text(position[0], position[1], text, size);
-        element.attr(_style);
-    }
-    else {
-        if (text) {
-            text = text.replace(/\n/g, '<br />');
-        }
-
-        // Draw text
-        if (_style["label-direction"] === 'vertical') {
-            element = this._PAPER.foreignObject(text, position[0], position[1], height, size[1]);
-        } else {
-            element = this._PAPER.foreignObject(text, position[0], position[1], size[0], size[1]);
-        }
-    }
+    //라벨 draw
+    element = this._PAPER.text(position[0], position[1], text, size);
+    element.attr(_style);
 
     // real size
     bBox = element.getBBox();
@@ -16037,142 +16023,71 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
     // Boundary Box
     geom = new OG.Rectangle([left, top], width, height);
 
-    if (!OG.Util.isIE()) {
-        if (_style["label-direction"] === 'vertical') {
-            // Text Horizontal Align
-            switch (text_anchor) {
-                case "start":
-                    y = geom.getBoundary().getLowerCenter().y;
-                    break;
-                case "end":
-                    y = geom.getBoundary().getUpperCenter().y - bBox.height;
-                    break;
-                case "middle":
-                    y = OG.Util.round(geom.getBoundary().getCentroid().y - bBox.height / 2);
-                    break;
-                default:
-                    y = OG.Util.round(geom.getBoundary().getCentroid().y - bBox.height / 2);
-                    break;
-            }
-
-            // Text Vertical Align
-            switch (_style["vertical-align"]) {
-                case "top":
-                    x = OG.Util.round(geom.getBoundary().getLeftCenter().x - bBox.width / 2) + 5;
-                    break;
-                case "bottom":
-                    x = geom.getBoundary().getRightCenter().x - bBox.width;
-                    break;
-                case "middle":
-                    x = geom.getBoundary().getCentroid().x - bBox.width;
-                    break;
-                default:
-                    x = geom.getBoundary().getCentroid().x - bBox.width;
-                    break;
-            }
-
-            angle = -90;
-        } else {
-            // Text Horizontal Align
-            switch (text_anchor) {
-                case "start":
-                    x = geom.getBoundary().getLeftCenter().x;
-                    break;
-                case "end":
-                    x = geom.getBoundary().getRightCenter().x - bBox.width;
-                    break;
-                case "middle":
-                    x = OG.Util.round(geom.getBoundary().getCentroid().x - bBox.width / 2);
-                    break;
-                default:
-                    x = OG.Util.round(geom.getBoundary().getCentroid().x - bBox.width / 2);
-                    break;
-            }
-
-            // Text Vertical Align
-            switch (_style["vertical-align"]) {
-                case "top":
-                    y = geom.getBoundary().getUpperCenter().y;
-                    break;
-                case "bottom":
-                    y = geom.getBoundary().getLowerCenter().y - bBox.height;
-                    break;
-                case "middle":
-                    y = OG.Util.round(geom.getBoundary().getCentroid().y - bBox.height / 2);
-                    break;
-                default:
-                    y = OG.Util.round(geom.getBoundary().getCentroid().y - bBox.height / 2);
-                    break;
-            }
+    if (_style["label-direction"] === 'vertical') {
+        // Text Horizontal Align
+        switch (text_anchor) {
+            case "start":
+                y = geom.getBoundary().getLowerCenter().y;
+                break;
+            case "end":
+                y = geom.getBoundary().getUpperCenter().y;
+                break;
+            case "middle":
+                y = geom.getBoundary().getCentroid().y;
+                break;
+            default:
+                y = geom.getBoundary().getCentroid().y;
+                break;
         }
-    }
-    else if (OG.Util.isIE()) {
-        if (_style["label-direction"] === 'vertical') {
-            // Text Horizontal Align
-            switch (text_anchor) {
-                case "start":
-                    y = geom.getBoundary().getLowerCenter().y;
-                    break;
-                case "end":
-                    y = geom.getBoundary().getUpperCenter().y;
-                    break;
-                case "middle":
-                    y = geom.getBoundary().getCentroid().y;
-                    break;
-                default:
-                    y = geom.getBoundary().getCentroid().y;
-                    break;
-            }
 
-            // Text Vertical Align
-            switch (_style["vertical-align"]) {
-                case "top":
-                    x = OG.Util.round(geom.getBoundary().getLeftCenter().x + bBox.height / 2);
-                    break;
-                case "bottom":
-                    x = OG.Util.round(geom.getBoundary().getRightCenter().x - bBox.height / 2);
-                    break;
-                case "middle":
-                    x = geom.getBoundary().getCentroid().x;
-                    break;
-                default:
-                    x = geom.getBoundary().getCentroid().x;
-                    break;
-            }
+        // Text Vertical Align
+        switch (_style["vertical-align"]) {
+            case "top":
+                x = OG.Util.round(geom.getBoundary().getLeftCenter().x + bBox.height / 2);
+                break;
+            case "bottom":
+                x = OG.Util.round(geom.getBoundary().getRightCenter().x - bBox.height / 2);
+                break;
+            case "middle":
+                x = geom.getBoundary().getCentroid().x;
+                break;
+            default:
+                x = geom.getBoundary().getCentroid().x;
+                break;
+        }
 
-            angle = -90;
-        } else {
-            // Text Horizontal Align
-            switch (text_anchor) {
-                case "start":
-                    x = geom.getBoundary().getLeftCenter().x;
-                    break;
-                case "end":
-                    x = geom.getBoundary().getRightCenter().x;
-                    break;
-                case "middle":
-                    x = geom.getBoundary().getCentroid().x;
-                    break;
-                default:
-                    x = geom.getBoundary().getCentroid().x;
-                    break;
-            }
+        angle = -90;
+    } else {
+        // Text Horizontal Align
+        switch (text_anchor) {
+            case "start":
+                x = geom.getBoundary().getLeftCenter().x;
+                break;
+            case "end":
+                x = geom.getBoundary().getRightCenter().x;
+                break;
+            case "middle":
+                x = geom.getBoundary().getCentroid().x;
+                break;
+            default:
+                x = geom.getBoundary().getCentroid().x;
+                break;
+        }
 
-            // Text Vertical Align
-            switch (_style["vertical-align"]) {
-                case "top":
-                    y = OG.Util.round(geom.getBoundary().getUpperCenter().y + bBox.height / 2);
-                    break;
-                case "bottom":
-                    y = OG.Util.round(geom.getBoundary().getLowerCenter().y - bBox.height / 2);
-                    break;
-                case "middle":
-                    y = geom.getBoundary().getCentroid().y;
-                    break;
-                default:
-                    y = geom.getBoundary().getCentroid().y;
-                    break;
-            }
+        // Text Vertical Align
+        switch (_style["vertical-align"]) {
+            case "top":
+                y = OG.Util.round(geom.getBoundary().getUpperCenter().y + bBox.height / 2);
+                break;
+            case "bottom":
+                y = OG.Util.round(geom.getBoundary().getLowerCenter().y - bBox.height / 2);
+                break;
+            case "middle":
+                y = geom.getBoundary().getCentroid().y;
+                break;
+            default:
+                y = geom.getBoundary().getCentroid().y;
+                break;
         }
     }
 
@@ -29653,7 +29568,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         /**
          * 라벨 최소 크기(IE)
          */
-        LABEL_MIN_SIZE: 100,
+        LABEL_MIN_SIZE: 0,
 
         /**
          * 라벨 최대 크기(IE)
@@ -30139,7 +30054,7 @@ OG.graph.Canvas.prototype = {
             'overflow-x': 'hidden',
             'overflow-y': 'auto'
         });
-        sliderImage = $('<img class="sliderImage" src=""/>');
+        sliderImage = $('<canvas class="sliderImage"></canvas>');
         sliderImage.css({
             position: 'absolute',
             top: '0px',
@@ -30160,7 +30075,7 @@ OG.graph.Canvas.prototype = {
             background: 'transparent'
         });
 
-//네비게이터가 이동되었을경우의 이벤트
+        //네비게이터가 이동되었을경우의 이벤트
         onNavigatorMove = function () {
             var svg, svgW, svgH, imgW, imgH, xRate, yRate, xOffset, yOffset, sliderX, sliderY;
             svg = me._RENDERER.getRootElement();
@@ -30246,20 +30161,20 @@ OG.graph.Canvas.prototype = {
         sliderImageWrapper.append(sliderImage);
         sliderImageWrapper.append(sliderNavigator);
 
-//캔버스 삭제시 슬라이더도 삭제
+        //캔버스 삭제시 슬라이더도 삭제
         $(container).on("remove", function () {
             me.removeSlider();
         });
 
-//기존에 등록된 슬라이더 삭제
+        //기존에 등록된 슬라이더 삭제
         if (this._CONFIG.SLIDER) {
             me.removeSlider();
         }
 
-//슬라이더를 캔버스에 등록
+        //슬라이더를 캔버스에 등록
         this._CONFIG.SLIDER = slider;
 
-//슬라이더 업데이트
+        //슬라이더 업데이트
         this.updateSlider(this._CONFIG.SCALE * 100);
     },
     updateNavigatior: function () {
@@ -30308,6 +30223,7 @@ OG.graph.Canvas.prototype = {
         var sliderBar = slider.find('.scaleSlider');
         var sliderImage = slider.find('.sliderImage');
         var sliderNavigator = slider.find('.sliderNavigator');
+        var sliderImageWrapper = slider.find('.sliderImageWrapper');
 
         sliderText.html(val);
         sliderBar.val(val);
@@ -30315,9 +30231,17 @@ OG.graph.Canvas.prototype = {
 
         var svg = me._RENDERER.getRootElement();
         var svgData = new XMLSerializer().serializeToString(svg);
-        var srcURL = "data:image/svg+xml;utf-8," + svgData;
-        sliderImage.attr('src', srcURL);
 
+        var image = new Image();
+        image.src = 'data:image/svg+xml;utf-8,' + svgData;
+        image.onload = function() {
+            var canvas = document.getElementById(sliderImage.attr('id'));
+            canvas.width = sliderImageWrapper.width();
+            canvas.height = sliderImageWrapper.width() * image.height / image.width;
+            var context = canvas.getContext('2d');
+            context.drawImage(image, 0, 0, sliderImageWrapper.width(), sliderImageWrapper.width() * image.height / image.width);
+            $(image).remove();
+        };
         me.updateNavigatior();
     }
     ,
