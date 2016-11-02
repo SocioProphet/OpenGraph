@@ -286,11 +286,74 @@
 //            var toTerminal = canvas.getRenderer().createDefaultTerminalString(toElement);
 //
 //            canvas.getRenderer().connect(fromTerminal,toTerminal,edgeElement);
+
+            OG.shape.Load = function (label) {
+                OG.shape.Load.superclass.call(this);
+
+                this.SHAPE_ID = 'OG.shape.Load';
+                this.label = label;
+            };
+            OG.shape.Load.prototype = new OG.shape.GeomShape();
+            OG.shape.Load.superclass = OG.shape.GeomShape;
+            OG.shape.Load.prototype.constructor = OG.shape.Load;
+            OG.Load = OG.shape.Load;
+
+            OG.shape.NMLoad = function (label) {
+                OG.shape.NMLoad.superclass.call(this);
+
+                this.SHAPE_ID = 'OG.shape.NMLoad';
+                this.label = label;
+            };
+            OG.shape.NMLoad.prototype = new OG.shape.Load();
+            OG.shape.NMLoad.superclass = OG.shape.Load;
+            OG.shape.NMLoad.prototype.constructor = OG.shape.NMLoad;
+            OG.NMLoad = OG.shape.NMLoad;
+
+            OG.shape.NMLoad.prototype.createShape = function () {
+                var geom1, geom2, geomCollection = [];
+                if (this.geom) {
+                    return this.geom;
+                }
+
+                geom1 = new OG.geometry.Circle([50, 50], 50);
+                geom1.style = new OG.geometry.Style({
+                    "stroke-width": 4
+                });
+
+                geom2 = new OG.geometry.Polygon([
+                    [20, 75],
+                    [40, 30],
+                    [60, 60],
+                    [80, 20],
+                    [60, 75],
+                    [40, 50]
+
+                ]);
+                geom2.style = new OG.geometry.Style({
+                    "fill": "black",
+                    "fill-opacity": 1
+                });
+
+                geomCollection.push(geom1);
+                geomCollection.push(geom2);
+
+                this.geom = new OG.geometry.GeometryCollection(geomCollection);
+                this.geom.style = new OG.geometry.Style({
+                    'label-position': 'bottom'
+                });
+
+                return this.geom;
+            };
+
             OG.shape.SwitchGear = function (label) {
                 OG.shape.SwitchGear.superclass.call(this);
 
                 this.SHAPE_ID = 'OG.shape.SwitchGear';
                 this.label = label;
+                this.DELETABLE = false;
+                this.ENABLE_TO = false;
+                this.CONNECT_CLONEABLE = false;
+                this.LABEL_EDITABLE = false;
             };
             OG.shape.SwitchGear.prototype = new OG.shape.GeomShape();
             OG.shape.SwitchGear.superclass = OG.shape.GeomShape;
@@ -324,35 +387,48 @@
                 return this.geom;
             };
 
-            var shape = new OG.SwitchGear();
-            var switchElement = canvas.drawShape([400, 300], shape, [400, 50]);
 
-
-            OG.shape.SwitchGear = function (label) {
-                OG.shape.SwitchGear.superclass.call(this);
-
-                this.CONNECTABLE = true;
-                this.SHAPE_ID = 'OG.shape.SwitchGear';
-                this.label = label;
+            var followSwgr = function (swgrElement) {
+                console.log('followSwgr');
+                var swgrText = canvas.getElementById(swgrElement.id + '-desc');
+                var boundary = canvas.getBoundary(swgrElement);
+                if (!swgrText) {
+                    var swgrTextShape = new OG.TextShape("P1BBA01,11kV,2000A");
+                    swgrTextShape.SELECTABLE = false;
+                    swgrTextShape.MOVABLE = false;
+                    swgrTextShape.CONNECTABLE = false;
+                    swgrTextShape.DELETABLE = false;
+                    swgrTextShape.RESIZABLE = false;
+                    swgrTextShape.LABEL_EDITABLE = false;
+                    swgrText = canvas.drawShape([boundary.getCentroid().x, boundary.getUpperCenter().y - 20], swgrTextShape, [boundary.getWidth(), 20], {
+                        'font-size': 15,
+                        'text-anchor': 'end',
+                        'vertical-align': 'top'
+                    }, swgrElement.id + '-desc');
+                }
+                canvas.moveCentroid(swgrText,[boundary.getCentroid().x, boundary.getUpperCenter().y - 20]);
+                canvas.resizeBox(swgrText,[boundary.getWidth(), 20]);
             };
-            OG.shape.SwitchGear.prototype = new OG.shape.GroupShape();
-            OG.shape.SwitchGear.superclass = OG.shape.GroupShape;
-            OG.shape.SwitchGear.prototype.constructor = OG.shape.SwitchGear;
-            OG.SwitchGear = OG.shape.SwitchGear;
 
+            var shape = new OG.SwitchGear('Switch name');
+            var swgrElement = canvas.drawShape([400, 300], shape, [400, 50]);
+            canvas.setShapeStyle(swgrElement, {'font-size': 20, 'text-anchor': 'middle'});
+            followSwgr(swgrElement);
 
-            var shape = new OG.SwitchGear('Switch Name');
-            var switchGear = canvas.drawShape([400, 300], shape, [400, 300]);
-            //label-angle
-            canvas.setShapeStyle(switchGear,{'font-size': 20,'text-anchor': 'middle'});
-            canvas.appendChild(switchElement,switchGear);
+            canvas.onMoveShape(function (event, shapeElement, offset) {
+                if(shapeElement.shape instanceof OG.shape.SwitchGear){
+                    followSwgr(shapeElement);
+                }
+            });
+            canvas.onResizeShape(function (event, shapeElement, offset) {
+                if(shapeElement.shape instanceof OG.shape.SwitchGear){
+                    followSwgr(shapeElement);
+                }
+            });
 
-            //var textShape1 = new OG.TextShape("Swich Name");
-            var textShape2 = new OG.TextShape("P1BBA01,11kV,2000A");
-
-            //canvas.drawShape([400, 300], textShape1, [0, 0], {'font-size': 20, 'text-anchor': 'middle', 'vertical-align': 'middle'});
-            canvas.drawShape([400, 250], textShape2, [400, 0], {'font-size': 15, 'text-anchor': 'end', 'vertical-align': 'top'});
-
+            var nmLoadShape = new OG.NMLoad('NMLoad name');
+            var nmLoadElement = canvas.drawShape([300, 500], nmLoadShape, [100, 100]);
+            canvas.setShapeStyle(nmLoadElement, {'font-size': 10,'label-direction':'horizontal', 'text-anchor': 'middle','label-position': 'right','label-width':500});
 
         });
 

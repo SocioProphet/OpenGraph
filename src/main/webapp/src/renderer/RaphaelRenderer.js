@@ -387,6 +387,9 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
     text_anchor = _style["text-anchor"] || 'middle';
     _style["text-anchor"] = 'middle';
 
+    //라벨 width 스타일 적용
+    size[0] = style.map['label-width'] ? style.map['label-width'] : size[0];
+
     //라벨 최대,최소 적용
     if (me._CONFIG.LABEL_MIN_SIZE && size[0]) {
         if (size[0] < me._CONFIG.LABEL_MIN_SIZE) {
@@ -3943,7 +3946,7 @@ OG.renderer.RaphaelRenderer.prototype.toBack = function (element) {
  * @param {Element|String} element Element 또는 ID
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.bringForward = function(element){
+OG.renderer.RaphaelRenderer.prototype.bringForward = function (element) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
     if (!rElement) {
         return;
@@ -3975,7 +3978,7 @@ OG.renderer.RaphaelRenderer.prototype.sendBackward = function (element) {
     }
     var length = $(element).prevAll().length;
     var depth = length - 2;
-    if(depth < 0){
+    if (depth < 0) {
         depth = 0;
     }
     root[0].insertBefore(element, OG.Util.isIE() ? root[0].childNodes[depth] : root[0].children[depth]);

@@ -827,6 +827,18 @@ canvas.drawShape([100, 100], new OG.CircleShape(), [50, 50], {stroke:'red'});
 
 ![](images/canvas/canvas-1.png)
 
+### label style
+
+도형의 라벨 포지션 및 라벨 텍스트 정렬을 위한 오픈그래프 정의 스타일이 있습니다.
+
+| 스타일 어트리뷰트 | 값                           | 설명                                         |
+|-------------------|------------------------------|----------------------------------------------|
+| label-position    | top,bottom,left,right,center | 도형을 기준으로 라벨의 상,하,좌,우,센터 위치 |
+| text-anchor       | start,middle,end             | 라벨 텍스트의 좌,중간,우 정렬                |
+| label-direction   | vertical,horizontal          | 라벨 세로 표기,가로 표기                     |
+| label-width       | number                       | 라벨의 길이                                  |
+| vertical-align    | top,bottom,middle            | 라벨의 텍스트의 상단 정렬,하단 정렬          |
+
 ### set Id
 
 도형을 그릴 때 아이디를 부여하지 않으면 랜덤한 아이디가 생성되나, 그릴 때 아이디를 지정하게 되면 해당 도형의 아이디로 지정됩니다.
