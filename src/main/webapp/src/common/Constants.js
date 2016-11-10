@@ -20,6 +20,9 @@ OG.layout = {};
 OG.renderer = {};
 
 /** @namespace */
+OG.marker = {};
+
+/** @namespace */
 OG.shape = {};
 
 /** @namespace */
@@ -219,6 +222,19 @@ OG.common.Constants = {
 	 */
 	TERMINAL: "_TERMINAL",
 
+	/**
+	 * 마커 등록을 위한 임시 노드 아이디
+	 */
+	MARKER_TEMP_NODE: "MARKER_TEMP_NODE",
+
+	/**
+	 * 캔버스의 마커 데피니션 suffix 정의
+	 */
+	MARKER_DEFS_SUFFIX: "_MARKER",
+	/**
+	 * Shape 에서 마커가 그려질 경우 원본 노드 suffix 정의
+	 */
+	ORIGINAL_NODE: "ORIGINAL_NODE",
 	/**
 	 * Element 의 커넥트 가이드 이벤트 보정영역의 정의
 	 */

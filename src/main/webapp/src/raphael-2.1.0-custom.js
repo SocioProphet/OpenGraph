@@ -3951,55 +3951,6 @@ window.Raphael.svg && function (R) {
 
                     angle = -toFloat(angle);
                     if (isNaN(angle)) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                         return null;
                     }
                     var vector = [0, 0, math.cos(R.rad(angle)), math.sin(R.rad(angle))],
@@ -4013,30 +3964,8 @@ window.Raphael.svg && function (R) {
                     if (vector[3] < 0) {
                         vector[1] = -vector[3];
                         vector[3] = 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     }
                 }
-
-
-
                 var dots = R._parseDots(gradient);
 
                 if (!dots) {
@@ -4173,57 +4102,9 @@ window.Raphael.svg && function (R) {
                     if (isEnd) {
                         o._.arrows.endPath && markerCounter[o._.arrows.endPath]--;
                         o._.arrows.endMarker && markerCounter[o._.arrows.endMarker]--;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     } else {
                         o._.arrows.startPath && markerCounter[o._.arrows.startPath]--;
                         o._.arrows.startMarker && markerCounter[o._.arrows.startMarker]--;
-
-
-
-
                     }
                 } else {
                     o._.arrows = {};
@@ -4243,7 +4124,7 @@ window.Raphael.svg && function (R) {
                     }
                     var marker = R._g.doc.getElementById(markerId),
                         use;
-                    if (!marker) {
+                        if (!marker) {
                         marker = $($("marker"), {
                             id: markerId,
                             markerHeight: h,
@@ -4255,22 +4136,7 @@ window.Raphael.svg && function (R) {
                         use = $($("use"), {
                             "xlink:href": "#" + pathId,
                             transform: (isEnd ? "rotate(180 " + w / 2 + " " + h / 2 + ") " : E) + "scale(" + w / t + "," + h / t + ")",
-
-
-
-
-
-
-
-
-
-
-
-
-
-//                        transform: (isEnd ? "rotate(180 " + (w-marker_stroke_width) / 2 + " " + (h-marker_stroke_width) / 2 + ") " : E) + "scale(" + (w-stroke*2) / t + "," + (h-stroke*2) / t + ")" + " translate(" + marker_stroke_width + "," + marker_stroke_width +")",
                             "stroke-width": (1 / ((w / t + h / t) / 2)).toFixed(4)
-//                        "stroke-width": marker_stroke_width
                         });
                         marker.appendChild(use);
                         p.defs.appendChild(marker);
@@ -4280,41 +4146,13 @@ window.Raphael.svg && function (R) {
                         use = marker.getElementsByTagName("use")[0];
                     }
                     $(use, attr);
-//                var delta = dx * (type != "diamond" && type != "oval" && type != "open_diamond" && type != "open_oval");
-//                var delta = dx * (type != "diamond" && type != "oval");
                     var delta = dx;
                     if (isEnd) {
                         from = o._.arrows.startdx * stroke || 0;
                         to = R.getTotalLength(attrs.path) - delta * stroke;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                     } else {
                         from = delta * stroke;
                         to = R.getTotalLength(attrs.path) - (o._.arrows.enddx * stroke || 0);
-
-
-
-
-
-
-
-
-
-
-
                     }
                     attr = {};
                     attr["marker-" + se] = "url(#" + markerId + ")";
@@ -4334,18 +4172,6 @@ window.Raphael.svg && function (R) {
                     } else {
                         from = 0;
                         to = R.getTotalLength(attrs.path) - (o._.arrows.enddx * stroke || 0);
-
-
-
-
-
-
-
-
-
-
-
-
                     }
                     o._.arrows[se + "Path"] && $(node, {d: Raphael.getSubpath(attrs.path, from, to)});
                     delete o._.arrows[se + "Path"];
@@ -4467,125 +4293,7 @@ window.Raphael.svg && function (R) {
                         case "path":
                             if (o.type == "path") {
                                 $(node, {d: value ? attrs.path = R._pathToAbsolute(value) : "M0,0"});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                                 o._.dirty = 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                                 if (o._.arrows) {
                                     "startString" in o._.arrows && addArrow(o, o._.arrows.startString);
                                     "endString" in o._.arrows && addArrow(o, o._.arrows.endString, 1);
@@ -4599,126 +4307,6 @@ window.Raphael.svg && function (R) {
                                 att = "x";
                                 value = attrs.x;
                             } else {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                                 break;
                             }
                         case "x":
@@ -4971,11 +4559,6 @@ window.Raphael.svg && function (R) {
             this.next = null;
         },
         elproto = R.el;
-
-
-
-
-
     Element.prototype = elproto;
     elproto.constructor = Element;
 

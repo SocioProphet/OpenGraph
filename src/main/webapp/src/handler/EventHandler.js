@@ -1893,7 +1893,10 @@ OG.handler.EventHandler.prototype = {
             // 마우스 클릭하여 선택 처리
             $(element).bind({
                 click: function (event, param) {
-                    $(me._RENDERER.getContainer()).focus();
+                    if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+                        $(me._RENDERER.getContainer()).focus();
+                    }
+                    //$(me._RENDERER.getContainer()).focus();
 
                     if (element.shape) {
                         me._RENDERER.removeAllVirtualEdge();
@@ -2311,7 +2314,7 @@ OG.handler.EventHandler.prototype = {
         var renderer = me._RENDERER;
         if (isEnableHotKey === true) {
             // delete, ctrl+A
-            $(renderer.getContainer()).bind("keydown", function (event) {
+            $(document).bind("keydown", function (event) {
                 // 라벨수정중엔 keydown 이벤트무시
                 if (!/^textarea$/i.test(event.target.tagName) && !/^input$/i.test(event.target.tagName)) {
                     // Undo Redo
@@ -2326,7 +2329,7 @@ OG.handler.EventHandler.prototype = {
                     }
 
                     // Delete : 삭제
-                    if (me._CONFIG.ENABLE_HOTKEY_DELETE && event.keyCode === KeyEvent.DOM_VK_DELETE) {
+                    if (me._CONFIG.ENABLE_HOTKEY_DELETE && (event.keyCode === KeyEvent.DOM_VK_DELETE || event.keyCode === KeyEvent.DOM_VK_BACK_SPACE)) {
                         event.preventDefault();
                         me.deleteSelectedShape();
                     }
@@ -2444,7 +2447,9 @@ OG.handler.EventHandler.prototype = {
             selector: '#' + me._RENDERER.getRootElement().id,
             build: function ($trigger, e) {
                 var root = me._RENDERER.getRootGroup(), copiedElement = $(root).data("copied");
-                $(me._RENDERER.getContainer()).focus();
+                if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+                    $(me._RENDERER.getContainer()).focus();
+                }
                 return {
                     items: {
                         'selectAll': {
@@ -3883,7 +3888,9 @@ OG.handler.EventHandler.prototype = {
             },
             selector: '#' + me._RENDERER.getRootElement().id + ' [_type=SHAPE]',
             build: function ($trigger, event) {
-                $(me._RENDERER.getContainer()).focus();
+                if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+                    $(me._RENDERER.getContainer()).focus();
+                }
                 var items;
 
                 if (me._getSelectedElement().length == 1) {
@@ -4009,7 +4016,9 @@ OG.handler.EventHandler.prototype = {
         var me = this;
 
         var dragBox = $(this).data("dragBox");
-        $(me._RENDERER.getContainer()).focus();
+        if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+            $(me._RENDERER.getContainer()).focus();
+        }
         if (!dragBox || (dragBox && dragBox.width < 1 && dragBox.height < 1)) {
             $(me._RENDERER.getRootElement())
                 .find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(

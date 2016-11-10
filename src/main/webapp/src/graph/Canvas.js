@@ -28,6 +28,10 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 
     this._CONFIG = {
         /**
+         * 도형 선택시 캔버스 포거싱 여부
+         */
+        FOCUS_CANVAS_ONSELECT: true,
+        /**
          * 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부
          */
         CHECK_BRIDGE_EDGE: true,
@@ -305,6 +309,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * Move & Resize 용 가이드 가로, 세로 최소 사이즈
          */
         GUIDE_MIN_SIZE: 18,
+
+        /**
+         * 도형 컨트롤러 아이콘 커넥트 라인 표시 개수
+         */
+        GUIDE_CONTROL_LINE_NUM: 2,
 
         /**
          * Collapse & Expand 용 가이드 Rect 사이즈
@@ -1057,7 +1066,7 @@ OG.graph.Canvas.prototype = {
 
         var image = new Image();
         image.src = 'data:image/svg+xml;utf-8,' + svgData;
-        image.onload = function() {
+        image.onload = function () {
             var canvas = document.getElementById(sliderImage.attr('id'));
             canvas.width = sliderImageWrapper.width();
             canvas.height = sliderImageWrapper.width() * image.height / image.width;
@@ -1066,6 +1075,16 @@ OG.graph.Canvas.prototype = {
             $(image).remove();
         };
         me.updateNavigatior();
+
+        //$('#testImg').remove();
+        //$('body').append('<img id="testImg"/>');
+        //$('#testImg').attr('src','data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgData).replace(/'/g,"%27").replace(/"/g,"%22"));
+        //$('#testImg').css({
+        //   'z-index': '19999',
+        //    'position': 'absolute',
+        //    'left': '0px', 'top': '0px',
+        //    'width': '300px','height':'300px'
+        //});
     }
     ,
     /**

@@ -1,10 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<!DOCTYPE html>
+<html>
 <head>
     <title>BPMN Modeler Example</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8">
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8">-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
 
     <!-- jquery -->
@@ -46,6 +46,12 @@
     <script type="text/javascript" src="../src/geometry/Point.js"></script>
     <script type="text/javascript" src="../src/geometry/Polygon.js"></script>
     <script type="text/javascript" src="../src/geometry/Rectangle.js"></script>
+
+    <script type="text/javascript" src="../src/maker/IMarker.js"></script>
+    <script type="text/javascript" src="../src/maker/RectangleMarker.js"></script>
+    <script type="text/javascript" src="../src/maker/SwitchMarker.js"></script>
+    <script type="text/javascript" src="../src/maker/CircleMarker.js"></script>
+    <script type="text/javascript" src="../src/maker/ArrowMarker.js"></script>
 
     <!--Shape-->
     <script type="text/javascript" src="../src/shape/IShape.js"></script>
@@ -180,6 +186,8 @@
             // Canvas
             canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
             canvas._CONFIG.DEFAULT_STYLE.EDGE["edge-type"] = "plain";
+            canvas._CONFIG.GUIDE_CONTROL_LINE_NUM = 1;
+            canvas._CONFIG.FOCUS_CANVAS_ONSELECT = false;
             //plain , bezier , straight
 
             canvas.initConfig({
@@ -200,6 +208,7 @@
                 stickGuide: true,
                 checkBridgeEdge: true
             });
+
 
             canvas.addSlider({
                 slider: $("#canvas_slider"),
@@ -232,6 +241,7 @@
                         element = canvas.drawShape([dropX, dropY],
                                 shape, [parseInt(shapeInfo._width, 10), parseInt(shapeInfo._height, 10)]);
                         $('#canvas').removeData('DRAG_SHAPE');
+
                     }
                 }
             });
@@ -276,160 +286,483 @@
             });
 
             //Simple example
-//            var fromElement = canvas.drawShape([200,200],new OG.RectangleShape('From'),[150,150]);
-//            var toElement = canvas.drawShape([600,200],new OG.RectangleShape('To'),[150,150]);
-//
-//            var edgeShape = new OG.shape.EdgeShape([100, 100], [700, 300], 'edge');
-//            var edgeElement = canvas.drawShape(null, edgeShape);
-//
-//            var fromTerminal = canvas.getRenderer().createDefaultTerminalString(fromElement);
-//            var toTerminal = canvas.getRenderer().createDefaultTerminalString(toElement);
-//
-//            canvas.getRenderer().connect(fromTerminal,toTerminal,edgeElement);
+            var fromElement = canvas.drawShape([200, 500], new OG.RectangleShape('From'), [150, 150]);
+            var toElement = canvas.drawShape([600, 550], new OG.RectangleShape('To'), [150, 150]);
 
-            OG.shape.Load = function (label) {
-                OG.shape.Load.superclass.call(this);
+            var edge = canvas.connect(fromElement, toElement);
+            canvas.setShapeStyle(edge, {
 
-                this.SHAPE_ID = 'OG.shape.Load';
-                this.label = label;
-            };
-            OG.shape.Load.prototype = new OG.shape.GeomShape();
-            OG.shape.Load.superclass = OG.shape.GeomShape;
-            OG.shape.Load.prototype.constructor = OG.shape.Load;
-            OG.Load = OG.shape.Load;
-
-            OG.shape.NMLoad = function (label) {
-                OG.shape.NMLoad.superclass.call(this);
-
-                this.SHAPE_ID = 'OG.shape.NMLoad';
-                this.label = label;
-            };
-            OG.shape.NMLoad.prototype = new OG.shape.Load();
-            OG.shape.NMLoad.superclass = OG.shape.Load;
-            OG.shape.NMLoad.prototype.constructor = OG.shape.NMLoad;
-            OG.NMLoad = OG.shape.NMLoad;
-
-            OG.shape.NMLoad.prototype.createShape = function () {
-                var geom1, geom2, geomCollection = [];
-                if (this.geom) {
-                    return this.geom;
-                }
-
-                geom1 = new OG.geometry.Circle([50, 50], 50);
-                geom1.style = new OG.geometry.Style({
-                    "stroke-width": 4
-                });
-
-                geom2 = new OG.geometry.Polygon([
-                    [20, 75],
-                    [40, 30],
-                    [60, 60],
-                    [80, 20],
-                    [60, 75],
-                    [40, 50]
-
-                ]);
-                geom2.style = new OG.geometry.Style({
-                    "fill": "black",
-                    "fill-opacity": 1
-                });
-
-                geomCollection.push(geom1);
-                geomCollection.push(geom2);
-
-                this.geom = new OG.geometry.GeometryCollection(geomCollection);
-                this.geom.style = new OG.geometry.Style({
-                    'label-position': 'bottom'
-                });
-
-                return this.geom;
-            };
-
-            OG.shape.SwitchGear = function (label) {
-                OG.shape.SwitchGear.superclass.call(this);
-
-                this.SHAPE_ID = 'OG.shape.SwitchGear';
-                this.label = label;
-                this.DELETABLE = false;
-                this.ENABLE_TO = false;
-                this.CONNECT_CLONEABLE = false;
-                this.LABEL_EDITABLE = false;
-            };
-            OG.shape.SwitchGear.prototype = new OG.shape.GeomShape();
-            OG.shape.SwitchGear.superclass = OG.shape.GeomShape;
-            OG.shape.SwitchGear.prototype.constructor = OG.shape.SwitchGear;
-            OG.SwitchGear = OG.shape.SwitchGear;
-
-            OG.shape.SwitchGear.prototype.createShape = function () {
-                if (this.geom) {
-                    return this.geom;
-                }
-
-                var geomCollection = [];
-                if (this.geom) {
-                    return this.geom;
-                }
-
-                var line1 = new OG.geometry.Line([-100, 10], [100, 10]);
-                var line2 = new OG.geometry.Line([-100, -10], [100, -10]);
-                geomCollection.push(line1);
-                geomCollection.push(line2);
-
-                this.geom = new OG.geometry.GeometryCollection(geomCollection);
-
-                this.geom.style = new OG.geometry.Style({
-                    'cursor': 'default',
-                    'stroke': '#d9534f',
-                    'stroke-width': '3',
-                    'fill': 'none',
-                    'fill-opacity': 0
-                });
-                return this.geom;
-            };
-
-
-            var followSwgr = function (swgrElement) {
-                console.log('followSwgr');
-                var swgrText = canvas.getElementById(swgrElement.id + '-desc');
-                var boundary = canvas.getBoundary(swgrElement);
-                if (!swgrText) {
-                    var swgrTextShape = new OG.TextShape("P1BBA01,11kV,2000A");
-                    swgrTextShape.SELECTABLE = false;
-                    swgrTextShape.MOVABLE = false;
-                    swgrTextShape.CONNECTABLE = false;
-                    swgrTextShape.DELETABLE = false;
-                    swgrTextShape.RESIZABLE = false;
-                    swgrTextShape.LABEL_EDITABLE = false;
-                    swgrText = canvas.drawShape([boundary.getCentroid().x, boundary.getUpperCenter().y - 20], swgrTextShape, [boundary.getWidth(), 20], {
-                        'font-size': 15,
-                        'text-anchor': 'end',
-                        'vertical-align': 'top'
-                    }, swgrElement.id + '-desc');
-                }
-                canvas.moveCentroid(swgrText,[boundary.getCentroid().x, boundary.getUpperCenter().y - 20]);
-                canvas.resizeBox(swgrText,[boundary.getWidth(), 20]);
-            };
-
-            var shape = new OG.SwitchGear('Switch name');
-            var swgrElement = canvas.drawShape([400, 300], shape, [400, 50]);
-            canvas.setShapeStyle(swgrElement, {'font-size': 20, 'text-anchor': 'middle'});
-            followSwgr(swgrElement);
-
-            canvas.onMoveShape(function (event, shapeElement, offset) {
-                if(shapeElement.shape instanceof OG.shape.SwitchGear){
-                    followSwgr(shapeElement);
-                }
+                'multi': [
+                    {
+                        top: -10,
+                        from: 'start',
+                        to: 'center',
+                        style: {
+                            'marker': {
+                                'end': {
+                                    'id': 'OG.marker.SwitchMarker',
+                                    'size': [20, 10],
+                                    'ref': [0, 0]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        top: -10,
+                        from: '51%',
+                        to: 'end',
+                        style: {
+                            'marker': {
+                                'start': {
+                                    'id': 'OG.marker.CircleMarker',
+                                    'size': [10, 10]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        top: 10,
+                        from: 'start',
+                        to: 'end',
+                        style: {
+                            'marker': {
+                                'start': {
+                                    'id': 'OG.marker.ArrowMarker',
+                                    'size': [10, 10]
+                                },
+                                'mid': {
+                                    'id': 'OG.marker.RectangleMarker',
+                                    'size': [15, 15]
+                                },
+                                'end': {
+                                    'id': 'OG.marker.ArrowMarker',
+                                    'size': [10, 10]
+                                }
+                            },
+                            'stroke': 'gray',
+                            pattern: {}
+                        }
+                    }
+                ]
             });
-            canvas.onResizeShape(function (event, shapeElement, offset) {
-                if(shapeElement.shape instanceof OG.shape.SwitchGear){
-                    followSwgr(shapeElement);
-                }
-            });
+            //$('#wrapper').scrollTop(1000);
+            //$(canvas._RENDERER.getContainer()).focus()
 
-            var nmLoadShape = new OG.NMLoad('NMLoad name');
-            var nmLoadElement = canvas.drawShape([300, 500], nmLoadShape, [100, 100]);
-            canvas.setShapeStyle(nmLoadElement, {'font-size': 10,'label-direction':'horizontal', 'text-anchor': 'middle','label-position': 'right','label-width':500});
-
+//            OG.shape.Load = function (label) {
+//                OG.shape.Load.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.Load';
+//                this.label = label;
+//            };
+//            OG.shape.Load.prototype = new OG.shape.GeomShape();
+//            OG.shape.Load.superclass = OG.shape.GeomShape;
+//            OG.shape.Load.prototype.constructor = OG.shape.Load;
+//            OG.Load = OG.shape.Load;
+//
+//            OG.shape.NMLoad = function (label) {
+//                OG.shape.NMLoad.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.NMLoad';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//                this.ENABLE_FROM = false;
+//            };
+//            OG.shape.NMLoad.prototype = new OG.shape.Load();
+//            OG.shape.NMLoad.superclass = OG.shape.Load;
+//            OG.shape.NMLoad.prototype.constructor = OG.shape.NMLoad;
+//            OG.NMLoad = OG.shape.NMLoad;
+//
+//            OG.shape.NMLoad.prototype.createShape = function () {
+//                var geom1, geom2, geomCollection = [];
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                geom1 = new OG.geometry.Circle([50, 50], 50);
+//                geom1.style = new OG.geometry.Style({
+//                    "stroke-width": 4
+//                });
+//
+//                geom2 = new OG.geometry.Polygon([
+//                    [20, 75],
+//                    [40, 30],
+//                    [60, 60],
+//                    [80, 20],
+//                    [60, 75],
+//                    [40, 50]
+//
+//                ]);
+//                geom2.style = new OG.geometry.Style({
+//                    "fill": "black",
+//                    "fill-opacity": 1
+//                });
+//
+//                geomCollection.push(geom1);
+//                geomCollection.push(geom2);
+//
+//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
+//                this.geom.style = new OG.geometry.Style({
+//                    'label-position': 'bottom'
+//                });
+//
+//                return this.geom;
+//            };
+//
+//            OG.shape.SHLoad = function (label) {
+//                OG.shape.SHLoad.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.SHLoad';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//                this.ENABLE_FROM = false;
+//            };
+//            OG.shape.SHLoad.prototype = new OG.shape.Load();
+//            OG.shape.SHLoad.superclass = OG.shape.Load;
+//            OG.shape.SHLoad.prototype.constructor = OG.shape.SHLoad;
+//            OG.SHLoad = OG.shape.SHLoad;
+//
+//            OG.shape.SHLoad.prototype.createShape = function () {
+//                var geom1, geom2, geomCollection = [];
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                geom1 = new OG.geometry.Circle([50, 50], 50);
+//                geom1.style = new OG.geometry.Style({
+//                    "stroke-width": 4
+//                });
+//
+//                geom2 = new OG.geometry.Polygon([
+//                    [20, 20],
+//                    [20, 80],
+//                    [30, 80],
+//                    [30, 50],
+//                    [70, 50],
+//                    [70, 80],
+//                    [80, 80],
+//                    [80, 20],
+//                    [70, 20],
+//                    [70, 40],
+//                    [30, 40],
+//                    [30, 20],
+//                    [20, 20]
+//                ]);
+//                geom2.style = new OG.geometry.Style({
+//                    "fill": "black",
+//                    "fill-opacity": 1
+//                });
+//
+//                geomCollection.push(geom1);
+//                geomCollection.push(geom2);
+//
+//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
+//                this.geom.style = new OG.geometry.Style({
+//                    'label-position': 'bottom'
+//                });
+//
+//                return this.geom;
+//            };
+//
+//
+//            OG.shape.HierarchyFeeder = function (label) {
+//                OG.shape.HierarchyFeeder.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.HierarchyFeeder';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//            };
+//            OG.shape.HierarchyFeeder.prototype = new OG.shape.GeomShape();
+//            OG.shape.HierarchyFeeder.superclass = OG.shape.GeomShape;
+//            OG.shape.HierarchyFeeder.prototype.constructor = OG.shape.HierarchyFeeder;
+//            OG.HierarchyFeeder = OG.shape.HierarchyFeeder;
+//
+//            OG.shape.HierarchyFeeder.prototype.createShape = function () {
+//                var geom1, geom2, geomCollection = [];
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                geom1 = new OG.geometry.Circle([50, 50], 50);
+//                geom1.style = new OG.geometry.Style({
+//                    "stroke-width": 4
+//                });
+//
+//                geom2 = new OG.geometry.Polygon([
+//                    [30, 80],
+//                    [30, 20],
+//                    [70, 20],
+//                    [70, 30],
+//                    [40, 30],
+//                    [40, 40],
+//                    [70, 40],
+//                    [70, 50],
+//                    [40, 50],
+//                    [40, 80],
+//                    [30, 80]
+//                ]);
+//                geom2.style = new OG.geometry.Style({
+//                    "fill": "black",
+//                    "fill-opacity": 1
+//                });
+//
+//                geomCollection.push(geom1);
+//                geomCollection.push(geom2);
+//
+//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
+//                this.geom.style = new OG.geometry.Style({
+//                    'label-position': 'bottom'
+//                });
+//
+//                return this.geom;
+//            };
+//
+//            OG.shape.HierarchyBldg = function (label) {
+//                OG.shape.HierarchyBldg.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.HierarchyBldg';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//                this.CONNECTABLE = false;
+//            };
+//            OG.shape.HierarchyBldg.prototype = new OG.shape.HorizontalPoolShape();
+//            OG.shape.HierarchyBldg.superclass = OG.shape.HorizontalPoolShape;
+//            OG.shape.HierarchyBldg.prototype.constructor = OG.shape.HierarchyBldg;
+//            OG.HierarchyBldg = OG.shape.HierarchyBldg;
+//
+//            OG.shape.HierarchyFloor = function (label) {
+//                OG.shape.HierarchyFloor.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.HierarchyFloor';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//                this.CONNECTABLE = false;
+//            };
+//            OG.shape.HierarchyFloor.prototype = new OG.shape.HorizontalPoolShape();
+//            OG.shape.HierarchyFloor.superclass = OG.shape.HorizontalPoolShape;
+//            OG.shape.HierarchyFloor.prototype.constructor = OG.shape.HierarchyFloor;
+//            OG.HierarchyFloor = OG.shape.HierarchyFloor;
+//
+//
+//            OG.shape.BLDG = function (label) {
+//                OG.shape.BLDG.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.BLDG';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//                this.CONNECTABLE = false;
+//            };
+//            OG.shape.BLDG.prototype = new OG.shape.GroupShape();
+//            OG.shape.BLDG.superclass = OG.shape.GroupShape;
+//            OG.shape.BLDG.prototype.constructor = OG.shape.BLDG;
+//            OG.BLDG = OG.shape.BLDG;
+//            OG.shape.BLDG.prototype.createShape = function () {
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+//                this.geom.style = new OG.geometry.Style({
+//                    'r': 6,
+//                    'fill': '#ffffff',
+//                    'fill-opacity': 0,
+//                    "vertical-align": "top",
+//                    "text-anchor": "start",
+//                    'stroke': 'black'
+//                });
+//                return this.geom;
+//            };
+//
+//            OG.shape.Location = function (label) {
+//                OG.shape.Location.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.Location';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//            };
+//            OG.shape.Location.prototype = new OG.shape.GeomShape();
+//            OG.shape.Location.superclass = OG.shape.GeomShape;
+//            OG.shape.Location.prototype.constructor = OG.shape.Location;
+//            OG.Location = OG.shape.Location;
+//            OG.shape.Location.prototype.createShape = function () {
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+//                this.geom.style = new OG.geometry.Style({
+//                    'fill-r': 1,
+//                    'fill-cx': .1,
+//                    'fill-cy': .1,
+//                    "stroke-width": 1.2,
+//                    fill: 'r(.1, .1)#FFFFFF-#FFFFCC',
+//                    'fill-opacity': 1,
+//                    r: '10'
+//                });
+//
+//                return this.geom;
+//            };
+//
+//            OG.shape.RaceWay = function (label) {
+//                OG.shape.RaceWay.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.Location';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//            };
+//            OG.shape.RaceWay.prototype = new OG.shape.GeomShape();
+//            OG.shape.RaceWay.superclass = OG.shape.GeomShape;
+//            OG.shape.RaceWay.prototype.constructor = OG.shape.RaceWay;
+//            OG.RaceWay = OG.shape.RaceWay;
+//
+//            OG.shape.Manhole = function (label) {
+//                OG.shape.Manhole.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.Location';
+//                this.label = label;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//            };
+//            OG.shape.Manhole.prototype = new OG.shape.RaceWay();
+//            OG.shape.Manhole.superclass = OG.shape.RaceWay;
+//            OG.shape.Manhole.prototype.constructor = OG.shape.Manhole;
+//            OG.Manhole = OG.shape.Manhole;
+//            OG.shape.Manhole.prototype.createShape = function () {
+//                var geom1, geom2, geom3, geomCollection = [];
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                geom1 = new OG.geometry.Circle([50, 50], 50);
+//                geom1.style = new OG.geometry.Style({
+//                    "stroke-width": 3
+//                });
+//
+//                geom2 = new OG.geometry.Line([25, 25], [75, 75]);
+//                geom2.style = new OG.geometry.Style({
+//                    "stroke-width": 5
+//                });
+//
+//                geom3 = new OG.geometry.Line([25, 75], [75, 25]);
+//                geom3.style = new OG.geometry.Style({
+//                    "stroke-width": 5
+//                });
+//
+//                geomCollection.push(geom1);
+//                geomCollection.push(geom2);
+//                geomCollection.push(geom3);
+//
+//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
+//                this.geom.style = new OG.geometry.Style({
+//                    'label-position': 'bottom'
+//                });
+//
+//                return this.geom;
+//            };
+//
+//
+//            OG.shape.SwitchGear = function (label) {
+//                OG.shape.SwitchGear.superclass.call(this);
+//
+//                this.SHAPE_ID = 'OG.shape.SwitchGear';
+//                this.label = label;
+//                this.DELETABLE = false;
+//                this.ENABLE_TO = false;
+//                this.CONNECT_CLONEABLE = false;
+//                this.LABEL_EDITABLE = false;
+//            };
+//            OG.shape.SwitchGear.prototype = new OG.shape.GeomShape();
+//            OG.shape.SwitchGear.superclass = OG.shape.GeomShape;
+//            OG.shape.SwitchGear.prototype.constructor = OG.shape.SwitchGear;
+//            OG.SwitchGear = OG.shape.SwitchGear;
+//
+//            OG.shape.SwitchGear.prototype.createShape = function () {
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                var geomCollection = [];
+//                if (this.geom) {
+//                    return this.geom;
+//                }
+//
+//                var line1 = new OG.geometry.Line([-100, 10], [100, 10]);
+//                var line2 = new OG.geometry.Line([-100, -10], [100, -10]);
+//                geomCollection.push(line1);
+//                geomCollection.push(line2);
+//
+//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
+//
+//                this.geom.style = new OG.geometry.Style({
+//                    'cursor': 'default',
+//                    'stroke': '#d9534f',
+//                    'stroke-width': '3',
+//                    'fill': 'none',
+//                    'fill-opacity': 0
+//                });
+//                return this.geom;
+//            };
+//
+//
+//            var followSwgr = function (swgrElement) {
+//                console.log('followSwgr');
+//                var swgrText = canvas.getElementById(swgrElement.id + '-desc');
+//                var boundary = canvas.getBoundary(swgrElement);
+//                if (!swgrText) {
+//                    var swgrTextShape = new OG.TextShape("P1BBA01,11kV,2000A");
+//                    swgrTextShape.SELECTABLE = false;
+//                    swgrTextShape.MOVABLE = false;
+//                    swgrTextShape.CONNECTABLE = false;
+//                    swgrTextShape.DELETABLE = false;
+//                    swgrTextShape.RESIZABLE = false;
+//                    swgrTextShape.LABEL_EDITABLE = false;
+//                    swgrText = canvas.drawShape([boundary.getCentroid().x, boundary.getUpperCenter().y - 20], swgrTextShape, [boundary.getWidth(), 20], {
+//                        'font-size': 15,
+//                        'text-anchor': 'end',
+//                        'vertical-align': 'top'
+//                    }, swgrElement.id + '-desc');
+//                }
+//                canvas.moveCentroid(swgrText,[boundary.getCentroid().x, boundary.getUpperCenter().y - 20]);
+//                canvas.resizeBox(swgrText,[boundary.getWidth(), 20]);
+//            };
+//
+//            var shape = new OG.SwitchGear('Switch name');
+//            var swgrElement = canvas.drawShape([400, 300], shape, [400, 50]);
+//            canvas.setShapeStyle(swgrElement, {'font-size': 20, 'text-anchor': 'middle'});
+//            followSwgr(swgrElement);
+//
+//            canvas.onMoveShape(function (event, shapeElement, offset) {
+//                if(shapeElement.shape instanceof OG.shape.SwitchGear){
+//                    followSwgr(shapeElement);
+//                }
+//            });
+//            canvas.onResizeShape(function (event, shapeElement, offset) {
+//                if(shapeElement.shape instanceof OG.shape.SwitchGear){
+//                    followSwgr(shapeElement);
+//                }
+//            });
+//
+//            var nmLoadShape = new OG.NMLoad('NMLoad name');
+//            var nmLoadElement = canvas.drawShape([300, 500], nmLoadShape, [50, 50]);
+//            canvas.setShapeStyle(nmLoadElement, {'font-size': 10,'label-width':200});
+//
+//            var shLoadShape = new OG.SHLoad('SHLoad name');
+//            var shLoadElement = canvas.drawShape([500, 500], shLoadShape, [50, 50]);
+//            canvas.setShapeStyle(shLoadElement, {'font-size': 10,'label-width':200});
+//
+//            var hierarchyfeederShape = new OG.HierarchyFeeder('Feeder name');
+//            var feederElement = canvas.drawShape([300, 100], hierarchyfeederShape, [50, 50]);
+//            canvas.setShapeStyle(feederElement, {'font-size': 10,'label-width':200});
+//
+//            //BLDG
+//            canvas.drawShape([100, 200], new OG.BLDG('BLDG'), [250, 150]);
         });
 
         function save() {
@@ -610,7 +943,8 @@
     </div>
 </div>
 
-<div class="ui-layout-center" id="canvas" style="cursor: default;"/>
+<div class="ui-layout-center" id="canvas" style="cursor: default;">
+</div>
 <div id="canvas_slider"></div>
 
 <script type="text/javascript">
