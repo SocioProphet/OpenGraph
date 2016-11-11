@@ -215,7 +215,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
 
         /**
          * nodePath 스트링으로부터 distance 표현식 만큼의 거리를 반환한다.
-         * distance 는 start,center,end, percentage,number 형태로 올 수 있다.
+         * distance 는 start,center,end, percentage, number, end- 형태로 올 수 있다.
          * @param nodePath 선분 노드 패스
          * @param distance 거리 표현식
          * @returns {Number} 선분 길이 대비 거리
@@ -241,6 +241,13 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 else if (distance == 'end') {
                     length = totalLenth;
                 }
+                else if (distance.indexOf('end-') != -1) {
+                    distance = parseInt(distance.replace('end-', ''));
+                    length = totalLenth - distance;
+                } else {
+                    distance = parseInt(distance);
+                    length = distance;
+                }
             }
             return length;
         };
@@ -252,7 +259,9 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             to = multiData['to'];
             multiStyle = OG.Util.apply(JSON.parse(JSON.stringify(_style)), multiData['style']);
             if (!top || !from || !to) {
-                continue;
+                if (top != 0) {
+                    continue;
+                }
             }
             //노드 아이디는 도형아이디 + 멀티 선분의 인덱스이다.
             nodeId = groupElement.id + m;
@@ -304,6 +313,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             var markerShapeId = nodeStyle['marker'][key]['id'];
             var size = nodeStyle['marker'][key]['size'];
             var ref = nodeStyle['marker'][key]['ref'];
+            var makerStyle = nodeStyle['marker'][key]['style'] ? nodeStyle['marker'][key]['style'] : {};
 
             //지정한 마커 shape 이 없다면 리턴한다.
             var makerShape;
@@ -341,14 +351,16 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 }
             }
 
-            //마커 스타일링. 마커 geometry 스타일에 노드(선분) 의 색을 입힌다.
+            //마커 스타일링. geometry < nodeOverrideStyle < makerStyle
             var nodeOverrideStyle = {
                 'stroke': nodeStyle['stroke'],
                 'fill': nodeStyle['stroke']
             };
+            OG.Util.apply(geometry.style.map, nodeOverrideStyle);
+            OG.Util.apply(geometry.style.map, makerStyle);
 
             //노드 복사를 위한 가상의 그룹노드
-            var tempNode = me.drawGeom(geometry, nodeOverrideStyle, OG.Constants.MARKER_TEMP_NODE);
+            var tempNode = me.drawGeom(geometry, null, OG.Constants.MARKER_TEMP_NODE);
             var cloneNode = $(tempNode).clone().wrapAll("<div/>");
 
             //가상의 그룹노드를 삭제한다.

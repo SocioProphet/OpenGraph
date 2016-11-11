@@ -49,7 +49,9 @@
 
     <script type="text/javascript" src="../src/maker/IMarker.js"></script>
     <script type="text/javascript" src="../src/maker/RectangleMarker.js"></script>
-    <script type="text/javascript" src="../src/maker/SwitchMarker.js"></script>
+    <script type="text/javascript" src="../src/maker/SwitchRMarker.js"></script>
+    <script type="text/javascript" src="../src/maker/SwitchLMarker.js"></script>
+    <script type="text/javascript" src="../src/maker/SwitchXMarker.js"></script>
     <script type="text/javascript" src="../src/maker/CircleMarker.js"></script>
     <script type="text/javascript" src="../src/maker/ArrowMarker.js"></script>
 
@@ -187,7 +189,7 @@
             canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
             canvas._CONFIG.DEFAULT_STYLE.EDGE["edge-type"] = "plain";
             canvas._CONFIG.GUIDE_CONTROL_LINE_NUM = 1;
-            canvas._CONFIG.FOCUS_CANVAS_ONSELECT = false;
+            canvas._CONFIG.FOCUS_CANVAS_ONSELECT = true;
             //plain , bezier , straight
 
             canvas.initConfig({
@@ -285,13 +287,7 @@
             canvas.onDisconnectShape(function (event, edgeElement, fromElement, toElement) {
             });
 
-            //Simple example
-            var fromElement = canvas.drawShape([200, 500], new OG.RectangleShape('From'), [150, 150]);
-            var toElement = canvas.drawShape([600, 550], new OG.RectangleShape('To'), [150, 150]);
-
-            var edge = canvas.connect(fromElement, toElement);
-            canvas.setShapeStyle(edge, {
-
+            var testStyle = {
                 'multi': [
                     {
                         top: -10,
@@ -300,16 +296,16 @@
                         style: {
                             'marker': {
                                 'end': {
-                                    'id': 'OG.marker.SwitchMarker',
+                                    'id': 'OG.marker.SwitchLMarker',
                                     'size': [20, 10],
-                                    'ref': [0, 0]
+                                    'ref': [2, 0]
                                 }
                             }
                         }
                     },
                     {
                         top: -10,
-                        from: '51%',
+                        from: 'center',
                         to: 'end',
                         style: {
                             'marker': {
@@ -336,17 +332,119 @@
                                 },
                                 'end': {
                                     'id': 'OG.marker.ArrowMarker',
-                                    'size': [10, 10]
+                                    'size': [10, 10],
+                                    'style': {
+                                        'stroke': 'red',
+                                        'fill': 'red'
+                                    }
                                 }
                             },
-                            'stroke': 'gray',
-                            pattern: {}
+                            pattern: {
+                                'id': 'OG.pattern.Hatched',
+                                'thickness': 16,
+                                'unit-width': 20,
+                                'unit-height': 20,
+                                'pattern-width': 25,
+                                'pattern-height': 25,
+                                'patternTransform': 'rotate(35) scale(1.4,1.4)',
+                                'style': {
+
+                                }
+                            },
+                            'stroke': 'gray'
                         }
                     }
                 ]
-            });
-            //$('#wrapper').scrollTop(1000);
-            //$(canvas._RENDERER.getContainer()).focus()
+            };
+
+            var busduct = {
+                'multi': [
+                    {
+                        top: -10,
+                        from: '20',
+                        to: 'end-20',
+                        style: {
+                            'marker': {
+                                'start': {
+                                    'id': 'OG.marker.SwitchRMarker',
+                                    'size': [8, 8],
+                                    'ref': [8, 0]
+                                },
+                                'end': {
+                                    'id': 'OG.marker.SwitchLMarker',
+                                    'size': [8, 8],
+                                    'ref': [1, 0]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        top: 10,
+                        from: '20',
+                        to: 'end-20',
+                        style: {
+                            'marker': {
+                                'start': {
+                                    'id': 'OG.marker.SwitchLMarker',
+                                    'size': [8, 8],
+                                    'ref': [7, 8]
+                                },
+                                'end': {
+                                    'id': 'OG.marker.SwitchRMarker',
+                                    'size': [8, 8],
+                                    'ref': [0, 8]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        top: 0,
+                        from: 'start',
+                        to: 'end',
+                        style: {}
+                    }
+                ]
+            };
+
+            var cable = {
+                'multi': [
+                    {
+                        top: 0,
+                        from: 'start',
+                        to: 'center',
+                        style: {
+                            'marker': {
+                                'end': {
+                                    'id': 'OG.marker.SwitchLMarker',
+                                    'size': [20, 8],
+                                    'ref': [3, 0]
+                                }
+                            }
+                        }
+                    },
+                    {
+                        top: 0,
+                        from: 'center',
+                        to: 'end',
+                        style: {
+                            'marker': {
+                                'start': {
+                                    'id': 'OG.marker.SwitchXMarker',
+                                    'size': [6, 6]
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+
+
+            //Simple example
+            var fromElement = canvas.drawShape([200, 200], new OG.RectangleShape('From'), [150, 150]);
+            var toElement = canvas.drawShape([600, 250], new OG.RectangleShape('To'), [150, 150]);
+
+            var edge = canvas.connect(fromElement, toElement, testStyle);
+
 
 //            OG.shape.Load = function (label) {
 //                OG.shape.Load.superclass.call(this);

@@ -32,7 +32,8 @@ OG.marker.ArrowMarker.prototype.createMarker = function () {
 	//this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
 	this.geom = new OG.geometry.Polygon([[0, 0], [30, 20], [0, 40], [0, 0]]);
 	this.geom.style = new OG.geometry.Style({
-		'fill-opacity': 1
+		'fill-opacity': 1,
+		'fill': 'black'
 	});
 	return this.geom;
 };

@@ -2314,7 +2314,13 @@ OG.handler.EventHandler.prototype = {
         var renderer = me._RENDERER;
         if (isEnableHotKey === true) {
             // delete, ctrl+A
-            $(document).bind("keydown", function (event) {
+            var _container;
+            if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+                _container = $(renderer.getContainer());
+            }else{
+                _container = $(document);
+            }
+            _container.bind("keydown", function (event) {
                 // 라벨수정중엔 keydown 이벤트무시
                 if (!/^textarea$/i.test(event.target.tagName) && !/^input$/i.test(event.target.tagName)) {
                     // Undo Redo

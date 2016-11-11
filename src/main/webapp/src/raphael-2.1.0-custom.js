@@ -39,7 +39,8 @@
         has = "hasOwnProperty",
         separator = /[\.\/]/,
         wildcard = "*",
-        fun = function () {},
+        fun = function () {
+        },
         numsort = function (a, b) {
             return a - b;
         },
@@ -239,7 +240,9 @@
     eve.toString = function () {
         return "You are running Eve " + version;
     };
-    (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function() { return eve; })) : (glob.eve = eve));
+    (typeof module != "undefined" && module.exports) ? (module.exports = eve) : (typeof define != "undefined" ? (define("eve", [], function () {
+        return eve;
+    })) : (glob.eve = eve));
 })(this);
 
 
@@ -269,6 +272,7 @@
             }
         }
     }
+
     R.version = "2.1.0";
     R.eve = eve;
     var loaded,
@@ -411,7 +415,8 @@
         sortByNumber = function (a, b) {
             return toFloat(a) - toFloat(b);
         },
-        fun = function () {},
+        fun = function () {
+        },
         pipe = function (x) {
             return x;
         },
@@ -513,7 +518,7 @@
         if (type == "array") {
             return o instanceof Array;
         }
-        return  (type == "null" && o === null) ||
+        return (type == "null" && o === null) ||
             (type == typeof o && o !== null) ||
             (type == "object" && o === Object(o)) ||
             (type == "array" && Array.isArray && Array.isArray(o)) ||
@@ -603,7 +608,7 @@
                     docum.write("<body>");
                     docum.close();
                     bod = docum.body;
-                } catch(e) {
+                } catch (e) {
                     bod = createPopup().document.body;
                 }
                 var range = bod.createTextRange();
@@ -613,7 +618,7 @@
                         var value = range.queryCommandValue("ForeColor");
                         value = ((value & 255) << 16) | (value & 65280) | ((value & 16711680) >>> 16);
                         return "#" + ("000000" + value.toString(16)).slice(-6);
-                    } catch(e) {
+                    } catch (e) {
                         return "none";
                     }
                 });
@@ -668,17 +673,6 @@
                 b: b,
                 hex: R.rgb(r, g, b),
                 toString: rgbtoString
-
-
-
-
-
-
-
-
-
-
-
 
 
             };
@@ -815,6 +809,7 @@
             return array.push(array.splice(i, 1)[0]);
         }
     }
+
     function cacher(f, scope, postprocessor) {
         function newf() {
             var arg = Array.prototype.slice.call(arguments, 0),
@@ -830,6 +825,7 @@
             cache[args] = f[apply](scope, arg);
             return postprocessor ? postprocessor(cache[args]) : cache[args];
         }
+
         return newf;
     }
 
@@ -959,7 +955,7 @@
         for (var i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2) {
             var p = [
                 {x: +crp[i - 2], y: +crp[i - 1]},
-                {x: +crp[i],     y: +crp[i + 1]},
+                {x: +crp[i], y: +crp[i + 1]},
                 {x: +crp[i + 2], y: +crp[i + 3]},
                 {x: +crp[i + 4], y: +crp[i + 5]}
             ];
@@ -983,7 +979,7 @@
                 (-p[0].x + 6 * p[1].x + p[2].x) / 6,
                 (-p[0].y + 6 * p[1].y + p[2].y) / 6,
                 (p[1].x + 6 * p[2].x - p[3].x) / 6,
-                (p[1].y + 6*p[2].y - p[3].y) / 6,
+                (p[1].y + 6 * p[2].y - p[3].y) / 6,
                 p[2].x,
                 p[2].y
             ]);
@@ -1140,6 +1136,7 @@
             t2 = t * t1 + 6 * p1 - 12 * p2 + 6 * p3;
         return t * t2 - 3 * p1 + 3 * p2;
     }
+
     function bezlen(x1, y1, x2, y2, x3, y3, x4, y4, z) {
         if (z == null) {
             z = 1;
@@ -1147,8 +1144,8 @@
         z = z > 1 ? 1 : z < 0 ? 0 : z;
         var z2 = z / 2,
             n = 12,
-            Tvalues = [-0.1252,0.1252,-0.3678,0.3678,-0.5873,0.5873,-0.7699,0.7699,-0.9041,0.9041,-0.9816,0.9816],
-            Cvalues = [0.2491,0.2491,0.2335,0.2335,0.2032,0.2032,0.1601,0.1601,0.1069,0.1069,0.0472,0.0472],
+            Tvalues = [-0.1252, 0.1252, -0.3678, 0.3678, -0.5873, 0.5873, -0.7699, 0.7699, -0.9041, 0.9041, -0.9816, 0.9816],
+            Cvalues = [0.2491, 0.2491, 0.2335, 0.2335, 0.2032, 0.2032, 0.1601, 0.1601, 0.1069, 0.1069, 0.0472, 0.0472],
             sum = 0;
         for (var i = 0; i < n; i++) {
             var ct = z2 * Tvalues[i] + z2,
@@ -1159,6 +1156,7 @@
         }
         return z2 * sum;
     }
+
     function getTatLen(x1, y1, x2, y2, x3, y3, x4, y4, ll) {
         if (ll < 0 || bezlen(x1, y1, x2, y2, x3, y3, x4, y4) < ll) {
             return;
@@ -1176,6 +1174,7 @@
         }
         return t2;
     }
+
     function intersect(x1, y1, x2, y2, x3, y3, x4, y4) {
         if (
             mmax(x1, x2) < mmin(x3, x4) ||
@@ -1210,12 +1209,15 @@
         }
         return {x: px, y: py};
     }
+
     function inter(bez1, bez2) {
         return interHelper(bez1, bez2);
     }
+
     function interCount(bez1, bez2) {
         return interHelper(bez1, bez2, 1);
     }
+
     function interHelper(bez1, bez2, justCount) {
         var bbox1 = R.bezierBBox(bez1),
             bbox2 = R.bezierBBox(bez2);
@@ -1736,7 +1738,7 @@
                     if (!path) {
                         return ["C", d.x, d.y, d.x, d.y, d.x, d.y];
                     }
-                    !(path[0] in {T:1, Q:1}) && (d.qx = d.qy = null);
+                    !(path[0] in {T: 1, Q: 1}) && (d.qx = d.qy = null);
                     switch (path[0]) {
                         case "M":
                             d.X = path[1];
@@ -2013,20 +2015,24 @@
         getEmpty = function (item) {
             var l = item[0];
             switch (l.toLowerCase()) {
-                case "t": return [l, 0, 0];
-                case "m": return [l, 1, 0, 0, 1, 0, 0];
-                case "r": if (item.length == 4) {
-                    return [l, 0, item[2], item[3]];
-                } else {
-                    return [l, 0];
-                }
-                case "s": if (item.length == 5) {
-                    return [l, 1, 1, item[3], item[4]];
-                } else if (item.length == 3) {
-                    return [l, 1, 1];
-                } else {
-                    return [l, 1];
-                }
+                case "t":
+                    return [l, 0, 0];
+                case "m":
+                    return [l, 1, 0, 0, 1, 0, 0];
+                case "r":
+                    if (item.length == 4) {
+                        return [l, 0, item[2], item[3]];
+                    } else {
+                        return [l, 0];
+                    }
+                case "s":
+                    if (item.length == 5) {
+                        return [l, 1, 1, item[3], item[4]];
+                    } else if (item.length == 3) {
+                        return [l, 1, 1];
+                    } else {
+                        return [l, 1];
+                    }
             }
         },
         equaliseTransform = R._equaliseTransform = function (t1, t2) {
@@ -2114,6 +2120,7 @@
             this.f = 0;
         }
     }
+
     (function (matrixproto) {
 
         matrixproto.add = function (a, b, c, d, e, f) {
@@ -2200,6 +2207,7 @@
         function norm(a) {
             return a[0] * a[0] + a[1] * a[1];
         }
+
         function normalize(a) {
             var mag = math.sqrt(norm(a));
             a[0] && (a[0] /= mag);
@@ -2248,7 +2256,7 @@
                 s.scalex = +s.scalex.toFixed(4);
                 s.scaley = +s.scaley.toFixed(4);
                 s.rotate = +s.rotate.toFixed(4);
-                return  (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) +
+                return (s.dx || s.dy ? "t" + [s.dx, s.dy] : E) +
                     (s.scalex != 1 || s.scaley != 1 ? "s" + [s.scalex, s.scaley, 0, 0] : E) +
                     (s.rotate ? "r" + [s.rotate, 0, 0] : E);
             } else {
@@ -2264,7 +2272,9 @@
 
         paperproto.safari = function () {
             var rect = this.rect(-99, -99, this.width + 99, this.height + 99).attr({stroke: "none"});
-            setTimeout(function () {rect.remove();});
+            setTimeout(function () {
+                rect.remove();
+            });
         };
     } else {
         paperproto.safari = fun;
@@ -2289,32 +2299,6 @@
                         f = function (e) {
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                             var scrollY = g.doc.documentElement.scrollTop || g.doc.body.scrollTop,
                                 scrollX = g.doc.documentElement.scrollLeft || g.doc.body.scrollLeft,
                                 x = e.clientX + scrollX,
@@ -2329,27 +2313,6 @@
                                         e.stopPropagation = stopTouch;
                                         break;
                                     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
                                 }
@@ -2439,39 +2402,16 @@
         elproto = R.el = {};
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     for (var i = events.length; i--;) {
         (function (eventName) {
             R[eventName] = elproto[eventName] = function (fn, scope) {
                 if (R.is(fn, "function")) {
                     this.events = this.events || [];
-                    this.events.push({name: eventName, f: fn, unbind: addEvent(this.shape || this.node || g.doc, eventName, fn, scope || this)});
+                    this.events.push({
+                        name: eventName,
+                        f: fn,
+                        unbind: addEvent(this.shape || this.node || g.doc, eventName, fn, scope || this)
+                    });
                 }
                 return this;
             };
@@ -2540,6 +2480,7 @@
             onend && eve.on("raphael.drag.end." + this.id, onend);
             eve("raphael.drag.start." + this.id, start_scope || move_scope || this, e.clientX + scrollX, e.clientY + scrollY, e);
         }
+
         this._drag = {};
         draggable.push({el: this, start: start});
         this.mousedown(start);
@@ -2646,7 +2587,7 @@
             body = doc.body,
             docElem = doc.documentElement,
             clientTop = docElem.clientTop || body.clientTop || 0, clientLeft = docElem.clientLeft || body.clientLeft || 0,
-            top  = box.top  + (g.win.pageYOffset || docElem.scrollTop || body.scrollTop ) - clientTop,
+            top = box.top + (g.win.pageYOffset || docElem.scrollTop || body.scrollTop ) - clientTop,
             left = box.left + (g.win.pageXOffset || docElem.scrollLeft || body.scrollLeft) - clientLeft;
         return {
             y: top,
@@ -2714,6 +2655,7 @@
     function x_y() {
         return this.x + S + this.y;
     }
+
     function x_y_w_h() {
         return this.x + S + this.y + S + this.width + " \xd7 " + this.height;
     }
@@ -2812,16 +2754,15 @@
                             if (subpath && !subpaths.start) {
                                 point = getPointAtSegmentLength(x, y, p[1], p[2], p[3], p[4], p[5], p[6], length - len);
                                 sp += ["C" + point.start.x, point.start.y, point.m.x, point.m.y, point.x, point.y];
-                                if (onlystart) {return sp;}
+                                if (onlystart) {
+                                    return sp;
+                                }
                                 subpaths.start = sp;
                                 sp = ["M" + point.x, point.y + "C" + point.n.x, point.n.y, point.end.x, point.end.y, p[5], p[6]].join();
                                 len += l;
                                 x = +p[5];
                                 y = +p[6];
                                 continue;
-
-
-
 
 
                             }
@@ -2859,7 +2800,9 @@
     };
 
     elproto.getTotalLength = function () {
-        if (this.type != "path") {return;}
+        if (this.type != "path") {
+            return;
+        }
         if (this.node.getTotalLength) {
             return this.node.getTotalLength();
         }
@@ -2867,12 +2810,16 @@
     };
 
     elproto.getPointAtLength = function (length) {
-        if (this.type != "path") {return;}
+        if (this.type != "path") {
+            return;
+        }
         return getPointAtLength(this.attrs.path, length);
     };
 
     elproto.getSubpath = function (from, to) {
-        if (this.type != "path") {return;}
+        if (this.type != "path") {
+            return;
+        }
         return R.getSubpath(this.attrs.path, from, to);
     };
 
@@ -2941,11 +2888,11 @@
     ef["back-out"] = ef.backOut;
 
     var animationElements = [],
-        requestAnimFrame = window.requestAnimationFrame       ||
+        requestAnimFrame = window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame    ||
-            window.oRequestAnimationFrame      ||
-            window.msRequestAnimationFrame     ||
+            window.mozRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
             function (callback) {
                 setTimeout(callback, 16);
             },
@@ -3049,8 +2996,8 @@
                         });
                     })(that.id, that, e.anim);
                 } else {
-                    (function(f, el, a) {
-                        setTimeout(function() {
+                    (function (f, el, a) {
+                        setTimeout(function () {
                             eve("raphael.anim.frame." + el.id, el, a);
                             eve("raphael.anim.finish." + el.id, el, a);
                             R.is(f, "function") && f.call(el);
@@ -3106,16 +3053,19 @@
             cy = 3 * p1y,
             by = 3 * (p2y - p1y) - cy,
             ay = 1 - cy - by;
+
         function sampleCurveX(t) {
             return ((ax * t + bx) * t + cx) * t;
         }
+
         function solve(x, epsilon) {
             var t = solveCurveX(x, epsilon);
             return ((ay * t + by) * t + cy) * t;
         }
+
         function solveCurveX(x, epsilon) {
             var t0, t1, t2, x2, d2, i;
-            for(t2 = x, i = 0; i < 8; i++) {
+            for (t2 = x, i = 0; i < 8; i++) {
                 x2 = sampleCurveX(t2) - x;
                 if (abs(x2) < epsilon) {
                     return t2;
@@ -3149,8 +3099,10 @@
             }
             return t2;
         }
+
         return solve(t, 1 / (200 * duration));
     }
+
     elproto.onAnimation = function (f) {
         f ? eve.on("raphael.anim.frame." + this.id, f) : eve.unbind("raphael.anim.frame." + this.id);
         return this;
@@ -3499,6 +3451,7 @@
             animationElements.splice(i--, 1);
         }
     }
+
     eve.on("raphael.remove", stopAnimation);
     eve.on("raphael.clear", stopAnimation);
     elproto.toString = function () {
@@ -3840,7 +3793,7 @@
     R.st = setproto;
     // Firefox <3.6 fix: http://webreflection.blogspot.com/2009/11/195-chars-to-help-lazy-loading.html
     (function (doc, loaded, f) {
-        if (doc.readyState == null && doc.addEventListener){
+        if (doc.readyState == null && doc.addEventListener) {
             doc.addEventListener(loaded, f = function () {
                 doc.removeEventListener(loaded, f, false);
                 doc.readyState = "complete";
@@ -3850,6 +3803,7 @@
         function isLoaded() {
             (/in/).test(doc.readyState) ? setTimeout(isLoaded, 9) : R.eve("raphael.DOMload");
         }
+
         isLoaded();
     })(document, "DOMContentLoaded");
 
@@ -3896,7 +3850,7 @@ window.Raphael.svg && function (R) {
         },
         markerCounter = {};
     R.toString = function () {
-        return  "Your browser supports SVG.\nYou are running Rapha\xebl " + this.version;
+        return "Your browser supports SVG.\nYou are running Rapha\xebl " + this.version;
     };
     var $ = function (el, attr) {
             if (attr) {
@@ -4000,14 +3954,14 @@ window.Raphael.svg && function (R) {
                     }
                 }
 
-                if(element.attrs['fill-r']){
+                if (element.attrs['fill-r']) {
                     el.setAttribute('r', element.attrs['fill-r']);
                 }
-                if(element.attrs['fill-cx']){
+                if (element.attrs['fill-cx']) {
                     el.setAttribute('cx', element.attrs['fill-cx']);
                 }
 
-                if(element.attrs['fill-cy']){
+                if (element.attrs['fill-cy']) {
                     el.setAttribute('cy', element.attrs['fill-cy']);
                 }
             }
@@ -4040,7 +3994,7 @@ window.Raphael.svg && function (R) {
                     dx,
                     refX,
                     attr,
-                    marker_stroke_width = stroke / 2 ,
+                    marker_stroke_width = stroke / 2,
                     w = 7,
                     h = 7,
                     t = 5;
@@ -4057,36 +4011,44 @@ window.Raphael.svg && function (R) {
                         case "none":
                             type = values[i];
                             break;
-                        case "wide": h = 10; break;
-                        case "narrow": h = 5; break;
-                        case "long": w = 10; break;
-                        case "short": w = 5; break;
+                        case "wide":
+                            h = 10;
+                            break;
+                        case "narrow":
+                            h = 5;
+                            break;
+                        case "long":
+                            w = 10;
+                            break;
+                        case "short":
+                            w = 5;
+                            break;
                     }
                 }
-                if (type == "open")  {
+                if (type == "open") {
                     w += 2;
                     h += 2;
                     t += 2;
                     dx = 1;
-                    refX = isEnd ? w-2 : 1;
+                    refX = isEnd ? w - 2 : 1;
                     attr = {
                         fill: "none",
                         stroke: attrs.stroke,
                         'stroke-dasharray': 0
                     };
-                } else if(type == 'classic'){
+                } else if (type == 'classic') {
                     refX = dx = w / 2;
                     attr = {
                         fill: "none",
-                        'fill-opacity' : 1,
+                        'fill-opacity': 1,
                         stroke: attrs.stroke,
                         'stroke-dasharray': 0
                     };
-                } else if(type == 'open_block' || type == 'open_diamond' || type == 'open_oval') {
+                } else if (type == 'open_block' || type == 'open_diamond' || type == 'open_oval') {
                     refX = dx = w / 2;
                     attr = {
                         fill: 'white',
-                        'fill-opacity' : 1,
+                        'fill-opacity': 1,
                         stroke: attrs.stroke,
                         'stroke-dasharray': 0
                     };
@@ -4094,7 +4056,7 @@ window.Raphael.svg && function (R) {
                     refX = dx = w / 2;
                     attr = {
                         fill: attrs.stroke,
-                        'fill-opacity' : 1,
+                        'fill-opacity': 1,
                         stroke: "none"
                     };
                 }
@@ -4124,7 +4086,7 @@ window.Raphael.svg && function (R) {
                     }
                     var marker = R._g.doc.getElementById(markerId),
                         use;
-                        if (!marker) {
+                    if (!marker) {
                         marker = $($("marker"), {
                             id: markerId,
                             markerHeight: h,
@@ -4205,7 +4167,11 @@ window.Raphael.svg && function (R) {
             value = dasharray[Str(value).toLowerCase()];
             if (value) {
                 var width = o.attrs["stroke-width"] || "1",
-                    butt = {round: width, square: width, butt: 0}[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
+                    butt = {
+                            round: width,
+                            square: width,
+                            butt: 0
+                        }[o.attrs["stroke-linecap"] || params["stroke-linecap"]] || 0,
                     dashes = [],
                     i = value.length;
                 while (i--) {
@@ -4215,7 +4181,7 @@ window.Raphael.svg && function (R) {
             }
         },
         setFillAndStroke = function (o, params, size) {
-            if(!o.node.style){
+            if (!o.node.style) {
                 o.node.style = {};
             }
             var node = o.node,
@@ -4486,25 +4452,54 @@ window.Raphael.svg && function (R) {
                     node.removeChild(node.firstChild);
                 }
                 var texts = Str(params.text).split("\n"),
-                    tspans = [], finaltspans = [],
+                    tspans = [], finaltspans = [], isWord = false,
                     tspan, temp;
 
                 //한 라인의 최대 글자 수. font size를 얻어와야 함.
                 var maxNum = parseInt(size[0] / 12);
 
-                for (var i = 0, ii = texts.length; i < ii; i++) {
-                    temp = texts[i];
 
-                    while(true){
-                        if(temp.length > maxNum){
-                            finaltspans.push(temp.substring(0, maxNum));
-                            temp = temp.substring(maxNum, temp.length);
-                        }else{
-                            finaltspans.push(temp);
-                            break;
+                function wordWrap(str, maxWidth) {
+                    var newLineStr = "\n", done = false, res = '';
+                    do {
+                        var found = false;
+                        // Inserts new line at first whitespace of the line
+                        for (i = maxWidth - 1; i >= 0; i--) {
+                            if (testWhite(str.charAt(i))) {
+                                res = res + [str.slice(0, i), newLineStr].join('');
+                                str = str.slice(i + 1);
+                                found = true;
+                                break;
+                            }
+                        }
+                        // Inserts new line at maxWidth position, the word is too long to wrap
+                        if (!found) {
+                            res += [str.slice(0, maxWidth), newLineStr].join('');
+                            str = str.slice(maxWidth);
+                        }
+
+                        if (str.length < maxWidth) {
+                            res += str;
+                            done = true;
+                        }
+                    } while (!done);
+
+                    var result = res.split("\n");
+                    var lines = [];
+                    for (var r = 0, lenr = result.length; r < lenr; r++) {
+                        if(result[r] && result[r].length > 0){
+                            lines.push(result[r]);
                         }
                     }
+                    return lines;
                 }
+
+                function testWhite(x) {
+                    var white = new RegExp(/^\s$/);
+                    return white.test(x.charAt(0));
+                }
+
+                finaltspans = wordWrap(params.text, maxNum)
                 for (var i = 0, ii = finaltspans.length; i < ii; i++) {
                     tspan = $("tspan");
                     i && $(tspan, {dy: fontSize * leading, x: a.x});
@@ -4575,7 +4570,7 @@ window.Raphael.svg && function (R) {
         return p;
     };
 
-    elproto.setTooltip = function(title){
+    elproto.setTooltip = function (title) {
         if (this.removed) {
             return this;
         }
@@ -4698,7 +4693,7 @@ window.Raphael.svg && function (R) {
         var bbox = {};
         try {
             bbox = this.node.getBBox();
-        } catch(e) {
+        } catch (e) {
             // Firefox 3.0.x plays badly here
         } finally {
             bbox = bbox || {};
@@ -4949,8 +4944,8 @@ window.Raphael.svg && function (R) {
             var el = $("div");
             el.style.cssText = [
                     "position:absolute",
-                    "left:" + (x - w/2) + "px",
-                    "top:" + (y - h/2) + "px",
+                    "left:" + (x - w / 2) + "px",
+                    "top:" + (y - h / 2) + "px",
                     "width:" + w + "px",
                     "height:" + h + "px"
                 ].join(";") + ";";
@@ -5039,7 +5034,8 @@ window.Raphael.svg && function (R) {
         container.canvas = cnvs;
         container.clear();
         container._left = container._top = 0;
-        isFloating && (container.renderfix = function () {});
+        isFloating && (container.renderfix = function () {
+        });
         container.renderfix();
         return container;
     };
@@ -5163,7 +5159,7 @@ window.Raphael.vml && function (R) {
         pathTypes = {path: 1, rect: 1, image: 1},
         ovalTypes = {circle: 1, ellipse: 1},
         path2vml = function (path) {
-            var total =  /[ahqstv]/ig,
+            var total = /[ahqstv]/ig,
                 command = R._pathToAbsolute;
             Str(path).match(total) && (command = R._path2curve);
             total = /[clmz]/g;
@@ -5246,7 +5242,7 @@ window.Raphael.vml && function (R) {
             s.visibility = "visible";
         };
     R.toString = function () {
-        return  "Your browser doesn\u2019t support SVG. Falling down to VML.\nYou are running Rapha\xebl " + this.version;
+        return "Your browser doesn\u2019t support SVG. Falling down to VML.\nYou are running Rapha\xebl " + this.version;
     };
     var addArrow = function (o, value, isEnd) {
             var values = Str(value).toLowerCase().split("-"),
@@ -5275,9 +5271,13 @@ window.Raphael.vml && function (R) {
                         type = 'diamond';
                         break;
                     case "wide":
-                    case "narrow": h = values[i]; break;
+                    case "narrow":
+                        h = values[i];
+                        break;
                     case "long":
-                    case "short": w = values[i]; break;
+                    case "short":
+                        w = values[i];
+                        break;
                 }
             }
             var stroke = o.node.getElementsByTagName("stroke")[0];
@@ -5404,7 +5404,10 @@ window.Raphael.vml && function (R) {
                         fill.color = R.getRGB(params.fill).hex;
                         fill.src = E;
                         fill.type = "solid";
-                        if (R.getRGB(params.fill).error && (res.type in {circle: 1, ellipse: 1} || Str(params.fill).charAt() != "r") && addGradientFill(res, params.fill, fill)) {
+                        if (R.getRGB(params.fill).error && (res.type in {
+                                circle: 1,
+                                ellipse: 1
+                            } || Str(params.fill).charAt() != "r") && addGradientFill(res, params.fill, fill)) {
                             a.fill = "none";
                             a.gradient = params.fill;
                             fill.rotate = false;
@@ -5877,7 +5880,7 @@ window.Raphael.vml && function (R) {
     R._engine.group = function (vml, x, y) {
         var el = createNode("group");
         el.coordsize = zoom + S + zoom;
-        if(x && y) {
+        if (x && y) {
             el.coordorigin = x + " " + y;
         }
         var p = new Element(el, vml),
@@ -6025,8 +6028,8 @@ window.Raphael.vml && function (R) {
         var g = createNode("group");
         g.style.cssText = [
                 "position:absolute",
-                "left:" + (x - w/2) + "px",
-                "top:" + (y - h/2) + "px",
+                "left:" + (x - w / 2) + "px",
+                "top:" + (y - h / 2) + "px",
                 "width:" + w + "px",
                 "height:" + h + "px"
             ].join(";") + ";";
@@ -6145,7 +6148,8 @@ window.Raphael.vml && function (R) {
                 container.appendChild(c);
             }
         }
-        res.renderfix = function () {};
+        res.renderfix = function () {
+        };
         return res;
     };
     R.prototype.clear = function () {
