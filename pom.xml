@@ -117,6 +117,10 @@
                                 <include>geometry/Curve.js</include>
                                 <include>geometry/Ellipse.js</include>
                                 <include>geometry/*.js</include>
+                                <include>marker/IMarker.js</include>
+                                <include>marker/*.js</include>
+                                <include>pattern/IPattern.js</include>
+                                <include>pattern/*.js</include>
                                 <include>shape/IShape.js</include>
                                 <include>shape/GeomShape.js</include>
                                 <include>shape/TextShape.js</include>
@@ -157,6 +161,10 @@
                                 <include>geometry/Curve-min.js</include>
                                 <include>geometry/Ellipse-min.js</include>
                                 <include>geometry/*.js</include>
+                                <include>marker/IMarker-min.js</include>
+                                <include>marker/*.js</include>
+                                <include>pattern/IPattern-min.js</include>
+                                <include>pattern/*.js</include>
                                 <include>shape/IShape-min.js</include>
                                 <include>shape/GeomShape-min.js</include>
                                 <include>shape/TextShape-min.js</include>
@@ -203,6 +211,10 @@
                                 <include>geometry/Curve-min.js</include>
                                 <include>geometry/Ellipse-min.js</include>
                                 <include>geometry/*.js</include>
+                                <include>marker/IMarker-min.js</include>
+                                <include>marker/*.js</include>
+                                <include>pattern/IPattern-min.js</include>
+                                <include>pattern/*.js</include>
                                 <include>shape/IShape-min.js</include>
                                 <include>shape/GeomShape-min.js</include>
                                 <include>shape/TextShape-min.js</include>

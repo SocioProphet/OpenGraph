@@ -47,13 +47,19 @@
     <script type="text/javascript" src="../src/geometry/Polygon.js"></script>
     <script type="text/javascript" src="../src/geometry/Rectangle.js"></script>
 
-    <script type="text/javascript" src="../src/maker/IMarker.js"></script>
-    <script type="text/javascript" src="../src/maker/RectangleMarker.js"></script>
-    <script type="text/javascript" src="../src/maker/SwitchRMarker.js"></script>
-    <script type="text/javascript" src="../src/maker/SwitchLMarker.js"></script>
-    <script type="text/javascript" src="../src/maker/SwitchXMarker.js"></script>
-    <script type="text/javascript" src="../src/maker/CircleMarker.js"></script>
-    <script type="text/javascript" src="../src/maker/ArrowMarker.js"></script>
+    <!--Marker-->
+    <script type="text/javascript" src="../src/marker/IMarker.js"></script>
+    <script type="text/javascript" src="../src/marker/RectangleMarker.js"></script>
+    <script type="text/javascript" src="../src/marker/SwitchRMarker.js"></script>
+    <script type="text/javascript" src="../src/marker/SwitchLMarker.js"></script>
+    <script type="text/javascript" src="../src/marker/SwitchXMarker.js"></script>
+    <script type="text/javascript" src="../src/marker/CircleMarker.js"></script>
+    <script type="text/javascript" src="../src/marker/ArrowMarker.js"></script>
+
+    <!--Pattern-->
+    <script type="text/javascript" src="../src/pattern/IPattern.js"></script>
+    <script type="text/javascript" src="../src/pattern/Hatched.js"></script>
+    <script type="text/javascript" src="../src/pattern/RectPattern.js"></script>
 
     <!--Shape-->
     <script type="text/javascript" src="../src/shape/IShape.js"></script>
@@ -133,6 +139,23 @@
     <script type="text/javascript" src="../src/renderer/RaphaelRenderer.js"></script>
     <script type="text/javascript" src="../src/handler/EventHandler.js"></script>
     <script type="text/javascript" src="../src/graph/Canvas.js"></script>
+
+    <!-- elec -->
+    <script type="text/javascript" src="../src/shape/elec/SwitchGear.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/BusductShape.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/RacewayShape.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/CableShape.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/Transform.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/SwitchTransformer.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/Load.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/NMLoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/SHLoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/HierarchyFeeder.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/HierarchyFloor.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/HierarchyBldg.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/BLDG.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/Location.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/Manhole.js"></script>
 
     <style type="text/css">
         .ui-layout-center {
@@ -287,580 +310,193 @@
             canvas.onDisconnectShape(function (event, edgeElement, fromElement, toElement) {
             });
 
-            var testStyle = {
-                'multi': [
-                    {
-                        top: -10,
-                        from: 'start',
-                        to: 'center',
-                        style: {
-                            'marker': {
-                                'end': {
-                                    'id': 'OG.marker.SwitchLMarker',
-                                    'size': [20, 10],
-                                    'ref': [2, 0]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        top: -10,
-                        from: 'center',
-                        to: 'end',
-                        style: {
-                            'marker': {
-                                'start': {
-                                    'id': 'OG.marker.CircleMarker',
-                                    'size': [10, 10]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        top: 10,
-                        from: 'start',
-                        to: 'end',
-                        style: {
-                            'marker': {
-                                'start': {
-                                    'id': 'OG.marker.ArrowMarker',
-                                    'size': [10, 10]
-                                },
-                                'mid': {
-                                    'id': 'OG.marker.RectangleMarker',
-                                    'size': [15, 15]
-                                },
-                                'end': {
-                                    'id': 'OG.marker.ArrowMarker',
-                                    'size': [10, 10],
-                                    'style': {
-                                        'stroke': 'red',
-                                        'fill': 'red'
-                                    }
-                                }
-                            },
-                            pattern: {
-                                'id': 'OG.pattern.Hatched',
-                                'thickness': 16,
-                                'unit-width': 20,
-                                'unit-height': 20,
-                                'pattern-width': 25,
-                                'pattern-height': 25,
-                                'patternTransform': 'rotate(35) scale(1.4,1.4)',
-                                'style': {
 
-                                }
-                            },
-                            'stroke': 'gray'
-                        }
-                    }
-                ]
+            var swgrData = {
+                "PJT_SQ": "SIM0004",
+                "SWGR_LIST_SEQ": 182,
+                "SWGR_TAG_NO": "P0BFE01",
+                "KKS_NUM": "400V INTAKE SWGR A",
+                "SWGR_NAME": "400V INTAKE SWGR A",
+                "SWGR_MAKER": "LSIS",
+                "SWGR_RATING_KVA": "",
+                "SWGR_TOTAL_KVA": "",
+                "SWGR_DUTY_CYCLE": "",
+                "SWGR_BUS_RATING": 1600,
+                "SWGR_TYPE": "MC",
+                "SWGR_DEM_KVA": "",
+                "SWGR_TYPE_NM": "MCC",
+                "FE_OWNER_ID": "KIYUL.KIM",
+                "SWGR_CHARGE_ID": "KIYUL.KIM",
+                "SWGR_OWNER_NM": "김기율",
+                "SWGR_CHARGE_LIST_SEQ": 101,
+                "SWGR_VOLTAGE": 400,
+                "SWGR_VOLTAGE_NUM": 400,
+                "BUS_RATING_NUM": 1600,
+                "SWGR_POWER_SOURCE": "N",
+                "SWGR_SHORT_CIR_RATING": "40kA, 1 sec",
+                "SWGR_SHORT_CIR_CURR": "",
+                "SWGR_CAPA_CAL_STAND": 1,
+                "SWGR_LINE_BUS_PT": "",
+                "SWGR_DUMMY": "",
+                "SWGR_BUS_TIE": "",
+                "SWGR_MO_SPARE": "",
+                "SWGR_NM_SPARE": "",
+                "SWGR_FREEZING_YN": "",
+                "SWGR_AUX_POWER": "",
+                "SWGR_LOCATION": "21. CW PUMP STATION",
+                "SWGR_LOCATION_TAG_NO": "",
+                "SWGR_EQUIP_DESC": "",
+                "FE_SWGR_LOAD_DIV": "S",
+                "SAVE_YN": "N"
+            };
+            var loadData = {
+                "PJT_SQ": "SIM0004",
+                "LOAD_LIST_SEQ": "TDLL_SIM0000004",
+                "REV_MST_SEQ": "S000001",
+                "KVA": 13,
+                "KW": 65,
+                "LO_EQUIP_TAG_NO": "P1HHQ02AN001M",
+                "KKS_NUM": "EMERGENCY OIL PUMP MOTOR STARTER",
+                "LO_UNIT": "UNIT #1",
+                "LO_PROC_SYS": "BOILER #1 SCANNER COOLING AIR FAN (B)",
+                "LO_EQUIP_LOC": "3. BLR ABOVE LEVEL",
+                "LO_EQUIP_DESC": "EMERGENCY OIL PUMP MOTOR STARTER",
+                "LO_TYPE": "NM",
+                "LO_POW_SOU": "D",
+                "LO_EQUIP_VOL": 220,
+                "LO_PH": 1,
+                "LO_RATED_POW": 65,
+                "LO_RATED_CURR": 295,
+                "LO_BHP": "",
+                "LO_EFF": 1,
+                "LO_PF": 1,
+                "LO_DUTY": "I",
+                "LO_OPER_HOUR": 5,
+                "LO_START_RATED_CURR": "",
+                "LO_CABLE_SIZE": "",
+                "LO_GLAND_SIZE": "",
+                "LO_LAST_REV_DATE": "",
+                "FE_OWNER_ID": "taehee1.han",
+                "LO_REMARK": "",
+                "LO_STATUS": "N",
+                "LO_INTERFACE_YN": "Y",
+                "LO_SHEET_ID": "900,003",
+                "LO_SHEET_ROW_ID": 4,
+                "SWGR_CHARGE_ID": "KIYUL.KIM",
+                "LO_S_OWNER": "KIYUL.KIM",
+                "LO_C_OWNER": "KIYUL.KIM",
+                "LO_S_OWNER_NM": "김기율",
+                "FE_SWGR_LOAD_DIV": "L",
+                "SAVE_YN": "N",
+                "USE_FL": "Y",
+                "SORT_ORD": "BLR-SCB-1001"
+            };
+            var feederData = {
+                "FEEDER_LIST_MGT_SEQ": 2022,
+                "REV_MST_SEQ": "R0000001",
+                "SWGR_LIST_SEQ": 178,
+                "PJT_SEQ": "SIM0004",
+                "GUI_XML": "",
+                "FE_SPARE_FEEDER_NUM": 11,
+                "SWGR_TYPE": "VCB",
+                "SWGR_TYPE_CD": "VC",
+                "SWGR_TAG_NO": "P1BBA02 (VCB)",
+                "SWGR_NAME": "11kV Unit SWGR B (VCB)",
+                "SWGR_TOTAL_KVA": "11,960",
+                "SWGR_DUTY_CYCLE": 0,
+                "SWGR_VOLTAGE": 11000,
+                "SWGR_POWER_SOURCE": "N",
+                "FE_TOT_PANEL_NUM": "",
+                "FE_TOT_PANEL_NUM_INPUT": "",
+                "FE_INCOMING": "",
+                "FE_OUT_GOING": "11/0.415kV Unit TR B",
+                "FE_LINE_BUS_PT": "",
+                "FE_DUMMY": "",
+                "FE_BUS_TIE": "",
+                "FE_MAGIN": "",
+                "FE_RATED_CURRENT": 628,
+                "FE_OWNER_ID": "KIYUL.KIM"
             };
 
-            var busduct = {
-                'multi': [
-                    {
-                        top: -10,
-                        from: '20',
-                        to: 'end-20',
-                        style: {
-                            'marker': {
-                                'start': {
-                                    'id': 'OG.marker.SwitchRMarker',
-                                    'size': [8, 8],
-                                    'ref': [8, 0]
-                                },
-                                'end': {
-                                    'id': 'OG.marker.SwitchLMarker',
-                                    'size': [8, 8],
-                                    'ref': [1, 0]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        top: 10,
-                        from: '20',
-                        to: 'end-20',
-                        style: {
-                            'marker': {
-                                'start': {
-                                    'id': 'OG.marker.SwitchLMarker',
-                                    'size': [8, 8],
-                                    'ref': [7, 8]
-                                },
-                                'end': {
-                                    'id': 'OG.marker.SwitchRMarker',
-                                    'size': [8, 8],
-                                    'ref': [0, 8]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        top: 0,
-                        from: 'start',
-                        to: 'end',
-                        style: {}
-                    }
-                ]
+            var hierarchyBldgData = {
+                "PJT_SQ": "SIM0004",
+                "HIER_SEQ": "H000001",
+                "NM": "CCB",
+                "DSCR": "CCB BUILDING",
+                "LV": 1,
+                "GUI_XML": ""
             };
 
-            var cable = {
-                'multi': [
-                    {
-                        top: 0,
-                        from: 'start',
-                        to: 'center',
-                        style: {
-                            'marker': {
-                                'end': {
-                                    'id': 'OG.marker.SwitchLMarker',
-                                    'size': [20, 8],
-                                    'ref': [3, 0]
-                                }
-                            }
-                        }
-                    },
-                    {
-                        top: 0,
-                        from: 'center',
-                        to: 'end',
-                        style: {
-                            'marker': {
-                                'start': {
-                                    'id': 'OG.marker.SwitchXMarker',
-                                    'size': [6, 6]
-                                }
-                            }
-                        }
-                    }
-                ]
+            var hierarchyFloorData = {
+                "PJT_SQ": "SIM0004",
+                "HIER_SEQ": "H000002",
+                "NM": "FLOOR1",
+                "DSCR": "FLOOR1",
+                "LV": 2,
+                "GUI_XML": ""
             };
 
+            var locationData = {
+                "PJT_SQ": "SIM0007",
+                "LOC_REF_SEQ": 33,
+                "LOC_REF_NAME": "1. TBN BLDG",
+                "HIER_SEQ": "H000002",
+                "LOC_REF_NAME_TO": "BA",
+                "LOC_REF_TEMP": 50,
+                "LOC_REF_LENGTH": 33,
+                "LOC_REF_REM": ""
+            };
 
-            //Simple example
-            var fromElement = canvas.drawShape([200, 200], new OG.RectangleShape('From'), [150, 150]);
-            var toElement = canvas.drawShape([600, 250], new OG.RectangleShape('To'), [150, 150]);
+            var bldgData = {
+                "PJT_SQ": "SIM0004",
+                "BLDG_SEQ": "B000001",
+                "NM": "CCB",
+                "DSCR": "CCB BUILDING",
+                "LV": 1,
+                "GUI_XML": ""
+            };
 
-            var edge = canvas.connect(fromElement, toElement, testStyle);
+            var swgrShape = new OG.SwitchGear(swgrData['SWGR_NAME']);
+            swgrShape.data = swgrData;
 
+            var nmLoadShape = new OG.NMLoad(loadData['LO_EQUIP_TAG_NO']);
+            nmLoadShape.data = loadData;
 
-//            OG.shape.Load = function (label) {
-//                OG.shape.Load.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.Load';
-//                this.label = label;
-//            };
-//            OG.shape.Load.prototype = new OG.shape.GeomShape();
-//            OG.shape.Load.superclass = OG.shape.GeomShape;
-//            OG.shape.Load.prototype.constructor = OG.shape.Load;
-//            OG.Load = OG.shape.Load;
-//
-//            OG.shape.NMLoad = function (label) {
-//                OG.shape.NMLoad.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.NMLoad';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//                this.ENABLE_FROM = false;
-//            };
-//            OG.shape.NMLoad.prototype = new OG.shape.Load();
-//            OG.shape.NMLoad.superclass = OG.shape.Load;
-//            OG.shape.NMLoad.prototype.constructor = OG.shape.NMLoad;
-//            OG.NMLoad = OG.shape.NMLoad;
-//
-//            OG.shape.NMLoad.prototype.createShape = function () {
-//                var geom1, geom2, geomCollection = [];
-//                if (this.geom) {
-//                    return this.geom;
-//                }
-//
-//                geom1 = new OG.geometry.Circle([50, 50], 50);
-//                geom1.style = new OG.geometry.Style({
-//                    "stroke-width": 4
-//                });
-//
-//                geom2 = new OG.geometry.Polygon([
-//                    [20, 75],
-//                    [40, 30],
-//                    [60, 60],
-//                    [80, 20],
-//                    [60, 75],
-//                    [40, 50]
-//
-//                ]);
-//                geom2.style = new OG.geometry.Style({
-//                    "fill": "black",
-//                    "fill-opacity": 1
-//                });
-//
-//                geomCollection.push(geom1);
-//                geomCollection.push(geom2);
-//
-//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
-//                this.geom.style = new OG.geometry.Style({
-//                    'label-position': 'bottom'
-//                });
-//
-//                return this.geom;
-//            };
-//
-//            OG.shape.SHLoad = function (label) {
-//                OG.shape.SHLoad.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.SHLoad';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//                this.ENABLE_FROM = false;
-//            };
-//            OG.shape.SHLoad.prototype = new OG.shape.Load();
-//            OG.shape.SHLoad.superclass = OG.shape.Load;
-//            OG.shape.SHLoad.prototype.constructor = OG.shape.SHLoad;
-//            OG.SHLoad = OG.shape.SHLoad;
-//
-//            OG.shape.SHLoad.prototype.createShape = function () {
-//                var geom1, geom2, geomCollection = [];
-//                if (this.geom) {
-//                    return this.geom;
-//                }
-//
-//                geom1 = new OG.geometry.Circle([50, 50], 50);
-//                geom1.style = new OG.geometry.Style({
-//                    "stroke-width": 4
-//                });
-//
-//                geom2 = new OG.geometry.Polygon([
-//                    [20, 20],
-//                    [20, 80],
-//                    [30, 80],
-//                    [30, 50],
-//                    [70, 50],
-//                    [70, 80],
-//                    [80, 80],
-//                    [80, 20],
-//                    [70, 20],
-//                    [70, 40],
-//                    [30, 40],
-//                    [30, 20],
-//                    [20, 20]
-//                ]);
-//                geom2.style = new OG.geometry.Style({
-//                    "fill": "black",
-//                    "fill-opacity": 1
-//                });
-//
-//                geomCollection.push(geom1);
-//                geomCollection.push(geom2);
-//
-//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
-//                this.geom.style = new OG.geometry.Style({
-//                    'label-position': 'bottom'
-//                });
-//
-//                return this.geom;
-//            };
-//
-//
-//            OG.shape.HierarchyFeeder = function (label) {
-//                OG.shape.HierarchyFeeder.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.HierarchyFeeder';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//            };
-//            OG.shape.HierarchyFeeder.prototype = new OG.shape.GeomShape();
-//            OG.shape.HierarchyFeeder.superclass = OG.shape.GeomShape;
-//            OG.shape.HierarchyFeeder.prototype.constructor = OG.shape.HierarchyFeeder;
-//            OG.HierarchyFeeder = OG.shape.HierarchyFeeder;
-//
-//            OG.shape.HierarchyFeeder.prototype.createShape = function () {
-//                var geom1, geom2, geomCollection = [];
-//                if (this.geom) {
-//                    return this.geom;
-//                }
-//
-//                geom1 = new OG.geometry.Circle([50, 50], 50);
-//                geom1.style = new OG.geometry.Style({
-//                    "stroke-width": 4
-//                });
-//
-//                geom2 = new OG.geometry.Polygon([
-//                    [30, 80],
-//                    [30, 20],
-//                    [70, 20],
-//                    [70, 30],
-//                    [40, 30],
-//                    [40, 40],
-//                    [70, 40],
-//                    [70, 50],
-//                    [40, 50],
-//                    [40, 80],
-//                    [30, 80]
-//                ]);
-//                geom2.style = new OG.geometry.Style({
-//                    "fill": "black",
-//                    "fill-opacity": 1
-//                });
-//
-//                geomCollection.push(geom1);
-//                geomCollection.push(geom2);
-//
-//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
-//                this.geom.style = new OG.geometry.Style({
-//                    'label-position': 'bottom'
-//                });
-//
-//                return this.geom;
-//            };
-//
-//            OG.shape.HierarchyBldg = function (label) {
-//                OG.shape.HierarchyBldg.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.HierarchyBldg';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//                this.CONNECTABLE = false;
-//            };
-//            OG.shape.HierarchyBldg.prototype = new OG.shape.HorizontalPoolShape();
-//            OG.shape.HierarchyBldg.superclass = OG.shape.HorizontalPoolShape;
-//            OG.shape.HierarchyBldg.prototype.constructor = OG.shape.HierarchyBldg;
-//            OG.HierarchyBldg = OG.shape.HierarchyBldg;
-//
-//            OG.shape.HierarchyFloor = function (label) {
-//                OG.shape.HierarchyFloor.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.HierarchyFloor';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//                this.CONNECTABLE = false;
-//            };
-//            OG.shape.HierarchyFloor.prototype = new OG.shape.HorizontalPoolShape();
-//            OG.shape.HierarchyFloor.superclass = OG.shape.HorizontalPoolShape;
-//            OG.shape.HierarchyFloor.prototype.constructor = OG.shape.HierarchyFloor;
-//            OG.HierarchyFloor = OG.shape.HierarchyFloor;
-//
-//
-//            OG.shape.BLDG = function (label) {
-//                OG.shape.BLDG.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.BLDG';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//                this.CONNECTABLE = false;
-//            };
-//            OG.shape.BLDG.prototype = new OG.shape.GroupShape();
-//            OG.shape.BLDG.superclass = OG.shape.GroupShape;
-//            OG.shape.BLDG.prototype.constructor = OG.shape.BLDG;
-//            OG.BLDG = OG.shape.BLDG;
-//            OG.shape.BLDG.prototype.createShape = function () {
-//                if (this.geom) {
-//                    return this.geom;
-//                }
-//
-//                this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
-//                this.geom.style = new OG.geometry.Style({
-//                    'r': 6,
-//                    'fill': '#ffffff',
-//                    'fill-opacity': 0,
-//                    "vertical-align": "top",
-//                    "text-anchor": "start",
-//                    'stroke': 'black'
-//                });
-//                return this.geom;
-//            };
-//
-//            OG.shape.Location = function (label) {
-//                OG.shape.Location.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.Location';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//            };
-//            OG.shape.Location.prototype = new OG.shape.GeomShape();
-//            OG.shape.Location.superclass = OG.shape.GeomShape;
-//            OG.shape.Location.prototype.constructor = OG.shape.Location;
-//            OG.Location = OG.shape.Location;
-//            OG.shape.Location.prototype.createShape = function () {
-//                if (this.geom) {
-//                    return this.geom;
-//                }
-//
-//                this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
-//                this.geom.style = new OG.geometry.Style({
-//                    'fill-r': 1,
-//                    'fill-cx': .1,
-//                    'fill-cy': .1,
-//                    "stroke-width": 1.2,
-//                    fill: 'r(.1, .1)#FFFFFF-#FFFFCC',
-//                    'fill-opacity': 1,
-//                    r: '10'
-//                });
-//
-//                return this.geom;
-//            };
-//
-//            OG.shape.RaceWay = function (label) {
-//                OG.shape.RaceWay.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.Location';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//            };
-//            OG.shape.RaceWay.prototype = new OG.shape.GeomShape();
-//            OG.shape.RaceWay.superclass = OG.shape.GeomShape;
-//            OG.shape.RaceWay.prototype.constructor = OG.shape.RaceWay;
-//            OG.RaceWay = OG.shape.RaceWay;
-//
-//            OG.shape.Manhole = function (label) {
-//                OG.shape.Manhole.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.Location';
-//                this.label = label;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//            };
-//            OG.shape.Manhole.prototype = new OG.shape.RaceWay();
-//            OG.shape.Manhole.superclass = OG.shape.RaceWay;
-//            OG.shape.Manhole.prototype.constructor = OG.shape.Manhole;
-//            OG.Manhole = OG.shape.Manhole;
-//            OG.shape.Manhole.prototype.createShape = function () {
-//                var geom1, geom2, geom3, geomCollection = [];
-//                if (this.geom) {
-//                    return this.geom;
-//                }
-//
-//                geom1 = new OG.geometry.Circle([50, 50], 50);
-//                geom1.style = new OG.geometry.Style({
-//                    "stroke-width": 3
-//                });
-//
-//                geom2 = new OG.geometry.Line([25, 25], [75, 75]);
-//                geom2.style = new OG.geometry.Style({
-//                    "stroke-width": 5
-//                });
-//
-//                geom3 = new OG.geometry.Line([25, 75], [75, 25]);
-//                geom3.style = new OG.geometry.Style({
-//                    "stroke-width": 5
-//                });
-//
-//                geomCollection.push(geom1);
-//                geomCollection.push(geom2);
-//                geomCollection.push(geom3);
-//
-//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
-//                this.geom.style = new OG.geometry.Style({
-//                    'label-position': 'bottom'
-//                });
-//
-//                return this.geom;
-//            };
-//
-//
-//            OG.shape.SwitchGear = function (label) {
-//                OG.shape.SwitchGear.superclass.call(this);
-//
-//                this.SHAPE_ID = 'OG.shape.SwitchGear';
-//                this.label = label;
-//                this.DELETABLE = false;
-//                this.ENABLE_TO = false;
-//                this.CONNECT_CLONEABLE = false;
-//                this.LABEL_EDITABLE = false;
-//            };
-//            OG.shape.SwitchGear.prototype = new OG.shape.GeomShape();
-//            OG.shape.SwitchGear.superclass = OG.shape.GeomShape;
-//            OG.shape.SwitchGear.prototype.constructor = OG.shape.SwitchGear;
-//            OG.SwitchGear = OG.shape.SwitchGear;
-//
-//            OG.shape.SwitchGear.prototype.createShape = function () {
-//                if (this.geom) {
-//                    return this.geom;
-//                }
-//
-//                var geomCollection = [];
-//                if (this.geom) {
-//                    return this.geom;
-//                }
-//
-//                var line1 = new OG.geometry.Line([-100, 10], [100, 10]);
-//                var line2 = new OG.geometry.Line([-100, -10], [100, -10]);
-//                geomCollection.push(line1);
-//                geomCollection.push(line2);
-//
-//                this.geom = new OG.geometry.GeometryCollection(geomCollection);
-//
-//                this.geom.style = new OG.geometry.Style({
-//                    'cursor': 'default',
-//                    'stroke': '#d9534f',
-//                    'stroke-width': '3',
-//                    'fill': 'none',
-//                    'fill-opacity': 0
-//                });
-//                return this.geom;
-//            };
-//
-//
-//            var followSwgr = function (swgrElement) {
-//                console.log('followSwgr');
-//                var swgrText = canvas.getElementById(swgrElement.id + '-desc');
-//                var boundary = canvas.getBoundary(swgrElement);
-//                if (!swgrText) {
-//                    var swgrTextShape = new OG.TextShape("P1BBA01,11kV,2000A");
-//                    swgrTextShape.SELECTABLE = false;
-//                    swgrTextShape.MOVABLE = false;
-//                    swgrTextShape.CONNECTABLE = false;
-//                    swgrTextShape.DELETABLE = false;
-//                    swgrTextShape.RESIZABLE = false;
-//                    swgrTextShape.LABEL_EDITABLE = false;
-//                    swgrText = canvas.drawShape([boundary.getCentroid().x, boundary.getUpperCenter().y - 20], swgrTextShape, [boundary.getWidth(), 20], {
-//                        'font-size': 15,
-//                        'text-anchor': 'end',
-//                        'vertical-align': 'top'
-//                    }, swgrElement.id + '-desc');
-//                }
-//                canvas.moveCentroid(swgrText,[boundary.getCentroid().x, boundary.getUpperCenter().y - 20]);
-//                canvas.resizeBox(swgrText,[boundary.getWidth(), 20]);
-//            };
-//
-//            var shape = new OG.SwitchGear('Switch name');
-//            var swgrElement = canvas.drawShape([400, 300], shape, [400, 50]);
-//            canvas.setShapeStyle(swgrElement, {'font-size': 20, 'text-anchor': 'middle'});
-//            followSwgr(swgrElement);
-//
-//            canvas.onMoveShape(function (event, shapeElement, offset) {
-//                if(shapeElement.shape instanceof OG.shape.SwitchGear){
-//                    followSwgr(shapeElement);
-//                }
-//            });
-//            canvas.onResizeShape(function (event, shapeElement, offset) {
-//                if(shapeElement.shape instanceof OG.shape.SwitchGear){
-//                    followSwgr(shapeElement);
-//                }
-//            });
-//
-//            var nmLoadShape = new OG.NMLoad('NMLoad name');
-//            var nmLoadElement = canvas.drawShape([300, 500], nmLoadShape, [50, 50]);
-//            canvas.setShapeStyle(nmLoadElement, {'font-size': 10,'label-width':200});
-//
-//            var shLoadShape = new OG.SHLoad('SHLoad name');
-//            var shLoadElement = canvas.drawShape([500, 500], shLoadShape, [50, 50]);
-//            canvas.setShapeStyle(shLoadElement, {'font-size': 10,'label-width':200});
-//
-//            var hierarchyfeederShape = new OG.HierarchyFeeder('Feeder name');
-//            var feederElement = canvas.drawShape([300, 100], hierarchyfeederShape, [50, 50]);
-//            canvas.setShapeStyle(feederElement, {'font-size': 10,'label-width':200});
-//
-//            //BLDG
-//            canvas.drawShape([100, 200], new OG.BLDG('BLDG'), [250, 150]);
+            var hierarchyFeederShape = new OG.HierarchyFeeder(feederData['SWGR_NAME']);
+            hierarchyFeederShape.data = feederData;
+
+            var HierarchyBldgShape = new OG.HierarchyBldg(hierarchyBldgData['NM']);
+            HierarchyBldgShape.data = hierarchyBldgData;
+
+            var HierarchyFloorShape = new OG.HierarchyFloor(hierarchyFloorData['NM']);
+            HierarchyFloorShape.data = hierarchyFloorData;
+
+            var locationShape = new OG.Location(locationData['LOC_REF_NAME_TO']);
+            locationShape.data = locationData;
+
+            var manholeShape = new OG.Manhole(null, locationData['LOC_REF_NAME_TO']);
+            manholeShape.data = locationData;
+
+            var bldgShape = new OG.BLDG(bldgData['NM']);
+            bldgShape.data = bldgData;
+
+            //var subElement1 = canvas.drawShape([400, 200], HierarchyBldgShape, [600, 200]);
+            //var subElement2 = canvas.drawShape([400, 500], HierarchyFloorShape, [450, 200]);
+            //var toElement = canvas.drawShape([700, 450], nmLoadShape, [70, 70]);
+            //var to2Element = canvas.drawShape([300, 450], hierarchyFeederShape, [70, 70]);
+
+            var subElement1 = canvas.drawShape([400, 400], locationShape, [50, 50]);
+            var subElement2 = canvas.drawShape([200, 400], manholeShape, [50, 50]);
+            var subElement3 = canvas.drawShape([200, 200], bldgShape, [200, 200]);
+
+            //canvas.connect(subElement, toElement, null, null, null, null, null, null, new OG.BusductShape());
+            //canvas.connect(subElement, to2Element, null, null, null, null, null, null, new OG.RacewayShape());
+            //var edge = canvas.connect(fromElement, toElement, cable);
+            //var edge = canvas.connect(fromElement, toElement, testStyle);
+
+            //다음단계 해야할것
+            //커스텀 콘텍스트 메뉴
+
         });
 
         function save() {

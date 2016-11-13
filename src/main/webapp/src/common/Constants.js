@@ -23,10 +23,16 @@ OG.renderer = {};
 OG.marker = {};
 
 /** @namespace */
+OG.pattern = {};
+
+/** @namespace */
 OG.shape = {};
 
 /** @namespace */
 OG.shape.bpmn = {};
+
+/** @namespace */
+OG.shape.elec = {};
 
 /**
  * @namespace
@@ -226,6 +232,11 @@ OG.common.Constants = {
 	 * 마커 등록을 위한 임시 노드 아이디
 	 */
 	MARKER_TEMP_NODE: "MARKER_TEMP_NODE",
+
+	/**
+	 * 패턴 등록을 위한 임시 노드 아이디
+	 */
+	PATTERN_TEMP_NODE: "PATTERN_TEMP_NODE",
 
 	/**
 	 * 캔버스의 마커 데피니션 suffix 정의

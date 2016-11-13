@@ -376,7 +376,9 @@
             x: 0,
             y: 0,
             // 추가 ("shape-rendering": "crispEdges")
-            "shape-rendering": "crispEdges"
+            "shape-rendering": "crispEdges",
+            "text-decoration": "none",
+            "word-wrap": "none"
         },
         availableAnimAttrs = R._availableAnimAttrs = {
             blur: nu,
@@ -4406,7 +4408,6 @@ window.Raphael.svg && function (R) {
                             if (attrs.gradient && !attrs[has]("stroke-opacity")) {
                                 $(node, {"stroke-opacity": value > 1 ? value / 100 : value});
                             }
-                        // fall
                         case "fill-opacity":
                             if (attrs.gradient) {
                                 gradient = R._g.doc.getElementById(node.getAttribute("fill").replace(/^url\(#|\)$/g, E));
@@ -4418,6 +4419,14 @@ window.Raphael.svg && function (R) {
                             }
                         // 추가 ("shape-rendering": "crispEdges")
                         case "shape-rendering":
+                            node.setAttribute(att, value);
+                            break;
+
+                        case "text-decoration":
+                            node.setAttribute(att, value);
+                            break;
+
+                        case "word-wrap":
                             node.setAttribute(att, value);
                             break;
 
@@ -4451,55 +4460,77 @@ window.Raphael.svg && function (R) {
                 while (node.firstChild) {
                     node.removeChild(node.firstChild);
                 }
-                var texts = Str(params.text).split("\n"),
-                    tspans = [], finaltspans = [], isWord = false,
-                    tspan, temp;
+                var tspans = [], finaltspans = [],
+                    tspan;
 
-                //한 라인의 최대 글자 수. font size를 얻어와야 함.
+                //TODO 한 라인의 최대 글자 수. font size 를 얻어와야 하는데 param의 font 프로퍼티는 정확하지 않음.
+                //var fontSize = params['font'];
+                //fontSize = fontSize ? fontSize.substring(0, fontSize.indexOf('px')) : 12;
+                //var maxNum = parseInt(size[0] / fontSize);
                 var maxNum = parseInt(size[0] / 12);
 
-
                 function wordWrap(str, maxWidth) {
-                    var newLineStr = "\n", done = false, res = '';
-                    do {
-                        var found = false;
-                        // Inserts new line at first whitespace of the line
-                        for (i = maxWidth - 1; i >= 0; i--) {
-                            if (testWhite(str.charAt(i))) {
-                                res = res + [str.slice(0, i), newLineStr].join('');
-                                str = str.slice(i + 1);
-                                found = true;
-                                break;
-                            }
-                        }
-                        // Inserts new line at maxWidth position, the word is too long to wrap
-                        if (!found) {
-                            res += [str.slice(0, maxWidth), newLineStr].join('');
-                            str = str.slice(maxWidth);
-                        }
-
-                        if (str.length < maxWidth) {
-                            res += str;
-                            done = true;
-                        }
-                    } while (!done);
-
-                    var result = res.split("\n");
+                    var texts = str.split("\n"), text;
                     var lines = [];
-                    for (var r = 0, lenr = result.length; r < lenr; r++) {
-                        if(result[r] && result[r].length > 0){
-                            lines.push(result[r]);
+                    var done = false;
+                    var testWhite = function (x) {
+                        var white = new RegExp(/^\s$/);
+                        return white.test(x.charAt(0));
+                    };
+                    for (var t = 0; t < texts.length; t++) {
+                        text = texts[t];
+                        do {
+                            var found = false;
+                            var res = '';
+                            if (text.length <= maxWidth) {
+                                lines.push(text);
+                                done = true;
+                            } else {
+                                // Inserts new line at first whitespace of the line
+                                for (i = maxWidth - 1; i >= 0; i--) {
+                                    if (testWhite(str.charAt(i))) {
+                                        res = res + text.slice(0, i)
+                                        text = text.slice(i + 1);
+                                        found = true;
+                                        lines.push(res);
+                                        break;
+                                    }
+                                }
+                                // Inserts new line at maxWidth position, the word is too long to wrap
+                                if (!found) {
+                                    res = res + text.slice(0, maxWidth);
+                                    text = text.slice(maxWidth);
+                                    lines.push(res);
+                                }
+                            }
+                        } while (!done);
+                    }
+
+                    var result = [];
+                    for (var r = 0, lenr = lines.length; r < lenr; r++) {
+                        if (lines[r] && lines[r].length > 0) {
+                            result.push(lines[r]);
                         }
+                    }
+                    if (!lines.length) {
+                        lines.push('');
                     }
                     return lines;
                 }
 
-                function testWhite(x) {
-                    var white = new RegExp(/^\s$/);
-                    return white.test(x.charAt(0));
+                if (!params.text) {
+                    finaltspans = [];
+                    finaltspans.push('');
                 }
-
-                finaltspans = wordWrap(params.text, maxNum)
+                if (!maxNum || isNaN(maxNum)) {
+                    finaltspans = [];
+                    finaltspans.push(params.text);
+                } else if (params['word-wrap'] == 'none') {
+                    finaltspans = params.text.split("\n");
+                }
+                else {
+                    finaltspans = wordWrap(params.text, maxNum);
+                }
                 for (var i = 0, ii = finaltspans.length; i < ii; i++) {
                     tspan = $("tspan");
                     i && $(tspan, {dy: fontSize * leading, x: a.x});

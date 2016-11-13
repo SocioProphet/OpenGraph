@@ -134,10 +134,99 @@ OG.renderer.RaphaelRenderer.prototype._getREleById = function (id) {
     return this._ELE_MAP.get(id);
 };
 
+OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
+    //그룹 엘리먼트에 createSubShape 메소드를 확인한다.
+    var me = this, subShapeNodes, subShapeNode, width, height, left, top,
+        subVertices, subStyle, subShape, subShapeId, tempNode, cloneNode,
+        boundary, bW, bH, bT, bL;
+    if (!groupElement.shape.createSubShape) {
+        return;
+    }
 
-OG.renderer.RaphaelRenderer.prototype._drawMarker = function (groupElement, geometry, style, parentStyle) {
+    //shape 데이터와 groupElement 의 데이터 중 element 의 데이터를 우선시한다.
+    if (groupElement.data) {
+        groupElement.shape.setData(groupElement.data);
+    }
+    //shape 만 데이터가 있을 경우 element 에도 데이터를 적용시킨다.
+    else if (groupElement.shape.getData()) {
+        groupElement.data = groupElement.shape.getData();
+    }
 
+    subShapeNodes = groupElement.shape.createSubShape();
+    for (var i = 0, leni = subShapeNodes.length; i < leni; i++) {
+        subShapeNode = subShapeNodes[i];
+        width = subShapeNode.width;
+        height = subShapeNode.height;
+        left = subShapeNode.left;
+        top = subShapeNode.top;
+        subVertices = subShapeNode.vertices;
+        subStyle = subShapeNode.style ? subShapeNode.style : {};
+        subShape = subShapeNode.shape;
+
+        //지정된 subShape 이 없다면 리턴한다.
+        if (!subShape) {
+            continue;
+        }
+
+        //subShapeId 를 구한다.
+        subShapeId = groupElement.id + '_sub_' + i;
+
+        //groupElement 의 바운더리에 따라 위치값들을 정한다.
+        boundary = me.getBoundary(groupElement);
+        bW = boundary.getWidth();
+        bH = boundary.getHeight();
+        bL = boundary.getUpperLeft().x;
+        bT = boundary.getUpperLeft().y;
+
+        if (!width && width != 0) {
+            width = bW;
+        } else {
+            width = bW * (width / 100);
+        }
+        if (!height && height != 0) {
+            height = bH;
+        } else {
+            height = bH * (height / 100);
+        }
+        if (!left && left != 0) {
+            left = (bW / 2) + bL;
+        } else {
+            left = bW * (left / 100) + bL;
+        }
+        if (!top && top != 0) {
+            top = (bH / 2) + bT;
+        } else {
+            top = bH * (top / 100) + bT;
+        }
+
+        if (subShape instanceof OG.shape.EdgeShape) {
+            if (subVertices && subVertices.length) {
+                for (var v = 0, lenv = subVertices.length; v < lenv; v++) {
+                    subVertices[v][0] = bW * (subVertices[v][0] / 100) + bL;
+                    subVertices[v][1] = bH * (subVertices[v][1] / 100) + bT;
+                }
+            } else {
+                subVertices = [[bL, bT], [bL + bW, bT]];
+            }
+            subShape.geom = new OG.PolyLine(subVertices);
+        }
+
+        //노드 복사를 위한 가상의 그룹노드
+        tempNode = me.drawShape([left + width / 2, top + height / 2], subShape, [width, height], subStyle, subShapeId);
+
+        //가상의 그룹노드 내부의 svg 엘리먼트들을 groupElement 내부로 이전시킨다.
+        $(tempNode).children().each(function () {
+            var child = $(this);
+            child.removeAttr('_type');
+            child.removeAttr('_shape');
+            groupElement.appendChild(child.get(0));
+        });
+
+        //가상의 그룹노드를 삭제한다.
+        me._remove(me._getREleById(tempNode.id));
+    }
 };
+
 /**
  * Geometry 를 캔버스에 드로잉한다.(Recursive)
  *
@@ -149,7 +238,6 @@ OG.renderer.RaphaelRenderer.prototype._drawMarker = function (groupElement, geom
  * @private
  */
 OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, geometry, style, parentStyle, isEdge) {
-
     //이곳에, 패턴에 관한 데이터를 추가해야 한다.
     //패턴에 따라 주어진 vertices 를 따라 패턴을 추가해준다.
     //패턴 두께. 패턴 내용물. 패턴 특이점. => 패턴의 일정거리까지는 무엇. 일정거리까지는 무엇. 디폴트는 무엇.
@@ -257,6 +345,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             top = multiData['top'];
             from = multiData['from'];
             to = multiData['to'];
+
             multiStyle = OG.Util.apply(JSON.parse(JSON.stringify(_style)), multiData['style']);
             if (!top || !from || !to) {
                 if (top != 0) {
@@ -268,7 +357,12 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
 
             //top 만큼 평행한 라인을 구한다.
             var pathStr;
-            var newVertices = geometry.getParallelPath(vertices, top);
+            var newVertices = [];
+            if (top == 0) {
+                newVertices = vertices;
+            } else {
+                newVertices = geometry.getParallelPath(vertices, top);
+            }
             for (var l = 0, lenl = newVertices.length; l < lenl; l++) {
                 if (l === 0) {
                     pathStr = "M" + newVertices[l].x + " " + newVertices[l].y;
@@ -285,15 +379,143 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             if (multiStyle['marker']) {
                 delete multiStyle['arrow-end'];
                 delete multiStyle['arrow-start'];
-                path.attr(multiStyle);
-                me._add(path);
-                groupElement.appendChild(path.node);
-                drawMarker(path, multiStyle, subPath, m);
-            } else {
-                path.attr(multiStyle);
-                me._add(path);
-                groupElement.appendChild(path.node);
             }
+
+            path.attr(multiStyle);
+            me._add(path);
+            groupElement.appendChild(path.node);
+
+            if (multiStyle['marker']) {
+                drawMarker(path, multiStyle, subPath, m);
+            }
+            if (multiStyle['pattern']) {
+                drawPattern(path, multiStyle, subPath, m);
+            }
+        }
+    };
+
+    var drawPattern = function (rElement, nodeStyle, nodePath, nodeIndex) {
+        var patternShapeId = nodeStyle['pattern']['id'];
+        var thickness = nodeStyle['pattern']['thickness'];
+        var unitWidth = nodeStyle['pattern']['unit-width'];
+        var unitHeight = nodeStyle['pattern']['unit-height'];
+        var patternWidth = nodeStyle['pattern']['pattern-width'];
+        var patternHeight = nodeStyle['pattern']['pattern-height'];
+        var patternTransform = nodeStyle['pattern']['patternTransform'];
+        var patternStyle = nodeStyle['pattern']['style'] ? nodeStyle['pattern']['style'] : {};
+
+        patternWidth = patternWidth ? patternWidth : 20;
+        patternHeight = patternHeight ? patternHeight : 20;
+        unitWidth = unitWidth ? unitWidth : patternWidth;
+        unitHeight = unitHeight ? unitHeight : patternHeight;
+        thickness = thickness ? thickness : 20;
+
+        //지정한 마커 shape 이 없다면 리턴한다.
+        var patternShape;
+        eval('patternShape = ' + patternShapeId);
+        if (!patternShape) {
+            return;
+        }
+        //Def 에 들어갈 마커 id 를 구한다.
+        var split = patternShapeId.split('.');
+        var patternId = groupElement.id + nodeIndex + split[split.length - 1];
+
+        //기존 def 에 존재하는 마커 삭제
+        var existMarkerDef = $(svg).find('#' + patternId);
+        existMarkerDef.remove();
+
+        patternShape = eval('new ' + patternShapeId + '()');
+        var geometry = patternShape.createPattern();
+
+        // 좌상단으로 이동 및 크기 조정
+        geometry.moveCentroid([unitWidth / 2, unitHeight / 2]);
+        geometry.resizeBox(unitWidth, unitHeight);
+
+        //패턴 스타일링. geometry < nodeOverrideStyle < patternStyle
+        var nodeOverrideStyle = {
+            'stroke': nodeStyle['stroke']
+        };
+        OG.Util.apply(geometry.style.map, nodeOverrideStyle);
+        OG.Util.apply(geometry.style.map, patternStyle);
+
+        //노드 복사를 위한 가상의 그룹노드
+        var tempNode = me.drawGeom(geometry, null, OG.Constants.PATTERN_TEMP_NODE);
+        var cloneNode = $(tempNode).clone().wrapAll("<div/>");
+
+        //가상의 그룹노드를 삭제한다.
+        me._remove(me._getREleById(tempNode.id));
+
+        cloneNode.removeAttr('_type');
+        cloneNode.removeAttr('_shape');
+        cloneNode.removeAttr('id');
+        cloneNode.children().each(function () {
+            $(this).removeAttr('_type');
+            $(this).removeAttr('_shape');
+            $(this).removeAttr('id');
+            $(this).removeAttr('marker-end');
+            $(this).removeAttr('marker-start');
+            $(this).removeAttr('marker-mid');
+        });
+
+        var data = {
+            id: patternId,
+            x: 0,
+            y: 0,
+            width: patternWidth,
+            height: patternHeight,
+            patternUnits: 'userSpaceOnUse'
+        };
+        if (patternTransform) {
+            data.patternTransform = patternTransform;
+        }
+
+        var el = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+        el.appendChild(cloneNode.get(0));
+        for (var k in data) {
+            el.setAttribute(k, data[k]);
+        }
+
+        $(svg).find('defs').get(0).appendChild(el);
+
+        //edge 일 경우 thickness 두께 만큼 새로운 패스를 생성한다.
+        if (isEdge) {
+            if (!thickness || thickness == 0) {
+                return;
+            }
+            //thickness +- 만큼 평행한 라인을 구한다.
+            var pathStr;
+            var topVertices = geometry.getParallelPath(vertices, thickness);
+            var bottomVertices = geometry.getParallelPath(vertices, -thickness);
+
+            //bottomVertices 의 순서를 리버스한다.
+            bottomVertices = bottomVertices.reverse();
+
+            //두 vertices 를 결합하여 Rectangle 형태의 polyline 을 생성한다.
+            var newVertices = topVertices.concat(bottomVertices);
+
+            for (var l = 0, lenl = newVertices.length; l < lenl; l++) {
+                if (l === 0) {
+                    pathStr = "M" + newVertices[l].x + " " + newVertices[l].y;
+                } else {
+                    pathStr += "L" + newVertices[l].x + " " + newVertices[l].y;
+                }
+            }
+            var path = me._PAPER.path(pathStr);
+
+            //새 패스에 적용할 스타일은 nodeStyle 의 fill-opacity 이다.
+            //만일 없다면 1로 적용한다.
+            var newPathStyle = {
+                'fill-opacity': nodeStyle['fill-opacity'] ? nodeStyle['fill-opacity'] : 1,
+                'stroke': 'none'
+            };
+            path.attr(newPathStyle);
+            me._add(path);
+            groupElement.appendChild(path.node);
+            $(path.node).attr('fill', 'url(#' + patternId + ')');
+        }
+        //edge 가 아닐경우 fill 에 바로 마커를 입힌다.
+        else {
+            $(rElement.node).attr('fill', 'url(#' + patternId + ')');
         }
     };
 
@@ -444,6 +666,11 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             element = this._PAPER.circle(geometry.coordinate.x, geometry.coordinate.y, 0.5);
             element.attr(_style);
 
+            //패턴정보가 있을 경우
+            if (rootPattern) {
+                drawPattern(element, _style, null, 0);
+            }
+
             connectGuideElement = this._PAPER.circle(geometry.coordinate.x, geometry.coordinate.y, 0.5);
             setConnectGuideAttr(connectGuideElement);
             break;
@@ -481,12 +708,16 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 }
                 //멀티 라인 정보가 없고, 패턴정보가 있을 경우
                 else if (!multi && rootPattern) {
-                    //drawPattern();
-                    //element.attr('stroke-opacity', '0');
+                    drawPattern(element, _style, pathStr, 0);
                 }
             } else {
                 element = this._PAPER.path(pathStr);
                 element.attr(_style);
+
+                //패턴정보가 있을 경우
+                if (rootPattern) {
+                    drawPattern(element, _style, pathStr, 0);
+                }
             }
 
             connectGuideElement = this._PAPER.path(pathStr);
@@ -509,6 +740,11 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
 
             element = this._PAPER.path(pathStr);
             element.attr(_style);
+
+            //패턴정보가 있을 경우
+            if (rootPattern) {
+                drawPattern(element, _style, pathStr, 0);
+            }
 
             connectGuideElement = this._PAPER.path(pathStr);
             setConnectGuideAttr(connectGuideElement);
@@ -535,6 +771,12 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 }
             }
             element.attr(_style);
+
+            //패턴정보가 있을 경우
+            if (rootPattern) {
+                drawPattern(element, _style, pathStr, 0);
+            }
+
             setConnectGuideAttr(connectGuideElement);
             break;
 
@@ -554,6 +796,10 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 connectGuideElement = this._PAPER.path(pathStr);
             }
             element.attr(_style);
+            //패턴정보가 있을 경우
+            if (rootPattern) {
+                drawPattern(element, _style, pathStr, 0);
+            }
             setConnectGuideAttr(connectGuideElement);
             break;
 
@@ -571,6 +817,10 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             }
             element = this._PAPER.path(pathStr);
             element.attr(_style);
+            //패턴정보가 있을 경우
+            if (rootPattern) {
+                drawPattern(element, _style, pathStr, 0);
+            }
 
             connectGuideElement = this._PAPER.path(pathStr);
             setConnectGuideAttr(connectGuideElement);
@@ -590,6 +840,11 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             }
             element = this._PAPER.path(pathStr);
             element.attr(_style);
+
+            //패턴정보가 있을 경우
+            if (rootPattern) {
+                drawPattern(element, _style, pathStr, 0);
+            }
 
             connectGuideElement = this._PAPER.path(pathStr);
             setConnectGuideAttr(connectGuideElement);
@@ -885,6 +1140,9 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
     groupNode.shapeStyle = (style instanceof OG.geometry.Style) ? style.map : style;
     $(groupNode).attr("_shape_id", shape.SHAPE_ID);
 
+    // 서브 shape 드로잉
+    me._drawSubShape(groupNode);
+
     // Draw for Task
     if (shape instanceof OG.shape.bpmn.A_Task) {
         if (groupNode.shape.LoopType != 'None')
@@ -1107,7 +1365,7 @@ OG.renderer.RaphaelRenderer.prototype.drawText = function (position, text, size,
     }
 
     // Draw text
-    element = this._PAPER.text(position[0], position[1], text, 8);
+    element = this._PAPER.text(position[0], position[1], text, size);
     element.attr(_style);
 
     // real size
@@ -1520,7 +1778,6 @@ OG.renderer.RaphaelRenderer.prototype.drawEdge = function (line, style, id, isSe
 
     // draw Edge
     this._drawGeometry(group.node, edge, _style, null, true);
-    //this._drawMarker(group.node, edge, _style);
 
     group.node.geom = edge;
     group.attr(me._CONFIG.DEFAULT_STYLE.SHAPE);
@@ -1587,6 +1844,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
 
     // 타이틀 라인 Drawing
     OG.Util.apply(_tempStyle, geometry.style.map, _style);
+
     if (_tempStyle['label-direction'] && _tempStyle['vertical-align'] === 'top') {
         if (_tempStyle['label-direction'] === 'vertical') {
             if (_tempStyle['title-size']) {
@@ -1618,7 +1876,16 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
             }
         }
         this._drawGeometry(group.node, titleLine, _style);
-        this._drawGeometry(group.node, group_hidden, me._CONFIG.DEFAULT_STYLE.GROUP_HIDDEN);
+
+        //label-fill 어트리뷰트 적용
+        var groupHiddenStyle = JSON.parse(JSON.stringify(me._CONFIG.DEFAULT_STYLE.GROUP_HIDDEN));
+        if (_tempStyle['label-fill']) {
+            groupHiddenStyle['fill'] = _tempStyle['label-fill'];
+        }
+        if (_tempStyle['label-fill-opacity']) {
+            groupHiddenStyle['fill-opacity'] = _tempStyle['label-fill-opacity'];
+        }
+        this._drawGeometry(group.node, group_hidden, groupHiddenStyle);
     }
 
     // 위치조정
@@ -1927,9 +2194,11 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
                     this.redrawConnectedEdge(element, excludeEdgeId);
                     this.drawLabel(element);
                 }
-
                 break;
         }
+
+        //서브 도형 그리기
+        me._drawSubShape(element);
 
         if (element.shape instanceof OG.shape.bpmn.A_Task) {
             if (element.shape.LoopType != 'None')

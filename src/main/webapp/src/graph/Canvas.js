@@ -1302,9 +1302,10 @@ OG.graph.Canvas.prototype = {
      * @param toP toElement 와 연결될 터미널 좌표 [x,y](optional)
      * @param preventTrigger 참 일 경우 이벤트 발생을 방지
      * @param id 연결선의 아이디
+     * @param {Element} edgeShape 이 값이 없으면 신규 OG.EdgeShape 를 생성
      * @returns {*|Element}
      */
-    connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger, id) {
+    connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger, id, edgeShape) {
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
         if (fromP) {
@@ -1325,9 +1326,14 @@ OG.graph.Canvas.prototype = {
         toPosition = [toPosition.x, toPosition.y];
 
         // draw edge
-        edge = this._RENDERER.drawShape(null, new OG.EdgeShape(fromPosition, toPosition), null, style, id);
+        edgeShape = edgeShape ? edgeShape : new OG.EdgeShape();
+        edgeShape.from = fromPosition;
+        edgeShape.to = toPosition;
+        edge = this._RENDERER.drawShape(null, edgeShape, null, style, id);
         edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
 
+        //if label null, convert undefined
+        label = label ? label : undefined;
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, preventTrigger);
 
@@ -1989,6 +1995,10 @@ OG.graph.Canvas.prototype = {
     setCustomData: function (shapeElement, data) {
         var element = OG.Util.isElement(shapeElement) ? shapeElement : document.getElementById(shapeElement);
         element.data = data;
+
+        //도형의 shape 에 데이터를 저장하고, 리드로우 한다.
+        element.shape.data = data;
+        this.getRenderer().redrawShape(shapeElement);
     }
     ,
 
@@ -2000,6 +2010,10 @@ OG.graph.Canvas.prototype = {
      */
     getCustomData: function (shapeElement) {
         var element = OG.Util.isElement(shapeElement) ? shapeElement : document.getElementById(shapeElement);
+        // element 에 데이터가 없을 경우 (shape 이 데이터를 가지고 있을 경우)
+        if(!element.data){
+            element.data = element.shape.data;
+        }
         return element.data;
     }
     ,
@@ -2286,6 +2300,9 @@ OG.graph.Canvas.prototype = {
                         if (label) {
                             shape.label = label;
                         }
+                        if (data) {
+                            shape.data = OG.JSON.decode(unescape(data));
+                        }
                         element = this.drawShape([x, y], shape, [width, height], OG.JSON.decode(style), id, parent, false);
                         if (element.shape instanceof OG.shape.bpmn.A_Task) {
                             element.shape.LoopType = loopType;
@@ -2298,6 +2315,9 @@ OG.graph.Canvas.prototype = {
                         shape = eval('new ' + shapeId + '(' + fromto + ')');
                         if (label) {
                             shape.label = label;
+                        }
+                        if (data) {
+                            shape.data = OG.JSON.decode(unescape(data));
                         }
                         if (fromLabel) {
                             shape.fromLabel = unescape(fromLabel);
@@ -2325,6 +2345,9 @@ OG.graph.Canvas.prototype = {
                         if (label) {
                             shape.label = label;
                         }
+                        if (data) {
+                            shape.data = OG.JSON.decode(unescape(data));
+                        }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;
                     case OG.Constants.SHAPE_TYPE.IMAGE:
@@ -2332,12 +2355,18 @@ OG.graph.Canvas.prototype = {
                         if (label) {
                             shape.label = label;
                         }
+                        if (data) {
+                            shape.data = OG.JSON.decode(unescape(data));
+                        }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;
                     case OG.Constants.SHAPE_TYPE.TEXT:
                         shape = eval('new ' + shapeId + '()');
                         if (value) {
                             shape.text = unescape(value);
+                        }
+                        if (data) {
+                            shape.data = OG.JSON.decode(unescape(data));
                         }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;

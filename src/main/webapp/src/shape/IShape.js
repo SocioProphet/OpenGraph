@@ -113,6 +113,12 @@ OG.shape.IShape = function () {
 
 
 	this.exceptionType = '';
+
+	/**
+	 * 도형의 데이터
+	 * @type Object
+	 */
+	this.data = null
 };
 OG.shape.IShape.prototype = {
 
@@ -140,6 +146,14 @@ OG.shape.IShape.prototype = {
 
 	// (void) 특수한 컨트롤을 생성하기 위한 함수
 	drawCustomControl: function(){
+	},
+
+	setData: function(data){
+		this.data = data;
+	},
+
+	getData: function(){
+		return this.data;
 	}
 };
 OG.shape.IShape.prototype.constructor = OG.shape.IShape;
