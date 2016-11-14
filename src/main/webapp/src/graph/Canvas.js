@@ -1996,9 +1996,8 @@ OG.graph.Canvas.prototype = {
         var element = OG.Util.isElement(shapeElement) ? shapeElement : document.getElementById(shapeElement);
         element.data = data;
 
-        //도형의 shape 에 데이터를 저장하고, 리드로우 한다.
+        //도형의 shape 에 데이터를 저장한다.
         element.shape.data = data;
-        this.getRenderer().redrawShape(shapeElement);
     }
     ,
 

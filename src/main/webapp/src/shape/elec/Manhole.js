@@ -1,5 +1,5 @@
 OG.shape.elec.Manhole = function (image, label) {
-    OG.shape.elec.Manhole.superclass.call(this);
+    OG.shape.elec.Manhole.superclass.call(this, image, label);
 
     this.SHAPE_ID = 'OG.shape.elec.Manhole';
     this.label = label;

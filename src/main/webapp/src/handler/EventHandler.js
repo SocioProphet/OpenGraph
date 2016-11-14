@@ -926,7 +926,7 @@ OG.handler.EventHandler.prototype = {
                              * IE 10,11 use parentNode instead parentElement
                              */
                             var parentNode = ele.parentElement;
-                            if(!parentNode){
+                            if (!parentNode) {
                                 parentNode = ele.parentNode;
                             }
                             if (parentNode.id !== root.id) {
@@ -984,6 +984,8 @@ OG.handler.EventHandler.prototype = {
                             if (virtualEdge) {
                                 $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'created');
                                 $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT, line.text);
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_LABEL, line.label);
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_SHAPE, line.shape);
                             }
                         }
                     });
@@ -997,6 +999,8 @@ OG.handler.EventHandler.prototype = {
                             virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
                             $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'active');
                             $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT, line.text);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_LABEL, line.label);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_SHAPE, line.shape);
                         }
                     });
                 });
@@ -1893,7 +1897,7 @@ OG.handler.EventHandler.prototype = {
             // 마우스 클릭하여 선택 처리
             $(element).bind({
                 click: function (event, param) {
-                    if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+                    if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
                         $(me._RENDERER.getContainer()).focus();
                     }
                     //$(me._RENDERER.getContainer()).focus();
@@ -1926,6 +1930,8 @@ OG.handler.EventHandler.prototype = {
                         var isConnectable = me._isConnectable(element.shape);
                         var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
                         var connectText = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT);
+                        var connectLabel = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_LABEL);
+                        var connectShape = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_SHAPE);
                         var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
                         var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
 
@@ -1945,7 +1951,10 @@ OG.handler.EventHandler.prototype = {
                                     isConnectable = false;
                                 }
                                 if (isConnectable) {
-                                    me._RENDERER._CANVAS.connect(target, element, null, connectText)
+                                    if (connectShape) {
+                                        eval('connectShape = new ' + connectShape + '()');
+                                    }
+                                    me._RENDERER._CANVAS.connect(target, element, null, connectLabel, null, null, null, null, connectShape);
                                     renderer.addHistory();
                                 }
                             } else {
@@ -2315,9 +2324,9 @@ OG.handler.EventHandler.prototype = {
         if (isEnableHotKey === true) {
             // delete, ctrl+A
             var _container;
-            if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+            if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
                 _container = $(renderer.getContainer());
-            }else{
+            } else {
                 _container = $(document);
             }
             _container.bind("keydown", function (event) {
@@ -2453,7 +2462,7 @@ OG.handler.EventHandler.prototype = {
             selector: '#' + me._RENDERER.getRootElement().id,
             build: function ($trigger, e) {
                 var root = me._RENDERER.getRootGroup(), copiedElement = $(root).data("copied");
-                if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+                if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
                     $(me._RENDERER.getContainer()).focus();
                 }
                 return {
@@ -3894,7 +3903,7 @@ OG.handler.EventHandler.prototype = {
             },
             selector: '#' + me._RENDERER.getRootElement().id + ' [_type=SHAPE]',
             build: function ($trigger, event) {
-                if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+                if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
                     $(me._RENDERER.getContainer()).focus();
                 }
                 var items;
@@ -4022,7 +4031,7 @@ OG.handler.EventHandler.prototype = {
         var me = this;
 
         var dragBox = $(this).data("dragBox");
-        if(me._CONFIG.FOCUS_CANVAS_ONSELECT){
+        if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
             $(me._RENDERER.getContainer()).focus();
         }
         if (!dragBox || (dragBox && dragBox.width < 1 && dragBox.height < 1)) {
@@ -5421,10 +5430,10 @@ OG.handler.EventHandler.prototype = {
             var isConnectable;
             var vertices = element.shape.geom.getVertices();
             if ($(spot).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
-                if($(spot).data("start")){
+                if ($(spot).data("start")) {
                     isConnectable = 'from';
                 }
-                if($(spot).data("end")){
+                if ($(spot).data("end")) {
                     isConnectable = 'to';
                 }
             }
@@ -5433,7 +5442,7 @@ OG.handler.EventHandler.prototype = {
 
         $(element).bind({
             mousemove: function (event) {
-                if(!me._isConnectable(element.shape)){
+                if (!me._isConnectable(element.shape)) {
                     return;
                 }
 
@@ -5598,7 +5607,7 @@ OG.handler.EventHandler.prototype = {
                 }
             },
             mouseout: function (event) {
-                if(!me._isConnectable(element.shape)){
+                if (!me._isConnectable(element.shape)) {
                     return;
                 }
                 var isShape = $(element).attr("_type") === OG.Constants.NODE_TYPE.SHAPE;
@@ -5651,7 +5660,7 @@ OG.handler.EventHandler.prototype = {
                 event.stopImmediatePropagation();
             },
             mouseover: function (event) {
-                if(!me._isConnectable(element.shape)){
+                if (!me._isConnectable(element.shape)) {
                     return;
                 }
                 var guide;

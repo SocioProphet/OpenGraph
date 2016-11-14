@@ -153,6 +153,9 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
     }
 
     subShapeNodes = groupElement.shape.createSubShape();
+    if (!subShapeNodes || !subShapeNodes.length) {
+        return;
+    }
     for (var i = 0, leni = subShapeNodes.length; i < leni; i++) {
         subShapeNode = subShapeNodes[i];
         width = subShapeNode.width;
@@ -2993,9 +2996,24 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         if (!_isConnectable) {
             return;
         }
-        var minText = text;
-        if (text.length > 3) {
-            minText = text.substring(0, 3) + '..';
+        var displayText;
+        var shapeId;
+        var shapeLabel;
+        //텍스트 형태가 스트링일 경우, 디폴트 선도형은 OG.EdgeShape
+        if(typeof text == 'string'){
+            displayText = text;
+            shapeLabel = text;
+            shapeId = 'OG.EdgeShape';
+        }
+        //오브젝트 형태일 경우 text 파라미터와 shape 파라미터를 얻는다.
+        else{
+            displayText = text.text;
+            shapeLabel = text.label;
+            shapeId = text.shape;
+        }
+        var minText = displayText;
+        if (displayText.length > 3) {
+            minText = displayText.substring(0, 3) + '..';
         }
         _line = me._PAPER.rect(_upperRight.x + _ctrlMargin, _upperRight.y, _ctrlSize, _ctrlSize);
         _linePath1 = me._PAPER.path(createTextLinePath(0, 0));
@@ -3022,7 +3040,9 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         }
         guide.line.push({
             node: _line.node,
-            text: text
+            text: displayText,
+            label: shapeLabel,
+            shape: shapeId
         });
         controllers.push(_line);
     }

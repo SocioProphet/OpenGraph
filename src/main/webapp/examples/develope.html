@@ -489,6 +489,26 @@
             var subElement2 = canvas.drawShape([200, 400], manholeShape, [50, 50]);
             var subElement3 = canvas.drawShape([200, 200], bldgShape, [200, 200]);
 
+            canvas.setTextListInController(subElement1, [
+                {
+                    text: 'cable',
+                    shape: 'OG.CableShape'
+                },
+                {
+                    text: 'busduct',
+                    shape: 'OG.BusductShape'
+                },
+                {
+                    text: 'busduct2',
+                    label: 'aaa',
+                    shape: 'OG.BusductShape'
+                },
+                {
+                    text: 'busduct3',
+                    shape: 'OG.BusductShape'
+                }
+            ]);
+
             //canvas.connect(subElement, toElement, null, null, null, null, null, null, new OG.BusductShape());
             //canvas.connect(subElement, to2Element, null, null, null, null, null, null, new OG.RacewayShape());
             //var edge = canvas.connect(fromElement, toElement, cable);
