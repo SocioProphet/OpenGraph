@@ -4319,13 +4319,15 @@ OG.handler.EventHandler.prototype = {
             };
 
             $.each(copiedElement, function (idx, item) {
+                var relatedElementsFromEdge, relatedFrom, relatedTo,
+                    copiedFrom, copiedTo, copiedEdge, pastedFrom, pastedTo, pastedEdge;
                 //연결선이 복제된 경우, 복제된 대상 중 연결선의 From 과 To 가 모두 있을경우 연결선을 복원한다.
                 if ($(item).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
-                    var relatedElementsFromEdge = renderer._CANVAS.getRelatedElementsFromEdge(item);
-                    var relatedFrom = relatedElementsFromEdge.from;
-                    var relatedTo = relatedElementsFromEdge.to;
-                    var copiedFrom, copiedTo, pastedFrom, pastedTo, pastedEdge,
-                        copiedEdge = item;
+                    relatedElementsFromEdge = renderer._CANVAS.getRelatedElementsFromEdge(item);
+                    relatedFrom = relatedElementsFromEdge.from;
+                    relatedTo = relatedElementsFromEdge.to;
+                    copiedFrom = undefined, copiedTo = undefined, pastedFrom = undefined, pastedTo = undefined, pastedEdge = undefined;
+                    copiedEdge = item;
 
                     for (var i = 0; i < copiedElement.length; i++) {
                         if (relatedFrom) {
@@ -4361,10 +4363,10 @@ OG.handler.EventHandler.prototype = {
                     var nextEdges = renderer._CANVAS.getNextEdges(item);
                     var relatedEdges = prevEdges.concat(nextEdges);
                     for (var i = 0, leni = relatedEdges.length; i < leni; i++) {
-                        var relatedElementsFromEdge = renderer._CANVAS.getRelatedElementsFromEdge(relatedEdges[i]);
-                        var relatedFrom = relatedElementsFromEdge.from;
-                        var relatedTo = relatedElementsFromEdge.to;
-                        var copiedFrom, copiedTo, copiedEdge, pastedFrom, pastedTo, pastedEdge;
+                        relatedElementsFromEdge = renderer._CANVAS.getRelatedElementsFromEdge(relatedEdges[i]);
+                        relatedFrom = relatedElementsFromEdge.from;
+                        relatedTo = relatedElementsFromEdge.to;
+                        copiedFrom = undefined, copiedTo = undefined, copiedEdge = undefined, pastedFrom = undefined, pastedTo = undefined, pastedEdge = undefined;
 
                         for (var c = 0; c < copiedElement.length; c++) {
                             if (relatedFrom) {
