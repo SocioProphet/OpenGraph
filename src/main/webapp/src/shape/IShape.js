@@ -124,7 +124,7 @@ OG.shape.IShape = function () {
 	 * 도형 선연결시 선연결 컨트롤러 목록
 	 * @type {Array}
 	 */
-	this.textLineController = [];
+	this.textList = [];
 };
 OG.shape.IShape.prototype = {
 

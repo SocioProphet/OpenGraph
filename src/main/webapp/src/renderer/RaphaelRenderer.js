@@ -3000,13 +3000,13 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         var shapeId;
         var shapeLabel;
         //텍스트 형태가 스트링일 경우, 디폴트 선도형은 OG.EdgeShape
-        if(typeof text == 'string'){
+        if (typeof text == 'string') {
             displayText = text;
             shapeLabel = text;
             shapeId = 'OG.EdgeShape';
         }
         //오브젝트 형태일 경우 text 파라미터와 shape 파라미터를 얻는다.
-        else{
+        else {
             displayText = text.text;
             shapeLabel = text.label;
             shapeId = text.shape;
@@ -3041,7 +3041,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         guide.line.push({
             node: _line.node,
             text: displayText,
-            label: shapeLabel,
+            label: shapeLabel ? shapeLabel : '',
             shape: shapeId
         });
         controllers.push(_line);
@@ -4461,12 +4461,7 @@ OG.renderer.RaphaelRenderer.prototype.setShapeStyle = function (element, style) 
 OG.renderer.RaphaelRenderer.prototype.setTextListInController = function (element, textList) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
     if (rElement && element.shape && element.shape.geom) {
-        var data = this._CANVAS.getCustomData(element);
-        if (!data) {
-            data = {}
-        }
-        data['textLineController'] = textList;
-        this._CANVAS.setCustomData(element, data);
+        element.shape.textList = textList;
     }
 };
 
@@ -4480,12 +4475,7 @@ OG.renderer.RaphaelRenderer.prototype.setTextListInController = function (elemen
 OG.renderer.RaphaelRenderer.prototype.getTextListInController = function (element) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
     if (rElement && element.shape && element.shape.geom) {
-        var data = this._CANVAS.getCustomData(element);
-        if (data) {
-            return data['textLineController'];
-        } else {
-            return null;
-        }
+        return element.shape.textList;
     }
 };
 

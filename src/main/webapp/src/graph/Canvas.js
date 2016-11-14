@@ -2010,7 +2010,7 @@ OG.graph.Canvas.prototype = {
     getCustomData: function (shapeElement) {
         var element = OG.Util.isElement(shapeElement) ? shapeElement : document.getElementById(shapeElement);
         // element 에 데이터가 없을 경우 (shape 이 데이터를 가지고 있을 경우)
-        if(!element.data){
+        if (!element.data) {
             element.data = element.shape.data;
         }
         return element.data;
@@ -2159,6 +2159,9 @@ OG.graph.Canvas.prototype = {
                 if (item.data) {
                     cell['@data'] = escape(OG.JSON.encode(item.data));
                 }
+                if (shape.textList) {
+                    cell['@textList'] = escape(OG.JSON.encode(shape.textList));
+                }
                 if (item.dataExt) {
                     cell['@dataExt'] = escape(OG.JSON.encode(item.dataExt));
                 }
@@ -2238,7 +2241,7 @@ OG.graph.Canvas.prototype = {
         var canvasWidth, canvasHeight, rootGroup,
             minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE,
             i, cell, shape, id, parent, shapeType, shapeId, x, y, width, height, style, geom, from, to,
-            fromEdge, toEdge, label, fromLabel, toLabel, angle, value, data, dataExt, element, loopType, taskType, swimlane;
+            fromEdge, toEdge, label, fromLabel, toLabel, angle, value, data, dataExt, element, loopType, taskType, swimlane, textList;
 
         this._RENDERER.clear();
 
@@ -2281,6 +2284,7 @@ OG.graph.Canvas.prototype = {
                 angle = cell[i]['@angle'];
                 value = cell[i]['@value'];
                 data = cell[i]['@data'];
+                textList = cell[i]['@textList'];
                 dataExt = cell[i]['@dataExt'];
                 loopType = cell[i]['@loopType'];
                 taskType = cell[i]['@taskType'];
@@ -2302,6 +2306,9 @@ OG.graph.Canvas.prototype = {
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
                         }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
+                        }
                         element = this.drawShape([x, y], shape, [width, height], OG.JSON.decode(style), id, parent, false);
                         if (element.shape instanceof OG.shape.bpmn.A_Task) {
                             element.shape.LoopType = loopType;
@@ -2317,6 +2324,9 @@ OG.graph.Canvas.prototype = {
                         }
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
+                        }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
                         }
                         if (fromLabel) {
                             shape.fromLabel = unescape(fromLabel);
@@ -2347,6 +2357,9 @@ OG.graph.Canvas.prototype = {
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
                         }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
+                        }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;
                     case OG.Constants.SHAPE_TYPE.IMAGE:
@@ -2357,6 +2370,9 @@ OG.graph.Canvas.prototype = {
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
                         }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
+                        }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;
                     case OG.Constants.SHAPE_TYPE.TEXT:
@@ -2366,6 +2382,9 @@ OG.graph.Canvas.prototype = {
                         }
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
+                        }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
                         }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;

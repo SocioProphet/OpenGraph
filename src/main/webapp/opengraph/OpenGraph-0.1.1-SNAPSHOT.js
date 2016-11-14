@@ -10856,7 +10856,7 @@ OG.shape.IShape = function () {
 	 * 도형 선연결시 선연결 컨트롤러 목록
 	 * @type {Array}
 	 */
-	this.textLineController = [];
+	this.textList = [];
 };
 OG.shape.IShape.prototype = {
 
@@ -18840,13 +18840,13 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         var shapeId;
         var shapeLabel;
         //텍스트 형태가 스트링일 경우, 디폴트 선도형은 OG.EdgeShape
-        if(typeof text == 'string'){
+        if (typeof text == 'string') {
             displayText = text;
             shapeLabel = text;
             shapeId = 'OG.EdgeShape';
         }
         //오브젝트 형태일 경우 text 파라미터와 shape 파라미터를 얻는다.
-        else{
+        else {
             displayText = text.text;
             shapeLabel = text.label;
             shapeId = text.shape;
@@ -18881,7 +18881,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         guide.line.push({
             node: _line.node,
             text: displayText,
-            label: shapeLabel,
+            label: shapeLabel ? shapeLabel : '',
             shape: shapeId
         });
         controllers.push(_line);
@@ -20301,12 +20301,7 @@ OG.renderer.RaphaelRenderer.prototype.setShapeStyle = function (element, style) 
 OG.renderer.RaphaelRenderer.prototype.setTextListInController = function (element, textList) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
     if (rElement && element.shape && element.shape.geom) {
-        var data = this._CANVAS.getCustomData(element);
-        if (!data) {
-            data = {}
-        }
-        data['textLineController'] = textList;
-        this._CANVAS.setCustomData(element, data);
+        element.shape.textList = textList;
     }
 };
 
@@ -20320,12 +20315,7 @@ OG.renderer.RaphaelRenderer.prototype.setTextListInController = function (elemen
 OG.renderer.RaphaelRenderer.prototype.getTextListInController = function (element) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
     if (rElement && element.shape && element.shape.geom) {
-        var data = this._CANVAS.getCustomData(element);
-        if (data) {
-            return data['textLineController'];
-        } else {
-            return null;
-        }
+        return element.shape.textList;
     }
 };
 
@@ -27815,7 +27805,8 @@ OG.handler.EventHandler.prototype = {
         var renderer = me._RENDERER;
         var root = renderer.getRootGroup(),
             copiedElement = $(root).data("copied"),
-            selectedElement = [], dx, dy, avgX = 0, avgY = 0;
+            selectedElement = [], dx, dy, avgX = 0, avgY = 0,
+            copiedMap = [];
         if (copiedElement) {
             $(renderer.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
                 if (item.id) {
@@ -27888,9 +27879,117 @@ OG.handler.EventHandler.prototype = {
                 me._copyChildren(item, newElement);
 
                 selectedElement.push(newElement);
+                copiedMap.push({
+                    copied: item,
+                    pasted: newElement
+                })
             });
-            $(root).data("copied", selectedElement);
 
+            var getPastedElementByCopied = function (copied) {
+                var pasted;
+                for (var i = 0, leni = copiedMap.length; i < leni; i++) {
+                    if (copiedMap[i]['copied'].id == copied.id) {
+                        pasted = copiedMap[i]['pasted'];
+                    }
+                }
+                return pasted;
+            };
+
+            $.each(copiedElement, function (idx, item) {
+                //연결선이 복제된 경우, 복제된 대상 중 연결선의 From 과 To 가 모두 있을경우 연결선을 복원한다.
+                if ($(item).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
+                    var relatedElementsFromEdge = renderer._CANVAS.getRelatedElementsFromEdge(item);
+                    var relatedFrom = relatedElementsFromEdge.from;
+                    var relatedTo = relatedElementsFromEdge.to;
+                    var copiedFrom, copiedTo, pastedFrom, pastedTo, pastedEdge,
+                        copiedEdge = item;
+
+                    for (var i = 0; i < copiedElement.length; i++) {
+                        if (relatedFrom) {
+                            if (copiedElement[i].id == relatedFrom.id) {
+                                copiedFrom = copiedElement[i];
+                            }
+                        }
+                        if (relatedTo) {
+                            if (copiedElement[i].id == relatedTo.id) {
+                                copiedTo = copiedElement[i];
+                            }
+                        }
+                    }
+                    if (copiedFrom && copiedTo) {
+                        pastedFrom = getPastedElementByCopied(copiedFrom);
+                        pastedTo = getPastedElementByCopied(copiedTo);
+                        pastedEdge = getPastedElementByCopied(copiedEdge);
+                        var pastedShape = pastedEdge.shape;
+                        var pastedId = pastedEdge.id;
+
+                        renderer._CANVAS.removeShape(pastedEdge);
+                        pastedEdge = renderer._CANVAS.connect(pastedFrom, pastedTo, null, null, null, null, null, pastedId);
+                        pastedEdge.shape = pastedShape;
+                        renderer.redrawShape(pastedEdge);
+                    }
+                }
+                // 일반 도형이 복제된 경우, 복제된 대상 중 연결된 도형이 있을 경우, 그 연결선 또한 복제된 대상 속에 있는지 찾는다.
+                // 만약 연결선이 복제 되지 않은 상태라면, 연결선을 복원한다.
+                // 연결선을 복원 한 후에는,
+                // copiedElement , selectedElement(pasted),copiedMap 에 각각 연결선을 추가하도록 한다.
+                else {
+                    var prevEdges = renderer._CANVAS.getPrevEdges(item);
+                    var nextEdges = renderer._CANVAS.getNextEdges(item);
+                    var relatedEdges = prevEdges.concat(nextEdges);
+                    for (var i = 0, leni = relatedEdges.length; i < leni; i++) {
+                        var relatedElementsFromEdge = renderer._CANVAS.getRelatedElementsFromEdge(relatedEdges[i]);
+                        var relatedFrom = relatedElementsFromEdge.from;
+                        var relatedTo = relatedElementsFromEdge.to;
+                        var copiedFrom, copiedTo, copiedEdge, pastedFrom, pastedTo, pastedEdge;
+
+                        for (var c = 0; c < copiedElement.length; c++) {
+                            if (relatedFrom) {
+                                if (copiedElement[c].id == relatedFrom.id) {
+                                    copiedFrom = copiedElement[c];
+                                }
+                            }
+                            if (relatedTo) {
+                                if (copiedElement[c].id == relatedTo.id) {
+                                    copiedTo = copiedElement[c];
+                                }
+                            }
+                            if (copiedElement[c].id == relatedEdges[i].id) {
+                                copiedEdge = copiedElement[c];
+                            }
+                        }
+                        if (copiedFrom && copiedTo && !copiedEdge) {
+                            pastedFrom = getPastedElementByCopied(copiedFrom);
+                            pastedTo = getPastedElementByCopied(copiedTo);
+                            copiedEdge = relatedEdges[i];
+
+                            //relatedEdges[i] 를 복사한다.
+                            var newShape = relatedEdges[i].shape.clone();
+                            if (relatedEdges[i].shape.geom instanceof OG.geometry.BezierCurve) {
+                                newShape.geom = new OG.BezierCurve(relatedEdges[i].shape.geom.getControlPoints());
+                            } else {
+                                newShape.geom = new OG.PolyLine(relatedEdges[i].shape.geom.getVertices());
+                            }
+                            newShape.geom.style = relatedEdges[i].shape.geom.style;
+                            newShape.geom.move(me._CONFIG.COPY_PASTE_PADDING, me._CONFIG.COPY_PASTE_PADDING);
+
+                            pastedEdge = renderer._CANVAS.connect(pastedFrom, pastedTo);
+                            pastedEdge.shape = newShape;
+                            pastedEdge.data = relatedEdges[i].data;
+
+                            renderer.redrawShape(pastedEdge);
+                            copiedElement.push(copiedEdge);
+                            selectedElement.push(pastedEdge);
+                            copiedMap.push({
+                                copied: copiedEdge.id,
+                                pasted: pastedEdge.id
+                            });
+                        }
+                    }
+                }
+            });
+
+            $(root).data("copied", selectedElement);
             renderer.addHistory();
         }
 
@@ -32021,7 +32120,7 @@ OG.graph.Canvas.prototype = {
     getCustomData: function (shapeElement) {
         var element = OG.Util.isElement(shapeElement) ? shapeElement : document.getElementById(shapeElement);
         // element 에 데이터가 없을 경우 (shape 이 데이터를 가지고 있을 경우)
-        if(!element.data){
+        if (!element.data) {
             element.data = element.shape.data;
         }
         return element.data;
@@ -32170,6 +32269,9 @@ OG.graph.Canvas.prototype = {
                 if (item.data) {
                     cell['@data'] = escape(OG.JSON.encode(item.data));
                 }
+                if (shape.textList) {
+                    cell['@textList'] = escape(OG.JSON.encode(shape.textList));
+                }
                 if (item.dataExt) {
                     cell['@dataExt'] = escape(OG.JSON.encode(item.dataExt));
                 }
@@ -32249,7 +32351,7 @@ OG.graph.Canvas.prototype = {
         var canvasWidth, canvasHeight, rootGroup,
             minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE,
             i, cell, shape, id, parent, shapeType, shapeId, x, y, width, height, style, geom, from, to,
-            fromEdge, toEdge, label, fromLabel, toLabel, angle, value, data, dataExt, element, loopType, taskType, swimlane;
+            fromEdge, toEdge, label, fromLabel, toLabel, angle, value, data, dataExt, element, loopType, taskType, swimlane, textList;
 
         this._RENDERER.clear();
 
@@ -32292,6 +32394,7 @@ OG.graph.Canvas.prototype = {
                 angle = cell[i]['@angle'];
                 value = cell[i]['@value'];
                 data = cell[i]['@data'];
+                textList = cell[i]['@textList'];
                 dataExt = cell[i]['@dataExt'];
                 loopType = cell[i]['@loopType'];
                 taskType = cell[i]['@taskType'];
@@ -32313,6 +32416,9 @@ OG.graph.Canvas.prototype = {
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
                         }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
+                        }
                         element = this.drawShape([x, y], shape, [width, height], OG.JSON.decode(style), id, parent, false);
                         if (element.shape instanceof OG.shape.bpmn.A_Task) {
                             element.shape.LoopType = loopType;
@@ -32328,6 +32434,9 @@ OG.graph.Canvas.prototype = {
                         }
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
+                        }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
                         }
                         if (fromLabel) {
                             shape.fromLabel = unescape(fromLabel);
@@ -32358,6 +32467,9 @@ OG.graph.Canvas.prototype = {
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
                         }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
+                        }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;
                     case OG.Constants.SHAPE_TYPE.IMAGE:
@@ -32368,6 +32480,9 @@ OG.graph.Canvas.prototype = {
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
                         }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
+                        }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;
                     case OG.Constants.SHAPE_TYPE.TEXT:
@@ -32377,6 +32492,9 @@ OG.graph.Canvas.prototype = {
                         }
                         if (data) {
                             shape.data = OG.JSON.decode(unescape(data));
+                        }
+                        if (textList) {
+                            shape.textList = OG.JSON.decode(unescape(textList));
                         }
                         element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
                         break;

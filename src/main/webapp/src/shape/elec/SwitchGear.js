@@ -7,6 +7,34 @@ OG.shape.elec.SwitchGear = function (label) {
     this.ENABLE_TO = false;
     this.CONNECT_CLONEABLE = false;
     this.LABEL_EDITABLE = false;
+
+    this.textList = [
+        {
+            text: 'cable',
+            label: '',
+            shape: 'OG.CableShape'
+        },
+        {
+            text: 'IPB',
+            label: 'IPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'SPB',
+            label: 'SPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'NSPB',
+            label: 'NSPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'CRB',
+            label: 'CRB',
+            shape: 'OG.BusductShape'
+        }
+    ];
 };
 OG.shape.elec.SwitchGear.prototype = new OG.shape.GeomShape();
 OG.shape.elec.SwitchGear.superclass = OG.shape.GeomShape;
