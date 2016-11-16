@@ -41,3 +41,20 @@ OG.shape.bpmn.E_Start.prototype.createShape = function () {
 
 	return this.geom;
 };
+
+OG.shape.bpmn.E_Start.prototype.createSubShape = function () {
+	this.sub = [];
+
+	if (this.inclusion) {
+		this.sub.push({
+			shape: new OG.ImageShape('resources/images/symbol/complete.png'),
+			width: '20px',
+			height: '20px',
+			right: '0px',
+			bottom: '20px',
+			style: {}
+		})
+	}
+
+	return this.sub;
+};

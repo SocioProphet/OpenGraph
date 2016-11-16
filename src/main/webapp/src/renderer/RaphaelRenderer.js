@@ -136,9 +136,10 @@ OG.renderer.RaphaelRenderer.prototype._getREleById = function (id) {
 
 OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
     //그룹 엘리먼트에 createSubShape 메소드를 확인한다.
-    var me = this, subShapeNodes, subShapeNode, width, height, left, top,
-        subVertices, subStyle, subShape, subShapeId, tempNode, cloneNode,
-        boundary, bW, bH, bT, bL;
+    var me = this, subShapeNodes, subShapeNode, width, height,
+        left, top, right, bottom, align, verticalAlign,
+        subVertices, subStyle, subShape, subShapeId, tempNode, zIndex,
+        boundary, bW, bH, bT, bL, tempNodes = [];
     if (!groupElement.shape.createSubShape) {
         return;
     }
@@ -162,6 +163,11 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         height = subShapeNode.height;
         left = subShapeNode.left;
         top = subShapeNode.top;
+        right = subShapeNode.right;
+        bottom = subShapeNode.bottom;
+        align = subShapeNode.align;
+        zIndex = subShapeNode['z-index'];
+        verticalAlign = subShapeNode['vertical-align'];
         subVertices = subShapeNode.vertices;
         subStyle = subShapeNode.style ? subShapeNode.style : {};
         subShape = subShapeNode.shape;
@@ -181,27 +187,62 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         bL = boundary.getUpperLeft().x;
         bT = boundary.getUpperLeft().y;
 
-        if (!width && width != 0) {
-            width = bW;
+        var getLength = function (standard, value) {
+            var length;
+
+            //값이 없고, 0 이 아닐경우
+            if (!value && value != 0) {
+                length = undefined;
+            }
+            //픽셀인 경우
+            else if (typeof value == 'string' && value.indexOf('px') != -1) {
+                length = parseInt(value.replace('px', ''));
+            }
+            //퍼센테이지 인 경우
+            else {
+                length = standard * (value / 100);
+            }
+            return length;
+        };
+
+        //Edge 가 아닌 일반 도형의 위치값을 구한다.
+        width = getLength(bW, width);
+        height = getLength(bH, height);
+        left = getLength(bW, left) + bL;
+        right = bL + bW - getLength(bW, right);
+        top = getLength(bH, top) + bT;
+        bottom = bT + bH - getLength(bH, bottom) - height;
+
+        //right 가 있다면 left 보다 우선하고, bottom 이 있다면 top 보다 우선한다.
+        if (!right && right != 0) {
+
         } else {
-            width = bW * (width / 100);
+            left = right;
         }
-        if (!height && height != 0) {
-            height = bH;
+        if (!bottom && bottom != 0) {
+
         } else {
-            height = bH * (height / 100);
-        }
-        if (!left && left != 0) {
-            left = (bW / 2) + bL;
-        } else {
-            left = bW * (left / 100) + bL;
-        }
-        if (!top && top != 0) {
-            top = (bH / 2) + bT;
-        } else {
-            top = bH * (top / 100) + bT;
+            top = bottom;
         }
 
+        //align 이나 vertice-algin 이 start,center,end 일 경우 left 와 top 값을 오버라이드 한다.
+        if (align == 'start') {
+            left = bL;
+        } else if (align == 'center') {
+            left = bL + (bW / 2) - (width / 2);
+        } else if (align == 'end') {
+            left = bL + bW - width;
+        }
+
+        if (verticalAlign == 'start') {
+            top = bT;
+        } else if (verticalAlign == 'center') {
+            top = bT + (bH / 2) - (height / 2);
+        } else if (verticalAlign == 'end') {
+            top = bT + bH - height;
+        }
+
+        //Edge 인 도형의 위치값을 구한다. Edge 인 도형의 vertices 는 퍼센테이지로만 환산한다.
         if (subShape instanceof OG.shape.EdgeShape) {
             if (subVertices && subVertices.length) {
                 for (var v = 0, lenv = subVertices.length; v < lenv; v++) {
@@ -214,19 +255,58 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
             subShape.geom = new OG.PolyLine(subVertices);
         }
 
-        //노드 복사를 위한 가상의 그룹노드
-        tempNode = me.drawShape([left + width / 2, top + height / 2], subShape, [width, height], subStyle, subShapeId);
 
-        //가상의 그룹노드 내부의 svg 엘리먼트들을 groupElement 내부로 이전시킨다.
-        $(tempNode).children().each(function () {
-            var child = $(this);
-            child.removeAttr('_type');
-            child.removeAttr('_shape');
-            groupElement.appendChild(child.get(0));
+        //노드 복사를 위한 가상의 그룹노드
+        tempNode = me.drawShape([left + width / 2, top + height / 2], subShape, [width, height], subStyle, subShapeId, true);
+
+        //z-index 에 따라 tempNodes 에 인서트한다.
+        //zIndex 가 없거나 0 이면 0 이다.
+        if (!zIndex || zIndex == 0) {
+            zIndex = 0;
+        }
+        tempNodes.push({
+            index: zIndex,
+            node: tempNode
+        });
+    }
+
+    //tempNodes 를 인덱스에 따라 소팅한다.
+    tempNodes.sort(
+        function (a, b) {
+            return a['index'] - b['index']
+        }
+    );
+
+    var index, node, standardChild;
+    for (var i = 0, leni = tempNodes.length; i < leni; i++) {
+        //groupElement 내부의 가장 첫 자식을 기준으로 삼는다.
+        standardChild = groupElement.firstChild;
+        index = tempNodes[i].index;
+        node = $(tempNodes[i].node);
+        $(node).children().each(function (childIndex, child) {
+            $(child).removeAttr('_type');
+            $(child).removeAttr('_shape');
+            $(child).attr('_index', index);
+
+            //0 보다 큰 인덱스는 groupElement 에 순서대로 인서트한다.
+            if (index >= 0) {
+                groupElement.appendChild(child);
+            }
+
+            else {
+                //기준이 없다면 순서대로 인서트한다.
+                if (!standardChild) {
+                    groupElement.appendChild(child);
+                }
+                //기준이 있다면 기준 앞에 인서트한다.
+                else {
+                    groupElement.insertBefore(child, standardChild);
+                }
+            }
         });
 
         //가상의 그룹노드를 삭제한다.
-        me._remove(me._getREleById(tempNode.id));
+        me._remove(me._getREleById(node.id));
     }
 };
 
@@ -297,6 +377,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
     var multi = _style['multi'];
     var rootMarker = _style['marker'];
     var rootPattern = _style['pattern'];
+    var rootAnimation = _style['animation'];
     var marker, pattern;
 
 
@@ -393,6 +474,9 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             }
             if (multiStyle['pattern']) {
                 drawPattern(path, multiStyle, subPath, m);
+            }
+            if (multiStyle['animation']) {
+                drawAnimation(path, multiStyle);
             }
         }
     };
@@ -661,6 +745,36 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
         groupElement.appendChild(virtualNode.node);
     };
 
+    var drawAnimation = function (rElement, nodeStyle) {
+        var animationData = nodeStyle['animation'];
+        var animationRepeat = nodeStyle['animation-repeat'];
+        var maxDuration = 0;
+        var monitorAnimationIndex;
+        var delay, ms;
+        for (var i = 0; i < animationData.length; i++) {
+            ms = animationData[i].ms ? animationData[i].ms : 0;
+            delay = animationData[i].delay ? animationData[i].delay : 0;
+            if (maxDuration < ms + delay) {
+                maxDuration = ms + delay;
+                monitorAnimationIndex = i;
+            }
+        }
+
+        var startAnimation = function () {
+            for (var i = 0; i < animationData.length; i++) {
+                var ani;
+                if (i == monitorAnimationIndex && animationRepeat) {
+                    ani = Raphael.animation(animationData[i].to, animationData[i].ms, startAnimation);
+                    rElement.attr(animationData[i].start).animate(ani.delay(animationData[i].delay));
+                } else {
+                    ani = Raphael.animation(animationData[i].to, animationData[i].ms);
+                    rElement.attr(animationData[i].start).animate(ani.delay(animationData[i].delay));
+                }
+            }
+        };
+        startAnimation();
+    };
+
     geometry.style.map = _style;
 
     // 타입에 따라 드로잉
@@ -713,6 +827,10 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 else if (!multi && rootPattern) {
                     drawPattern(element, _style, pathStr, 0);
                 }
+                //애니메이션 정보가 있을 경우
+                else if (!multi && rootAnimation) {
+                    drawAnimation(element, _style);
+                }
             } else {
                 element = this._PAPER.path(pathStr);
                 element.attr(_style);
@@ -720,6 +838,11 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 //패턴정보가 있을 경우
                 if (rootPattern) {
                     drawPattern(element, _style, pathStr, 0);
+                }
+
+                //애니메이션 정보가 있을 경우
+                if (rootAnimation) {
+                    drawAnimation(element, _style);
                 }
             }
 
@@ -747,6 +870,10 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             //패턴정보가 있을 경우
             if (rootPattern) {
                 drawPattern(element, _style, pathStr, 0);
+            }
+            //애니메이션 정보가 있을 경우
+            if (rootAnimation) {
+                drawAnimation(element, _style);
             }
 
             connectGuideElement = this._PAPER.path(pathStr);
@@ -780,6 +907,11 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawPattern(element, _style, pathStr, 0);
             }
 
+            //애니메이션 정보가 있을 경우
+            if (rootAnimation) {
+                drawAnimation(element, _style);
+            }
+
             setConnectGuideAttr(connectGuideElement);
             break;
 
@@ -803,6 +935,11 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             if (rootPattern) {
                 drawPattern(element, _style, pathStr, 0);
             }
+
+            //애니메이션 정보가 있을 경우
+            if (rootAnimation) {
+                drawAnimation(element, _style);
+            }
             setConnectGuideAttr(connectGuideElement);
             break;
 
@@ -823,6 +960,11 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             //패턴정보가 있을 경우
             if (rootPattern) {
                 drawPattern(element, _style, pathStr, 0);
+            }
+
+            //애니메이션 정보가 있을 경우
+            if (rootAnimation) {
+                drawAnimation(element, _style);
             }
 
             connectGuideElement = this._PAPER.path(pathStr);
@@ -847,6 +989,11 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             //패턴정보가 있을 경우
             if (rootPattern) {
                 drawPattern(element, _style, pathStr, 0);
+            }
+
+            //애니메이션 정보가 있을 경우
+            if (rootAnimation) {
+                drawAnimation(element, _style);
             }
 
             connectGuideElement = this._PAPER.path(pathStr);
@@ -1079,11 +1226,11 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
  * @param {Number[]} size Shape Width, Height
  * @param {OG.geometry.Style|Object} style 스타일
  * @param {String} id Element ID 지정
- * @param {Boolean} preventDrop Lane, Pool 생성 drop 모드 수행 방지
+ * @param {Boolean} preventEvent 이벤트 방지
  * @return {Element} Group DOM Element with geometry
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, size, style, id, preventDrop) {
+OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, size, style, id, preventEvent) {
     var width = size ? size[0] : 100,
         height = size ? size[1] : 100,
         groupNode, geometry, text, image, html,
@@ -1147,45 +1294,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
     me._drawSubShape(groupNode);
 
     // Draw for Task
-    if (shape instanceof OG.shape.bpmn.A_Task) {
-        if (groupNode.shape.LoopType != 'None')
-            this.drawLoopType(groupNode);
-        if (groupNode.shape.TaskType != 'None')
-            this.drawTaskType(groupNode);
-        if (groupNode.shape.status != 'None')
-            this.drawStatus(groupNode);
-    }
-
-    if (shape instanceof OG.shape.bpmn.A_Subprocess) {
-        if (groupNode.shape.status != 'None')
-            this.drawStatus(groupNode);
-        if (groupNode.shape.inclusion)
-            this.drawCheckInclusion(groupNode);
-    }
-
-    if (shape instanceof OG.shape.bpmn.Value_Chain) {
-        if (groupNode.shape.inclusion)
-            this.drawCheckInclusion(groupNode);
-    }
-
-    if (shape instanceof OG.shape.bpmn.Value_Chain_Module) {
-        if (groupNode.shape.inclusion)
-            this.drawCheckInclusion(groupNode);
-    }
-
-    if (shape instanceof OG.shape.bpmn.E_Start) {
-        if (groupNode.shape.inclusion)
-            this.drawCheckInclusion(groupNode);
-    }
-
-    if (shape instanceof OG.shape.bpmn.E_End) {
-        if (groupNode.shape.inclusion)
-            this.drawCheckInclusion(groupNode);
-    }
-
-    // Draw Error
-    if (groupNode.shape.exceptionType != '')
-        this.drawExceptionType(groupNode);
 
 
     // Draw Label
@@ -1249,11 +1357,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
             return;
         }
 
-        //그룹이 A_Task 일경우 반응하지 않는다.
-        if (frontGroup.shape instanceof OG.shape.bpmn.A_Task) {
-            return;
-        }
-
         //자신일 경우 반응하지 않는다.
         if (frontGroup.id === groupNode.id) {
             return;
@@ -1279,7 +1382,9 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
     }
 
     // drawShape event fire
-    $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
+    if (!preventEvent) {
+        $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
+    }
 
     return groupNode;
 };
@@ -2202,56 +2307,6 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
 
         //서브 도형 그리기
         me._drawSubShape(element);
-
-        if (element.shape instanceof OG.shape.bpmn.A_Task) {
-            if (element.shape.LoopType != 'None')
-                this.drawLoopType(element);
-            if (element.shape.TaskType != 'None')
-                this.drawTaskType(element);
-            if (element.shape.status != 'None')
-                this.drawStatus(element);
-        }
-
-        if (element.shape instanceof OG.shape.HorizontalPoolShape) {
-            if (element.shape.LoopType != 'None')
-                this.drawLoopType(element);
-        }
-
-        if (element.shape instanceof OG.shape.bpmn.A_Subprocess) {
-            if (element.shape.status != 'None')
-                this.drawStatus(element);
-            if (element.shape.inclusion)
-                this.drawCheckInclusion(element);
-        }
-
-        if (element.shape instanceof OG.shape.bpmn.Value_Chain) {
-            if (element.shape.inclusion)
-                this.drawCheckInclusion(element);
-        }
-
-        if (element.shape instanceof OG.shape.bpmn.Value_Chain_Module) {
-            if (element.shape.inclusion)
-                this.drawCheckInclusion(element);
-        }
-
-        if (element.shape instanceof OG.shape.bpmn.E_Start) {
-            if (element.shape.inclusion)
-                this.drawCheckInclusion(element);
-        }
-
-        if (element.shape instanceof OG.shape.bpmn.E_End) {
-            if (element.shape.inclusion)
-                this.drawCheckInclusion(element);
-        }
-
-        if (element.shape.exceptionType != '')
-            this.drawExceptionType(element);
-
-        //버튼이 필요한 shape 일 경우 리사이즈 시에 그려 준다
-        if (element.shape.HaveButton) {
-            var me = this, collapseObj, clickHandle;
-            collapseObj = this.drawButton(element);
-        }
     }
 
     // redrawShape event fire
@@ -3604,169 +3659,50 @@ OG.renderer.RaphaelRenderer.prototype.removeRubberBand = function (root) {
     $(root).removeData("rubberBand");
 };
 
-/**
- * ID에 해당하는 Element 의 Collapse 가이드를 드로잉한다.
- *
- * @param {Element|String} element Element 또는 ID
- * @return {Element}
- * @override
- */
-OG.renderer.RaphaelRenderer.prototype.drawCollapseGuide = function (element) {
-    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect, _rect1,
-        _size = me._CONFIG.COLLAPSE_SIZE,
-        _hSize = _size / 2;
-
-    if (rElement && geometry && $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.GROUP) {
-        _bBoxRect = this._getREleById(rElement.id + OG.Constants.COLLAPSE_BBOX_SUFFIX);
-        if (_bBoxRect) {
-            this._remove(_bBoxRect);
-        }
-        _rect = this._getREleById(rElement.id + OG.Constants.COLLAPSE_SUFFIX);
-        if (_rect) {
-            this._remove(_rect);
-        }
-
-        envelope = geometry.getBoundary();
-        _upperLeft = envelope.getUpperLeft();
-
-        // hidden box
-        _bBoxRect = this._PAPER.rect(envelope.getUpperLeft().x - _size, envelope.getUpperLeft().y - _size,
-            envelope.getWidth() + _size * 2, envelope.getHeight() + _size * 2);
-        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.COLLAPSE_BBOX);
-        this._add(_bBoxRect, rElement.id + OG.Constants.COLLAPSE_BBOX_SUFFIX);
-
-        if (rElement.node.shape.isCollapsed === true) {
-            // expand 랜더링
-            _rect = this._PAPER.path(
-                "M" + (_upperLeft.x + _hSize) + " " + (_upperLeft.y + _hSize) +
-                "h" + _size + "v" + _size + "h" + (-1 * _size) + "v" + (-1 * _size) +
-                "m1 " + _hSize + "h" + (_size - 2) + "M" +
-                (_upperLeft.x + _hSize) + " " + (_upperLeft.y + _hSize) +
-                "m" + _hSize + " 1v" + (_size - 2)
-            );
-        } else {
-            // collapse 랜더링
-            _rect = this._PAPER.path("M" + (_upperLeft.x + _hSize) + " " +
-                (_upperLeft.y + _hSize) + "h" + _size + "v" + _size + "h" + (-1 * _size) + "v" + (-1 * _size) +
-                "m1 " + _hSize + "h" + (_size - 2));
-        }
-
-        _rect.attr(me._CONFIG.DEFAULT_STYLE.COLLAPSE);
-        this._add(_rect, rElement.id + OG.Constants.COLLAPSE_SUFFIX);
-
-        // layer 위치 조정
-        _bBoxRect.insertBefore(rElement);
-        _rect.insertAfter(rElement);
-
-        return {
-            bBox: _bBoxRect.node,
-            collapse: _rect.node
-        };
-    }
-
-    return null;
-};
-
-/*
- + 버튼 그리는 부분
- auth : 민수환
-
- */
-OG.renderer.RaphaelRenderer.prototype.drawButton = function (element) {
-    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect, _rect1,
-        _size = me._CONFIG.COLLAPSE_SIZE,
-        _hSize = _size / 2;
-
-    _bBoxRect = this._getREleById(rElement.id + OG.Constants.COLLAPSE_BBOX_SUFFIX);
-    if (_bBoxRect) {
-        this._remove(_bBoxRect);
-    }
-    _rect1 = this._getREleById(rElement.id + OG.Constants.COLLAPSE_SUFFIX);
-    if (_rect1) {
-        this._remove(_rect1);
-    }
-
-    envelope = geometry.getBoundary();
-    _lowerCenter = envelope.getLowerCenter();
-    // hidden box
-    _bBoxRect = this._PAPER.rect(envelope.getUpperLeft().x - _size, envelope.getUpperLeft().y - _size,
-        envelope.getWidth() + _size * 2, envelope.getHeight() + _size * 2);
-    _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.COLLAPSE_BBOX);
-    this._add(_bBoxRect, rElement.id + OG.Constants.COLLAPSE_BBOX_SUFFIX);
-
-    _rect1 = this._PAPER.image("resources/images/symbol/subprocess.png", _lowerCenter.x - 10, _lowerCenter.y - 25, 20, 20);
-
-    _rect1.attr({
-        "stroke": element.shape.geom.style.map.stroke,
-        "stroke-width": 1,
-        fill: "white",
-        "fill-opacity": 0,
-        "shape-rendering": "crispEdges"
-    })
-
-    this._add(_rect1, rElement.id + OG.Constants.COLLAPSE_SUFFIX);
-
-    // layer 위치 조정
-    rElement.appendChild(_bBoxRect);
-    rElement.appendChild(_rect1);
-
-    return {
-        bBox: _bBoxRect.node,
-        collapse: _rect1.node
-    };
-
-
-    return null;
-};
-
 //Loop Type 드로우
 
 OG.renderer.RaphaelRenderer.prototype.drawLoopType = function (element) {
-    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect, _rect1, _lowerCenter,
-        _size = me._CONFIG.COLLAPSE_SIZE,
-        _hSize = _size / 2;
-
-    _rect1 = this._getREleById(rElement.id + OG.Constants.LOOPTYPE_SUFFIX);
-    if (_rect1) {
-        this._remove(_rect1);
-    }
-
-    envelope = geometry.getBoundary();
-    _lowerCenter = envelope.getLowerCenter();
-
-    switch (element.shape.LoopType) {
-        case "Standard":
-            _rect1 = this._PAPER.image("resources/images/symbol/loop_standard.png", _lowerCenter.x - 10, _lowerCenter.y - 25, 20, 20);
-            break;
-
-        case "MIParallel":
-            _rect1 = this._PAPER.path(
-                "M" + (_lowerCenter.x - 15) + " " + (_lowerCenter.y - 15) +
-                "v" + 15 + "M" + (_lowerCenter.x - 10) + " " + (_lowerCenter.y - 15) +
-                "v" + 15 + "M" + (_lowerCenter.x - 5) + " " + (_lowerCenter.y - 15) + "v" + 15
-            );
-            break;
-
-        case "MISequential":
-            _rect1 = this._PAPER.path(
-                "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 15) +
-                "h" + 15 + "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 10) +
-                "h" + 15 + "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 5) + "h" + 15
-            );
-            break;
-
-    }
-    this._add(_rect1, rElement.id + OG.Constants.LOOPTYPE_SUFFIX);
-    _rect1.insertAfter(rElement);
-    rElement.appendChild(_rect1);
-
-    return null;
+    //var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
+    //    geometry = rElement ? rElement.node.shape.geom : null,
+    //    envelope, _upperLeft, _bBoxRect, _rect, _rect1, _lowerCenter,
+    //    _size = me._CONFIG.COLLAPSE_SIZE,
+    //    _hSize = _size / 2;
+    //
+    //_rect1 = this._getREleById(rElement.id + OG.Constants.LOOPTYPE_SUFFIX);
+    //if (_rect1) {
+    //    this._remove(_rect1);
+    //}
+    //
+    //envelope = geometry.getBoundary();
+    //_lowerCenter = envelope.getLowerCenter();
+    //
+    //switch (element.shape.LoopType) {
+    //    case "Standard":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/loop_standard.png", _lowerCenter.x - 10, _lowerCenter.y - 25, 20, 20);
+    //        break;
+    //
+    //    case "MIParallel":
+    //        _rect1 = this._PAPER.path(
+    //            "M" + (_lowerCenter.x - 15) + " " + (_lowerCenter.y - 15) +
+    //            "v" + 15 + "M" + (_lowerCenter.x - 10) + " " + (_lowerCenter.y - 15) +
+    //            "v" + 15 + "M" + (_lowerCenter.x - 5) + " " + (_lowerCenter.y - 15) + "v" + 15
+    //        );
+    //        break;
+    //
+    //    case "MISequential":
+    //        _rect1 = this._PAPER.path(
+    //            "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 15) +
+    //            "h" + 15 + "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 10) +
+    //            "h" + 15 + "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 5) + "h" + 15
+    //        );
+    //        break;
+    //
+    //}
+    //this._add(_rect1, rElement.id + OG.Constants.LOOPTYPE_SUFFIX);
+    //_rect1.insertAfter(rElement);
+    //rElement.appendChild(_rect1);
+    //
+    //return null;
 };
 
 //Marker Draw
@@ -3779,179 +3715,186 @@ OG.renderer.RaphaelRenderer.prototype.drawAttatchEvent = function (element) {
 
 OG.renderer.RaphaelRenderer.prototype.drawTaskType = function (element) {
 
-    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect, _rect1,
-        _size = me._CONFIG.COLLAPSE_SIZE,
-        _hSize = _size / 2;
-
-    _rect1 = this._getREleById(rElement.id + OG.Constants.TASKTYPE_SUFFIX);
-    if (_rect1) {
-        this._remove(_rect1);
-    }
-
-    envelope = geometry.getBoundary();
-    _upperLeft = envelope.getUpperLeft();
-
-    switch (element.shape.TaskType) {
-        case "User":
-            _rect1 = this._PAPER.image("resources/images/symbol/User.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-        case "Send":
-            _rect1 = this._PAPER.image("resources/images/symbol/Send.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-        case "Receive":
-            _rect1 = this._PAPER.image("resources/images/symbol/Receive.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-        case "Manual":
-            _rect1 = this._PAPER.image("resources/images/symbol/Manual.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-        case "Service":
-            _rect1 = this._PAPER.image("resources/images/symbol/Service.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-        case "BusinessRule":
-            _rect1 = this._PAPER.image("resources/images/symbol/BusinessRule.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-        case "Script":
-            _rect1 = this._PAPER.image("resources/images/symbol/Script.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-        case "Mapper":
-            _rect1 = this._PAPER.image("resources/images/symbol/Mapper.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-        case "WebService":
-            _rect1 = this._PAPER.image("resources/images/symbol/WebService.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-            break;
-
-    }
-
-    this._add(_rect1, rElement.id + OG.Constants.TASKTYPE_SUFFIX);
-    _rect1.insertAfter(rElement);
-    rElement.appendChild(_rect1);
-
-    return null;
+    //var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
+    //    geometry = rElement ? rElement.node.shape.geom : null,
+    //    envelope, _upperLeft, _bBoxRect, _rect, _rect1,
+    //    _size = me._CONFIG.COLLAPSE_SIZE,
+    //    _hSize = _size / 2;
+    //
+    //_rect1 = this._getREleById(rElement.id + OG.Constants.TASKTYPE_SUFFIX);
+    //if (_rect1) {
+    //    this._remove(_rect1);
+    //}
+    //
+    //envelope = geometry.getBoundary();
+    //_upperLeft = envelope.getUpperLeft();
+    //
+    //switch (element.shape.TaskType) {
+    //    case "User":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/User.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //    case "Send":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/Send.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //    case "Receive":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/Receive.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //    case "Manual":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/Manual.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //    case "Service":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/Service.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //    case "BusinessRule":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/BusinessRule.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //    case "Script":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/Script.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //    case "Mapper":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/Mapper.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //    case "WebService":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/WebService.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
+    //        break;
+    //
+    //}
+    //
+    //this._add(_rect1, rElement.id + OG.Constants.TASKTYPE_SUFFIX);
+    //_rect1.insertAfter(rElement);
+    //rElement.appendChild(_rect1);
+    //
+    //return null;
 };
 
 //Status 드로우
 
 OG.renderer.RaphaelRenderer.prototype.drawStatus = function (element) {
-    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect, _rect1,
-        _size = me._CONFIG.COLLAPSE_SIZE,
-        _hSize = _size / 2;
-
-    _rect1 = this._getREleById(rElement.id + OG.Constants.STATUS_SUFFIX);
-    if (_rect1) {
-        this._remove(_rect1);
-    }
-
-    _rect = this._getREleById(rElement.id + OG.Constants.STATUS_SUFFIX + '_IMG');
-    if (_rect) {
-        this._remove(_rect);
-    }
-
-    envelope = geometry.getBoundary();
-    _upperRight = envelope.getUpperRight();
-
-    switch (element.shape.status) {
-        case "Completed":
-            _rect1 = this._PAPER.image("images/opengraph/complete.png", _upperRight.x - 25, _upperRight.y + 5, 20, 20);
-            break;
-        case "Running":
-            _rect = this._PAPER.rect(envelope.getUpperLeft().x - 10, envelope.getUpperLeft().y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
-            _rect.attr("fill", "#C9E2FC");
-            _rect.attr("stroke-width", "0.2");
-            _rect.attr("r", "10");
-            _rect.attr("fill-opacity", "1");
-            _rect.attr("stroke-dasharray", "--");
-
-            _rect1 = this._PAPER.image("images/opengraph/running.png", _upperRight.x - 25, _upperRight.y + 5, 20, 20);
-            break;
-    }
-
-    if (element.shape.status == "Running") {
-        var ani1 = Raphael.animation({
-            fill: '#C9E2FC'
-        }, 1000);
-
-        var ani2 = Raphael.animation({
-            fill: 'white'
-        }, 1000, startAni);
-
-        function startAni() {
-            _rect.attr({fill: 'white'}).animate(ani1);
-            _rect.attr({fill: '#C9E2FC'}).animate(ani2.delay(1000));
-        }
-
-        startAni();
-    }
-    this._add(_rect1, rElement.id + OG.Constants.STATUS_SUFFIX);
-    _rect1.insertAfter(rElement);
-    rElement.appendChild(_rect1);
-
-    if (_rect) {
-        this._add(_rect, rElement.id + OG.Constants.STATUS_SUFFIX + '_IMG');
-        _rect.insertAfter(rElement);
-        rElement.prependChild(_rect);
-    }
-
-    return null;
+    //var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
+    //    geometry = rElement ? rElement.node.shape.geom : null,
+    //    envelope, _upperLeft, _bBoxRect, _upperRight, _rect, _rect1,
+    //    _size = me._CONFIG.COLLAPSE_SIZE,
+    //    _hSize = _size / 2;
+    //
+    //_rect1 = this._getREleById(rElement.id + OG.Constants.STATUS_SUFFIX);
+    //if (_rect1) {
+    //    this._remove(_rect1);
+    //}
+    //
+    //_rect = this._getREleById(rElement.id + OG.Constants.STATUS_SUFFIX + '_IMG');
+    //if (_rect) {
+    //    this._remove(_rect);
+    //}
+    //
+    //envelope = geometry.getBoundary();
+    //_upperRight = envelope.getUpperRight();
+    //
+    //switch (element.shape.status) {
+    //    case "Completed":
+    //        _rect1 = this._PAPER.image("resources/images/symbol/complete.png", _upperRight.x - 25, _upperRight.y + 5, 20, 20);
+    //        break;
+    //    case "Running":
+    //        _rect = this._PAPER.rect(envelope.getUpperLeft().x - 10, envelope.getUpperLeft().y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
+    //        _rect.attr("fill", "#C9E2FC");
+    //        _rect.attr("stroke-width", "0.2");
+    //        _rect.attr("r", "10");
+    //        _rect.attr("fill-opacity", "1");
+    //        _rect.attr("stroke-dasharray", "--");
+    //
+    //        _rect1 = this._PAPER.image("resources/images/symbol/running.png", _upperRight.x - 25, _upperRight.y + 5, 20, 20);
+    //        break;
+    //}
+    //
+    //if (element.shape.status == "Running") {
+    //    //애니메이션 프로퍼티는,
+    //    var animationRepeat = true;
+    //    var animationData =
+    //        [
+    //            {
+    //                start: {
+    //                    fill: 'white'
+    //                },
+    //                to: {
+    //                    fill: '#C9E2FC'
+    //                },
+    //                ms: 1000
+    //            },
+    //            {
+    //                start: {
+    //                    fill: '#C9E2FC'
+    //                },
+    //                to: {
+    //                    fill: 'white'
+    //                },
+    //                ms: 1000,
+    //                delay: 1000
+    //            }
+    //        ];
+    //    var maxDuration = 0;
+    //    var monitorAnimationIndex;
+    //    var delay, ms;
+    //    for (var i = 0; i < animationData.length; i++) {
+    //        ms = animationData[i].ms ? animationData[i].ms : 0;
+    //        delay = animationData[i].delay ? animationData[i].delay : 0;
+    //        if (maxDuration < ms + delay) {
+    //            maxDuration = ms + delay;
+    //            monitorAnimationIndex = i;
+    //        }
+    //    }
+    //
+    //    var startAnimation = function () {
+    //        for (var i = 0; i < animationData.length; i++) {
+    //            var ani;
+    //            if (i == monitorAnimationIndex && animationRepeat) {
+    //                ani = Raphael.animation(animationData[i].to, animationData[i].ms, startAnimation);
+    //                _rect.attr(animationData[i].start).animate(ani.delay(animationData[i].delay));
+    //            } else {
+    //                ani = Raphael.animation(animationData[i].to, animationData[i].ms);
+    //                _rect.attr(animationData[i].start).animate(ani.delay(animationData[i].delay));
+    //            }
+    //        }
+    //    };
+    //    startAnimation();
+    //}
+    //this._add(_rect1, rElement.id + OG.Constants.STATUS_SUFFIX);
+    //_rect1.insertAfter(rElement);
+    //rElement.appendChild(_rect1);
+    //
+    //if (_rect) {
+    //    this._add(_rect, rElement.id + OG.Constants.STATUS_SUFFIX + '_IMG');
+    //    _rect.insertAfter(rElement);
+    //    rElement.prependChild(_rect);
+    //}
+    //
+    //return null;
 };
 
 OG.renderer.RaphaelRenderer.prototype.drawCheckInclusion = function (element) {
-    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect,
-        _size = me._CONFIG.COLLAPSE_SIZE,
-        _hSize = _size / 2;
-
-    _rect1 = this._getREleById(rElement.id + OG.Constants.INCLUSION_SUFFIX);
-    if (_rect1) {
-        this._remove(_rect1);
-    }
-
-    envelope = geometry.getBoundary();
-    _lowerRight = envelope.getLowerRight();
-
-    _rect1 = this._PAPER.image("resources/images/symbol/complete.png", _lowerRight.x, _lowerRight.y - 20, 20, 20);
-
-    this._add(_rect1, rElement.id + OG.Constants.INCLUSION_SUFFIX);
-    _rect1.insertAfter(rElement);
-    rElement.appendChild(_rect1);
-
-    $(_rect1[0]).bind("click", function (event) {
-        $(rElement[0]).trigger("inclusionclick");
-    });
-
-    return null;
-};
-
-OG.renderer.RaphaelRenderer.prototype.drawExceptionType = function (element) {
-
-    var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-        geometry = rElement ? rElement.node.shape.geom : null,
-        envelope, _upperLeft, _bBoxRect, _rect,
-        _size = me._CONFIG.COLLAPSE_SIZE,
-        _hSize = _size / 2;
-
-    _rect = this._getREleById(rElement.id + OG.Constants.EXCEPTIONTYPE_SUFFIX);
-    if (_rect) {
-        this._remove(_rect);
-    }
-
-    envelope = geometry.getBoundary();
-    _upperRight = envelope.getUpperRight();
-
-    switch (element.shape.exceptionType) {
-        case "error":
-            _rect = this._PAPER.image("images/activity_status/i_status_CANCELLED.png", _upperRight.x - 25, _upperRight.y + 5, 20, 20);
-            break;
-    }
-
-    this._add(_rect, rElement.id + OG.Constants.EXCEPTIONTYPE_SUFFIX);
-    _rect.insertAfter(rElement);
-    rElement.appendChild(_rect);
-    return null;
+    //var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
+    //    geometry = rElement ? rElement.node.shape.geom : null,
+    //    envelope, _upperLeft, _bBoxRect, _rect,
+    //    _size = me._CONFIG.COLLAPSE_SIZE,
+    //    _hSize = _size / 2;
+    //
+    //_rect1 = this._getREleById(rElement.id + OG.Constants.INCLUSION_SUFFIX);
+    //if (_rect1) {
+    //    this._remove(_rect1);
+    //}
+    //
+    //envelope = geometry.getBoundary();
+    //_lowerRight = envelope.getLowerRight();
+    //
+    //_rect1 = this._PAPER.image("resources/images/symbol/complete.png", _lowerRight.x, _lowerRight.y - 20, 20, 20);
+    //
+    //this._add(_rect1, rElement.id + OG.Constants.INCLUSION_SUFFIX);
+    //_rect1.insertAfter(rElement);
+    //rElement.appendChild(_rect1);
+    //
+    //$(_rect1[0]).bind("click", function (event) {
+    //    $(rElement[0]).trigger("inclusionclick");
+    //});
+    //
+    //return null;
 };
 
 /**
@@ -4051,162 +3994,6 @@ OG.renderer.RaphaelRenderer.prototype.addToGroup = function (groupElement, eleme
     var i;
     for (i = 0; i < elements.length; i++) {
         groupElement.appendChild(elements[i]);
-    }
-};
-
-/**
- * 주어진 Shape 이 그룹인 경우 collapse 한다.
- *
- * @param {Element} element
- * @override
- */
-OG.renderer.RaphaelRenderer.prototype.collapse = function (element) {
-    var me = this, childNodes, i, hideChildEdge;
-
-    hideChildEdge = function (_collapseRootElement, _element) {
-        var edgeIdArray, fromEdge, toEdge, _childNodes = _element.childNodes, otherShape, i, j, isNeedToRedraw;
-        for (i = _childNodes.length - 1; i >= 0; i--) {
-            if ($(_childNodes[i]).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
-                hideChildEdge(_collapseRootElement, _childNodes[i]);
-
-                isNeedToRedraw = false;
-                edgeIdArray = $(_childNodes[i]).attr("_fromedge");
-                if (edgeIdArray) {
-                    edgeIdArray = edgeIdArray.split(",");
-                    for (j = 0; j < edgeIdArray.length; j++) {
-                        fromEdge = me.getElementById(edgeIdArray[j]);
-                        if (fromEdge) {
-                            otherShape = me._getShapeFromTerminal($(fromEdge).attr("_from"));
-
-                            // otherShape 이 같은 collapse 범위내에 있는지 체크
-                            if ($(otherShape).parents("#" + _collapseRootElement.id).length !== 0) {
-                                me.hide(fromEdge);
-                            } else {
-                                isNeedToRedraw = true;
-                            }
-                        }
-                    }
-                }
-
-                edgeIdArray = $(_childNodes[i]).attr("_toedge");
-                if (edgeIdArray) {
-                    edgeIdArray = edgeIdArray.split(",");
-                    for (j = 0; j < edgeIdArray.length; j++) {
-                        toEdge = me.getElementById(edgeIdArray[j]);
-                        if (toEdge) {
-                            otherShape = me._getShapeFromTerminal($(toEdge).attr("_to"));
-
-                            // otherShape 이 같은 collapse 범위내에 있는지 체크
-                            if ($(otherShape).parents("#" + _collapseRootElement.id).length !== 0) {
-                                me.hide(toEdge);
-                            } else {
-                                isNeedToRedraw = true;
-                            }
-                        }
-                    }
-                }
-
-                // group 영역 밖의 연결된 otherShape 이 있는 경우 redraw
-                if (isNeedToRedraw === true) {
-                    me.redrawConnectedEdge(_childNodes[i]);
-                }
-            }
-        }
-    };
-
-    if (element.shape) {
-        childNodes = element.childNodes;
-        for (i = childNodes.length - 1; i >= 0; i--) {
-            if ($(childNodes[i]).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
-                this.hide(childNodes[i]);
-            }
-        }
-        element.shape.isCollapsed = true;
-        $(element).attr("_collapsed", true);
-
-        hideChildEdge(element, element);
-        this.redrawShape(element);
-
-        // collapsed event fire
-        $(this._PAPER.canvas).trigger('collapsed', [element]);
-    }
-};
-
-/**
- * 주어진 Shape 이 그룹인 경우 expand 한다.
- *
- * @param {Element} element
- * @override
- */
-OG.renderer.RaphaelRenderer.prototype.expand = function (element) {
-    var me = this, childNodes, i, showChildEdge;
-
-    showChildEdge = function (_collapseRootElement, _element) {
-        var edgeIdArray, fromEdge, toEdge, _childNodes = _element.childNodes, otherShape, i, j, isNeedToRedraw;
-        for (i = _childNodes.length - 1; i >= 0; i--) {
-            if ($(_childNodes[i]).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
-                showChildEdge(_collapseRootElement, _childNodes[i]);
-
-                isNeedToRedraw = false;
-                edgeIdArray = $(_childNodes[i]).attr("_fromedge");
-                if (edgeIdArray) {
-                    edgeIdArray = edgeIdArray.split(",");
-                    for (j = 0; j < edgeIdArray.length; j++) {
-                        fromEdge = me.getElementById(edgeIdArray[j]);
-                        if (fromEdge) {
-                            otherShape = me._getShapeFromTerminal($(fromEdge).attr("_from"));
-
-                            // otherShape 이 같은 collapse 범위내에 있는지 체크
-                            if ($(otherShape).parents("#" + _collapseRootElement.id).length !== 0) {
-                                me.show(fromEdge);
-                            } else {
-                                isNeedToRedraw = true;
-                            }
-                        }
-                    }
-                }
-
-                edgeIdArray = $(_childNodes[i]).attr("_toedge");
-                if (edgeIdArray) {
-                    edgeIdArray = edgeIdArray.split(",");
-                    for (j = 0; j < edgeIdArray.length; j++) {
-                        toEdge = me.getElementById(edgeIdArray[j]);
-                        if (toEdge) {
-                            otherShape = me._getShapeFromTerminal($(toEdge).attr("_to"));
-
-                            // otherShape 이 같은 collapse 범위내에 있는지 체크
-                            if ($(otherShape).parents("#" + _collapseRootElement.id).length !== 0) {
-                                me.show(toEdge);
-                            } else {
-                                isNeedToRedraw = true;
-                            }
-                        }
-                    }
-                }
-
-                // group 영역 밖의 연결된 otherShape 이 있는 경우 redrawConnectedEdge
-                if (isNeedToRedraw === true) {
-                    me.redrawConnectedEdge(_childNodes[i]);
-                }
-            }
-        }
-    };
-
-    if (element.shape) {
-        childNodes = element.childNodes;
-        for (i = childNodes.length - 1; i >= 0; i--) {
-            if ($(childNodes[i]).attr("_type") === OG.Constants.NODE_TYPE.SHAPE) {
-                this.show(childNodes[i]);
-            }
-        }
-        element.shape.isCollapsed = false;
-        $(element).attr("_collapsed", false);
-
-        showChildEdge(element, element);
-        this.redrawShape(element);
-
-        // expanded event fire
-        $(this._PAPER.canvas).trigger('expanded', [element]);
     }
 };
 

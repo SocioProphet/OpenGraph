@@ -134,6 +134,8 @@
     <script type="text/javascript" src="../src/shape/bpmn/M_Group.js"></script>
     <script type="text/javascript" src="../src/shape/bpmn/M_Text.js"></script>
     <script type="text/javascript" src="../src/shape/bpmn/ScopeActivity.js"></script>
+    <script type="text/javascript" src="../src/shape/bpmn/MIParallel.js"></script>
+    <script type="text/javascript" src="../src/shape/bpmn/MISequential.js"></script>
 
     <script type="text/javascript" src="../src/renderer/IRenderer.js"></script>
     <script type="text/javascript" src="../src/renderer/RaphaelRenderer.js"></script>
@@ -276,6 +278,7 @@
 
             // Shape 이 처음 Draw 되었을 때의 이벤트 리스너
             canvas.onDrawShape(function (event, shapeElement) {
+                console.log('onDrawShape');
             });
 
             // Undo 되었을 때의 이벤트 리스너
@@ -488,6 +491,8 @@
             var subElement1 = canvas.drawShape([400, 400], locationShape, [50, 50]);
             var subElement2 = canvas.drawShape([200, 400], manholeShape, [50, 50]);
             var subElement3 = canvas.drawShape([200, 200], swgrShape, [400, 250]);
+
+            var subElement4 = canvas.drawShape([500, 300], new OG.A_HumanTask(), [100, 100]);
 
 
             //canvas.connect(subElement, toElement, null, null, null, null, null, null, new OG.BusductShape());

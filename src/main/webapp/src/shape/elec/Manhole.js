@@ -6,7 +6,7 @@ OG.shape.elec.Manhole = function (image, label) {
     this.CONNECT_CLONEABLE = false;
     this.LABEL_EDITABLE = false;
 
-    if(!image){
+    if (!image) {
         this.image = 'resources/images/elec/manhole.svg'
     }
 };
@@ -37,7 +37,41 @@ OG.shape.elec.Manhole.prototype.createSubShape = function () {
                 'font-color': 'gray',
                 'text-anchor': 'start',
                 'vertical-align': 'top'
-            }
+            },
+            'z-index': -1,
+        },
+        {
+            shape: new OG.RectangleShape(),
+            width: 100,
+            height: 100,
+            left: 0,
+            top: 0,
+            style: {
+                'fill-opacity': 1,
+                animation: [
+                    {
+                        start: {
+                            fill: 'white'
+                        },
+                        to: {
+                            fill: '#C9E2FC'
+                        },
+                        ms: 1000
+                    },
+                    {
+                        start: {
+                            fill: '#C9E2FC'
+                        },
+                        to: {
+                            fill: 'white'
+                        },
+                        ms: 1000,
+                        delay: 1000
+                    }
+                ],
+                'animation-repeat': true
+            },
+            'z-index': -2,
         }
     ];
     return this.sub;

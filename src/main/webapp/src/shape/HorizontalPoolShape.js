@@ -46,3 +46,32 @@ OG.shape.HorizontalPoolShape.prototype.createShape = function () {
 
     return this.geom;
 };
+
+OG.shape.HorizontalPoolShape.prototype.createSubShape = function () {
+    this.sub = [];
+
+    var loopShape;
+    switch (this.LoopType) {
+        case 'Standard' :
+            loopShape = new OG.ImageShape('resources/images/symbol/loop_standard.png');
+            break;
+        case 'MIParallel' :
+            loopShape = new OG.MIParallel();
+            break;
+        case 'MISequential' :
+            loopShape = new OG.MISequential();
+            break;
+    }
+    if (loopShape) {
+        this.sub.push({
+            shape: loopShape,
+            width: '15px',
+            height: '15px',
+            bottom: '5px',
+            align: 'center',
+            style: {}
+        })
+    }
+
+    return this.sub;
+};

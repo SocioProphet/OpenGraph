@@ -13,11 +13,11 @@
 OG.shape.bpmn.A_Task = function (label) {
     OG.shape.bpmn.A_Task.superclass.call(this);
 
+    this.GROUP_DROPABLE = false;
     this.SHAPE_ID = 'OG.shape.bpmn.A_Task';
     this.label = label;
     this.CONNECTABLE = true;
     this.GROUP_COLLAPSIBLE = false;
-    //this.HaveButton = true;
     this.LoopType = "None";
     this.TaskType = "None";
     this.status = "None";
@@ -53,4 +53,134 @@ OG.shape.bpmn.A_Task.prototype.createShape = function () {
     });
 
     return this.geom;
+};
+
+OG.shape.bpmn.A_Task.prototype.createSubShape = function () {
+    this.sub = [];
+
+    var loopShape;
+    switch (this.LoopType) {
+        case 'Standard' :
+            loopShape = new OG.ImageShape('resources/images/symbol/loop_standard.png');
+            break;
+        case 'MIParallel' :
+            loopShape = new OG.MIParallel();
+            break;
+        case 'MISequential' :
+            loopShape = new OG.MISequential();
+            break;
+    }
+    if (loopShape) {
+        this.sub.push({
+            shape: loopShape,
+            width: '15px',
+            height: '15px',
+            bottom: '5px',
+            align: 'center',
+            style: {}
+        })
+    }
+
+    var taskTypeShape;
+    switch (this.TaskType) {
+        case "User":
+            taskTypeShape = new OG.ImageShape("resources/images/symbol/User.png");
+            break;
+        case "Send":
+            taskTypeShape = new OG.ImageShape('resources/images/symbol/Send.png');
+            break;
+        case "Receive":
+            taskTypeShape = new OG.ImageShape("resources/images/symbol/Receive.png");
+            break;
+        case "Manual":
+            taskTypeShape = new OG.ImageShape("resources/images/symbol/Manual.png");
+            break;
+        case "Service":
+            taskTypeShape = new OG.ImageShape("resources/images/symbol/Service.png");
+            break;
+        case "BusinessRule":
+            taskTypeShape = new OG.ImageShape("resources/images/symbol/BusinessRule.png");
+            break;
+        case "Script":
+            taskTypeShape = new OG.ImageShape("resources/images/symbol/Script.png");
+            break;
+        case "Mapper":
+            taskTypeShape = new OG.ImageShape("resources/images/symbol/Mapper.png");
+            break;
+        case "WebService":
+            taskTypeShape = new OG.ImageShape("resources/images/symbol/WebService.png");
+            break;
+    }
+    if (taskTypeShape) {
+        this.sub.push({
+            shape: taskTypeShape,
+            width: '20px',
+            height: '20px',
+            top: '5px',
+            left: '5px',
+            style: {}
+        })
+    }
+
+    var statusShape, statusAnimation;
+    switch (this.status) {
+        case "Completed":
+            statusShape = new OG.ImageShape("resources/images/symbol/complete.png");
+            break;
+        case "Running":
+            statusShape = new OG.ImageShape('resources/images/symbol/running.png');
+            statusAnimation = new OG.RectangleShape();
+            break;
+    }
+    if (statusShape) {
+        this.sub.push({
+            shape: statusShape,
+            width: '20px',
+            height: '20px',
+            right: '25px',
+            top: '5px',
+            style: {}
+        })
+    }
+    if (statusAnimation) {
+        this.sub.push({
+            shape: statusAnimation,
+            'z-index': -1,
+            width: '120',
+            height: '120',
+            left: '-10',
+            top: '-10',
+            style: {
+                'fill-opacity': 1,
+                animation: [
+                    {
+                        start: {
+                            fill: 'white'
+                        },
+                        to: {
+                            fill: '#C9E2FC'
+                        },
+                        ms: 1000
+                    },
+                    {
+                        start: {
+                            fill: '#C9E2FC'
+                        },
+                        to: {
+                            fill: 'white'
+                        },
+                        ms: 1000,
+                        delay: 1000
+                    }
+                ],
+                'animation-repeat': true,
+                "fill": "#C9E2FC",
+                "stroke-width": "0.2",
+                "r": "10",
+                'stroke-dasharray': '--'
+            }
+        })
+    }
+
+    return this.sub;
 };

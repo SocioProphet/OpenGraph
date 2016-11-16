@@ -48,3 +48,96 @@ OG.shape.bpmn.A_Subprocess.prototype.createShape = function () {
 
     return this.geom;
 };
+
+OG.shape.bpmn.A_Subprocess.prototype.createSubShape = function () {
+    this.sub = [];
+
+    var statusShape, statusAnimation;
+    switch (this.status) {
+        case "Completed":
+            statusShape = new OG.ImageShape("resources/images/symbol/complete.png");
+            break;
+        case "Running":
+            statusShape = new OG.ImageShape('resources/images/symbol/running.png');
+            statusAnimation = new OG.RectangleShape();
+            break;
+    }
+    if (statusShape) {
+        this.sub.push({
+            shape: statusShape,
+            width: '20px',
+            height: '20px',
+            right: '25px',
+            top: '5px',
+            style: {}
+        })
+    }
+    if (statusAnimation) {
+        this.sub.push({
+            shape: statusAnimation,
+            'z-index': -1,
+            width: '120',
+            height: '120',
+            left: '-10',
+            top: '-10',
+            style: {
+                'fill-opacity': 1,
+                animation: [
+                    {
+                        start: {
+                            fill: 'white'
+                        },
+                        to: {
+                            fill: '#C9E2FC'
+                        },
+                        ms: 1000
+                    },
+                    {
+                        start: {
+                            fill: '#C9E2FC'
+                        },
+                        to: {
+                            fill: 'white'
+                        },
+                        ms: 1000,
+                        delay: 1000
+                    }
+                ],
+                'animation-repeat': true,
+                "fill": "#C9E2FC",
+                "stroke-width": "0.2",
+                "r": "10",
+                'stroke-dasharray': '--'
+            }
+        })
+    }
+
+    if (this.inclusion) {
+        this.sub.push({
+            shape: new OG.ImageShape('resources/images/symbol/complete.png'),
+            width: '20px',
+            height: '20px',
+            right: '0px',
+            bottom: '20px',
+            style: {}
+        })
+    }
+
+    if (this.HaveButton) {
+        this.sub.push({
+            shape: new OG.ImageShape('resources/images/symbol/subprocess.png'),
+            width: '20px',
+            height: '20px',
+            align: 'center',
+            bottom: '5px',
+            style: {
+                "stroke-width": 1,
+                fill: "white",
+                "fill-opacity": 0,
+                "shape-rendering": "crispEdges"
+            }
+        })
+    }
+
+    return this.sub;
+};

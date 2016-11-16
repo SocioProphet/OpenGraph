@@ -182,11 +182,6 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         GROUP_DROPABLE: true,
 
         /**
-         * 최소화 가능여부
-         */
-        GROUP_COLLAPSIBLE: true,
-
-        /**
          * 이동, 리사이즈 드래그시 MOVE_SNAP_SIZE 적용 여부
          */
         DRAG_GRIDABLE: true,
@@ -723,7 +718,6 @@ OG.graph.Canvas.prototype = {
      * - connectRequired    : 드래그하여 연결시 연결대상 있는 경우에만 Edge 드로잉 처리 여부(디폴트 true)
      * - labelEditable      : 라벨 수정여부(디폴트 true)
      * - groupDropable      : 그룹핑 가능여부(디폴트 true)
-     * - collapsible        : 최소화 가능여부(디폴트 true)
      * - enableHotKey       : 핫키 가능여부(디폴트 true)
      * - enableContextMenu  : 마우스 우클릭 메뉴 가능여부(디폴트 true)
      * - autoExtensional    : 캔버스 자동 확장 기능(디폴트 true)
@@ -747,7 +741,6 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.CONNECT_REQUIRED = config.connectRequired === undefined ? this._CONFIG.CONNECT_REQUIRED : config.connectRequired;
             this._CONFIG.LABEL_EDITABLE = config.labelEditable === undefined ? this._CONFIG.LABEL_EDITABLE : config.labelEditable;
             this._CONFIG.GROUP_DROPABLE = config.groupDropable === undefined ? this._CONFIG.GROUP_DROPABLE : config.groupDropable;
-            this._CONFIG.GROUP_COLLAPSIBLE = config.collapsible === undefined ? this._CONFIG.GROUP_COLLAPSIBLE : config.collapsible;
             this._CONFIG.ENABLE_HOTKEY = config.enableHotKey === undefined ? this._CONFIG.ENABLE_HOTKEY : config.enableHotKey;
             this._CONFIG.ENABLE_CONTEXTMENU = config.enableContextMenu === undefined ? this._CONFIG.ENABLE_CONTEXTMENU : config.enableContextMenu;
             this._CONFIG.AUTO_EXTENSIONAL = config.autoExtensional === undefined ? this._CONFIG.AUTO_EXTENSIONAL : config.autoExtensional;
@@ -1110,12 +1103,12 @@ OG.graph.Canvas.prototype = {
      * @param {OG.geometry.Style|Object} style 스타일 (Optional)
      * @param {String} id Element ID 지정 (Optional)
      * @param {String} parentId 부모 Element ID 지정 (Optional)
-     * @param {Boolean} preventDrop Lane, Pool 생성 drop 모드 수행 방지
+     * @param {Boolean} preventEvent  이벤트 생성 방지
      * @return {Element} Group DOM Element with geometry
      */
-    drawShape: function (position, shape, size, style, id, parentId, preventDrop) {
+    drawShape: function (position, shape, size, style, id, parentId, preventEvent) {
 
-        var element = this._RENDERER.drawShape(position, shape, size, style, id, preventDrop);
+        var element = this._RENDERER.drawShape(position, shape, size, style, id, preventEvent);
 
         if (position && (shape.TYPE === OG.Constants.SHAPE_TYPE.EDGE)) {
             element = this._RENDERER.move(element, position);
@@ -1136,14 +1129,6 @@ OG.graph.Canvas.prototype = {
 
         if (this._HANDLER._isLabelEditable(element.shape)) {
             this._HANDLER.enableEditLabel(element);
-        }
-
-        if (element.shape.HaveButton) {   // + 버튼을 만들기 위해서
-            this._HANDLER.enableButton(element);
-        }
-
-        if (this._CONFIG.GROUP_COLLAPSIBLE && element.shape.GROUP_COLLAPSIBLE) {
-            this._HANDLER.enableCollapse(element);
         }
 
         if (!id) {
@@ -1391,7 +1376,7 @@ OG.graph.Canvas.prototype = {
                 shape.geom = geom;
             }
         }
-        edge = this.drawShape(null, shape, null, style, id, null, false);
+        edge = this.drawShape(null, shape, null, style, id, null);
 
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, true);
@@ -2309,7 +2294,7 @@ OG.graph.Canvas.prototype = {
                         if (textList) {
                             shape.textList = OG.JSON.decode(unescape(textList));
                         }
-                        element = this.drawShape([x, y], shape, [width, height], OG.JSON.decode(style), id, parent, false);
+                        element = this.drawShape([x, y], shape, [width, height], OG.JSON.decode(style), id, parent);
                         if (element.shape instanceof OG.shape.bpmn.A_Task) {
                             element.shape.LoopType = loopType;
                             element.shape.TaskType = taskType;
@@ -2344,7 +2329,7 @@ OG.graph.Canvas.prototype = {
                                 shape.geom = geom;
                             }
                         }
-                        element = this.drawShape(null, shape, null, OG.JSON.decode(style), id, parent, false);
+                        element = this.drawShape(null, shape, null, OG.JSON.decode(style), id, parent);
                         break;
                     case OG.Constants.SHAPE_TYPE.HTML:
                         shape = eval('new ' + shapeId + '()');
@@ -2360,7 +2345,7 @@ OG.graph.Canvas.prototype = {
                         if (textList) {
                             shape.textList = OG.JSON.decode(unescape(textList));
                         }
-                        element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
+                        element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent);
                         break;
                     case OG.Constants.SHAPE_TYPE.IMAGE:
                         shape = eval('new ' + shapeId + '(\'' + value + '\')');
@@ -2373,7 +2358,7 @@ OG.graph.Canvas.prototype = {
                         if (textList) {
                             shape.textList = OG.JSON.decode(unescape(textList));
                         }
-                        element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
+                        element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent);
                         break;
                     case OG.Constants.SHAPE_TYPE.TEXT:
                         shape = eval('new ' + shapeId + '()');
@@ -2386,7 +2371,7 @@ OG.graph.Canvas.prototype = {
                         if (textList) {
                             shape.textList = OG.JSON.decode(unescape(textList));
                         }
-                        element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent, false);
+                        element = this.drawShape([x, y], shape, [width, height, angle], OG.JSON.decode(style), id, parent);
                         break;
                 }
 

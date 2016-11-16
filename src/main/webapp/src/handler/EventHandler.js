@@ -280,63 +280,6 @@ OG.handler.EventHandler.prototype = {
     },
 
     /**
-     * 주어진 Shape Element 를 Collapse/Expand 가능하도록 한다.
-     *
-     * @param {Element} element Shape Element
-     */
-    enableCollapse: function (element) {
-        var me = this, collapseObj, clickHandle;
-
-        clickHandle = function (_element, _collapsedOjb) {
-            if (_collapsedOjb && _collapsedOjb.bBox && _collapsedOjb.collapse) {
-                $(_collapsedOjb.collapse).bind("click", function (event) {
-                    if (_element.shape.isCollapsed === true) {
-                        me._RENDERER.expand(_element);
-                        _collapsedOjb = me._RENDERER.drawCollapseGuide(_element);
-                        clickHandle(_element, _collapsedOjb);
-                    } else {
-                        me._RENDERER.collapse(_element);
-                        _collapsedOjb = me._RENDERER.drawCollapseGuide(_element);
-                        clickHandle(_element, _collapsedOjb);
-                    }
-                });
-
-                $(_collapsedOjb.bBox).bind("mouseout", function (event) {
-                    me._RENDERER.remove(_element.id + OG.Constants.COLLAPSE_BBOX);
-                    me._RENDERER.remove(_element.id + OG.Constants.COLLAPSE_SUFFIX);
-                });
-            }
-        };
-
-        if (element && $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.GROUP) {
-            $(element).bind({
-                mouseover: function () {
-                    collapseObj = me._RENDERER.drawCollapseGuide(this);
-                    if (collapseObj && collapseObj.bBox && collapseObj.collapse) {
-                        clickHandle(element, collapseObj);
-                    }
-                }
-            });
-        }
-    },
-
-    /*
-     + 버튼을 만들어 버튼을 누를 경우 팝업이 뜬다.
-     auth :  민수환
-     */
-    enableButton: function (element) {
-        var me = this, collapseObj, clickHandle;
-        collapseObj = me._RENDERER.drawButton(element);
-        clickHandle = function (_element, _collapsedOjb) {
-            if (_collapsedOjb && _collapsedOjb.bBox && _collapsedOjb.collapse) {
-                $(_collapsedOjb.collapse).bind("click", function (event) {
-                    $(_element).trigger("btnclick");
-                });
-            }
-        };
-    },
-
-    /**
      * Shape 엘리먼트의 이동 가능여부를 설정한다.
      *
      * @param {Element} element Shape 엘리먼트
@@ -4146,7 +4089,11 @@ OG.handler.EventHandler.prototype = {
         var me = this, geometry, position, width, height, shape;
 
         $(me._RENDERER.getRootElement()).find("[_selected=true]").each(function (index, item) {
-            shape = eval('new ' + value + '(\'' + item.shape.label + '\')');
+            if (item.shape.label) {
+                shape = eval('new ' + value + '(\'' + item.shape.label + '\')');
+            } else {
+                shape = eval('new ' + value + '()');
+            }
             position = [item.shape.geom.boundary.getCentroid().x, item.shape.geom.boundary.getCentroid().y];
             width = item.shape.geom.boundary.getWidth();
             height = item.shape.geom.boundary.getHeight();
@@ -4291,9 +4238,6 @@ OG.handler.EventHandler.prototype = {
                 me.setResizable(newElement, newGuide, me._isResizable(newElement.shape));
                 me.setConnectable(newElement, newGuide, me._isConnectable(newElement.shape));
 
-                if (me._CONFIG.GROUP_COLLAPSIBLE && newElement.shape.GROUP_COLLAPSIBLE) {
-                    me.enableCollapse(newElement);
-                }
                 if (me._isLabelEditable(newElement.shape)) {
                     me.enableEditLabel(newElement);
                 }
@@ -5177,9 +5121,6 @@ OG.handler.EventHandler.prototype = {
                 me.setMovable(newElement, me._isMovable(newElement.shape));
                 me.setConnectGuide(newElement, me._isConnectable(newElement.shape));
 
-                if (me._CONFIG.GROUP_COLLAPSIBLE && newElement.shape.GROUP_COLLAPSIBLE) {
-                    me.enableCollapse(newElement);
-                }
                 if (me._isLabelEditable(newElement.shape)) {
                     me.enableEditLabel(newElement);
                 }

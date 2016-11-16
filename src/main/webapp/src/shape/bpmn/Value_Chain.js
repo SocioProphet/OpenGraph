@@ -41,3 +41,36 @@ OG.shape.bpmn.Value_Chain.prototype.createShape = function () {
 
     return this.geom;
 };
+
+OG.shape.bpmn.Value_Chain.prototype.createSubShape = function () {
+    this.sub = [];
+
+    if (this.inclusion) {
+        this.sub.push({
+            shape: new OG.ImageShape('resources/images/symbol/complete.png'),
+            width: '20px',
+            height: '20px',
+            right: '0px',
+            bottom: '20px',
+            style: {}
+        })
+    }
+
+    if (this.HaveButton) {
+        this.sub.push({
+            shape: new OG.ImageShape('resources/images/symbol/subprocess.png'),
+            width: '20px',
+            height: '20px',
+            align: 'center',
+            bottom: '5px',
+            style: {
+                "stroke-width": 1,
+                fill: "white",
+                "fill-opacity": 0,
+                "shape-rendering": "crispEdges"
+            }
+        })
+    }
+
+    return this.sub;
+};
