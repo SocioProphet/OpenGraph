@@ -38,8 +38,8 @@ OG.shape.elec.BusductShape.prototype.createShape = function () {
         'multi': [
             {
                 top: -10,
-                from: '20',
-                to: 'end-20',
+                from: '20px',
+                to: 'end-20px',
                 style: {
                     'marker': {
                         'start': {
@@ -57,8 +57,8 @@ OG.shape.elec.BusductShape.prototype.createShape = function () {
             },
             {
                 top: 10,
-                from: '20',
-                to: 'end-20',
+                from: '20px',
+                to: 'end-20px',
                 style: {
                     'marker': {
                         'start': {

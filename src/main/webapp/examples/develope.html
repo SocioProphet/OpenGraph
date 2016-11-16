@@ -147,7 +147,6 @@
     <script type="text/javascript" src="../src/shape/elec/BusductShape.js"></script>
     <script type="text/javascript" src="../src/shape/elec/RacewayShape.js"></script>
     <script type="text/javascript" src="../src/shape/elec/CableShape.js"></script>
-    <script type="text/javascript" src="../src/shape/elec/Transform.js"></script>
     <script type="text/javascript" src="../src/shape/elec/SwitchTransformer.js"></script>
     <script type="text/javascript" src="../src/shape/elec/Load.js"></script>
     <script type="text/javascript" src="../src/shape/elec/NMLoad.js"></script>
@@ -462,6 +461,9 @@
             var swgrShape = new OG.SwitchGear(swgrData['SWGR_NAME']);
             swgrShape.data = swgrData;
 
+            var swgrTransFormerShape = new OG.SwitchTransformer(swgrData['SWGR_NAME']);
+            swgrTransFormerShape.data = swgrData;
+
             var nmLoadShape = new OG.NMLoad(loadData['LO_EQUIP_TAG_NO']);
             nmLoadShape.data = loadData;
 
@@ -490,7 +492,7 @@
 
             var subElement1 = canvas.drawShape([400, 400], locationShape, [50, 50]);
             var subElement2 = canvas.drawShape([200, 400], manholeShape, [50, 50]);
-            var subElement3 = canvas.drawShape([200, 200], swgrShape, [400, 250]);
+            var subElement3 = canvas.drawShape([200, 200], swgrTransFormerShape, [100, 150]);
 
             var subElement4 = canvas.drawShape([500, 300], new OG.A_HumanTask(), [100, 100]);
 

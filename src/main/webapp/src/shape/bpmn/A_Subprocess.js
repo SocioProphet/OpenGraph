@@ -76,10 +76,10 @@ OG.shape.bpmn.A_Subprocess.prototype.createSubShape = function () {
         this.sub.push({
             shape: statusAnimation,
             'z-index': -1,
-            width: '120',
-            height: '120',
-            left: '-10',
-            top: '-10',
+            width: '120%',
+            height: '120%',
+            left: '-10%',
+            top: '-10%',
             style: {
                 'fill-opacity': 1,
                 animation: [

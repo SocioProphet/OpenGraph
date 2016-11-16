@@ -194,13 +194,19 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
             if (!value && value != 0) {
                 length = undefined;
             }
-            //픽셀인 경우
-            else if (typeof value == 'string' && value.indexOf('px') != -1) {
-                length = parseInt(value.replace('px', ''));
-            }
-            //퍼센테이지 인 경우
-            else {
-                length = standard * (value / 100);
+            //숫자 형태인 경우
+            else if (typeof value == 'number') {
+                length = value;
+            } else if (typeof value == 'string') {
+                //픽셀인 경우
+                if (value.indexOf('px') != -1) {
+                    length = parseInt(value.replace('px', ''));
+                }
+                //퍼센테이지 경우
+                if (value.indexOf('%') != -1) {
+                    value = parseInt(value.replace('%', ''));
+                    length = standard * (value / 100);
+                }
             }
             return length;
         };
@@ -209,7 +215,7 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         width = getLength(bW, width);
         height = getLength(bH, height);
         left = getLength(bW, left) + bL;
-        right = bL + bW - getLength(bW, right);
+        right = bL + bW - getLength(bW, right) - width;
         top = getLength(bH, top) + bT;
         bottom = bT + bH - getLength(bH, bottom) - height;
 
@@ -242,19 +248,18 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
             top = bT + bH - height;
         }
 
-        //Edge 인 도형의 위치값을 구한다. Edge 인 도형의 vertices 는 퍼센테이지로만 환산한다.
+        //Edge 인 도형의 위치값을 구한다. subVertices 의 left,top 기준값으로 정한다.
         if (subShape instanceof OG.shape.EdgeShape) {
             if (subVertices && subVertices.length) {
                 for (var v = 0, lenv = subVertices.length; v < lenv; v++) {
-                    subVertices[v][0] = bW * (subVertices[v][0] / 100) + bL;
-                    subVertices[v][1] = bH * (subVertices[v][1] / 100) + bT;
+                    subVertices[v][0] = getLength(bW, subVertices[v][0]) + bL;
+                    subVertices[v][1] = getLength(bH, subVertices[v][1]) + bT;
                 }
             } else {
                 subVertices = [[bL, bT], [bL + bW, bT]];
             }
             subShape.geom = new OG.PolyLine(subVertices);
         }
-
 
         //노드 복사를 위한 가상의 그룹노드
         tempNode = me.drawShape([left + width / 2, top + height / 2], subShape, [width, height], subStyle, subShapeId, true);
@@ -399,6 +404,10 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             if (typeof distance == 'number') {
                 length = distance;
             } else if (typeof distance == 'string') {
+                //픽셀일 경우
+                if (distance.indexOf('px') != -1) {
+                    length = parseInt(distance.replace('px', ''));
+                }
                 //퍼센테이지 일 경우
                 if (distance.indexOf('%') != -1) {
                     distance = parseInt(distance.replace('%', ''));
@@ -414,9 +423,9 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                     length = totalLenth;
                 }
                 else if (distance.indexOf('end-') != -1) {
-                    distance = parseInt(distance.replace('end-', ''));
-                    length = totalLenth - distance;
-                } else {
+                    length = totalLenth - getSubDistance(nodePath, distance.replace('end-', ''));
+                }
+                else {
                     distance = parseInt(distance);
                     length = distance;
                 }
