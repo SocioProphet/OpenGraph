@@ -1,6 +1,15 @@
 Shape
 =====
 
+ - [IShape](#ishape)
+ - [Configuration](#configuration)
+ - [GeomShape](#geomshape)
+ - [EdgeShape](#edgeshape)
+ - [GroupShape](#groupshape)
+ - [ImageShape](#imageshape)
+ - [TextShape](#textshape)
+
+
 Shape 은 오픈그래프 캔버스 에 drawing 하기 위한 도형을 정의한 클래스입니다.
 
 Shape 은 화면에 표현될 Geometry 클래스를 가지고 있고, 사용자가 UI 상에서 도형을 선택하거나 이동시키는 등의 이벤트에 대한 제어 내용을 포함하고 있습니다.

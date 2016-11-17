@@ -1,6 +1,13 @@
 Extend Shape
 ============
 
+ - [CircleShape](#circleshape)
+ - [EllipseShape](#ellipseshape)
+ - [RectangleShape](#rectangleshape)
+ - [PoolShape](#poolshape)
+ - [LaneShape](#laneshape)
+ - [Define Custom Shape](#define-custom-shape)
+
 [Shape](shapes.md) 섹션에서 기본적인 다음의 기본적인 Shape 클래스들을 살펴보았습니다.
 
  - [GeomShape](shapes.md#geomshape)

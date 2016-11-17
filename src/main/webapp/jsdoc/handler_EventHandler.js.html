@@ -308,63 +308,6 @@ OG.handler.EventHandler.prototype = {
     },
 
     /**
-     * 주어진 Shape Element 를 Collapse/Expand 가능하도록 한다.
-     *
-     * @param {Element} element Shape Element
-     */
-    enableCollapse: function (element) {
-        var me = this, collapseObj, clickHandle;
-
-        clickHandle = function (_element, _collapsedOjb) {
-            if (_collapsedOjb &amp;&amp; _collapsedOjb.bBox &amp;&amp; _collapsedOjb.collapse) {
-                $(_collapsedOjb.collapse).bind("click", function (event) {
-                    if (_element.shape.isCollapsed === true) {
-                        me._RENDERER.expand(_element);
-                        _collapsedOjb = me._RENDERER.drawCollapseGuide(_element);
-                        clickHandle(_element, _collapsedOjb);
-                    } else {
-                        me._RENDERER.collapse(_element);
-                        _collapsedOjb = me._RENDERER.drawCollapseGuide(_element);
-                        clickHandle(_element, _collapsedOjb);
-                    }
-                });
-
-                $(_collapsedOjb.bBox).bind("mouseout", function (event) {
-                    me._RENDERER.remove(_element.id + OG.Constants.COLLAPSE_BBOX);
-                    me._RENDERER.remove(_element.id + OG.Constants.COLLAPSE_SUFFIX);
-                });
-            }
-        };
-
-        if (element &amp;&amp; $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.GROUP) {
-            $(element).bind({
-                mouseover: function () {
-                    collapseObj = me._RENDERER.drawCollapseGuide(this);
-                    if (collapseObj &amp;&amp; collapseObj.bBox &amp;&amp; collapseObj.collapse) {
-                        clickHandle(element, collapseObj);
-                    }
-                }
-            });
-        }
-    },
-
-    /*
-     + 버튼을 만들어 버튼을 누를 경우 팝업이 뜬다.
-     auth :  민수환
-     */
-    enableButton: function (element) {
-        var me = this, collapseObj, clickHandle;
-        collapseObj = me._RENDERER.drawButton(element);
-        clickHandle = function (_element, _collapsedOjb) {
-            if (_collapsedOjb &amp;&amp; _collapsedOjb.bBox &amp;&amp; _collapsedOjb.collapse) {
-                $(_collapsedOjb.collapse).bind("click", function (event) {
-                    $(_element).trigger("btnclick");
-                });
-            }
-        };
-    },
-
-    /**
      * Shape 엘리먼트의 이동 가능여부를 설정한다.
      *
      * @param {Element} element Shape 엘리먼트
@@ -954,7 +897,7 @@ OG.handler.EventHandler.prototype = {
                              * IE 10,11 use parentNode instead parentElement
                              */
                             var parentNode = ele.parentElement;
-                            if(!parentNode){
+                            if (!parentNode) {
                                 parentNode = ele.parentNode;
                             }
                             if (parentNode.id !== root.id) {
@@ -1012,6 +955,8 @@ OG.handler.EventHandler.prototype = {
                             if (virtualEdge) {
                                 $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'created');
                                 $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT, line.text);
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_LABEL, line.label);
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_SHAPE, line.shape);
                             }
                         }
                     });
@@ -1025,6 +970,8 @@ OG.handler.EventHandler.prototype = {
                             virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
                             $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE, 'active');
                             $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT, line.text);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_LABEL, line.label);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_SHAPE, line.shape);
                         }
                     });
                 });
@@ -1921,7 +1868,10 @@ OG.handler.EventHandler.prototype = {
             // 마우스 클릭하여 선택 처리
             $(element).bind({
                 click: function (event, param) {
-                    $(me._RENDERER.getContainer()).focus();
+                    if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
+                        $(me._RENDERER.getContainer()).focus();
+                    }
+                    //$(me._RENDERER.getContainer()).focus();
 
                     if (element.shape) {
                         me._RENDERER.removeAllVirtualEdge();
@@ -1951,6 +1901,8 @@ OG.handler.EventHandler.prototype = {
                         var isConnectable = me._isConnectable(element.shape);
                         var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
                         var connectText = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT);
+                        var connectLabel = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_LABEL);
+                        var connectShape = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_SHAPE);
                         var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
                         var isEdge = $(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE;
 
@@ -1970,7 +1922,10 @@ OG.handler.EventHandler.prototype = {
                                     isConnectable = false;
                                 }
                                 if (isConnectable) {
-                                    me._RENDERER._CANVAS.connect(target, element, null, connectText)
+                                    if (connectShape) {
+                                        eval('connectShape = new ' + connectShape + '()');
+                                    }
+                                    me._RENDERER._CANVAS.connect(target, element, null, connectLabel, null, null, null, null, connectShape);
                                     renderer.addHistory();
                                 }
                             } else {
@@ -2339,7 +2294,13 @@ OG.handler.EventHandler.prototype = {
         var renderer = me._RENDERER;
         if (isEnableHotKey === true) {
             // delete, ctrl+A
-            $(renderer.getContainer()).bind("keydown", function (event) {
+            var _container;
+            if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
+                _container = $(renderer.getContainer());
+            } else {
+                _container = $(document);
+            }
+            _container.bind("keydown", function (event) {
                 // 라벨수정중엔 keydown 이벤트무시
                 if (!/^textarea$/i.test(event.target.tagName) &amp;&amp; !/^input$/i.test(event.target.tagName)) {
                     // Undo Redo
@@ -2354,7 +2315,7 @@ OG.handler.EventHandler.prototype = {
                     }
 
                     // Delete : 삭제
-                    if (me._CONFIG.ENABLE_HOTKEY_DELETE &amp;&amp; event.keyCode === KeyEvent.DOM_VK_DELETE) {
+                    if (me._CONFIG.ENABLE_HOTKEY_DELETE &amp;&amp; (event.keyCode === KeyEvent.DOM_VK_DELETE || event.keyCode === KeyEvent.DOM_VK_BACK_SPACE)) {
                         event.preventDefault();
                         me.deleteSelectedShape();
                     }
@@ -2472,7 +2433,9 @@ OG.handler.EventHandler.prototype = {
             selector: '#' + me._RENDERER.getRootElement().id,
             build: function ($trigger, e) {
                 var root = me._RENDERER.getRootGroup(), copiedElement = $(root).data("copied");
-                $(me._RENDERER.getContainer()).focus();
+                if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
+                    $(me._RENDERER.getContainer()).focus();
+                }
                 return {
                     items: {
                         'selectAll': {
@@ -3911,7 +3874,9 @@ OG.handler.EventHandler.prototype = {
             },
             selector: '#' + me._RENDERER.getRootElement().id + ' [_type=SHAPE]',
             build: function ($trigger, event) {
-                $(me._RENDERER.getContainer()).focus();
+                if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
+                    $(me._RENDERER.getContainer()).focus();
+                }
                 var items;
 
                 if (me._getSelectedElement().length == 1) {
@@ -4037,7 +4002,9 @@ OG.handler.EventHandler.prototype = {
         var me = this;
 
         var dragBox = $(this).data("dragBox");
-        $(me._RENDERER.getContainer()).focus();
+        if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
+            $(me._RENDERER.getContainer()).focus();
+        }
         if (!dragBox || (dragBox &amp;&amp; dragBox.width &lt; 1 &amp;&amp; dragBox.height &lt; 1)) {
             $(me._RENDERER.getRootElement())
                 .find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(
@@ -4150,7 +4117,11 @@ OG.handler.EventHandler.prototype = {
         var me = this, geometry, position, width, height, shape;
 
         $(me._RENDERER.getRootElement()).find("[_selected=true]").each(function (index, item) {
-            shape = eval('new ' + value + '(\'' + item.shape.label + '\')');
+            if (item.shape.label) {
+                shape = eval('new ' + value + '(\'' + item.shape.label + '\')');
+            } else {
+                shape = eval('new ' + value + '()');
+            }
             position = [item.shape.geom.boundary.getCentroid().x, item.shape.geom.boundary.getCentroid().y];
             width = item.shape.geom.boundary.getWidth();
             height = item.shape.geom.boundary.getHeight();
@@ -4232,7 +4203,8 @@ OG.handler.EventHandler.prototype = {
         var renderer = me._RENDERER;
         var root = renderer.getRootGroup(),
             copiedElement = $(root).data("copied"),
-            selectedElement = [], dx, dy, avgX = 0, avgY = 0;
+            selectedElement = [], dx, dy, avgX = 0, avgY = 0,
+            copiedMap = [];
         if (copiedElement) {
             $(renderer.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, item) {
                 if (item.id) {
@@ -4294,9 +4266,6 @@ OG.handler.EventHandler.prototype = {
                 me.setResizable(newElement, newGuide, me._isResizable(newElement.shape));
                 me.setConnectable(newElement, newGuide, me._isConnectable(newElement.shape));
 
-                if (me._CONFIG.GROUP_COLLAPSIBLE &amp;&amp; newElement.shape.GROUP_COLLAPSIBLE) {
-                    me.enableCollapse(newElement);
-                }
                 if (me._isLabelEditable(newElement.shape)) {
                     me.enableEditLabel(newElement);
                 }
@@ -4305,9 +4274,119 @@ OG.handler.EventHandler.prototype = {
                 me._copyChildren(item, newElement);
 
                 selectedElement.push(newElement);
+                copiedMap.push({
+                    copied: item,
+                    pasted: newElement
+                })
             });
-            $(root).data("copied", selectedElement);
 
+            var getPastedElementByCopied = function (copied) {
+                var pasted;
+                for (var i = 0, leni = copiedMap.length; i &lt; leni; i++) {
+                    if (copiedMap[i]['copied'].id == copied.id) {
+                        pasted = copiedMap[i]['pasted'];
+                    }
+                }
+                return pasted;
+            };
+
+            $.each(copiedElement, function (idx, item) {
+                var relatedElementsFromEdge, relatedFrom, relatedTo,
+                    copiedFrom, copiedTo, copiedEdge, pastedFrom, pastedTo, pastedEdge;
+                //연결선이 복제된 경우, 복제된 대상 중 연결선의 From 과 To 가 모두 있을경우 연결선을 복원한다.
+                if ($(item).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
+                    relatedElementsFromEdge = renderer._CANVAS.getRelatedElementsFromEdge(item);
+                    relatedFrom = relatedElementsFromEdge.from;
+                    relatedTo = relatedElementsFromEdge.to;
+                    copiedFrom = undefined, copiedTo = undefined, pastedFrom = undefined, pastedTo = undefined, pastedEdge = undefined;
+                    copiedEdge = item;
+
+                    for (var i = 0; i &lt; copiedElement.length; i++) {
+                        if (relatedFrom) {
+                            if (copiedElement[i].id == relatedFrom.id) {
+                                copiedFrom = copiedElement[i];
+                            }
+                        }
+                        if (relatedTo) {
+                            if (copiedElement[i].id == relatedTo.id) {
+                                copiedTo = copiedElement[i];
+                            }
+                        }
+                    }
+                    if (copiedFrom &amp;&amp; copiedTo) {
+                        pastedFrom = getPastedElementByCopied(copiedFrom);
+                        pastedTo = getPastedElementByCopied(copiedTo);
+                        pastedEdge = getPastedElementByCopied(copiedEdge);
+                        var pastedShape = pastedEdge.shape;
+                        var pastedId = pastedEdge.id;
+
+                        renderer._CANVAS.removeShape(pastedEdge);
+                        pastedEdge = renderer._CANVAS.connect(pastedFrom, pastedTo, null, null, null, null, null, pastedId);
+                        pastedEdge.shape = pastedShape;
+                        renderer.redrawShape(pastedEdge);
+                    }
+                }
+                // 일반 도형이 복제된 경우, 복제된 대상 중 연결된 도형이 있을 경우, 그 연결선 또한 복제된 대상 속에 있는지 찾는다.
+                // 만약 연결선이 복제 되지 않은 상태라면, 연결선을 복원한다.
+                // 연결선을 복원 한 후에는,
+                // copiedElement , selectedElement(pasted),copiedMap 에 각각 연결선을 추가하도록 한다.
+                else {
+                    var prevEdges = renderer._CANVAS.getPrevEdges(item);
+                    var nextEdges = renderer._CANVAS.getNextEdges(item);
+                    var relatedEdges = prevEdges.concat(nextEdges);
+                    for (var i = 0, leni = relatedEdges.length; i &lt; leni; i++) {
+                        relatedElementsFromEdge = renderer._CANVAS.getRelatedElementsFromEdge(relatedEdges[i]);
+                        relatedFrom = relatedElementsFromEdge.from;
+                        relatedTo = relatedElementsFromEdge.to;
+                        copiedFrom = undefined, copiedTo = undefined, copiedEdge = undefined, pastedFrom = undefined, pastedTo = undefined, pastedEdge = undefined;
+
+                        for (var c = 0; c &lt; copiedElement.length; c++) {
+                            if (relatedFrom) {
+                                if (copiedElement[c].id == relatedFrom.id) {
+                                    copiedFrom = copiedElement[c];
+                                }
+                            }
+                            if (relatedTo) {
+                                if (copiedElement[c].id == relatedTo.id) {
+                                    copiedTo = copiedElement[c];
+                                }
+                            }
+                            if (copiedElement[c].id == relatedEdges[i].id) {
+                                copiedEdge = copiedElement[c];
+                            }
+                        }
+                        if (copiedFrom &amp;&amp; copiedTo &amp;&amp; !copiedEdge) {
+                            pastedFrom = getPastedElementByCopied(copiedFrom);
+                            pastedTo = getPastedElementByCopied(copiedTo);
+                            copiedEdge = relatedEdges[i];
+
+                            //relatedEdges[i] 를 복사한다.
+                            var newShape = relatedEdges[i].shape.clone();
+                            if (relatedEdges[i].shape.geom instanceof OG.geometry.BezierCurve) {
+                                newShape.geom = new OG.BezierCurve(relatedEdges[i].shape.geom.getControlPoints());
+                            } else {
+                                newShape.geom = new OG.PolyLine(relatedEdges[i].shape.geom.getVertices());
+                            }
+                            newShape.geom.style = relatedEdges[i].shape.geom.style;
+                            newShape.geom.move(me._CONFIG.COPY_PASTE_PADDING, me._CONFIG.COPY_PASTE_PADDING);
+
+                            pastedEdge = renderer._CANVAS.connect(pastedFrom, pastedTo);
+                            pastedEdge.shape = newShape;
+                            pastedEdge.data = relatedEdges[i].data;
+
+                            renderer.redrawShape(pastedEdge);
+                            copiedElement.push(copiedEdge);
+                            selectedElement.push(pastedEdge);
+                            copiedMap.push({
+                                copied: copiedEdge.id,
+                                pasted: pastedEdge.id
+                            });
+                        }
+                    }
+                }
+            });
+
+            $(root).data("copied", selectedElement);
             renderer.addHistory();
         }
 
@@ -5070,9 +5149,6 @@ OG.handler.EventHandler.prototype = {
                 me.setMovable(newElement, me._isMovable(newElement.shape));
                 me.setConnectGuide(newElement, me._isConnectable(newElement.shape));
 
-                if (me._CONFIG.GROUP_COLLAPSIBLE &amp;&amp; newElement.shape.GROUP_COLLAPSIBLE) {
-                    me.enableCollapse(newElement);
-                }
                 if (me._isLabelEditable(newElement.shape)) {
                     me.enableEditLabel(newElement);
                 }
@@ -5434,10 +5510,10 @@ OG.handler.EventHandler.prototype = {
             var isConnectable;
             var vertices = element.shape.geom.getVertices();
             if ($(spot).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
-                if($(spot).data("start")){
+                if ($(spot).data("start")) {
                     isConnectable = 'from';
                 }
-                if($(spot).data("end")){
+                if ($(spot).data("end")) {
                     isConnectable = 'to';
                 }
             }
@@ -5446,7 +5522,7 @@ OG.handler.EventHandler.prototype = {
 
         $(element).bind({
             mousemove: function (event) {
-                if(!me._isConnectable(element.shape)){
+                if (!me._isConnectable(element.shape)) {
                     return;
                 }
 
@@ -5611,7 +5687,7 @@ OG.handler.EventHandler.prototype = {
                 }
             },
             mouseout: function (event) {
-                if(!me._isConnectable(element.shape)){
+                if (!me._isConnectable(element.shape)) {
                     return;
                 }
                 var isShape = $(element).attr("_type") === OG.Constants.NODE_TYPE.SHAPE;
@@ -5664,7 +5740,7 @@ OG.handler.EventHandler.prototype = {
                 event.stopImmediatePropagation();
             },
             mouseover: function (event) {
-                if(!me._isConnectable(element.shape)){
+                if (!me._isConnectable(element.shape)) {
                     return;
                 }
                 var guide;
@@ -5986,13 +6062,13 @@ OG.EventHandler = OG.handler.EventHandler;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="OG.common.Constants.html">Constants</a></li><li><a href="OG.common.CurveUtil.html">CurveUtil</a></li><li><a href="OG.common.HashMap.html">HashMap</a></li><li><a href="OG.common.JSON.html">JSON</a></li><li><a href="OG.common.Util.html">Util</a></li><li><a href="OG.geometry.BezierCurve.html">BezierCurve</a></li><li><a href="OG.geometry.Circle.html">Circle</a></li><li><a href="OG.geometry.Coordinate.html">Coordinate</a></li><li><a href="OG.geometry.Curve.html">Curve</a></li><li><a href="OG.geometry.Ellipse.html">Ellipse</a></li><li><a href="OG.geometry.Envelope.html">Envelope</a></li><li><a href="OG.geometry.Geometry.html">Geometry</a></li><li><a href="OG.geometry.GeometryCollection.html">GeometryCollection</a></li><li><a href="OG.geometry.Line.html">Line</a></li><li><a href="OG.geometry.Point.html">Point</a></li><li><a href="OG.geometry.Polygon.html">Polygon</a></li><li><a href="OG.geometry.PolyLine.html">PolyLine</a></li><li><a href="OG.geometry.Rectangle.html">Rectangle</a></li><li><a href="OG.geometry.Style.html">Style</a></li><li><a href="OG.graph.Canvas.html">Canvas</a></li><li><a href="OG.handler.EventHandler.html">EventHandler</a></li><li><a href="OG.renderer.IRenderer.html">IRenderer</a></li><li><a href="OG.renderer.RaphaelRenderer.html">RaphaelRenderer</a></li><li><a href="OG.shape.CircleShape.html">CircleShape</a></li><li><a href="OG.shape.EdgeShape.html">EdgeShape</a></li><li><a href="OG.shape.EllipseShape.html">EllipseShape</a></li><li><a href="OG.shape.GeomShape.html">GeomShape</a></li><li><a href="OG.shape.GroupShape.html">GroupShape</a></li><li><a href="OG.shape.HorizontalLaneShape.html">HorizontalLaneShape</a></li><li><a href="OG.shape.HorizontalPoolShape.html">HorizontalPoolShape</a></li><li><a href="OG.shape.HtmlShape.html">HtmlShape</a></li><li><a href="OG.shape.ImageShape.html">ImageShape</a></li><li><a href="OG.shape.IShape.html">IShape</a></li><li><a href="OG.shape.RectangleShape.html">RectangleShape</a></li><li><a href="OG.shape.SpotShape.html">SpotShape</a></li><li><a href="OG.shape.TextShape.html">TextShape</a></li><li><a href="OG.shape.VerticalLaneShape.html">VerticalLaneShape</a></li><li><a href="OG.shape.VerticalPoolShape.html">VerticalPoolShape</a></li></ul><h3>Namespaces</h3><ul><li><a href="OG.html">OG</a></li><li><a href="OG.common.html">common</a></li><li><a href="OG.geometry.html">geometry</a></li><li><a href="OG.graph.html">graph</a></li><li><a href="OG.handler.html">handler</a></li><li><a href="OG.layout.html">layout</a></li><li><a href="OG.renderer.html">renderer</a></li><li><a href="OG.shape.html">shape</a></li><li><a href="OG.shape.bpmn.html">bpmn</a></li></ul><h3>Global</h3><ul><li><a href="global.html#override">override</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="OG.common.Constants.html">Constants</a></li><li><a href="OG.common.CurveUtil.html">CurveUtil</a></li><li><a href="OG.common.HashMap.html">HashMap</a></li><li><a href="OG.common.JSON.html">JSON</a></li><li><a href="OG.common.Util.html">Util</a></li><li><a href="OG.geometry.BezierCurve.html">BezierCurve</a></li><li><a href="OG.geometry.Circle.html">Circle</a></li><li><a href="OG.geometry.Coordinate.html">Coordinate</a></li><li><a href="OG.geometry.Curve.html">Curve</a></li><li><a href="OG.geometry.Ellipse.html">Ellipse</a></li><li><a href="OG.geometry.Envelope.html">Envelope</a></li><li><a href="OG.geometry.Geometry.html">Geometry</a></li><li><a href="OG.geometry.GeometryCollection.html">GeometryCollection</a></li><li><a href="OG.geometry.Line.html">Line</a></li><li><a href="OG.geometry.Point.html">Point</a></li><li><a href="OG.geometry.Polygon.html">Polygon</a></li><li><a href="OG.geometry.PolyLine.html">PolyLine</a></li><li><a href="OG.geometry.Rectangle.html">Rectangle</a></li><li><a href="OG.geometry.Style.html">Style</a></li><li><a href="OG.graph.Canvas.html">Canvas</a></li><li><a href="OG.handler.EventHandler.html">EventHandler</a></li><li><a href="OG.marker.ArrowMarker.html">ArrowMarker</a></li><li><a href="OG.marker.CircleMarker.html">CircleMarker</a></li><li><a href="OG.marker.IMarker.html">IMarker</a></li><li><a href="OG.marker.RectangleMarker.html">RectangleMarker</a></li><li><a href="OG.marker.SwitchLMarker.html">SwitchLMarker</a></li><li><a href="OG.marker.SwitchRMarker.html">SwitchRMarker</a></li><li><a href="OG.marker.SwitchXMarker.html">SwitchXMarker</a></li><li><a href="OG.pattern.HatchedPattern.html">HatchedPattern</a></li><li><a href="OG.pattern.IPattern.html">IPattern</a></li><li><a href="OG.pattern.RectPattern.html">RectPattern</a></li><li><a href="OG.renderer.IRenderer.html">IRenderer</a></li><li><a href="OG.renderer.RaphaelRenderer.html">RaphaelRenderer</a></li><li><a href="OG.shape.CircleShape.html">CircleShape</a></li><li><a href="OG.shape.EdgeShape.html">EdgeShape</a></li><li><a href="OG.shape.EllipseShape.html">EllipseShape</a></li><li><a href="OG.shape.GeomShape.html">GeomShape</a></li><li><a href="OG.shape.GroupShape.html">GroupShape</a></li><li><a href="OG.shape.HorizontalLaneShape.html">HorizontalLaneShape</a></li><li><a href="OG.shape.HorizontalPoolShape.html">HorizontalPoolShape</a></li><li><a href="OG.shape.HtmlShape.html">HtmlShape</a></li><li><a href="OG.shape.ImageShape.html">ImageShape</a></li><li><a href="OG.shape.IShape.html">IShape</a></li><li><a href="OG.shape.RectangleShape.html">RectangleShape</a></li><li><a href="OG.shape.SpotShape.html">SpotShape</a></li><li><a href="OG.shape.TextShape.html">TextShape</a></li><li><a href="OG.shape.VerticalLaneShape.html">VerticalLaneShape</a></li><li><a href="OG.shape.VerticalPoolShape.html">VerticalPoolShape</a></li></ul><h3>Namespaces</h3><ul><li><a href="OG.html">OG</a></li><li><a href="OG.common.html">common</a></li><li><a href="OG.geometry.html">geometry</a></li><li><a href="OG.graph.html">graph</a></li><li><a href="OG.handler.html">handler</a></li><li><a href="OG.layout.html">layout</a></li><li><a href="OG.marker.html">marker</a></li><li><a href="OG.pattern.html">pattern</a></li><li><a href="OG.renderer.html">renderer</a></li><li><a href="OG.shape.html">shape</a></li><li><a href="OG.shape.bpmn.html">bpmn</a></li><li><a href="OG.shape.elec.html">elec</a></li></ul><h3>Global</h3><ul><li><a href="global.html#override">override</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Sat Oct 29 2016 21:11:48 GMT+0900 (KST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Fri Nov 18 2016 02:36:36 GMT+0900 (KST)
 </footer>
 
 <script> prettyPrint(); </script>

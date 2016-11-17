@@ -15,9 +15,9 @@ OG.shape.bpmn.M_Text = function (label) {
 
 	this.SHAPE_ID = 'OG.shape.bpmn.M_Text';
 	this.label = label || 'Text';
-	this.SELECTABLE = false;
-	this.CONNECTABLE = false;
-	this.MOVABLE = false;
+	//this.SELECTABLE = false;
+	//this.CONNECTABLE = false;
+	//this.MOVABLE = false;
 };
 OG.shape.bpmn.M_Text.prototype = new OG.shape.GeomShape();
 OG.shape.bpmn.M_Text.superclass = OG.shape.GeomShape;

@@ -1,6 +1,20 @@
 Canvas Selector
 ===============
 
+ - [getElementById](#getelementbyid)
+ - [getElementsByType](#getelementsbytype)
+ - [getElementsByShapeId](#getelementsbyshapeid)
+ - [getRelatedElementsFromEdge](#getrelatedelementsfromedge)
+ - [getParent](#getparent)
+ - [getChilds](#getchilds)
+ - [getAllShapes](#getallshapes)
+ - [getPrevEdges](#getprevedges)
+ - [getNextEdges](#getnextedges)
+ - [getPrevShapes](#getprevshapes)
+ - [getPrevShapeIds](#getprevshapeids)
+ - [getNextShapes](#getnextshapes)
+ - [getNextShapeIds](#getnextshapeids)
+
 오픈그래프의 캔버스의 셀렉터 메소드들에 대해 알아보겠습니다.
 
 ## getElementById

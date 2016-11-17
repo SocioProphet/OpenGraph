@@ -23,7 +23,7 @@
     <script type="text/javascript" src="./layout/js/jquery.layout-latest.js"></script>
 
     <!-- Opengraph -->
-    <script type="text/javascript" src="../opengraph/OpenGraph-0.1.1-SNAPSHOT.js"></script>
+    <script type="text/javascript" src="../opengraph/OpenGraph-0.1.2-SNAPSHOT.js"></script>
 
     <script type="text/javascript" src="../src/raphael-2.1.0-custom.js"></script>
     <script type="text/javascript" src="../src/common/Constants.js"></script>
@@ -313,197 +313,195 @@
             });
 
 
-            var swgrData = {
-                "PJT_SQ": "SIM0004",
-                "SWGR_LIST_SEQ": 182,
-                "SWGR_TAG_NO": "P0BFE01",
-                "KKS_NUM": "400V INTAKE SWGR A",
-                "SWGR_NAME": "400V INTAKE SWGR A",
-                "SWGR_MAKER": "LSIS",
-                "SWGR_RATING_KVA": "",
-                "SWGR_TOTAL_KVA": "",
-                "SWGR_DUTY_CYCLE": "",
-                "SWGR_BUS_RATING": 1600,
-                "SWGR_TYPE": "MC",
-                "SWGR_DEM_KVA": "",
-                "SWGR_TYPE_NM": "MCC",
-                "FE_OWNER_ID": "KIYUL.KIM",
-                "SWGR_CHARGE_ID": "KIYUL.KIM",
-                "SWGR_OWNER_NM": "김기율",
-                "SWGR_CHARGE_LIST_SEQ": 101,
-                "SWGR_VOLTAGE": 400,
-                "SWGR_VOLTAGE_NUM": 400,
-                "BUS_RATING_NUM": 1600,
-                "SWGR_POWER_SOURCE": "N",
-                "SWGR_SHORT_CIR_RATING": "40kA, 1 sec",
-                "SWGR_SHORT_CIR_CURR": "",
-                "SWGR_CAPA_CAL_STAND": 1,
-                "SWGR_LINE_BUS_PT": "",
-                "SWGR_DUMMY": "",
-                "SWGR_BUS_TIE": "",
-                "SWGR_MO_SPARE": "",
-                "SWGR_NM_SPARE": "",
-                "SWGR_FREEZING_YN": "",
-                "SWGR_AUX_POWER": "",
-                "SWGR_LOCATION": "21. CW PUMP STATION",
-                "SWGR_LOCATION_TAG_NO": "",
-                "SWGR_EQUIP_DESC": "",
-                "FE_SWGR_LOAD_DIV": "S",
-                "SAVE_YN": "N"
+            OG.shape.SampleShape = function (label) {
+                OG.shape.SampleShape.superclass.call(this);
+
+                this.SHAPE_ID = 'OG.shape.SampleShape';
+                this.label = label;
+
             };
-            var loadData = {
-                "PJT_SQ": "SIM0004",
-                "LOAD_LIST_SEQ": "TDLL_SIM0000004",
-                "REV_MST_SEQ": "S000001",
-                "KVA": 13,
-                "KW": 65,
-                "LO_EQUIP_TAG_NO": "P1HHQ02AN001M",
-                "KKS_NUM": "EMERGENCY OIL PUMP MOTOR STARTER",
-                "LO_UNIT": "UNIT #1",
-                "LO_PROC_SYS": "BOILER #1 SCANNER COOLING AIR FAN (B)",
-                "LO_EQUIP_LOC": "3. BLR ABOVE LEVEL",
-                "LO_EQUIP_DESC": "EMERGENCY OIL PUMP MOTOR STARTER",
-                "LO_TYPE": "NM",
-                "LO_POW_SOU": "D",
-                "LO_EQUIP_VOL": 220,
-                "LO_PH": 1,
-                "LO_RATED_POW": 65,
-                "LO_RATED_CURR": 295,
-                "LO_BHP": "",
-                "LO_EFF": 1,
-                "LO_PF": 1,
-                "LO_DUTY": "I",
-                "LO_OPER_HOUR": 5,
-                "LO_START_RATED_CURR": "",
-                "LO_CABLE_SIZE": "",
-                "LO_GLAND_SIZE": "",
-                "LO_LAST_REV_DATE": "",
-                "FE_OWNER_ID": "taehee1.han",
-                "LO_REMARK": "",
-                "LO_STATUS": "N",
-                "LO_INTERFACE_YN": "Y",
-                "LO_SHEET_ID": "900,003",
-                "LO_SHEET_ROW_ID": 4,
-                "SWGR_CHARGE_ID": "KIYUL.KIM",
-                "LO_S_OWNER": "KIYUL.KIM",
-                "LO_C_OWNER": "KIYUL.KIM",
-                "LO_S_OWNER_NM": "김기율",
-                "FE_SWGR_LOAD_DIV": "L",
-                "SAVE_YN": "N",
-                "USE_FL": "Y",
-                "SORT_ORD": "BLR-SCB-1001"
-            };
-            var feederData = {
-                "FEEDER_LIST_MGT_SEQ": 2022,
-                "REV_MST_SEQ": "R0000001",
-                "SWGR_LIST_SEQ": 178,
-                "PJT_SEQ": "SIM0004",
-                "GUI_XML": "",
-                "FE_SPARE_FEEDER_NUM": 11,
-                "SWGR_TYPE": "VCB",
-                "SWGR_TYPE_CD": "VC",
-                "SWGR_TAG_NO": "P1BBA02 (VCB)",
-                "SWGR_NAME": "11kV Unit SWGR B (VCB)",
-                "SWGR_TOTAL_KVA": "11,960",
-                "SWGR_DUTY_CYCLE": 0,
-                "SWGR_VOLTAGE": 11000,
-                "SWGR_POWER_SOURCE": "N",
-                "FE_TOT_PANEL_NUM": "",
-                "FE_TOT_PANEL_NUM_INPUT": "",
-                "FE_INCOMING": "",
-                "FE_OUT_GOING": "11/0.415kV Unit TR B",
-                "FE_LINE_BUS_PT": "",
-                "FE_DUMMY": "",
-                "FE_BUS_TIE": "",
-                "FE_MAGIN": "",
-                "FE_RATED_CURRENT": 628,
-                "FE_OWNER_ID": "KIYUL.KIM"
+            OG.shape.SampleShape.prototype = new OG.shape.GeomShape();
+            OG.shape.SampleShape.superclass = OG.shape.GeomShape;
+            OG.shape.SampleShape.prototype.constructor = OG.shape.SampleShape;
+            OG.SampleShape = OG.shape.SampleShape;
+
+            /**
+             * 드로잉할 Shape 을 생성하여 반환한다.
+             *
+             * @return {OG.geometry.Geometry} Shape 정보
+             * @override
+             */
+            OG.shape.SampleShape.prototype.createShape = function () {
+                if (this.geom) {
+                    return this.geom;
+                }
+
+                this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+                this.geom.style = new OG.geometry.Style({
+                    'fill-r': 1,
+                    'fill-cx': .1,
+                    'fill-cy': .1,
+                    "stroke-width": 1.2,
+                    fill: 'r(.1, .1)#FFFFFF-#FFFFCC',
+                    'fill-opacity': 1,
+                    r: '10'
+                });
+                return this.geom;
             };
 
-            var hierarchyBldgData = {
-                "PJT_SQ": "SIM0004",
-                "HIER_SEQ": "H000001",
-                "NM": "CCB",
-                "DSCR": "CCB BUILDING",
-                "LV": 1,
-                "GUI_XML": ""
+            OG.shape.SampleShape.prototype.createSubShape = function () {
+                this.sub = [];
+
+                var loopShape;
+                switch (this.data.LoopType) {
+                    case 'Standard' :
+                        loopShape = new OG.ImageShape('resources/images/symbol/loop_standard.png');
+                        break;
+                    case 'MIParallel' :
+                        loopShape = new OG.MIParallel();
+                        break;
+                    case 'MISequential' :
+                        loopShape = new OG.MISequential();
+                        break;
+                }
+                if (loopShape) {
+                    this.sub.push({
+                        shape: loopShape,
+                        width: '15px',
+                        height: '15px',
+                        bottom: '5px',
+                        align: 'center',
+                        style: {}
+                    })
+                }
+
+                var taskTypeShape;
+                switch (this.data.TaskType) {
+                    case "User":
+                        taskTypeShape = new OG.ImageShape("resources/images/symbol/User.png");
+                        break;
+                    case "Send":
+                        taskTypeShape = new OG.ImageShape('resources/images/symbol/Send.png');
+                        break;
+                    case "Receive":
+                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Receive.png");
+                        break;
+                    case "Manual":
+                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Manual.png");
+                        break;
+                    case "Service":
+                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Service.png");
+                        break;
+                    case "BusinessRule":
+                        taskTypeShape = new OG.ImageShape("resources/images/symbol/BusinessRule.png");
+                        break;
+                    case "Script":
+                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Script.png");
+                        break;
+                    case "Mapper":
+                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Mapper.png");
+                        break;
+                    case "WebService":
+                        taskTypeShape = new OG.ImageShape("resources/images/symbol/WebService.png");
+                        break;
+                }
+                if (taskTypeShape) {
+                    this.sub.push({
+                        shape: taskTypeShape,
+                        width: '20px',
+                        height: '20px',
+                        top: '5px',
+                        left: '5px',
+                        style: {}
+                    })
+                }
+
+                var statusShape, statusAnimation;
+                switch (this.data.status) {
+                    case "Completed":
+                        statusShape = new OG.ImageShape("resources/images/symbol/complete.png");
+                        break;
+                    case "Running":
+                        statusShape = new OG.ImageShape('resources/images/symbol/running.png');
+                        statusAnimation = new OG.RectangleShape();
+                        break;
+                }
+                if (statusShape) {
+                    this.sub.push({
+                        shape: statusShape,
+                        width: '20px',
+                        height: '20px',
+                        right: '25px',
+                        top: '5px',
+                        style: {}
+                    })
+                }
+                if (statusAnimation) {
+                    this.sub.push({
+                        shape: statusAnimation,
+                        'z-index': -1,
+                        width: '120%',
+                        height: '120%',
+                        left: '-10%',
+                        top: '-10%',
+                        style: {
+                            'fill-opacity': 1,
+                            animation: [
+                                {
+                                    start: {
+                                        fill: 'white'
+                                    },
+                                    to: {
+                                        fill: '#C9E2FC'
+                                    },
+                                    ms: 1000
+                                },
+                                {
+                                    start: {
+                                        fill: '#C9E2FC'
+                                    },
+                                    to: {
+                                        fill: 'white'
+                                    },
+                                    ms: 1000,
+                                    delay: 1000
+                                }
+                            ],
+                            'animation-repeat': true,
+                            "fill": "#C9E2FC",
+                            "stroke-width": "0.2",
+                            "r": "10",
+                            'stroke-dasharray': '--'
+                        }
+                    })
+                }
+
+                return this.sub;
             };
 
-            var hierarchyFloorData = {
-                "PJT_SQ": "SIM0004",
-                "HIER_SEQ": "H000002",
-                "NM": "FLOOR1",
-                "DSCR": "FLOOR1",
-                "LV": 2,
-                "GUI_XML": ""
+            var sampleShape1 = new OG.SampleShape();
+            sampleShape1.data = {
+                LoopType: 'Standard',
+                TaskType: 'User',
+                status : 'Completed'
             };
+            canvas.drawShape([300, 300], sampleShape1, [100, 100]);
 
-            var locationData = {
-                "PJT_SQ": "SIM0007",
-                "LOC_REF_SEQ": 33,
-                "LOC_REF_NAME": "1. TBN BLDG",
-                "HIER_SEQ": "H000002",
-                "LOC_REF_NAME_TO": "BA",
-                "LOC_REF_TEMP": 50,
-                "LOC_REF_LENGTH": 33,
-                "LOC_REF_REM": ""
+            var sampleShape2 = new OG.SampleShape();
+            sampleShape2.data = {
+                LoopType: 'MIParallel',
+                TaskType: 'Send',
+                status : 'Running'
             };
+            canvas.drawShape([500, 300], sampleShape2, [100, 100]);
 
-            var bldgData = {
-                "PJT_SQ": "SIM0004",
-                "BLDG_SEQ": "B000001",
-                "NM": "CCB",
-                "DSCR": "CCB BUILDING",
-                "LV": 1,
-                "GUI_XML": ""
+            var sampleShape3 = new OG.SampleShape();
+            sampleShape2.data = {
+                LoopType: 'MISequential',
+                TaskType: 'Manual',
+                status : 'Completed'
             };
-
-            var swgrShape = new OG.SwitchGear(swgrData['SWGR_NAME']);
-            swgrShape.data = swgrData;
-
-            var swgrTransFormerShape = new OG.SwitchTransformer(swgrData['SWGR_NAME']);
-            swgrTransFormerShape.data = swgrData;
-
-            var nmLoadShape = new OG.NMLoad(loadData['LO_EQUIP_TAG_NO']);
-            nmLoadShape.data = loadData;
-
-            var hierarchyFeederShape = new OG.HierarchyFeeder(feederData['SWGR_NAME']);
-            hierarchyFeederShape.data = feederData;
-
-            var HierarchyBldgShape = new OG.HierarchyBldg(hierarchyBldgData['NM']);
-            HierarchyBldgShape.data = hierarchyBldgData;
-
-            var HierarchyFloorShape = new OG.HierarchyFloor(hierarchyFloorData['NM']);
-            HierarchyFloorShape.data = hierarchyFloorData;
-
-            var locationShape = new OG.Location(locationData['LOC_REF_NAME_TO']);
-            locationShape.data = locationData;
-
-            var manholeShape = new OG.Manhole(null, locationData['LOC_REF_NAME_TO']);
-            manholeShape.data = locationData;
-
-            var bldgShape = new OG.BLDG(bldgData['NM']);
-            bldgShape.data = bldgData;
-
-            //var subElement1 = canvas.drawShape([400, 200], HierarchyBldgShape, [600, 200]);
-            //var subElement2 = canvas.drawShape([400, 500], HierarchyFloorShape, [450, 200]);
-            //var toElement = canvas.drawShape([700, 450], nmLoadShape, [70, 70]);
-            //var to2Element = canvas.drawShape([300, 450], hierarchyFeederShape, [70, 70]);
-
-            var subElement1 = canvas.drawShape([400, 400], locationShape, [50, 50]);
-            var subElement2 = canvas.drawShape([200, 400], manholeShape, [50, 50]);
-            var subElement3 = canvas.drawShape([200, 200], swgrTransFormerShape, [100, 150]);
-
-            var subElement4 = canvas.drawShape([500, 300], new OG.A_HumanTask(), [100, 100]);
-
-
-            //canvas.connect(subElement, toElement, null, null, null, null, null, null, new OG.BusductShape());
-            //canvas.connect(subElement, to2Element, null, null, null, null, null, null, new OG.RacewayShape());
-            //var edge = canvas.connect(fromElement, toElement, cable);
-            //var edge = canvas.connect(fromElement, toElement, testStyle);
-
-            //다음단계 해야할것
-            //커스텀 콘텍스트 메뉴
+            canvas.drawShape([700, 300], sampleShape3, [100, 100]);
 
         });
 

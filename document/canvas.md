@@ -1,6 +1,39 @@
 Canvas Drawing
 ==============
 
+ - [Configuration](#configuration)
+ - [More Detail Configuration](#more-detail-configuration)
+ - [Zoom Panel](#zoom-panel)
+ - [drawShape](#drawshape)
+ - [style](#style)
+ - [label style](#label-style)
+ - [style](#style)
+ - [set Id](#set-id)
+ - [set Parent](#set-parent)
+ - [setShapeStyle](#setshapestyle)
+ - [setTextListInController](#settextlistincontroller)
+ - [drawLabel](#drawlabel)
+ - [connect](#connect)
+ - [disconnect](#disconnect)
+ - [group](#group)
+ - [clear](#clear)
+ - [removeShape](#removeshape)
+ - [removeChild](#removechild)
+ - [getRootElement](#getrootelement)
+ - [getRootGroup](#getrootgroup)
+ - [attribute](#attribute)
+ - [front and back](#front-and-back)
+ - [canvas size](#canvas-size)
+ - [scale](#scale)
+ - [show and hide](#show-and-hide)
+ - [append and insert](#append-and-insert)
+ - [move](#move)
+ - [rotate](#rotate)
+ - [resize](#resize)
+ - [align](#align)
+ - [undo && redo](#undo-&&-redo)
+ - [getBoundary](#getboundary)
+
 오픈그래프의 캔버스 객체는 다음을 선언함으로써 얻을 수 있습니다.
 
 ```
@@ -22,13 +55,12 @@ var canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images
 * - connectRequired    : 드래그하여 연결시 연결대상 있는 경우에만 Edge 드로잉 처리 여부(디폴트 true)
 * - labelEditable      : 라벨 수정여부(디폴트 true)
 * - groupDropable      : 그룹핑 가능여부(디폴트 true)
-* - collapsible        : 최소화 가능여부(디폴트 true)
 * - enableHotKey       : 핫키 가능여부(디폴트 true)
 * - enableContextMenu  : 마우스 우클릭 메뉴 가능여부(디폴트 true)
 * - autoExtensional    : 캔버스 자동 확장 기능(디폴트 true)
-* - useSlider          : 확대축소 슬라이더 사용 여부(디폴트 true)
-* - stickGuide         : 스틱 가이드 표시 여부(디폴트 true)
-* - checkBridgeEdge    : 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부(디폴트 true)
+* - useSlider          : 확대축소 슬라이더 사용 여부
+* - stickGuide         : 스틱 가이드 표시 여부
+* - checkBridgeEdge    : 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부
 ```
 
 Configuration 설정은 canvas 를 선언한 후 initConfig 메소드로 조정할 수 있습니다.
@@ -45,7 +77,6 @@ canvas.initConfig({
                 connectRequired: true,
                 labelEditable: true,
                 groupDropable: true,
-                collapsible: true,
                 enableHotKey: true,
                 enableContextMenu: true,
                 useSlider: true,
@@ -136,647 +167,653 @@ canvas._CONFIG.CONNECTABLE = false;
 
 ```
 {
-        /**
-         * 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부
-         */
-        CHECK_BRIDGE_EDGE: true,
-        
-        /**
-         * 스틱 가이드 생성 여부
-         */
-        STICK_GUIDE: true,
-        
-        /**
-         * 슬라이더
-         */
-        SLIDER: null,
-        
-        /**
-         * 서버 수신 데이터 처리중
-         */
-        REMOTE_PERFORMED_DURING: false,
-        
-        /**
-         * 리모트 데피니션
-         */
-        REMOTE_IDENTIFIER: null,
-        
-        /**
-         * 리모트 모드
-         */
-        REMOTEABLE: false,
-        
-        /**
-         * 리모트 모드 수정권한
-         */
-        REMOTE_EDITABLE: false,
-        
-        /**
-         * 리모트 모드 마스터모드
-         */
-        REMOTE_ISMASTER: false,
-        
-        /**
-         * 히스토리 인덱스
-         */
-        HISTORY_INDEX: 0,
-        
-        /**
-         * 히스토리 저장소
-         */
-        HISTORY: [],
-        
-        /**
-         * 히스토리 저장 횟수
-         */
-        HISTORY_SIZE: 100,
 
-        /**
-         * 확대/축소 슬라이더
-         */
-        USE_SLIDER: true,
+    /**
+     * 도형 선택시 캔버스 포거싱 여부
+     */
+    FOCUS_CANVAS_ONSELECT: true,
+    
+    /**
+     * 연결된 두 오브젝트의 소속에 따른 연결선 스타일 변화 여부
+     */
+    CHECK_BRIDGE_EDGE: true,
+    
+    /**
+     * 스틱 가이드 생성 여부
+     */
+    STICK_GUIDE: true,
+    
+    /**
+     * 슬라이더
+     */
+    SLIDER: null,
+    
+    /**
+     * 서버 수신 데이터 처리중
+     */
+    REMOTE_PERFORMED_DURING: false,
+    
+    /**
+     * 리모트 데피니션
+     */
+    REMOTE_IDENTIFIER: null,
+    
+    /**
+     * 리모트 모드
+     */
+    REMOTEABLE: false,
+    
+    /**
+     * 리모트 모드 수정권한
+     */
+    REMOTE_EDITABLE: false,
+    
+    /**
+     * 리모트 모드 마스터모드
+     */
+    REMOTE_ISMASTER: false,
+    
+    /**
+     * 히스토리 인덱스
+     */
+    HISTORY_INDEX: 0,
+    
+    /**
+     * 히스토리 저장소
+     */
+    HISTORY: [],
+    
+    /**
+     * 히스토리 저장 횟수
+     */
+    HISTORY_SIZE: 100,
 
-        /**
-         * 클릭선택 가능여부
-         */
-        SELECTABLE: true,
+    /**
+     * 확대/축소 슬라이더
+     */
+    USE_SLIDER: true,
 
-        /**
-         * 마우스드래그선택 가능여부
-         */
-        DRAG_SELECTABLE: true,
+    /**
+     * 클릭선택 가능여부
+     */
+    SELECTABLE: true,
 
-        /**
-         * 이동 가능여부
-         */
-        MOVABLE: true,
-        MOVABLE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+    /**
+     * 마우스드래그선택 가능여부
+     */
+    DRAG_SELECTABLE: true,
+
+    /**
+     * 이동 가능여부
+     */
+    MOVABLE: true,
+    MOVABLE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * 리사이즈 가능여부
+     */
+    RESIZABLE: true,
+    RESIZABLE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * 연결 가능여부
+     */
+    CONNECTABLE: true,
+
+    /**
+     * Self 연결 가능여부
+     */
+    SELF_CONNECTABLE: true,
+
+    /**
+     * 가이드에 자기자신을 복사하는 컨트롤러 여부.
+     */
+    CONNECT_CLONEABLE: true,
+
+    /**
+     * 드래그하여 연결시 연결대상 있는 경우에만 Edge 드로잉 처리 여부
+     */
+    CONNECT_REQUIRED: true,
+
+    /**
+     * 드래그하여 연결시 그룹을 건너뛸때 스타일 변경 여부
+     */
+    CONNECT_STYLE_CHANGE: true,
+    CONNECT_STYLE_CHANGE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * 가이드에 삭제 컨트롤러 여부
+     */
+    DELETABLE: true,
+    DELETABLE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * 라벨 수정여부
+     */
+    LABEL_EDITABLE: true,
+    LABEL_EDITABLE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * 그룹핑 가능여부
+     */
+    GROUP_DROPABLE: true,
+
+    /**
+     * 이동, 리사이즈 드래그시 MOVE_SNAP_SIZE 적용 여부
+     */
+    DRAG_GRIDABLE: true,
+
+    /**
+     * 핫키 가능여부
+     */
+    ENABLE_HOTKEY: true,
+
+    /**
+     * 핫키 : UNDO REDO 키 가능여부
+     */
+    ENABLE_HOTKEY_CTRL_Z: true,
+
+    /**
+     * 핫키 : DELETE 삭제 키 가능여부
+     */
+    ENABLE_HOTKEY_DELETE: true,
+
+    /**
+     * 핫키 : Ctrl+A 전체선택 키 가능여부
+     */
+    ENABLE_HOTKEY_CTRL_A: true,
+
+    /**
+     * 핫키 : Ctrl+C 복사 키 가능여부
+     */
+    ENABLE_HOTKEY_CTRL_C: true,
+
+    /**
+     * 핫키 : Ctrl+V 붙여넣기 키 가능여부
+     */
+    ENABLE_HOTKEY_CTRL_V: true,
+
+    /**
+     * 핫키 : Ctrl+D 복제하기 키 가능여부
+     */
+    ENABLE_HOTKEY_CTRL_D: true,
+
+    /**
+     * 핫키 : Ctrl+G 그룹 키 가능여부
+     */
+    ENABLE_HOTKEY_CTRL_G: true,
+
+    /**
+     * 핫키 : Ctrl+U 언그룹 키 가능여부
+     */
+    ENABLE_HOTKEY_CTRL_U: true,
+
+    /**
+     * 핫키 : 방향키 가능여부
+     */
+    ENABLE_HOTKEY_ARROW: true,
+
+    /**
+     * 핫키 : Shift + 방향키 가능여부
+     */
+    ENABLE_HOTKEY_SHIFT_ARROW: true,
+
+    /**
+     * 마우스 우클릭 메뉴 가능여부
+     */
+    ENABLE_CONTEXTMENU: true,
+
+    /**
+     * 캔버스 스케일(리얼 사이즈 : Scale = 1)
+     */
+    SCALE: 1,
+
+    /**
+     * 캔버스 최소 스케일
+     */
+    SCALE_MIN: 0.1,
+
+    /**
+     * 캔버스 최대 스케일
+     */
+    SCALE_MAX: 10,
+
+    /**
+     * Edge 꺽은선 패딩 사이즈
+     */
+    EDGE_PADDING: 20,
+
+    /**
+     * 라벨의 패딩 사이즈
+     */
+    LABEL_PADDING: 5,
+
+    /**
+     * 라벨 에디터(textarea)의 디폴트 width
+     */
+    LABEL_EDITOR_WIDTH: 500,
+
+    /**
+     * 라벨 에디터(textarea)의 디폴트 height
+     */
+    LABEL_EDITOR_HEIGHT: 16,
+
+    /**
+     * 시작, 끝점 라벨의 offsetTop 값
+     */
+    FROMTO_LABEL_OFFSET_TOP: 15,
+
+    /**
+     * Move & Resize 용 가이드 선 콘트롤 Rect 사이즈
+     */
+    GUIDE_LINE_SIZE: 20,
+    /**
+     * Move & Resize 용 가이드 선 콘트롤 마진 사이즈
+     */
+    GUIDE_LINE_MARGIN: 10,
+
+    /**
+     * Move & Resize 용 가이드 콘트롤 Rect 사이즈
+     */
+    GUIDE_RECT_SIZE: 8,
+
+    /**
+     * Move & Resize 용 가이드 가로, 세로 최소 사이즈
+     */
+    GUIDE_MIN_SIZE: 18,
+
+    /**
+     * 도형 컨트롤러 아이콘 커넥트 라인 표시 개수
+     */
+    GUIDE_CONTROL_LINE_NUM: 2,
+
+    /**
+     * Collapse & Expand 용 가이드 Rect 사이즈
+     */
+    COLLAPSE_SIZE: 10,
+
+    /**
+     * Shape Move & Resize 시 이동 간격
+     */
+    MOVE_SNAP_SIZE: 8,
+
+    /**
+     * 터미널 cross 사이즈
+     */
+    TERMINAL_SIZE: 5,
+
+    /**
+     * Shape 복사시 패딩 사이즈
+     */
+    COPY_PASTE_PADDING: 20,
+
+    /**
+     * Fit Canvas 시 패딩 사이즈
+     */
+    FIT_CANVAS_PADDING: 20,
+
+    /**
+     * 캔버스 영역 자동 확장 여부
+     */
+    AUTO_EXTENSIONAL: true,
+
+    /**
+     * 캔버스 영역 자동 확장시 증가 사이즈
+     */
+    AUTO_EXTENSION_SIZE: 100,
+
+    /**
+     * 캔버스 배경색
+     */
+    CANVAS_BACKGROUND: "#f9f9f9",
+
+    /**
+     * 이미지 url 정보
+     */
+    IMAGE_USER: "http://processcodi.com/images/opengraph/User.png",
+    IMAGE_SEND: "http://processcodi.com/images/opengraph/Send.png",
+    IMAGE_RECEIVE: "http://processcodi.com/images/opengraph/Receive.png",
+    IMAGE_MANUAL: "http://processcodi.com/images/opengraph/Manual.png",
+    IMAGE_SERVICE: "http://processcodi.com/images/opengraph/Service.png",
+    IMAGE_RULE: "http://processcodi.com/images/opengraph/BusinessRule.png",
+    IMAGE_SCRIPT: "http://processcodi.com/images/opengraph/Script.png",
+    IMAGE_MAPPER: "http://processcodi.com/images/opengraph/mapper.png",
+    IMAGE_WEB: "http://processcodi.com/images/opengraph/w_services.png",
+
+    /**
+     * Edge 선 자동마춤 각도 최소값
+     */
+    TRIM_EDGE_ANGLE_SIZE: 170,
+    /**
+     * Edge 선 이동딜레이 거리
+     */
+    EDGE_MOVE_DELAY_SIZE: 14,
+
+    /**
+     * swimLane 리사이즈 최소 폭
+     */
+    LANE_MIN_SIZE: 50,
+
+    /**
+     * swimLane 확장 기본 폭
+     */
+    LANE_DEFAULT_SIZE: 100,
+
+    /**
+     * swimLane, pool 생성 기본 가로,세로
+     */
+    POOL_DEFAULT_SIZE: [300, 200],
+
+    /**
+     * 그룹 하위 shape 와 그룹사이의 여유폭
+     */
+    GROUP_INNER_SAPCE: 10,
+
+    /**
+     * 라벨 최소 크기(IE)
+     */
+    LABEL_MIN_SIZE: 0,
+
+    /**
+     * 라벨 최대 크기(IE)
+     */
+    LABEL_MAX_SIZE: 300,
+
+    /**
+     * 디폴트 스타일 정의
+     */
+    DEFAULT_STYLE: {
+        SHAPE: {cursor: "default"},
+        GEOM: {
+            stroke: "black",
+            "fill-r": ".5",
+            "fill-cx": ".5",
+            "fill-cy": ".5",
+            fill: "white",
+            "fill-opacity": 0,
+            "label-position": "center"
         },
-
-        /**
-         * 리사이즈 가능여부
-         */
-        RESIZABLE: true,
-        RESIZABLE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+        TEXT: {stroke: "none", "text-anchor": "middle"},
+        HTML: {"label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"},
+        IMAGE: {"label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"},
+        EDGE: {
+            stroke: "black",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 1.5,
+            "stroke-opacity": 1,
+            "edge-type": "plain",
+            "arrow-start": "none",
+            "arrow-end": "block",
+            "stroke-dasharray": "",
+            "label-position": "center",
+            "stroke-linejoin": "round",
+            cursor: "pointer"
         },
-
-        /**
-         * 연결 가능여부
-         */
-        CONNECTABLE: true,
-
-        /**
-         * Self 연결 가능여부
-         */
-        SELF_CONNECTABLE: true,
-
-        /**
-         * 가이드에 자기자신을 복사하는 컨트롤러 여부.
-         */
-        CONNECT_CLONEABLE: true,
-
-        /**
-         * 드래그하여 연결시 연결대상 있는 경우에만 Edge 드로잉 처리 여부
-         */
-        CONNECT_REQUIRED: true,
-
-        /**
-         * 드래그하여 연결시 그룹을 건너뛸때 스타일 변경 여부
-         */
-        CONNECT_STYLE_CHANGE: true,
-        CONNECT_STYLE_CHANGE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+        EDGE_SHADOW: {
+            stroke: "#00FF00",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 1,
+            "stroke-opacity": 1,
+            "arrow-start": "none",
+            "arrow-end": "none",
+            "stroke-dasharray": "- ",
+            "edge-type": "plain",
+            cursor: "pointer"
         },
-
-        /**
-         * 가이드에 삭제 컨트롤러 여부
-         */
-        DELETABLE: true,
-        DELETABLE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+        EDGE_HIDDEN: {
+            stroke: "white",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 10,
+            "stroke-opacity": 0,
+            cursor: "pointer"
         },
-
-        /**
-         * 라벨 수정여부
-         */
-        LABEL_EDITABLE: true,
-        LABEL_EDITABLE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+        GROUP: {
+            stroke: "black",
+            fill: "none",
+            "fill-opacity": 0,
+            "label-position": "bottom",
+            "text-anchor": "middle",
+            "vertical-align": "top"
         },
-
-        /**
-         * 그룹핑 가능여부
-         */
-        GROUP_DROPABLE: true,
-
-        /**
-         * 최소화 가능여부
-         */
-        GROUP_COLLAPSIBLE: true,
-
-        /**
-         * 이동, 리사이즈 드래그시 MOVE_SNAP_SIZE 적용 여부
-         */
-        DRAG_GRIDABLE: true,
-
-        /**
-         * 핫키 가능여부
-         */
-        ENABLE_HOTKEY: true,
-
-        /**
-         * 핫키 : UNDO REDO 키 가능여부
-         */
-        ENABLE_HOTKEY_CTRL_Z: true,
-
-        /**
-         * 핫키 : DELETE 삭제 키 가능여부
-         */
-        ENABLE_HOTKEY_DELETE: true,
-
-        /**
-         * 핫키 : Ctrl+A 전체선택 키 가능여부
-         */
-        ENABLE_HOTKEY_CTRL_A: true,
-
-        /**
-         * 핫키 : Ctrl+C 복사 키 가능여부
-         */
-        ENABLE_HOTKEY_CTRL_C: true,
-
-        /**
-         * 핫키 : Ctrl+V 붙여넣기 키 가능여부
-         */
-        ENABLE_HOTKEY_CTRL_V: true,
-
-        /**
-         * 핫키 : Ctrl+D 복제하기 키 가능여부
-         */
-        ENABLE_HOTKEY_CTRL_D: true,
-
-        /**
-         * 핫키 : Ctrl+G 그룹 키 가능여부
-         */
-        ENABLE_HOTKEY_CTRL_G: true,
-
-        /**
-         * 핫키 : Ctrl+U 언그룹 키 가능여부
-         */
-        ENABLE_HOTKEY_CTRL_U: true,
-
-        /**
-         * 핫키 : 방향키 가능여부
-         */
-        ENABLE_HOTKEY_ARROW: true,
-
-        /**
-         * 핫키 : Shift + 방향키 가능여부
-         */
-        ENABLE_HOTKEY_SHIFT_ARROW: true,
-
-        /**
-         * 마우스 우클릭 메뉴 가능여부
-         */
-        ENABLE_CONTEXTMENU: true,
-
-        /**
-         * 캔버스 스케일(리얼 사이즈 : Scale = 1)
-         */
-        SCALE: 1,
-
-        /**
-         * 캔버스 최소 스케일
-         */
-        SCALE_MIN: 0.1,
-
-        /**
-         * 캔버스 최대 스케일
-         */
-        SCALE_MAX: 10,
-
-        /**
-         * Edge 꺽은선 패딩 사이즈
-         */
-        EDGE_PADDING: 20,
-
-        /**
-         * 라벨의 패딩 사이즈
-         */
-        LABEL_PADDING: 5,
-
-        /**
-         * 라벨 에디터(textarea)의 디폴트 width
-         */
-        LABEL_EDITOR_WIDTH: 500,
-
-        /**
-         * 라벨 에디터(textarea)의 디폴트 height
-         */
-        LABEL_EDITOR_HEIGHT: 16,
-
-        /**
-         * 시작, 끝점 라벨의 offsetTop 값
-         */
-        FROMTO_LABEL_OFFSET_TOP: 15,
-
-        /**
-         * Move & Resize 용 가이드 선 콘트롤 Rect 사이즈
-         */
-        GUIDE_LINE_SIZE: 20,
-        /**
-         * Move & Resize 용 가이드 선 콘트롤 마진 사이즈
-         */
-        GUIDE_LINE_MARGIN: 10,
-
-        /**
-         * Move & Resize 용 가이드 콘트롤 Rect 사이즈
-         */
-        GUIDE_RECT_SIZE: 8,
-
-        /**
-         * Move & Resize 용 가이드 가로, 세로 최소 사이즈
-         */
-        GUIDE_MIN_SIZE: 18,
-
-        /**
-         * Collapse & Expand 용 가이드 Rect 사이즈
-         */
-        COLLAPSE_SIZE: 10,
-
-        /**
-         * Shape Move & Resize 시 이동 간격
-         */
-        MOVE_SNAP_SIZE: 8,
-
-        /**
-         * 터미널 cross 사이즈
-         */
-        TERMINAL_SIZE: 5,
-
-        /**
-         * Shape 복사시 패딩 사이즈
-         */
-        COPY_PASTE_PADDING: 20,
-
-        /**
-         * Fit Canvas 시 패딩 사이즈
-         */
-        FIT_CANVAS_PADDING: 20,
-
-        /**
-         * 캔버스 영역 자동 확장 여부
-         */
-        AUTO_EXTENSIONAL: true,
-
-        /**
-         * 캔버스 영역 자동 확장시 증가 사이즈
-         */
-        AUTO_EXTENSION_SIZE: 100,
-
-        /**
-         * 캔버스 배경색
-         */
-        CANVAS_BACKGROUND: "#f9f9f9",
-
-        /**
-         * 이미지 url 정보
-         */
-        IMAGE_USER: "http://processcodi.com/images/opengraph/User.png",
-        IMAGE_SEND: "http://processcodi.com/images/opengraph/Send.png",
-        IMAGE_RECEIVE: "http://processcodi.com/images/opengraph/Receive.png",
-        IMAGE_MANUAL: "http://processcodi.com/images/opengraph/Manual.png",
-        IMAGE_SERVICE: "http://processcodi.com/images/opengraph/Service.png",
-        IMAGE_RULE: "http://processcodi.com/images/opengraph/BusinessRule.png",
-        IMAGE_SCRIPT: "http://processcodi.com/images/opengraph/Script.png",
-        IMAGE_MAPPER: "http://processcodi.com/images/opengraph/mapper.png",
-        IMAGE_WEB: "http://processcodi.com/images/opengraph/w_services.png",
-
-        /**
-         * Edge 선 자동마춤 각도 최소값
-         */
-        TRIM_EDGE_ANGLE_SIZE: 170,
-        /**
-         * Edge 선 이동딜레이 거리
-         */
-        EDGE_MOVE_DELAY_SIZE: 14,
-
-        /**
-         * swimLane 리사이즈 최소 폭
-         */
-        LANE_MIN_SIZE: 50,
-
-        /**
-         * swimLane 확장 기본 폭
-         */
-        LANE_DEFAULT_SIZE: 100,
-
-        /**
-         * swimLane, pool 생성 기본 가로,세로
-         */
-        POOL_DEFAULT_SIZE: [300, 200],
-
-        /**
-         * 그룹 하위 shape 와 그룹사이의 여유폭
-         */
-        GROUP_INNER_SAPCE: 10,
-
-        /**
-         * 라벨 최소 크기(IE)
-         */
-        LABEL_MIN_SIZE: 100,
-
-        /**
-         * 라벨 최대 크기(IE)
-         */
-        LABEL_MAX_SIZE: 300,
-
-        /**
-         * 디폴트 스타일 정의
-         */
-        DEFAULT_STYLE: {
-            SHAPE: {cursor: "default"},
-            GEOM: {
-                stroke: "black",
-                "fill-r": ".5",
-                "fill-cx": ".5",
-                "fill-cy": ".5",
-                fill: "white",
-                "fill-opacity": 0,
-                "label-position": "center"
-            },
-            TEXT: {stroke: "none", "text-anchor": "middle"},
-            HTML: {"label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"},
-            IMAGE: {"label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"},
-            EDGE: {
-                stroke: "black",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 1.5,
-                "stroke-opacity": 1,
-                "edge-type": "plain",
-                "arrow-start": "none",
-                "arrow-end": "block",
-                "stroke-dasharray": "",
-                "label-position": "center",
-                "stroke-linejoin": "round",
-                cursor: "pointer"
-            },
-            EDGE_SHADOW: {
-                stroke: "#00FF00",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 1,
-                "stroke-opacity": 1,
-                "arrow-start": "none",
-                "arrow-end": "none",
-                "stroke-dasharray": "- ",
-                "edge-type": "plain",
-                cursor: "pointer"
-            },
-            EDGE_HIDDEN: {
-                stroke: "white",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 10,
-                "stroke-opacity": 0,
-                cursor: "pointer"
-            },
-            GROUP: {
-                stroke: "black",
-                fill: "none",
-                "fill-opacity": 0,
-                "label-position": "bottom",
-                "text-anchor": "middle",
-                "vertical-align": "top"
-            },
-            GROUP_HIDDEN: {stroke: "black", fill: "white", "fill-opacity": 0, "stroke-opacity": 0, cursor: "move"},
-            GROUP_SHADOW: {
-                stroke: "white",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 15,
-                "stroke-opacity": 0,
-                cursor: "pointer"
-            },
-            GROUP_SHADOW_MAPPER: {
-                stroke: "white",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 1,
-                "stroke-opacity": 0,
-                cursor: "pointer"
-            },
-            GUIDE_BBOX: {
-                stroke: "#00FF00",
-                fill: "white",
-                "fill-opacity": 0,
-                "stroke-dasharray": "- ",
-                "shape-rendering": "crispEdges",
-                cursor: "move"
-            },
-            GUIDE_UL: {
-                stroke: "#03689a",
-                fill: "#03689a",
-                "fill-opacity": 0.5,
-                cursor: "nwse-resize",
-                "shape-rendering": "crispEdges"
-            },
-            GUIDE_UR: {
-                stroke: "#03689a",
-                fill: "#03689a",
-                "fill-opacity": 0.5,
-                cursor: "nesw-resize",
-                "shape-rendering": "crispEdges"
-            },
-            GUIDE_LL: {
-                stroke: "#03689a",
-                fill: "#03689a",
-                "fill-opacity": 0.5,
-                cursor: "nesw-resize",
-                "shape-rendering": "crispEdges"
-            },
-            GUIDE_LR: {
-                stroke: "#03689a",
-                fill: "#03689a",
-                "fill-opacity": 0.5,
-                cursor: "nwse-resize",
-                "shape-rendering": "crispEdges"
-            },
-            GUIDE_LC: {
-                stroke: "#03689a",
-                fill: "#03689a",
-                "fill-opacity": 0.5,
-                cursor: "ew-resize",
-                "shape-rendering": "crispEdges"
-            },
-            GUIDE_UC: {
-                stroke: "black",
-                fill: "#03689a",
-                "fill-opacity": 0.5,
-                cursor: "ns-resize",
-                "shape-rendering": "crispEdges"
-            },
-            GUIDE_RC: {
-                stroke: "black",
-                fill: "#03689a",
-                "fill-opacity": 0.5,
-                cursor: "ew-resize",
-                "shape-rendering": "crispEdges"
-            },
-            GUIDE_LWC: {
-                stroke: "black",
-                fill: "#03689a",
-                "fill-opacity": 0.5,
-                cursor: "ns-resize",
-                "shape-rendering": "crispEdges"
-            },
-            GUIDE_FROM: {stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"},
-            GUIDE_TO: {stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"},
-            GUIDE_CTL_H: {stroke: "black", fill: "#00FF00", cursor: "ew-resize", "shape-rendering": "crispEdges"},
-            GUIDE_CTL_V: {stroke: "black", fill: "#00FF00", cursor: "ns-resize", "shape-rendering": "crispEdges"},
-            GUIDE_SHADOW: {stroke: "black", fill: "none", "stroke-dasharray": "- ", "shape-rendering": "crispEdges"},
-            GUIDE_LINE: {
-                stroke: "black",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 1.2,
-                "stroke-opacity": 1,
-                "stroke-dasharray": "",
-                "arrow-end": "block",
-                "stroke-linejoin": "round",
-                cursor: "pointer"
-            },
-            GUIDE_LINE_ESSENSIA: {
-                stroke: "black",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 1.2,
-                "stroke-opacity": 1,
-                "stroke-dasharray": "",
-                "arrow-start": "diamond",
-                "arrow-end": "none",
-                "stroke-linejoin": "round",
-                cursor: "pointer"
-            },
-            GUIDE_VIRTUAL_EDGE: {
-                stroke: "black",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 1,
-                "stroke-opacity": 1,
-                "stroke-dasharray": "- ",
-                "stroke-linejoin": "round",
-                "arrow-start": "none",
-                "arrow-end": "none"
-            },
-            GUIDE_LINE_AREA: {
-                stroke: "#ffffff",
-                fill: "#ffffff",
-                "fill-opacity": 0.1,
-                "stroke-width": 1,
-                "stroke-opacity": 0.2,
-                cursor: "pointer"
-            },
-            GUIDE_RECT_AREA: {
-                stroke: "black",
-                fill: "#ffffff",
-                "fill-opacity": 0,
-                "stroke-width": 1,
-                "stroke-opacity": 1,
-                cursor: "pointer"
-            },
-            RUBBER_BAND: {stroke: "#0000FF", opacity: 0.2, fill: "#0077FF"},
-            DROP_OVER_BBOX: {stroke: "#0077FF", fill: "none", opacity: 0.3, "shape-rendering": "crispEdges"},
-            LABEL: {"font-size": 12, "font-color": "black", "fill": "white"},
-            LABEL_EDITOR: {
-                position: "absolute",
-                overflow: "visible",
-                resize: "none",
-                "text-align": "center",
-                display: "block",
-                padding: 0
-            },
-            COLLAPSE: {
-                stroke: "black",
-                fill: "none",
-                "fill-opacity": 0,
-                cursor: "pointer",
-                "shape-rendering": "crispEdges"
-            },
-            COLLAPSE_BBOX: {stroke: "none", fill: "none", "fill-opacity": 0},
-            BUTTON: {
-                stroke: "#9FD7FF",
-                fill: "white",
-                "fill-opacity": 0,
-                cursor: "pointer",
-                "shape-rendering": "crispEdges"
-            },
-            CONNECT_GUIDE_EVENT_AREA: {
-                stroke: "#ffffff",
-                fill: "none",
-                "fill-opacity": 0,
-                "stroke-width": 20,
-                "stroke-opacity": 0
-            },
-            CONNECT_GUIDE_BBOX: {
-                stroke: "#00FF00",
-                fill: "none",
-                "stroke-dasharray": "- ",
-                "shape-rendering": "crispEdges"
-            },
-            CONNECT_GUIDE_BBOX_EXPEND: 10,
-            CONNECT_GUIDE_SPOT_CIRCLE: {
-                r: 7,
-                stroke: "#A6A6A6",
-                "stroke-width": 1,
-                fill: "#FFE400",
-                "fill-opacity": 0.5,
-                cursor: "pointer"
-            },
-            CONNECT_GUIDE_SPOT_RECT: {
-                stroke: "#A6A6A6",
-                "stroke-width": 1,
-                fill: "#FFE400",
-                "fill-opacity": 0.2,
-                cursor: "ns-resize",
-                w: 20,
-                h: 10
-            },
-            CONNECTABLE_HIGHLIGHT: {
-                "stroke-width": 2
-            },
-            NOT_CONNECTABLE_HIGHLIGHT: {
-                fill: "#FAAFBE",
-                "fill-opacity": 0.5
-            }
+        GROUP_HIDDEN: {stroke: "black", fill: "white", "fill-opacity": 0, "stroke-opacity": 0, cursor: "move"},
+        GROUP_SHADOW: {
+            stroke: "white",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 15,
+            "stroke-opacity": 0,
+            cursor: "pointer"
+        },
+        GROUP_SHADOW_MAPPER: {
+            stroke: "white",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 1,
+            "stroke-opacity": 0,
+            cursor: "pointer"
+        },
+        GUIDE_BBOX: {
+            stroke: "#00FF00",
+            fill: "white",
+            "fill-opacity": 0,
+            "stroke-dasharray": "- ",
+            "shape-rendering": "crispEdges",
+            cursor: "move"
+        },
+        GUIDE_UL: {
+            stroke: "#03689a",
+            fill: "#03689a",
+            "fill-opacity": 0.5,
+            cursor: "nwse-resize",
+            "shape-rendering": "crispEdges"
+        },
+        GUIDE_UR: {
+            stroke: "#03689a",
+            fill: "#03689a",
+            "fill-opacity": 0.5,
+            cursor: "nesw-resize",
+            "shape-rendering": "crispEdges"
+        },
+        GUIDE_LL: {
+            stroke: "#03689a",
+            fill: "#03689a",
+            "fill-opacity": 0.5,
+            cursor: "nesw-resize",
+            "shape-rendering": "crispEdges"
+        },
+        GUIDE_LR: {
+            stroke: "#03689a",
+            fill: "#03689a",
+            "fill-opacity": 0.5,
+            cursor: "nwse-resize",
+            "shape-rendering": "crispEdges"
+        },
+        GUIDE_LC: {
+            stroke: "#03689a",
+            fill: "#03689a",
+            "fill-opacity": 0.5,
+            cursor: "ew-resize",
+            "shape-rendering": "crispEdges"
+        },
+        GUIDE_UC: {
+            stroke: "black",
+            fill: "#03689a",
+            "fill-opacity": 0.5,
+            cursor: "ns-resize",
+            "shape-rendering": "crispEdges"
+        },
+        GUIDE_RC: {
+            stroke: "black",
+            fill: "#03689a",
+            "fill-opacity": 0.5,
+            cursor: "ew-resize",
+            "shape-rendering": "crispEdges"
+        },
+        GUIDE_LWC: {
+            stroke: "black",
+            fill: "#03689a",
+            "fill-opacity": 0.5,
+            cursor: "ns-resize",
+            "shape-rendering": "crispEdges"
+        },
+        GUIDE_FROM: {stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"},
+        GUIDE_TO: {stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"},
+        GUIDE_CTL_H: {stroke: "black", fill: "#00FF00", cursor: "ew-resize", "shape-rendering": "crispEdges"},
+        GUIDE_CTL_V: {stroke: "black", fill: "#00FF00", cursor: "ns-resize", "shape-rendering": "crispEdges"},
+        GUIDE_SHADOW: {stroke: "black", fill: "none", "stroke-dasharray": "- ", "shape-rendering": "crispEdges"},
+        GUIDE_LINE: {
+            stroke: "black",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 1.2,
+            "stroke-opacity": 1,
+            "stroke-dasharray": "",
+            "arrow-end": "block",
+            "stroke-linejoin": "round",
+            cursor: "pointer"
+        },
+        GUIDE_LINE_ESSENSIA: {
+            stroke: "black",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 1.2,
+            "stroke-opacity": 1,
+            "stroke-dasharray": "",
+            "arrow-start": "diamond",
+            "arrow-end": "none",
+            "stroke-linejoin": "round",
+            cursor: "pointer"
+        },
+        GUIDE_VIRTUAL_EDGE: {
+            stroke: "black",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 1,
+            "stroke-opacity": 1,
+            "stroke-dasharray": "- ",
+            "stroke-linejoin": "round",
+            "arrow-start": "none",
+            "arrow-end": "none"
+        },
+        GUIDE_LINE_AREA: {
+            stroke: "#ffffff",
+            fill: "#ffffff",
+            "fill-opacity": 0.1,
+            "stroke-width": 1,
+            "stroke-opacity": 0.2,
+            cursor: "pointer"
+        },
+        GUIDE_RECT_AREA: {
+            stroke: "black",
+            fill: "#ffffff",
+            "fill-opacity": 0,
+            "stroke-width": 1,
+            "stroke-opacity": 1,
+            cursor: "pointer"
+        },
+        RUBBER_BAND: {stroke: "#0000FF", opacity: 0.2, fill: "#0077FF"},
+        DROP_OVER_BBOX: {stroke: "#0077FF", fill: "none", opacity: 0.3, "shape-rendering": "crispEdges"},
+        LABEL: {"font-size": 12, "font-color": "black", "fill": "none"},
+        LABEL_EDITOR: {
+            position: "absolute",
+            overflow: "visible",
+            resize: "none",
+            "text-align": "center",
+            display: "block",
+            padding: 0
+        },
+        COLLAPSE: {
+            stroke: "black",
+            fill: "none",
+            "fill-opacity": 0,
+            cursor: "pointer",
+            "shape-rendering": "crispEdges"
+        },
+        COLLAPSE_BBOX: {stroke: "none", fill: "none", "fill-opacity": 0},
+        BUTTON: {
+            stroke: "#9FD7FF",
+            fill: "white",
+            "fill-opacity": 0,
+            cursor: "pointer",
+            "shape-rendering": "crispEdges"
+        },
+        CONNECT_GUIDE_EVENT_AREA: {
+            stroke: "#ffffff",
+            fill: "none",
+            "fill-opacity": 0,
+            "stroke-width": 20,
+            "stroke-opacity": 0
+        },
+        CONNECT_GUIDE_BBOX: {
+            stroke: "#00FF00",
+            fill: "none",
+            "stroke-dasharray": "- ",
+            "shape-rendering": "crispEdges"
+        },
+        CONNECT_GUIDE_BBOX_EXPEND: 10,
+        CONNECT_GUIDE_SPOT_CIRCLE: {
+            r: 7,
+            stroke: "#A6A6A6",
+            "stroke-width": 1,
+            fill: "#FFE400",
+            "fill-opacity": 0.5,
+            cursor: "pointer"
+        },
+        CONNECT_GUIDE_SPOT_RECT: {
+            stroke: "#A6A6A6",
+            "stroke-width": 1,
+            fill: "#FFE400",
+            "fill-opacity": 0.2,
+            cursor: "ns-resize",
+            w: 20,
+            h: 10
+        },
+        CONNECTABLE_HIGHLIGHT: {
+            "stroke-width": 2
+        },
+        NOT_CONNECTABLE_HIGHLIGHT: {
+            fill: "#FAAFBE",
+            "fill-opacity": 0.5
         }
+    }
 }
 ```
 

@@ -25,15 +25,6 @@ OG.RectangleMarker = OG.marker.RectangleMarker;
  * @override
  */
 OG.marker.RectangleMarker.prototype.createMarker = function () {
-	//if (this.geom) {
-	//	return this.geom;
-	//}
-    //
-	//this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
-	//this.geom.style = new OG.geometry.Style({
-	//	'fill-opacity': 1
-	//});
-	//return this.geom;
 	var geom1, geom2, geomCollection = [];
 	if (this.geom) {
 		return this.geom;
@@ -62,9 +53,6 @@ OG.marker.RectangleMarker.prototype.createMarker = function () {
 	geomCollection.push(geom2);
 
 	this.geom = new OG.geometry.GeometryCollection(geomCollection);
-	this.geom.style = new OG.geometry.Style({
-		'label-position': 'bottom'
-	});
 
 	return this.geom;
 };

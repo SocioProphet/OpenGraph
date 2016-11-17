@@ -4464,10 +4464,9 @@ window.Raphael.svg && function (R) {
                     tspan;
 
                 //TODO 한 라인의 최대 글자 수. font size 를 얻어와야 하는데 param의 font 프로퍼티는 정확하지 않음.
-                //var fontSize = params['font'];
-                //fontSize = fontSize ? fontSize.substring(0, fontSize.indexOf('px')) : 12;
-                //var maxNum = parseInt(size[0] / fontSize);
-                var maxNum = parseInt(size[0] / 12);
+                var ogFontSize = params['font-size'];
+                ogFontSize = ogFontSize ? ogFontSize : 12;
+                var maxNum = parseInt(size[0] / (ogFontSize / 2));
 
                 function wordWrap(str, maxWidth) {
                     var texts = str.split("\n"), text;

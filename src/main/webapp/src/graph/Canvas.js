@@ -400,7 +400,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         /**
          * 라벨 최대 크기(IE)
          */
-        LABEL_MAX_SIZE: 300,
+        LABEL_MAX_SIZE: 1000,
 
         /**
          * 디폴트 스타일 정의

@@ -1,5 +1,5 @@
 /**
- * Hatched Pattern
+ * Rect Pattern
  *
  * @class
  * @extends OG.pattern.IPattern

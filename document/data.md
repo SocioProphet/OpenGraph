@@ -1,6 +1,11 @@
 Canvas Data
 ===========
 
+ - [toXML && toJSON](#toxml-&&-tojson)
+ - [loadXML && loadJSON](#loadxml-&&-loadjson)
+ - [setCustomData && getCustomData](#setcustomdata-&&-getcustomdata)
+ - [setExtCustomData && getExtCustomData](#setextcustomdata-&&-getextcustomdata)
+
 오픈그래프의 전체 캔버스의 데이터 입출력과 각 도형별 데이터 컨트롤에 대해 알아보겠습니다.
 
 ## toXML && toJSON

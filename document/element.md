@@ -1,6 +1,9 @@
 Element
 =======
 
+ - [Structure](#structure)
+ - [Event binding](#event-binding)
+
 ## Structure
 
 오픈그래프의 도형을 하나 그려보고, 도형을 콘솔로 출력하여 봅니다.

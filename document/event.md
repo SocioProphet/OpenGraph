@@ -1,6 +1,23 @@
 Event
 =====
 
+ - [onDrawShape && onRedrawShape](#ondrawshape-&&-onredrawshape)
+ - [onUndo && onRedo](#onundo-&&-onredo)
+ - [onDivideLane](#ondividelane)
+ - [onDrawLabel](#ondrawlabel)
+ - [onLabelChanged](#onlabelchanged)
+ - [onBeforeLabelChange](#onbeforelabelchange)
+ - [onRemoveShape && onBeforeRemoveShape](#onremoveshape-&&-onbeforeremoveshape)
+ - [onRotateShape](#onrotateshape)
+ - [onMoveShape](#onmoveshape)
+ - [onResizeShape](#onresizeshape)
+ - [onBeforeConnectShape](#onbeforeconnectshape)
+ - [onConnectShape](#onconnectshape)
+ - [onDisconnectShape](#ondisconnectshape)
+ - [onGroup](#ongroup)
+ - [onUnGroup](#onungroup)
+ 
+ 
 오픈그래프의 캔버스가 제공하는 이벤트에 대해 알아보도록 합니다.
 
 ## onDrawShape && onRedrawShape

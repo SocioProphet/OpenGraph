@@ -325,17 +325,6 @@ OG.geometry.Geometry.prototype = {
             return p.distance(A);
         }
 
-        // otherwise use comp.graphics.algorithms Frequently Asked Questions method
-        //	(1)				AC dot AB
-        //			   r = -----------
-        //					||AB||^2
-        //	r has the following meaning:
-        //	r=0 P = A
-        //	r=1 P = B
-        //	r&lt;0 P is on the backward extension of AB
-        //	r>1 P is on the forward extension of AB
-        //	0&lt;r&lt;1 P is interior to AB
-
         r = ((p.x - A.x) * (B.x - A.x) + (p.y - A.y) * (B.y - A.y)) /
             ((B.x - A.x) * (B.x - A.x) + (B.y - A.y) * (B.y - A.y));
 
@@ -345,13 +334,6 @@ OG.geometry.Geometry.prototype = {
         if (r >= 1.0) {
             return p.distance(B);
         }
-
-        // (2)
-        //		 (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay)
-        //	s = -----------------------------
-        //					L^2
-        //
-        //	Then the distance from C to P = |s|*L.
 
         s = ((A.y - p.y) * (B.x - A.x) - (A.x - p.x) * (B.y - A.y)) /
             ((B.x - A.x) * (B.x - A.x) + (B.y - A.y) * (B.y - A.y));
@@ -409,7 +391,7 @@ OG.geometry.Geometry.prototype = {
     },
 
     /**
-     * 주어진 라인과 교차하는 좌표를 반환한다.
+     * 기하도형이 주어진 라인과 교차하는 좌표들을 반환한다.
      *
      * @param {OG.geometry.Coordinate[]} line 라인 시작좌표, 끝좌표 Array
      * @return {OG.geometry.Coordinate[]}
@@ -437,7 +419,7 @@ OG.geometry.Geometry.prototype = {
     },
 
     /**
-     * 주어진 라인과 교차하는 좌표중 시작좌표에 가장 가까운 좌표를 반환한다.
+     * 기하도형이 주어진 라인과 교차하는 좌표중 시작좌표에 가장 가까운 좌표를 반환한다.
      *
      * @param {OG.geometry.Coordinate[]} line 라인 시작좌표, 끝좌표 Array
      * @return {OG.geometry.Coordinate[]}
@@ -464,13 +446,14 @@ OG.geometry.Geometry.prototype = {
     },
 
     /**
-     * 라인1 로부터 라인2 의 교차점을 계산한다.
+     * 라인1 과 라인2 의 교차점을 계산한다.
      *
      * @param {OG.geometry.Coordinate[]} line1 line1 라인 시작좌표, 끝좌표 Array
      * @param {OG.geometry.Coordinate[]} line2 line2 라인 시작좌표, 끝좌표 Array
+     * @param {boolean} extension 라인을 연장하여 교차점을 계산하는 여부
      * @return {OG.geometry.Coordinate} 교차점
      */
-    intersectLineToLine: function (line1, line2) {
+    intersectLineToLine: function (line1, line2, extension) {
         var A = this.convertCoordinate(line1[0]),
             B = this.convertCoordinate(line1[1]),
             C = this.convertCoordinate(line2[0]),
@@ -500,6 +483,9 @@ OG.geometry.Geometry.prototype = {
                 result = new OG.Coordinate(OG.Util.round(A.x + r * (B.x - A.x)), OG.Util.round(A.y + r * (B.y - A.y)));
             } else {
                 resultText = "No Intersection";
+                if (extension) {
+                    result = new OG.Coordinate(OG.Util.round(A.x + r * (B.x - A.x)), OG.Util.round(A.y + r * (B.y - A.y)));
+                }
             }
         } else {
             if (r_top === 0 || s_top === 0) {
@@ -513,7 +499,7 @@ OG.geometry.Geometry.prototype = {
     },
 
     /**
-     * 라인1 로부터 라인2 의 교차점을 계산한다.
+     * 주어진 원과 주어진 라인의 교차점을 계산한다.
      *
      * @param {OG.geometry.Coordinate} center 중심점
      * @param {Number} radius 반경
@@ -572,7 +558,7 @@ OG.geometry.Geometry.prototype = {
     },
 
     /**
-     * 포인트 P 로부터 라인 AB의 교차점을 계산한다.
+     * 포인트 P 로부터 라인 AB 까지 수직인 가상선을 생각할때, 그 교차점을 계산한다.
      * Note: NON-ROBUST!
      *
      * @param {OG.geometry.Coordinate|Number[]} p 기준좌표
@@ -607,7 +593,7 @@ OG.geometry.Geometry.prototype = {
     },
 
     /**
-     * 주어진 좌표에 대해 공간기하객체의 퍼센테이지 비율을 구한다.
+     * 주어진 좌표에 대해 공간기하객체 바운더리 대비 가로,세로 위치 퍼센테이지 비율을 구한다.
      *
      * @param {OG.geometry.Coordinate} _coordinate 좌표
      * @return {Object} {px , py}
@@ -688,6 +674,174 @@ OG.geometry.Geometry.prototype = {
     },
 
     /**
+     * 주어진 선분과 일정 거리에 있는 평행한 선분을 반환한다.
+     * @param {OG.geometry.Coordinate} from 라인 시작좌표
+     * @param {OG.geometry.Coordinate} to 라인 끝좌표
+     * @param distance
+     * @return {OG.geometry.Coordinate[]} 평행선 시작좌표, 끝좌표 Array
+     */
+    getParallelLine: function (from, to, distance) {
+        var me = this;
+        var direction = 'plus';
+        var moveX = 0;
+        var moveY = 0;
+        var p1 = this.convertCoordinate(from);
+        var p2 = this.convertCoordinate(to);
+        //캔버스의 좌표계는 y 좌표가 위에서부터 0으로 시작하기 때문에 방정식 좌표계에 맞추기 위해, 두 점의 y 를 교환하고,
+        //방정식의 상수를 마추기 위해 첫번째 x,y 를 0 으로 맞추고 두번째 x,y 도 그 거리만큼 이동한다.
+        //계산 후의 두 좌표를 리턴할때 y 를 서로 교체하도록 한다.
+        var reverseY = function (p1, p2) {
+            p1.y = p1.y * -1;
+            p2.y = p2.y * -1;
+            moveX = 0 - p1.x;
+            moveY = 0 - p1.y;
+            p1.x = p1.x + moveX;
+            p2.x = p2.x + moveX;
+            p1.y = p1.y + moveY;
+            p2.y = p2.y + moveY;
+            return [p1, p2]
+        };
+
+        var revertY = function (p1, p2) {
+            p1 = me.convertCoordinate(p1);
+            p2 = me.convertCoordinate(p2);
+            p1.x = p1.x - moveX;
+            p2.x = p2.x - moveX;
+            p1.y = p1.y - moveY;
+            p2.y = p2.y - moveY;
+            p1.y = p1.y * -1;
+            p2.y = p2.y * -1;
+            return [p1, p2]
+        };
+
+        reverseY(p1, p2);
+
+        var x1 = p1.x;
+        var x2 = p2.x;
+        var y1 = p1.y;
+        var y2 = p2.y;
+
+        //distance 이 0 인 경우
+        if (y1 == y2 &amp;&amp; x1 == x2) {
+            return revertY(p1, p2);
+        }
+
+        //두 점이 동일할 경우
+        if (y1 == y2 &amp;&amp; x1 == x2) {
+            return revertY(p1, p2);
+        }
+
+        //distance 이 직선이 어느방향인가에 따라 틀려져야 한다.
+        //두 점이 y 축과 평행할 경우 선분이 위 방향이면 distance 은 - 값이다.
+        if (x1 == x2) {
+            if (y2 > y1) {
+                distance = distance * -1;
+                direction = 'minus';
+            }
+        }
+        //그 외의 경우 선분이 좌측방향이면 distance 은 - 값이다
+        else {
+            if (x2 &lt; x1) {
+                distance = distance * -1;
+                direction = 'minus';
+            }
+        }
+
+        //두 점이 x 축과 평행할 경우
+        if (y1 == y2) {
+            return revertY([x1, y1 + distance], [x2, y2 + distance]);
+        }
+
+        //두 점이 y 축과 평행할 경우
+        if (x1 == x2) {
+            return revertY([x1 + distance, y1], [x2 + distance, y2]);
+        }
+
+        //두 점 사이에 기울기가 존재할 경우
+        var m = -1 / ((y2 - y1) / (x2 - x1));
+
+        //상수 c1 는 p1 과 수직인 선의 방정식 상수
+        var c1 = y1 - (m * x1);
+
+        //상수 c2 는 p2 과 수직인 선의 방정식 상수
+        var c2 = y2 - (m * x2);
+
+        //점x1 ,y1 을 지나는 원의 방정식: (x-x1)제곱 + (y-y1)제곱 = distance (반지름) 제곱
+        //근의 방정식: ax제곱 + bx + d = 0; ==> -b +- 루트(b제곱 - 4ad) / 2a
+        var getInjectPoint = function (x1, y1, m, c, distance) {
+            var x, y, meetX1, meetX2, meetY1, meetY2;
+            var a, b, d;
+            a = 1 + Math.pow(m, 2);
+            b = (-2 * x1) + (2 * m * c) - (2 * m * y1);
+            d = Math.pow(x1, 2) + Math.pow(c - y1, 2) - Math.pow(distance, 2);
+
+            meetX1 = (-b + Math.sqrt(Math.pow(b, 2) - (4 * a * d))) / (2 * a);
+            meetY1 = meetX1 * m + c;
+
+            meetX2 = (-b - Math.sqrt(Math.pow(b, 2) - (4 * a * d))) / (2 * a);
+            meetY2 = meetX2 * m + c;
+
+            //원 방정식으로 구한 두 접점을 벡터의 방향에 따라 한 접점을 선택한다.
+            //distance 이 음수값일 경우
+            if (distance &lt; 0) {
+                if (meetY1 &lt; meetY2) {
+                    x = meetX1;
+                    y = meetY1;
+                } else {
+                    x = meetX2;
+                    y = meetY2;
+                }
+            }
+            //distance 이 양수일 경우
+            else {
+                if (meetY1 > meetY2) {
+                    x = meetX1;
+                    y = meetY1;
+                } else {
+                    x = meetX2;
+                    y = meetY2;
+                }
+            }
+            return [x, y];
+        };
+        return revertY(getInjectPoint(x1, y1, m, c1, distance), getInjectPoint(x2, y2, m, c2, distance));
+    },
+
+    /**
+     * 주어진 라인과 일정 거리에 있는 평행한 라인을 반환한다.
+     * @param {OG.geometry.Coordinate[]} line 라인 좌표 Array
+     * @param distance
+     */
+    getParallelPath: function (line, distance) {
+        var me = this;
+        var lines = [];
+        var vertices = [];
+        for (var i = 0, leni = line.length; i &lt; leni; i++) {
+            if (i &lt; leni - 1) {
+                lines.push(me.getParallelLine(line[i], line[i + 1], distance));
+            }
+        }
+        for (var c = 0, lenc = lines.length; c &lt; lenc; c++) {
+            if (c == 0) {
+                vertices[0] = lines[c][0];
+            }
+            if (c &lt; lenc - 1) {
+                var inject = me.intersectLineToLine(lines[c], lines[c + 1], true);
+                //교점이 존재할 경우
+                if (inject) {
+                    vertices[c + 1] = inject;
+                } else {
+                    vertices[c + 1] = lines[c][1]
+                }
+            }
+            if (c == lenc - 1) {
+                vertices[c + 1] = lines[c][1]
+            }
+        }
+        return vertices;
+    },
+
+    /**
      * 저장된 boundary 를 클리어하여 새로 계산하도록 한다.
      */
     reset: function () {
@@ -704,13 +858,13 @@ OG.geometry.Geometry.prototype.constructor = OG.geometry.Geometry;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="OG.common.Constants.html">Constants</a></li><li><a href="OG.common.CurveUtil.html">CurveUtil</a></li><li><a href="OG.common.HashMap.html">HashMap</a></li><li><a href="OG.common.JSON.html">JSON</a></li><li><a href="OG.common.Util.html">Util</a></li><li><a href="OG.geometry.BezierCurve.html">BezierCurve</a></li><li><a href="OG.geometry.Circle.html">Circle</a></li><li><a href="OG.geometry.Coordinate.html">Coordinate</a></li><li><a href="OG.geometry.Curve.html">Curve</a></li><li><a href="OG.geometry.Ellipse.html">Ellipse</a></li><li><a href="OG.geometry.Envelope.html">Envelope</a></li><li><a href="OG.geometry.Geometry.html">Geometry</a></li><li><a href="OG.geometry.GeometryCollection.html">GeometryCollection</a></li><li><a href="OG.geometry.Line.html">Line</a></li><li><a href="OG.geometry.Point.html">Point</a></li><li><a href="OG.geometry.Polygon.html">Polygon</a></li><li><a href="OG.geometry.PolyLine.html">PolyLine</a></li><li><a href="OG.geometry.Rectangle.html">Rectangle</a></li><li><a href="OG.geometry.Style.html">Style</a></li><li><a href="OG.graph.Canvas.html">Canvas</a></li><li><a href="OG.handler.EventHandler.html">EventHandler</a></li><li><a href="OG.renderer.IRenderer.html">IRenderer</a></li><li><a href="OG.renderer.RaphaelRenderer.html">RaphaelRenderer</a></li><li><a href="OG.shape.CircleShape.html">CircleShape</a></li><li><a href="OG.shape.EdgeShape.html">EdgeShape</a></li><li><a href="OG.shape.EllipseShape.html">EllipseShape</a></li><li><a href="OG.shape.GeomShape.html">GeomShape</a></li><li><a href="OG.shape.GroupShape.html">GroupShape</a></li><li><a href="OG.shape.HorizontalLaneShape.html">HorizontalLaneShape</a></li><li><a href="OG.shape.HorizontalPoolShape.html">HorizontalPoolShape</a></li><li><a href="OG.shape.HtmlShape.html">HtmlShape</a></li><li><a href="OG.shape.ImageShape.html">ImageShape</a></li><li><a href="OG.shape.IShape.html">IShape</a></li><li><a href="OG.shape.RectangleShape.html">RectangleShape</a></li><li><a href="OG.shape.SpotShape.html">SpotShape</a></li><li><a href="OG.shape.TextShape.html">TextShape</a></li><li><a href="OG.shape.VerticalLaneShape.html">VerticalLaneShape</a></li><li><a href="OG.shape.VerticalPoolShape.html">VerticalPoolShape</a></li></ul><h3>Namespaces</h3><ul><li><a href="OG.html">OG</a></li><li><a href="OG.common.html">common</a></li><li><a href="OG.geometry.html">geometry</a></li><li><a href="OG.graph.html">graph</a></li><li><a href="OG.handler.html">handler</a></li><li><a href="OG.layout.html">layout</a></li><li><a href="OG.renderer.html">renderer</a></li><li><a href="OG.shape.html">shape</a></li><li><a href="OG.shape.bpmn.html">bpmn</a></li></ul><h3>Global</h3><ul><li><a href="global.html#override">override</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="OG.common.Constants.html">Constants</a></li><li><a href="OG.common.CurveUtil.html">CurveUtil</a></li><li><a href="OG.common.HashMap.html">HashMap</a></li><li><a href="OG.common.JSON.html">JSON</a></li><li><a href="OG.common.Util.html">Util</a></li><li><a href="OG.geometry.BezierCurve.html">BezierCurve</a></li><li><a href="OG.geometry.Circle.html">Circle</a></li><li><a href="OG.geometry.Coordinate.html">Coordinate</a></li><li><a href="OG.geometry.Curve.html">Curve</a></li><li><a href="OG.geometry.Ellipse.html">Ellipse</a></li><li><a href="OG.geometry.Envelope.html">Envelope</a></li><li><a href="OG.geometry.Geometry.html">Geometry</a></li><li><a href="OG.geometry.GeometryCollection.html">GeometryCollection</a></li><li><a href="OG.geometry.Line.html">Line</a></li><li><a href="OG.geometry.Point.html">Point</a></li><li><a href="OG.geometry.Polygon.html">Polygon</a></li><li><a href="OG.geometry.PolyLine.html">PolyLine</a></li><li><a href="OG.geometry.Rectangle.html">Rectangle</a></li><li><a href="OG.geometry.Style.html">Style</a></li><li><a href="OG.graph.Canvas.html">Canvas</a></li><li><a href="OG.handler.EventHandler.html">EventHandler</a></li><li><a href="OG.marker.ArrowMarker.html">ArrowMarker</a></li><li><a href="OG.marker.CircleMarker.html">CircleMarker</a></li><li><a href="OG.marker.IMarker.html">IMarker</a></li><li><a href="OG.marker.RectangleMarker.html">RectangleMarker</a></li><li><a href="OG.marker.SwitchLMarker.html">SwitchLMarker</a></li><li><a href="OG.marker.SwitchRMarker.html">SwitchRMarker</a></li><li><a href="OG.marker.SwitchXMarker.html">SwitchXMarker</a></li><li><a href="OG.pattern.HatchedPattern.html">HatchedPattern</a></li><li><a href="OG.pattern.IPattern.html">IPattern</a></li><li><a href="OG.pattern.RectPattern.html">RectPattern</a></li><li><a href="OG.renderer.IRenderer.html">IRenderer</a></li><li><a href="OG.renderer.RaphaelRenderer.html">RaphaelRenderer</a></li><li><a href="OG.shape.CircleShape.html">CircleShape</a></li><li><a href="OG.shape.EdgeShape.html">EdgeShape</a></li><li><a href="OG.shape.EllipseShape.html">EllipseShape</a></li><li><a href="OG.shape.GeomShape.html">GeomShape</a></li><li><a href="OG.shape.GroupShape.html">GroupShape</a></li><li><a href="OG.shape.HorizontalLaneShape.html">HorizontalLaneShape</a></li><li><a href="OG.shape.HorizontalPoolShape.html">HorizontalPoolShape</a></li><li><a href="OG.shape.HtmlShape.html">HtmlShape</a></li><li><a href="OG.shape.ImageShape.html">ImageShape</a></li><li><a href="OG.shape.IShape.html">IShape</a></li><li><a href="OG.shape.RectangleShape.html">RectangleShape</a></li><li><a href="OG.shape.SpotShape.html">SpotShape</a></li><li><a href="OG.shape.TextShape.html">TextShape</a></li><li><a href="OG.shape.VerticalLaneShape.html">VerticalLaneShape</a></li><li><a href="OG.shape.VerticalPoolShape.html">VerticalPoolShape</a></li></ul><h3>Namespaces</h3><ul><li><a href="OG.html">OG</a></li><li><a href="OG.common.html">common</a></li><li><a href="OG.geometry.html">geometry</a></li><li><a href="OG.graph.html">graph</a></li><li><a href="OG.handler.html">handler</a></li><li><a href="OG.layout.html">layout</a></li><li><a href="OG.marker.html">marker</a></li><li><a href="OG.pattern.html">pattern</a></li><li><a href="OG.renderer.html">renderer</a></li><li><a href="OG.shape.html">shape</a></li><li><a href="OG.shape.bpmn.html">bpmn</a></li><li><a href="OG.shape.elec.html">elec</a></li></ul><h3>Global</h3><ul><li><a href="global.html#override">override</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Sat Oct 29 2016 21:11:48 GMT+0900 (KST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Fri Nov 18 2016 02:36:36 GMT+0900 (KST)
 </footer>
 
 <script> prettyPrint(); </script>
