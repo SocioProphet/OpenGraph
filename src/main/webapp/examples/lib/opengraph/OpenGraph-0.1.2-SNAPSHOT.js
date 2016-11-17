@@ -4465,10 +4465,9 @@ window.Raphael.svg && function (R) {
                     tspan;
 
                 //TODO 한 라인의 최대 글자 수. font size 를 얻어와야 하는데 param의 font 프로퍼티는 정확하지 않음.
-                //var fontSize = params['font'];
-                //fontSize = fontSize ? fontSize.substring(0, fontSize.indexOf('px')) : 12;
-                //var maxNum = parseInt(size[0] / fontSize);
-                var maxNum = parseInt(size[0] / 12);
+                var ogFontSize = params['font-size'];
+                ogFontSize = ogFontSize ? ogFontSize : 12;
+                var maxNum = parseInt(size[0] / (ogFontSize / 2));
 
                 function wordWrap(str, maxWidth) {
                     var texts = str.split("\n"), text;
@@ -10456,15 +10455,6 @@ OG.RectangleMarker = OG.marker.RectangleMarker;
  * @override
  */
 OG.marker.RectangleMarker.prototype.createMarker = function () {
-	//if (this.geom) {
-	//	return this.geom;
-	//}
-    //
-	//this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
-	//this.geom.style = new OG.geometry.Style({
-	//	'fill-opacity': 1
-	//});
-	//return this.geom;
 	var geom1, geom2, geomCollection = [];
 	if (this.geom) {
 		return this.geom;
@@ -10493,9 +10483,6 @@ OG.marker.RectangleMarker.prototype.createMarker = function () {
 	geomCollection.push(geom2);
 
 	this.geom = new OG.geometry.GeometryCollection(geomCollection);
-	this.geom.style = new OG.geometry.Style({
-		'label-position': 'bottom'
-	});
 
 	return this.geom;
 };
@@ -10697,7 +10684,7 @@ OG.pattern.HatchedPattern.prototype.createPattern = function () {
     return this.geom;
 };
 /**
- * Hatched Pattern
+ * Rect Pattern
  *
  * @class
  * @extends OG.pattern.IPattern
@@ -14690,9 +14677,9 @@ OG.shape.bpmn.M_Text = function (label) {
 
 	this.SHAPE_ID = 'OG.shape.bpmn.M_Text';
 	this.label = label || 'Text';
-	this.SELECTABLE = false;
-	this.CONNECTABLE = false;
-	this.MOVABLE = false;
+	//this.SELECTABLE = false;
+	//this.CONNECTABLE = false;
+	//this.MOVABLE = false;
 };
 OG.shape.bpmn.M_Text.prototype = new OG.shape.GeomShape();
 OG.shape.bpmn.M_Text.superclass = OG.shape.GeomShape;
@@ -30669,7 +30656,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         /**
          * 라벨 최대 크기(IE)
          */
-        LABEL_MAX_SIZE: 300,
+        LABEL_MAX_SIZE: 1000,
 
         /**
          * 디폴트 스타일 정의

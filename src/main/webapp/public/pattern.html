@@ -1,0 +1,366 @@
+<!doctype html>
+<html>
+ <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><!--Prevent IE using compatibility mode on local or intranet pages. Do not put scripts before this line.-->
+  <meta name="viewport" content="width=device-width, user-scalable=yes"><!--Mobile device scaling-->
+  <meta charset="UTF-8">
+  <title>Opengraph Documentation</title>
+
+  <!--load stylesheets first (rationale: https://developers.google.com/speed/docs/best-practices/rtt#PutStylesBeforeScripts)-->
+  <link rel="stylesheet" href="require/webknife/framework.min.css" type="text/css">
+  <link rel="stylesheet" href="require/webknife/highlight.min.css" type="text/css">
+  <link rel="stylesheet" href="require/docgen.css" type="text/css">
+  <link rel="stylesheet" href="require/print.css" media="print">
+
+  <!--load scripts second-->
+
+  <script src="require/webknife/framework.min.js"></script>
+  <script src="require/webknife/framework.icons.js"></script>
+  <script src="require/webknife/highlight.min.js"></script>
+
+  <!--inline scripts last-->
+
+<script type="text/javascript">
+
+$(document).ready( function () {
+  $("#dg-toc").hide(); //hide the table of contents
+
+  //instantiate an svg injector to show SVG icons
+  var injector = new svgInject();
+  injector.inject();
+
+  //code syntax highlighting
+  $('pre code, .w-inline-code').each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+
+  //toggle visibility of table of contents
+  $("#dg-navigator").click(function()
+  {
+    $("#dg-toc").slideToggle("fast");
+    $(this).toggleClass("active");
+  });
+
+});
+</script>
+
+<script type="text/x-mathjax-config">
+//MathJax configuration is the same as used by math.stackexchange.com
+MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"], linebreaks: { automatic:true }, EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50) },
+  tex2jax: { inlineMath: [ ["$", "$"], ["\\\\(","\\\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+  TeX: {  noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } }, Macros: { href: "{}" } },
+  messageStyle: "none"
+});
+</script>
+
+</head>
+
+<body>
+
+<div id="dg-toc"><div><table class="unstyled"><tr><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Overview</li><li><a href="README.html">Overview</a></li><li><a href="getting-start.html">Getting Started</a></li><li><a href="examples.html">Examples</a></li><li><a href="github.html">Fork on Github</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Canvas</li><li><a href="canvas.html">Canvas Drawing</a></li><li><a href="selector.html">Canvas Selector</a></li><li><a href="data.html">Canvas Data</a></li><li><a href="event.html">Canvas Event</a></li><li><a href="renderer.html">Developer - Renderer</a></li><li><a href="handler.html">Developer - Handler</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Element</li><li><a href="element.html">Element</a></li><li><a href="geometry.html">Geometry</a></li><li><a href="shapes.html">Shape</a></li><li><a href="extend-shape.html">Extend Shape</a></li><li><a href="marker.html">Marker</a></li><li><a href="pattern.html">Pattern</a></li><li><a href="multi.html">Multi Line Edge</a></li><li><a href="animation.html">Animation</a></li><li><a href="subshape.html">Sub Shape</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Api reference</li><li><a href="jsdoc.html">Api reference</a></li></ul></td><td class="dg-tocGroup" id="dg-tocFixedColumn"><ul><li><span class="w-icon dg-tocIcon" data-name="person_group" title="archive"></span><a href="ownership.html">Ownership</a></li><li><span class="w-icon dg-tocIcon" data-name="refresh" title="archive"></span><a href="release-notes.html">Release Notes</a></li></ul><div></div></td></tr></table></div></div>
+<div id="dg-navigator">Table of contents</div>
+
+<header>
+ <div class="w-fixed-width">
+  <a id="dg-homelink" href="README.html">
+    <div id="dg-logo" style="background-image: url(files/images/logo.png); height: 84px; line-height: 84px; padding-left: 109px;">
+      <span id="dg-title">Opengraph Documentation</span> <span id="dg-web-title-version" style="font-weight:normal;">(0.1.2)</span>
+    </div>
+  </a>
+  <div>
+    <span id="dg-backlink"></span>
+  </div>
+ </div>
+</header>
+
+<section id="dg-content"><div class="w-fixed-width"><div id="dg-innerContent"><h1 id="dg-autoTitle">Pattern</h1><h1 id="pattern">Pattern</h1>
+<ul>
+<li><a href="#custom-pattern">Custom Pattern</a></li>
+<li><a href="#custom-pattern-size">Custom Pattern Size</a></li>
+<li><a href="#custom-pattern-unit-size">Custom Pattern Unit Size</a></li>
+<li><a href="#custom-pattern-style-&amp;&amp;-transform">Custom Pattern Style &amp;&amp; Transform</a></li>
+<li><a href="#hatched-pattern">Hatched Pattern</a></li>
+<li><a href="#custom-pattern-in-edgeshape">Custom Pattern in EdgeShape</a></li>
+</ul>
+<p>&#xD328;&#xD134; &#xC2A4;&#xD0C0;&#xC77C;&#xC740; &#xB3C4;&#xD615;&#xC758; &#xB0B4;&#xBD80;&#xC758; fill &#xC5B4;&#xD2B8;&#xB9AC;&#xBDF0;&#xD2B8;&#xB97C; &#xB300;&#xCCB4;&#xD558;&#xBA70;, &#xB3C4;&#xD615; &#xC18D;&#xC5D0; &#xD2B9;&#xC815; &#xD328;&#xD134;&#xC744; &#xBC18;&#xBCF5;&#xD558;&#xC5EC; &#xB4DC;&#xB85C;&#xC789;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<p><a href="#http://tutorials.jenkov.com/svg/fill-patterns.html">SVG Fill Patterns</a></p>
+<h2 id="custom-pattern">Custom Pattern</h2>
+<p>&#xC624;&#xD508;&#xADF8;&#xB798;&#xD504;&#xB294; &#xC0AC;&#xC6A9;&#xC790; &#xC2A4;&#xC2A4;&#xB85C; &#xD328;&#xD134;&#xC744; &#xC81C;&#xC791;&#xD558;&#xC5EC; &#xC2A4;&#xD0C0;&#xC77C;&#xB9C1;&#xC5D0; &#xD65C;&#xC6A9;&#xD560; &#xC218; &#xC788;&#xB3C4;&#xB85D; &#xC9C0;&#xC6D0;&#xD558;&#xACE0;, &#xAE30;&#xBCF8; &#xC81C;&#xACF5; &#xD328;&#xD134;&#xC740; &#xC9C0;&#xC6D0;&#xD558;&#xC9C0; &#xC54A;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>&#xCEE4;&#xC2A4;&#xD140; &#xD328;&#xD134;&#xC744; &#xC0AC;&#xC6A9;&#xD558;&#xAE30; &#xC704;&#xD574;&#xC11C;&#xB294;, &#xC6B0;&#xC120; &#xD328;&#xD134; &#xD074;&#xB798;&#xC2A4; &#xD558;&#xB098;&#xB97C; &#xC81C;&#xC791;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>&#xD328;&#xD134; &#xD074;&#xB798;&#xC2A4; &#xC81C;&#xC791;&#xC740; <a href="extend-shape.html#define-custom-shape">Define Custom Shape</a> &#xC81C;&#xC791;&#xBC29;&#xC2DD;&#xACFC; &#xB3D9;&#xC77C;&#xD558;&#xC9C0;&#xB9CC; &#xB124;&#xC784;&#xC2A4;&#xD398;&#xC774;&#xC2A4;&#xB9CC; &#xBC14;&#xB01D;&#xB2C8;&#xB2E4;.</p>
+<p>&#xB2E4;&#xC74C;&#xC740; &#xC0AC;&#xAC01;&#xD615; &#xBAA8;&#xC591;&#xC758; &#xD328;&#xD134; &#xD074;&#xB798;&#xC2A4; &#xC0D8;&#xD50C;&#xC785;&#xB2C8;&#xB2E4;.</p>
+<pre><code>/**
+ * Rect Pattern
+ *
+ * @class
+ * @extends OG.pattern.IPattern
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @author &lt;a href=&quot;mailto:sppark@uengine.org&quot;&gt;Seungpil Park&lt;/a&gt;
+ */
+OG.pattern.RectPattern = function () {
+    OG.pattern.RectPattern.superclass.call(this);
+
+    this.PATTERN_ID = &apos;OG.pattern.RectPattern&apos;;
+};
+OG.pattern.RectPattern.prototype = new OG.pattern.IPattern();
+OG.pattern.RectPattern.superclass = OG.pattern.IPattern;
+OG.pattern.RectPattern.prototype.constructor = OG.pattern.RectPattern;
+OG.RectPattern = OG.pattern.RectPattern;
+
+/**
+ * &#xB4DC;&#xB85C;&#xC789;&#xD560; pattern &#xC744; &#xC0DD;&#xC131;&#xD558;&#xC5EC; &#xBC18;&#xD658;&#xD55C;&#xB2E4;.
+ *
+ * @return {OG.geometry.Geometry} pattern &#xC815;&#xBCF4;
+ * @override
+ */
+OG.pattern.RectPattern.prototype.createPattern = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+    return this.geom;
+};
+</code></pre>
+<h2 id="custom-pattern-size">Custom Pattern Size</h2>
+<p>&#xCEE4;&#xC2A4;&#xD140; Shape &#xB97C; &#xC0DD;&#xC131;&#xD560;&#xB54C;&#xC640; &#xBAA8;&#xB4E0; &#xCF54;&#xB4DC;&#xAC00; &#xB3D9;&#xC77C;&#xD558;&#xC9C0;&#xB9CC;, OG.shape &#xAC00; OG.pattern &#xC73C;&#xB85C; &#xBC14;&#xB00C;&#xC5C8;&#xC74C;&#xC744; &#xC54C; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>&#xC774;&#xC81C; &#xC774; &#xCF54;&#xB4DC;&#xB97C; &#xC624;&#xD508;&#xADF8;&#xB798;&#xD504; &#xB77C;&#xC774;&#xBE0C;&#xB7EC;&#xB9AC;&#xB97C; &#xBD88;&#xB7EC;&#xC628; &#xD6C4; html &#xD398;&#xC774;&#xC9C0;&#xC5D0; &#xC0BD;&#xC785;&#xD558;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>&#xB2E4;&#xC74C; &#xD560; &#xC77C;&#xC740; &#xC774; &#xD328;&#xD134;&#xC744; &#xB3C4;&#xD615;&#xC5D0; &#xC801;&#xC6A9;&#xC2DC;&#xD0A4;&#xB294; &#xAC83;&#xC785;&#xB2C8;&#xB2E4;.</p>
+<p>&#xB3C4;&#xD615;&#xC5D0; &#xC801;&#xC6A9;&#xC2DC;&#xD0AC; &#xB54C;&#xB294; &quot;pattern&quot; &#xC2A4;&#xD0C0;&#xC77C; &#xC5B4;&#xD2B8;&#xB9AC;&#xBDF0;&#xD2B8;&#xB97C; &#xC0AC;&#xC6A9;&#xD558;&#xAC8C; &#xB418;&#xB294;&#xB370;, &#xBA87;&#xAC00;&#xC9C0; &#xD504;&#xB85C;&#xD37C;&#xD2F0;&#xC640; &#xD568;&#xAED8; json &#xD615;&#xC2DD;&#xC73C;&#xB85C; &#xD45C;&#xD604;&#xD558;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<table class="w-table w-fixed w-stripe">
+<thead>
+<tr>
+<th>&#xD328;&#xD134; &#xD504;&#xB85C;&#xD37C;&#xD2F0;</th>
+<th>&#xC124;&#xBA85;</th>
+<th>&#xC124;&#xBA85;</th>
+<th>&#xBE44;&#xACE0;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>string</td>
+<td>&#xD328;&#xD134; &#xD074;&#xB798;&#xC2A4;&#xBA85;</td>
+<td></td>
+</tr>
+<tr>
+<td>pattern-width</td>
+<td>number</td>
+<td>&#xD328;&#xD134; &#xAC00;&#xB85C;</td>
+<td></td>
+</tr>
+<tr>
+<td>pattern-height</td>
+<td>number</td>
+<td>&#xD328;&#xD134; &#xC138;&#xB85C;</td>
+<td></td>
+</tr>
+<tr>
+<td>patternTransform</td>
+<td>number</td>
+<td>&#xD328;&#xD134;&#xC758; transform</td>
+<td>Svg transform syntax</td>
+</tr>
+<tr>
+<td>unit-width</td>
+<td>number</td>
+<td>&#xD328;&#xD134; &#xC720;&#xB2DB;&#xC758; &#xAC00;&#xB85C;</td>
+<td></td>
+</tr>
+<tr>
+<td>unit-height</td>
+<td>number</td>
+<td>&#xD328;&#xD134; &#xC720;&#xB2DB;&#xC758; &#xC138;&#xB85C;</td>
+<td></td>
+</tr>
+<tr>
+<td>thickness</td>
+<td>number</td>
+<td>&#xC120; &#xB3C4;&#xD615;&#xC5D0; &#xD328;&#xD134;&#xC744; &#xCC44;&#xC6B8;&#xACBD;&#xC6B0; &#xD328;&#xD134; &#xB450;&#xAED8;</td>
+<td>EdgeShape &#xB3C4;&#xD615; &#xD55C;&#xC815;</td>
+</tr>
+<tr>
+<td>style</td>
+<td>Object</td>
+<td>&#xD328;&#xD134; &#xC720;&#xB2DB; &#xC2A4;&#xD0C0;&#xC77C;</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>&#xC704;&#xC758; &#xD45C;&#xB97C; &#xCC38;&#xC870;&#xD558;&#xC5EC; &#xC0AC;&#xAC01;&#xD615;&#xC758; &#xB3C4;&#xD615; &#xC548;&#xC5D0; OG.pattern.RectPattern &#xD328;&#xD134;&#xC744; &#xC801;&#xC6A9;&#xD558;&#xB3C4;&#xB85D; &#xD574;&#xBD05;&#xB2C8;&#xB2E4;.</p>
+<pre><code>var rect = canvas.drawShape([200,200], new OG.RectangleShape(), [300,200]);
+
+canvas.setShapeStyle(rect, {
+    pattern: {
+        &apos;id&apos;: &apos;OG.pattern.RectPattern&apos;,
+        &apos;thickness&apos;: 10,
+        &apos;pattern-width&apos;: 60,
+        &apos;pattern-height&apos;: 60,
+    },
+    &apos;fill-opacity&apos;:1
+});
+</code></pre>
+<p><img src="images/pattern/pattern1.png" alt=""></p>
+<h2 id="custom-pattern-unit-size">Custom Pattern Unit Size</h2>
+<p>&#xACC4;&#xC18D;&#xD574;&#xC11C;, &#xB9C8;&#xCEE4;&#xC5D0; unit-width &#xC640; unit-height &#xB97C; &#xC801;&#xC6A9;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD558;&#xACA0;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>pattern-width &#xC640; pattern-size &#xB294; &#xB3C4;&#xD615;&#xC548;&#xC5D0;&#xC758; &#xD558;&#xB098;&#xC758; &#xD328;&#xD134;&#xC774; &#xCC28;&#xC9C0;&#xD558;&#xB294; &#xBE14;&#xB85D; &#xC601;&#xC5ED;&#xC774;&#xB77C;&#xBA74;, unit &#xC740; &#xBE14;&#xB85D;&#xC548;&#xC5D0;&#xC11C; &#xCC28;&#xC9C0;&#xD558;&#xB294; &#xD328;&#xD134;&#xC758; geometry &#xC601;&#xC5ED;&#xC744; &#xB73B;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>unit-width &#xC640; unit-height &#xB97C; &#xC9C1;&#xC811; &#xC801;&#xC6A9;&#xD558;&#xC5EC; &#xC544;&#xB798; &#xCF54;&#xB4DC;&#xB97C; &#xC2E4;&#xD589;&#xC2DC;&#xD0A4;&#xACE0; &#xC774;&#xD574;&#xD558;&#xC5EC; &#xBCF4;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<pre><code>var rect = canvas.drawShape([200,200], new OG.RectangleShape(), [300,200]);
+
+canvas.setShapeStyle(rect, {
+    pattern: {
+        &apos;id&apos;: &apos;OG.pattern.RectPattern&apos;,
+        &apos;unit-width&apos;: 15,
+        &apos;unit-height&apos;: 15,
+        &apos;pattern-width&apos;: 30,
+        &apos;pattern-height&apos;: 30
+    },
+    &apos;fill-opacity&apos;:1
+});
+</code></pre>
+<p><img src="images/pattern/pattern2.png" alt=""></p>
+<h2 id="custom-pattern-style-&amp;&amp;-transform">Custom Pattern Style &amp;&amp; Transform</h2>
+<p>&#xC81C;&#xC791;&#xD55C; &#xCEE4;&#xC2A4;&#xD140; &#xD328;&#xD134;&#xB97C; &#xC801;&#xC6A9;&#xC2DC;&#xD0AC; &#xB54C;, style &#xD504;&#xB85C;&#xD37C;&#xD2F0;&#xB85C; &#xD328;&#xD134;&#xC5D0; &#xC2A4;&#xD0C0;&#xC77C;&#xC744; &#xC801;&#xC6A9;&#xD560; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>patternTransform &#xC740; &#xD328;&#xD134; &#xAC01;&#xAC01;&#xC758; transform &#xC744; &#xC758;&#xBBF8;&#xD558;&#xB294;&#xAC83; &#xC544;&#xB2CC;, &#xC804;&#xCCB4;&#xC801; &#xD328;&#xD134; &#xBC30;&#xC5F4;&#xC758; transform &#xC744; &#xC815;&#xC758;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>&#xC544;&#xB798; &#xC608;&#xC81C;&#xB97C; &#xD1B5;&#xD574; patternTransform &#xACFC; style &#xC744; &#xC801;&#xC6A9;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<pre><code>var rect = canvas.drawShape([200,200], new OG.RectangleShape(), [300,200]);
+
+canvas.setShapeStyle(rect, {
+    pattern: {
+        &apos;id&apos;: &apos;OG.pattern.RectPattern&apos;,
+        &apos;pattern-width&apos;: 30,
+        &apos;pattern-height&apos;: 30,
+        &apos;unit-width&apos;: 15,
+        &apos;unit-height&apos;: 15,
+        &apos;patternTransform&apos;: &apos;rotate(35)&apos;,
+        &apos;style&apos;: {
+            &apos;stroke-width&apos;: 2,
+            &apos;stroke&apos;: &apos;orange&apos;
+        }
+    },
+    &apos;fill-opacity&apos;:1
+});
+</code></pre>
+<p><img src="images/pattern/pattern3.png" alt=""></p>
+<h2 id="hatched-pattern">Hatched Pattern</h2>
+<p>&#xD328;&#xD134; &#xD074;&#xB798;&#xC2A4; &#xC81C;&#xC791;&#xC2DC; &#xB3C5;&#xB9BD;&#xC801;&#xC778; &#xBAA8;&#xC591;&#xC758; &#xD328;&#xD134;&#xC774; &#xC544;&#xB2CC; &#xD328;&#xD134;&#xB07C;&#xB9AC; &#xC5F0;&#xACB0;&#xB418;&#xC5B4; &#xD2B9;&#xC815; &#xBAA8;&#xC591;&#xC744; &#xB098;&#xD0C0;&#xB0B4;&#xC57C; &#xD560; &#xACBD;&#xC6B0;&#xAC00; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>&#xC544;&#xB798; &#xADF8;&#xB9BC;&#xACFC; &#xAC19;&#xC740; Hatched (&#xBE57;&#xAE08;) &#xBAA8;&#xC591; &#xD328;&#xD134;&#xC774; &#xC88B;&#xC740; &#xC608;&#xC785;&#xB2C8;&#xB2E4;.</p>
+<p><img src="images/pattern/pattern-hatch.png" alt=""></p>
+<p>&#xC704;&#xC758; &#xADF8;&#xB9BC;&#xC5D0;&#xC11C;&#xCC98;&#xB7FC;, &#xC5F0;&#xC18D;&#xB41C; &#xBAA8;&#xC591;&#xC758; &#xBE57;&#xAE08; &#xCC98;&#xB9AC;&#xB97C; &#xC704;&#xD574;&#xC11C;&#xB294; &#xD558;&#xB098;&#xC758; &#xD328;&#xD134;&#xC5D0; &#xC138; &#xC904;&#xC758; &#xB77C;&#xC778;&#xC774; &#xC788;&#xC5B4;&#xC57C; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>&#xC704;&#xC758; &#xBAA8;&#xC591;&#xC744; &#xAD6C;&#xD604;&#xD558;&#xAE30; &#xC704;&#xD55C; geometry &#xCC98;&#xB9AC;&#xB97C; &#xD558;&#xB294; &#xD328;&#xD134; &#xD074;&#xB798;&#xC2A4;&#xB97C; &#xC81C;&#xC791;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<pre><code>/**
+ * Hatched Pattern
+ *
+ * @class
+ * @extends OG.pattern.IPattern
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @author &lt;a href=&quot;mailto:sppark@uengine.org&quot;&gt;Seungpil Park&lt;/a&gt;
+ */
+OG.pattern.HatchedPattern = function () {
+    OG.pattern.HatchedPattern.superclass.call(this);
+
+    this.PATTERN_ID = &apos;OG.pattern.HatchedPattern&apos;;
+};
+OG.pattern.HatchedPattern.prototype = new OG.pattern.IPattern();
+OG.pattern.HatchedPattern.superclass = OG.pattern.IPattern;
+OG.pattern.HatchedPattern.prototype.constructor = OG.pattern.HatchedPattern;
+OG.HatchedPattern = OG.pattern.HatchedPattern;
+
+/**
+ * &#xB4DC;&#xB85C;&#xC789;&#xD560; pattern &#xC744; &#xC0DD;&#xC131;&#xD558;&#xC5EC; &#xBC18;&#xD658;&#xD55C;&#xB2E4;.
+ *
+ * @return {OG.geometry.Geometry} pattern &#xC815;&#xBCF4;
+ * @override
+ */
+OG.pattern.HatchedPattern.prototype.createPattern = function () {
+    var geom1, geom2, geom3, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Line([-1, 1], [1, -1]);
+    geom2 = new OG.geometry.Line([0, 4], [4, 0]);
+    geom3 = new OG.geometry.Line([3, 5], [5, 3]);
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+    geomCollection.push(geom3);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+
+    return this.geom;
+};
+</code></pre>
+<p>&#xC704; &#xD328;&#xD134; &#xD074;&#xB798;&#xC2A4;&#xB97C; &#xC774;&#xC6A9;&#xD574; &#xB3C4;&#xD615;&#xC744; &#xADF8;&#xB9B4; &#xACBD;&#xC6B0; &#xBE57;&#xAE08; &#xBAA8;&#xC591;&#xC758; &#xD328;&#xD134;&#xC73C;&#xB85C; &#xCC44;&#xC6CC;&#xC9C0;&#xAC8C; &#xB429;&#xB2C8;&#xB2E4;.</p>
+<pre><code>var rect = canvas.drawShape([200, 200], new OG.RectangleShape(), [300, 200]);
+
+canvas.setShapeStyle(rect, {
+    pattern: {
+        &apos;id&apos;: &apos;OG.pattern.HatchedPattern&apos;,
+        &apos;unit-width&apos;: 18,
+        &apos;unit-height&apos;: 18,
+        &apos;pattern-width&apos;: 12,
+        &apos;pattern-height&apos;: 12,
+        &apos;style&apos;: {
+            &apos;stroke&apos;: &apos;black&apos;
+        }
+    },
+    &apos;fill-opacity&apos;: 1
+});
+</code></pre>
+<p><img src="images/pattern/pattern4.png" alt=""></p>
+<h2 id="custom-pattern-in-edgeshape">Custom Pattern in EdgeShape</h2>
+<p>&#xC624;&#xD508;&#xADF8;&#xB798;&#xD504;&#xC5D0;&#xC11C;&#xB294; &#xC120; &#xB3C4;&#xD615;&#xC5D0;&#xB3C4; &#xD328;&#xD134;&#xC744; &#xC801;&#xC6A9;&#xC2DC;&#xD0AC; &#xC218; &#xC788;&#xB3C4;&#xB85D; &#xC9C0;&#xC6D0;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>&#xD328;&#xD134; &#xC2A4;&#xD0C0;&#xC77C;&#xC744; EdgeShape &#xC120;&#xB3C4;&#xD615;&#xC5D0; &#xC8FC;&#xAC8C; &#xB420; &#xACBD;&#xC6B0;, &#xD328;&#xD134; &#xB450;&#xAED8; &#xD504;&#xB85C;&#xD37C;&#xD2F0;&#xC778; thickness &#xB97C; &#xCD94;&#xAC00;&#xB85C; &#xC9C0;&#xC815;&#xD574;&#xC57C; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>thickness &#xB97C; &#xCD94;&#xAC00;&#xD558;&#xC5EC; &#xC0D8;&#xD50C; &#xCF54;&#xB4DC;&#xB97C; &#xC791;&#xC131;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<pre><code>var edge1 = canvas.drawShape(null, new OG.EdgeShape([100, 100], [500, 100]), null);
+var edge2 = canvas.drawShape(null, new OG.EdgeShape([100, 150], [500, 150]), null);
+
+canvas.setShapeStyle(edge1, {
+    pattern: {
+        &apos;id&apos;: &apos;OG.pattern.HatchedPattern&apos;,
+        &apos;thickness&apos;: 15,
+        &apos;unit-width&apos;: 18,
+        &apos;unit-height&apos;: 18,
+        &apos;pattern-width&apos;: 12,
+        &apos;pattern-height&apos;: 12,
+        &apos;style&apos;: {
+            &apos;stroke&apos;: &apos;black&apos;
+        }
+    },
+    &apos;stroke&apos;: &apos;none&apos;
+});
+canvas.setShapeStyle(edge2, {
+    pattern: {
+        &apos;id&apos;: &apos;OG.pattern.RectPattern&apos;,
+        &apos;thickness&apos;: 20,
+        &apos;pattern-width&apos;: 20,
+        &apos;pattern-height&apos;: 20,
+        &apos;style&apos;: {
+            &apos;stroke&apos;: &apos;black&apos;
+        }
+    },
+    &apos;stroke&apos;: &apos;none&apos;
+});
+</code></pre>
+<p><img src="images/pattern/pattern5.png" alt=""></p>
+</div></div></section>
+
+ <footer>
+  <div><p class="w-fixed-width"><span id="dg-web-footer">Version 0.1.2 released on 11/18/2016.</span></p></div>
+  <div class="w-fixed-width">
+    <p><span id="dg-copyright">&#xA9; 2016 <a href="sppark@uengine.org">Seunpil park</a></span></p>
+    <p>
+      <span id="dg-marking"></span>
+      <span id="dg-legalese"></span>
+      <span id="dg-attribution">Created by DocGen 2.1.3 on 18/11/2016 at 02:53:20.</span>
+    </p>
+  </div>
+ </footer>
+ 
+ </body>
+</html>

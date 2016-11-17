@@ -57,14 +57,14 @@ MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX",
 
 <body>
 
-<div id="dg-toc"><div><table class="unstyled"><tr><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Overview</li><li><a href="README.html">Overview</a></li><li><a href="getting-start.html">Getting Started</a></li><li><a href="examples.html">Examples</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Canvas</li><li><a href="canvas.html">Canvas Drawing</a></li><li><a href="selector.html">Canvas Selector</a></li><li><a href="data.html">Canvas Data</a></li><li><a href="event.html">Canvas Event</a></li><li><a href="renderer.html">Developer - Renderer</a></li><li><a href="handler.html">Developer - Handler</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Element</li><li><a href="element.html">Element</a></li><li><a href="geometry.html">Geometry</a></li><li><a href="shapes.html">Shape</a></li><li><a href="extend-shape.html">Extend Shape</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Api reference</li><li><a href="jsdoc.html">Api reference</a></li></ul></td><td class="dg-tocGroup" id="dg-tocFixedColumn"><ul><li><span class="w-icon dg-tocIcon" data-name="person_group" title="archive"></span><a href="ownership.html">Ownership</a></li><li><span class="w-icon dg-tocIcon" data-name="refresh" title="archive"></span><a href="release-notes.html">Release Notes</a></li></ul><div></div></td></tr></table></div></div>
+<div id="dg-toc"><div><table class="unstyled"><tr><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Overview</li><li><a href="README.html">Overview</a></li><li><a href="getting-start.html">Getting Started</a></li><li><a href="examples.html">Examples</a></li><li><a href="github.html">Fork on Github</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Canvas</li><li><a href="canvas.html">Canvas Drawing</a></li><li><a href="selector.html">Canvas Selector</a></li><li><a href="data.html">Canvas Data</a></li><li><a href="event.html">Canvas Event</a></li><li><a href="renderer.html">Developer - Renderer</a></li><li><a href="handler.html">Developer - Handler</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Element</li><li><a href="element.html">Element</a></li><li><a href="geometry.html">Geometry</a></li><li><a href="shapes.html">Shape</a></li><li><a href="extend-shape.html">Extend Shape</a></li><li><a href="marker.html">Marker</a></li><li><a href="pattern.html">Pattern</a></li><li><a href="multi.html">Multi Line Edge</a></li><li><a href="animation.html">Animation</a></li><li><a href="subshape.html">Sub Shape</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Api reference</li><li><a href="jsdoc.html">Api reference</a></li></ul></td><td class="dg-tocGroup" id="dg-tocFixedColumn"><ul><li><span class="w-icon dg-tocIcon" data-name="person_group" title="archive"></span><a href="ownership.html">Ownership</a></li><li><span class="w-icon dg-tocIcon" data-name="refresh" title="archive"></span><a href="release-notes.html">Release Notes</a></li></ul><div></div></td></tr></table></div></div>
 <div id="dg-navigator">Table of contents</div>
 
 <header>
  <div class="w-fixed-width">
   <a id="dg-homelink" href="README.html">
     <div id="dg-logo" style="background-image: url(files/images/logo.png); height: 84px; line-height: 84px; padding-left: 109px;">
-      <span id="dg-title">Opengraph Documentation</span> <span id="dg-web-title-version" style="font-weight:normal;">(0.1.1)</span>
+      <span id="dg-title">Opengraph Documentation</span> <span id="dg-web-title-version" style="font-weight:normal;">(0.1.2)</span>
     </div>
   </a>
   <div>
@@ -74,6 +74,22 @@ MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX",
 </header>
 
 <section id="dg-content"><div class="w-fixed-width"><div id="dg-innerContent"><h1 id="dg-autoTitle">Geometry</h1><h1 id="geometry">Geometry</h1>
+<ul>
+<li><a href="#point">Point</a></li>
+<li><a href="#coordinate">Coordinate</a></li>
+<li><a href="#envelope">Envelope</a></li>
+<li><a href="#style">Style</a></li>
+<li><a href="#geometry">Geometry</a></li>
+<li><a href="#geometrycollection">GeometryCollection</a></li>
+<li><a href="#polygon">Polygon</a></li>
+<li><a href="#rectangle">Rectangle</a></li>
+<li><a href="#polyline">PolyLine</a></li>
+<li><a href="#line">Line</a></li>
+<li><a href="#curve">Curve</a></li>
+<li><a href="#beziercurve">BezierCurve</a></li>
+<li><a href="#ellipse">Ellipse</a></li>
+<li><a href="#circle">Circle</a></li>
+</ul>
 <p>Geometry &#xB294; &#xC624;&#xD508;&#xADF8;&#xB798;&#xD504;&#xC758; &#xACF5;&#xAC04; &#xAE30;&#xD558; &#xAC1D;&#xCCB4;&#xC785;&#xB2C8;&#xB2E4;.</p>
 <p>&#xC55E;&#xC120; &#xACFC;&#xC815;&#xB4E4;&#xB85C; &#xC624;&#xD508;&#xADF8;&#xB798;&#xD504; Dom &#xAC1D;&#xCCB4; &#xD558;&#xC704;&#xC5D0; &#xB3C4;&#xD615; &#xD074;&#xB798;&#xC2A4;&#xAC00; &#xC788;&#xACE0;, &#xB3C4;&#xD615; &#xD074;&#xB798;&#xC2A4; &#xD558;&#xC704;&#xC5D0; Geometry &#xACF5;&#xAC04; &#xAE30;&#xD558; &#xAC1D;&#xCCB4;&#xAC00; &#xC788;&#xB2E4;&#xB294; &#xAC83;&#xC744; &#xAE30;&#xC220;&#xD588;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
 <p>&#xB3C4;&#xD615; &#xD074;&#xB798;&#xC2A4;&#xB294; Shape &#xC774;&#xB77C;&#xACE0; &#xD45C;&#xD604;&#xD558;&#xAE30;&#xB3C4; &#xD569;&#xB2C8;&#xB2E4;.</p>
@@ -301,7 +317,7 @@ canvas.getRenderer().redrawShape(element2);
 </code></pre>
 <p><img src="images/geometry/geometry-coodinate2.png" alt=""></p>
 <h2 id="envelope">Envelope</h2>
-<p>OG.geometry.Envelope &#xAE30;&#xD558; &#xAC1D;&#xCCB4;&#xB294; &#xC55E;&#xC120; <a href="./canvas.md#getboundary">Canvas - getBoundary</a> &#xD30C;&#xD2B8;&#xC5D0;&#xC11C; canvas.getBoundary() &#xBA54;&#xC18C;&#xB4DC;&#xB97C; &#xD1B5;&#xD574;&#xC11C;&#xB3C4;
+<p>OG.geometry.Envelope &#xAE30;&#xD558; &#xAC1D;&#xCCB4;&#xB294; &#xC55E;&#xC120; <a href="./canvas.html#getboundary">Canvas - getBoundary</a> &#xD30C;&#xD2B8;&#xC5D0;&#xC11C; canvas.getBoundary() &#xBA54;&#xC18C;&#xB4DC;&#xB97C; &#xD1B5;&#xD574;&#xC11C;&#xB3C4;
 &#xC811;&#xADFC;&#xD560; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
 <p>canvas.getBoundary() &#xBA54;&#xC18C;&#xB4DC;&#xB97C; &#xD638;&#xCD9C;&#xD558;&#xB294; &#xC21C;&#xAC04;, &#xC624;&#xD508;&#xADF8;&#xB798;&#xD504;&#xB294; &#xD638;&#xCD9C; &#xB300;&#xC0C1;&#xC774; &#xC5B4;&#xB5A0;&#xD55C; Shape &#xC744; &#xC9C0;&#xB2C8;&#xACE0; &#xC788;&#xB358;&#xC9C0; &#xAC04;&#xC5D0;
 &#xB3C4;&#xD615;&#xC758; &#xBAA8;&#xB4E0; &#xAF2D;&#xC9C0;&#xC810;&#xC744; &#xD3EC;&#xD568;&#xC2DC;&#xD0A4;&#xB294; &#xCD5C;&#xC18C;&#xD55C;&#xC758; &#xC0AC;&#xAC01;&#xD615;&#xC758; &#xC601;&#xC5ED;&#xC744; &#xB9CC;&#xB4E4;&#xC5B4;&#xB0B4;&#xC5B4;, OG.geometry.Envelope &#xAE30;&#xD558; &#xAC1D;&#xCCB4;&#xB97C; &#xB9AC;&#xD134;&#xD569;&#xB2C8;&#xB2E4;.</p>
@@ -952,13 +968,13 @@ var customShape = canvas.drawShape([300, 200], shape, [200, 200]);
 </div></div></section>
 
  <footer>
-  <div><p class="w-fixed-width"><span id="dg-web-footer">Version 0.1.1 released on 10/17/2016.</span></p></div>
+  <div><p class="w-fixed-width"><span id="dg-web-footer">Version 0.1.2 released on 11/18/2016.</span></p></div>
   <div class="w-fixed-width">
     <p><span id="dg-copyright">&#xA9; 2016 <a href="sppark@uengine.org">Seunpil park</a></span></p>
     <p>
       <span id="dg-marking"></span>
       <span id="dg-legalese"></span>
-      <span id="dg-attribution">Created by DocGen 2.1.3 on 29/10/2016 at 21:53:02.</span>
+      <span id="dg-attribution">Created by DocGen 2.1.3 on 18/11/2016 at 02:53:20.</span>
     </p>
   </div>
  </footer>

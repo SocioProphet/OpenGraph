@@ -1,0 +1,495 @@
+<!doctype html>
+<html>
+ <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><!--Prevent IE using compatibility mode on local or intranet pages. Do not put scripts before this line.-->
+  <meta name="viewport" content="width=device-width, user-scalable=yes"><!--Mobile device scaling-->
+  <meta charset="UTF-8">
+  <title>Opengraph Documentation</title>
+
+  <!--load stylesheets first (rationale: https://developers.google.com/speed/docs/best-practices/rtt#PutStylesBeforeScripts)-->
+  <link rel="stylesheet" href="require/webknife/framework.min.css" type="text/css">
+  <link rel="stylesheet" href="require/webknife/highlight.min.css" type="text/css">
+  <link rel="stylesheet" href="require/docgen.css" type="text/css">
+  <link rel="stylesheet" href="require/print.css" media="print">
+
+  <!--load scripts second-->
+
+  <script src="require/webknife/framework.min.js"></script>
+  <script src="require/webknife/framework.icons.js"></script>
+  <script src="require/webknife/highlight.min.js"></script>
+
+  <!--inline scripts last-->
+
+<script type="text/javascript">
+
+$(document).ready( function () {
+  $("#dg-toc").hide(); //hide the table of contents
+
+  //instantiate an svg injector to show SVG icons
+  var injector = new svgInject();
+  injector.inject();
+
+  //code syntax highlighting
+  $('pre code, .w-inline-code').each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+
+  //toggle visibility of table of contents
+  $("#dg-navigator").click(function()
+  {
+    $("#dg-toc").slideToggle("fast");
+    $(this).toggleClass("active");
+  });
+
+});
+</script>
+
+<script type="text/x-mathjax-config">
+//MathJax configuration is the same as used by math.stackexchange.com
+MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"], linebreaks: { automatic:true }, EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50) },
+  tex2jax: { inlineMath: [ ["$", "$"], ["\\\\(","\\\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+  TeX: {  noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } }, Macros: { href: "{}" } },
+  messageStyle: "none"
+});
+</script>
+
+</head>
+
+<body>
+
+<div id="dg-toc"><div><table class="unstyled"><tr><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Overview</li><li><a href="README.html">Overview</a></li><li><a href="getting-start.html">Getting Started</a></li><li><a href="examples.html">Examples</a></li><li><a href="github.html">Fork on Github</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Canvas</li><li><a href="canvas.html">Canvas Drawing</a></li><li><a href="selector.html">Canvas Selector</a></li><li><a href="data.html">Canvas Data</a></li><li><a href="event.html">Canvas Event</a></li><li><a href="renderer.html">Developer - Renderer</a></li><li><a href="handler.html">Developer - Handler</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Element</li><li><a href="element.html">Element</a></li><li><a href="geometry.html">Geometry</a></li><li><a href="shapes.html">Shape</a></li><li><a href="extend-shape.html">Extend Shape</a></li><li><a href="marker.html">Marker</a></li><li><a href="pattern.html">Pattern</a></li><li><a href="multi.html">Multi Line Edge</a></li><li><a href="animation.html">Animation</a></li><li><a href="subshape.html">Sub Shape</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Api reference</li><li><a href="jsdoc.html">Api reference</a></li></ul></td><td class="dg-tocGroup" id="dg-tocFixedColumn"><ul><li><span class="w-icon dg-tocIcon" data-name="person_group" title="archive"></span><a href="ownership.html">Ownership</a></li><li><span class="w-icon dg-tocIcon" data-name="refresh" title="archive"></span><a href="release-notes.html">Release Notes</a></li></ul><div></div></td></tr></table></div></div>
+<div id="dg-navigator">Table of contents</div>
+
+<header>
+ <div class="w-fixed-width">
+  <a id="dg-homelink" href="README.html">
+    <div id="dg-logo" style="background-image: url(files/images/logo.png); height: 84px; line-height: 84px; padding-left: 109px;">
+      <span id="dg-title">Opengraph Documentation</span> <span id="dg-web-title-version" style="font-weight:normal;">(0.1.2)</span>
+    </div>
+  </a>
+  <div>
+    <span id="dg-backlink"></span>
+  </div>
+ </div>
+</header>
+
+<section id="dg-content"><div class="w-fixed-width"><div id="dg-innerContent"><h1 id="dg-autoTitle">Multi Line Edge</h1><h1 id="multi-line-edge">Multi Line Edge</h1>
+<ul>
+<li><a href="#basic-multi-edge">Basic Multi Edge</a></li>
+<li><a href="#multi-edge-from-to">Multi Edge from to</a></li>
+<li><a href="#multi-edge-examples">Multi Edge Examples</a></li>
+</ul>
+<h2 id="basic-multi-edge">Basic Multi Edge</h2>
+<p>&#xC624;&#xD508;&#xADF8;&#xB798;&#xD504;&#xC758; EdgeShape &#xB97C; &#xB4DC;&#xB85C;&#xC789;&#xD560; &#xB54C;, &#xAE30;&#xBCF8;&#xC801;&#xC73C;&#xB85C; &#xD558;&#xB098;&#xC758; &#xC120;&#xBD84;&#xC73C;&#xB85C; &#xD45C;&#xD604;&#xB429;&#xB2C8;&#xB2E4;.</p>
+<p>&#xB3C4;&#xD615; &quot;multi&quot; &#xC2A4;&#xD0C0;&#xC77C; &#xC5B4;&#xD2B8;&#xB9AC;&#xBDF0;&#xD2B8;&#xB97C; &#xD1B5;&#xD574; &#xB2E4;&#xC218;&#xC758; &#xC120;&#xBD84;&#xC73C;&#xB85C; &#xC774;&#xB8E8;&#xC5B4;&#xC9C4; &#xC5F0;&#xACB0;&#xC120; &#xD45C;&#xD604;&#xC774; &#xAC00;&#xB2A5;&#xD55C;&#xB370;, &#xAC01;&#xAC01;&#xC758; &#xC120;&#xBD84;&#xB9C8;&#xB2E4; &#xAC1C;&#xBCC4;&#xC801;&#xC778; &#xC2A4;&#xD0C0;&#xC77C; &#xBC0F; &#xB9C8;&#xCEE4;&#xB97C; &#xC801;&#xC6A9;&#xD560; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>&#xB610;&#xD55C;, &quot;multi&quot; &#xC2A4;&#xD0C0;&#xC77C; &#xC5B4;&#xD2B8;&#xB9AC;&#xBDF0;&#xD2B8;&#xAC00; &#xBD99;&#xC740; &#xC120;&#xBD84;&#xC740; &#xC2A4;&#xC2A4;&#xB85C;&#xB294; &#xBCF4;&#xC774;&#xC9C0; &#xC54A;&#xAC8C; &#xB418;&#xACE0;, multi &#xC548;&#xC5D0; &#xD45C;&#xD604;&#xB41C; &#xC120;&#xBD84;&#xB9CC; &#xB4DC;&#xB85C;&#xC789;&#xB429;&#xB2C8;&#xB2E4;.</p>
+<p>&quot;multi&quot; &#xC2A4;&#xD0C0;&#xC77C; &#xC5B4;&#xD2B8;&#xB9AC;&#xBDF0;&#xD2B8;&#xB294; &#xBA87;&#xAC00;&#xC9C0; &#xD504;&#xB85C;&#xD37C;&#xD2F0;&#xC640; &#xD568;&#xAED8; json &#xD615;&#xC2DD;&#xC73C;&#xB85C; &#xD45C;&#xD604;&#xD558;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<table class="w-table w-fixed w-stripe">
+<thead>
+<tr>
+<th>&#xD504;&#xB85C;&#xD37C;&#xD2F0;</th>
+<th>&#xC124;&#xBA85;</th>
+<th>&#xC124;&#xBA85;</th>
+<th>&#xBE44;&#xACE0;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>top</td>
+<td>number</td>
+<td>&#xAE30;&#xC900;&#xC120;&#xC73C;&#xB85C;&#xBD80;&#xD130;&#xC758; &#xAC70;&#xB9AC;</td>
+<td></td>
+</tr>
+<tr>
+<td>from</td>
+<td>number or string</td>
+<td>&#xAE30;&#xC900;&#xC120; &#xB300;&#xBE44; &#xC120;&#xBD84;&#xC758; &#xC2DC;&#xC791;&#xC810;</td>
+<td>10,&apos;10&apos;,&apos;10px&apos;,&apos;10%&apos;,&apos;start&apos;,&apos;center&apos;,&apos;end&apos;,&apos;end-10&apos;</td>
+</tr>
+<tr>
+<td>to</td>
+<td>number or string</td>
+<td>&#xAE30;&#xC900;&#xC120; &#xB300;&#xBE44; &#xC120;&#xBD84;&#xC758; &#xC885;&#xB8CC;&#xC810;</td>
+<td>10,&apos;10&apos;,&apos;10px&apos;,&apos;10%&apos;,&apos;start&apos;,&apos;center&apos;,&apos;end&apos;,&apos;end-10&apos;</td>
+</tr>
+<tr>
+<td>style</td>
+<td>Object</td>
+<td>&#xC120;&#xBD84;&#xC758; &#xC2A4;&#xD0C0;&#xC77C;</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>&#xC704;&#xC758; &#xD45C;&#xB97C; &#xCC38;&#xC870;&#xD558;&#xC5EC; &#xB450; &#xC904;&#xB85C; &#xC774;&#xB8E8;&#xC5B4;&#xC9C4; EdgeShape &#xB97C; &#xC0DD;&#xC131;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<pre><code>var edge1 = canvas.drawShape(null, new OG.EdgeShape([100, 100], [500, 100]), null);
+
+canvas.setShapeStyle(edge1, {
+    multi: [
+        {
+            &apos;top&apos;: 10,
+            &apos;from&apos;: &apos;start&apos;,
+            &apos;to&apos;: &apos;end&apos;,
+            &apos;style&apos;: {
+                &apos;arrow-end&apos;: &apos;block&apos;,
+                &apos;stroke&apos;: &apos;red&apos;
+            }
+        },
+        {
+            &apos;top&apos;: -10,
+            &apos;from&apos;: &apos;start&apos;,
+            &apos;to&apos;: &apos;end&apos;,
+            &apos;style&apos;: {
+                &apos;arrow-end&apos;: &apos;block&apos;,
+                &apos;stroke&apos;: &apos;blue&apos;
+            }
+        }
+    ]
+});
+</code></pre>
+<p><img src="images/multi/multi1.png" alt=""></p>
+<h2 id="multi-edge-from-to">Multi Edge from to</h2>
+<p>from &#xACFC; to &#xD504;&#xB85C;&#xD37C;&#xD2F0;&#xB294; &#xC120;&#xBD84;&#xC774; &#xAC00;&#xC9C4; Path &#xB85C;&#xBD80;&#xD130; &#xC2DC;&#xC791;&#xC810;, &#xC885;&#xB8CC;&#xC810;&#xC744; &#xC758;&#xBBF8;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>&#xD45C;&#xD604;&#xBC29;&#xC2DD;&#xC740; px, number, percentage, end-number &#xBC29;&#xC2DD;&#xC73C;&#xB85C; &#xAC00;&#xB2A5;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<table class="w-table w-fixed w-stripe">
+<thead>
+<tr>
+<th>&#xD45C;&#xD604;&#xC2DD;</th>
+<th>&#xC124;&#xBA85;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>&#xC2DC;&#xC791;&#xC810;&#xC73C;&#xB85C;&#xBD80;&#xD130; 10px</td>
+</tr>
+<tr>
+<td>10</td>
+<td>&#xC2DC;&#xC791;&#xC810;&#xC73C;&#xB85C;&#xBD80;&#xD130; 10px</td>
+</tr>
+<tr>
+<td>10px</td>
+<td>&#xC2DC;&#xC791;&#xC810;&#xC73C;&#xB85C;&#xBD80;&#xD130; 10px</td>
+</tr>
+<tr>
+<td>10%</td>
+<td>&#xC2DC;&#xC791;&#xC810;&#xC73C;&#xB85C;&#xBD80;&#xD130; 10&#xD37C;&#xC13C;&#xD14C;&#xC774;&#xC9C0;</td>
+</tr>
+<tr>
+<td>start</td>
+<td>&#xC2DC;&#xC791;&#xC810;</td>
+</tr>
+<tr>
+<td>center</td>
+<td>&#xC911;&#xC559;&#xC810;</td>
+</tr>
+<tr>
+<td>end</td>
+<td>&#xB05D;&#xC810;</td>
+</tr>
+<tr>
+<td>end-10</td>
+<td>&#xB05D;&#xC810;&#xC73C;&#xB85C;&#xBD80;&#xD130; 10px</td>
+</tr>
+</tbody>
+</table>
+<p>&#xC704;&#xC758; &#xD45C;&#xD604;&#xC2DD;&#xC73C;&#xB85C; &#xC544;&#xB798;&#xC758; &#xC0D8;&#xD50C; &#xCF54;&#xB4DC;&#xB97C; &#xAD6C;&#xD604;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<pre><code>var edge1 = canvas.drawShape(null, new OG.EdgeShape([100, 100], [500, 100]), null);
+
+canvas.setShapeStyle(edge1, {
+    multi: [
+        {
+            &apos;top&apos;: 0,
+            &apos;from&apos;: &apos;start&apos;,
+            &apos;to&apos;: &apos;end&apos;,
+            &apos;style&apos;: {
+                &apos;arrow-end&apos;: &apos;block&apos;
+            }
+        },
+        {
+            &apos;top&apos;: -30,
+            &apos;from&apos;: &apos;30px&apos;,
+            &apos;to&apos;: &apos;40%&apos;,
+            &apos;style&apos;: {
+                &apos;arrow-end&apos;: &apos;block&apos;
+            }
+        },
+        {
+            &apos;top&apos;: -30,
+            &apos;from&apos;: &apos;40%&apos;,
+            &apos;to&apos;: &apos;80%&apos;,
+            &apos;style&apos;: {
+                &apos;arrow-end&apos;: &apos;block&apos;
+            }
+        },
+        {
+            &apos;top&apos;: -30,
+            &apos;from&apos;: &apos;80%&apos;,
+            &apos;to&apos;: &apos;end-30px&apos;,
+            &apos;style&apos;: {
+                &apos;arrow-end&apos;: &apos;block&apos;
+            }
+        }
+    ]
+});
+</code></pre>
+<p><img src="images/multi/multi2.png" alt=""></p>
+<h2 id="multi-edge-examples">Multi Edge Examples</h2>
+<p>EdgeShape &#xB97C; &#xC0C1;&#xC18D;&#xBC1B;&#xB294; &#xC120; &#xB3C4;&#xD615; &#xD074;&#xB798;&#xC2A4;&#xB97C; &#xB9CC;&#xB4E4;&#xACE0;, &#xB3C4;&#xD615;&#xAC04;&#xC758; &#xC5F0;&#xACB0;&#xC5D0; &#xD65C;&#xC6A9;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD558;&#xACA0;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<pre><code>/**
+ * ELECTRONIC : CableShape
+ *
+ * @class
+ * @extends OG.shape.CableShape
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @param {Number[]} from &#xC640;&#xC774;&#xC5B4; &#xC2DC;&#xC791; &#xC88C;&#xD45C;
+ * @param {Number[]} to &#xC640;&#xC774;&#xC5B4; &#xB05D; &#xC88C;&#xD45C;
+ * @param {String} label &#xB77C;&#xBCA8; [Optional]
+ * @author &lt;a href=&quot;mailto:sppark@uengine.org&quot;&gt;Seungpil Park&lt;/a&gt;
+ * @private
+ */
+OG.shape.elec.CableShape = function (from, to, label) {
+    OG.shape.elec.CableShape.superclass.call(this, from, to, label);
+
+    this.SHAPE_ID = &apos;OG.shape.elec.CableShape&apos;;
+};
+OG.shape.elec.CableShape.prototype = new OG.shape.EdgeShape();
+OG.shape.elec.CableShape.superclass = OG.shape.EdgeShape;
+OG.shape.elec.CableShape.prototype.constructor = OG.shape.elec.CableShape;
+OG.CableShape = OG.shape.elec.CableShape;
+
+/**
+ * &#xB4DC;&#xB85C;&#xC789;&#xD560; Shape &#xC744; &#xC0DD;&#xC131;&#xD558;&#xC5EC; &#xBC18;&#xD658;&#xD55C;&#xB2E4;.
+ *
+ * @return {OG.geometry.Geometry} Shape &#xC815;&#xBCF4;
+ * @override
+ */
+OG.shape.elec.CableShape.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
+    this.geom.style = new OG.geometry.Style({
+        &apos;multi&apos;: [
+            {
+                top: 0,
+                from: &apos;start&apos;,
+                to: &apos;center&apos;,
+                style: {
+                    &apos;marker&apos;: {
+                        &apos;end&apos;: {
+                            &apos;id&apos;: &apos;OG.marker.SwitchLMarker&apos;,
+                            &apos;size&apos;: [20, 8],
+                            &apos;ref&apos;: [3, 0]
+                        }
+                    }
+                }
+            },
+            {
+                top: 0,
+                from: &apos;center&apos;,
+                to: &apos;end&apos;,
+                style: {
+                    &apos;marker&apos;: {
+                        &apos;start&apos;: {
+                            &apos;id&apos;: &apos;OG.marker.SwitchXMarker&apos;,
+                            &apos;size&apos;: [6, 6]
+                        }
+                    }
+                }
+            }
+        ]
+    });
+    return this.geom;
+};
+
+
+/**
+ * ELECTRONIC : Busduct Shape
+ *
+ * @class
+ * @extends OG.shape.BusductShape
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @param {Number[]} from &#xC640;&#xC774;&#xC5B4; &#xC2DC;&#xC791; &#xC88C;&#xD45C;
+ * @param {Number[]} to &#xC640;&#xC774;&#xC5B4; &#xB05D; &#xC88C;&#xD45C;
+ * @param {String} label &#xB77C;&#xBCA8; [Optional]
+ * @author &lt;a href=&quot;mailto:sppark@uengine.org&quot;&gt;Seungpil Park&lt;/a&gt;
+ * @private
+ */
+OG.shape.elec.BusductShape = function (from, to, label) {
+    OG.shape.elec.BusductShape.superclass.call(this, from, to, label);
+
+    this.SHAPE_ID = &apos;OG.shape.elec.BusductShape&apos;;
+};
+OG.shape.elec.BusductShape.prototype = new OG.shape.EdgeShape();
+OG.shape.elec.BusductShape.superclass = OG.shape.EdgeShape;
+OG.shape.elec.BusductShape.prototype.constructor = OG.shape.elec.BusductShape;
+OG.BusductShape = OG.shape.elec.BusductShape;
+
+/**
+ * &#xB4DC;&#xB85C;&#xC789;&#xD560; Shape &#xC744; &#xC0DD;&#xC131;&#xD558;&#xC5EC; &#xBC18;&#xD658;&#xD55C;&#xB2E4;.
+ *
+ * @return {OG.geometry.Geometry} Shape &#xC815;&#xBCF4;
+ * @override
+ */
+OG.shape.elec.BusductShape.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
+    this.geom.style = new OG.geometry.Style({
+        &apos;multi&apos;: [
+            {
+                top: -10,
+                from: &apos;20px&apos;,
+                to: &apos;end-20px&apos;,
+                style: {
+                    &apos;marker&apos;: {
+                        &apos;start&apos;: {
+                            &apos;id&apos;: &apos;OG.marker.SwitchRMarker&apos;,
+                            &apos;size&apos;: [8, 8],
+                            &apos;ref&apos;: [8, 0]
+                        },
+                        &apos;end&apos;: {
+                            &apos;id&apos;: &apos;OG.marker.SwitchLMarker&apos;,
+                            &apos;size&apos;: [8, 8],
+                            &apos;ref&apos;: [1, 0]
+                        }
+                    }
+                }
+            },
+            {
+                top: 10,
+                from: &apos;20px&apos;,
+                to: &apos;end-20px&apos;,
+                style: {
+                    &apos;marker&apos;: {
+                        &apos;start&apos;: {
+                            &apos;id&apos;: &apos;OG.marker.SwitchLMarker&apos;,
+                            &apos;size&apos;: [8, 8],
+                            &apos;ref&apos;: [7, 8]
+                        },
+                        &apos;end&apos;: {
+                            &apos;id&apos;: &apos;OG.marker.SwitchRMarker&apos;,
+                            &apos;size&apos;: [8, 8],
+                            &apos;ref&apos;: [0, 8]
+                        }
+                    }
+                }
+            },
+            {
+                top: 0,
+                from: &apos;start&apos;,
+                to: &apos;end&apos;,
+                style: {}
+            }
+        ]
+    });
+    return this.geom;
+};
+
+/**
+ * ELECTRONIC : Raceway Shape
+ *
+ * @class
+ * @extends OG.shape.RacewayShape
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @param {Number[]} from &#xC640;&#xC774;&#xC5B4; &#xC2DC;&#xC791; &#xC88C;&#xD45C;
+ * @param {Number[]} to &#xC640;&#xC774;&#xC5B4; &#xB05D; &#xC88C;&#xD45C;
+ * @param {String} label &#xB77C;&#xBCA8; [Optional]
+ * @author &lt;a href=&quot;mailto:sppark@uengine.org&quot;&gt;Seungpil Park&lt;/a&gt;
+ * @private
+ */
+OG.shape.elec.RacewayShape = function (from, to, label) {
+    OG.shape.elec.RacewayShape.superclass.call(this, from, to, label);
+
+    this.SHAPE_ID = &apos;OG.shape.elec.RacewayShape&apos;;
+};
+OG.shape.elec.RacewayShape.prototype = new OG.shape.EdgeShape();
+OG.shape.elec.RacewayShape.superclass = OG.shape.EdgeShape;
+OG.shape.elec.RacewayShape.prototype.constructor = OG.shape.elec.RacewayShape;
+OG.RacewayShape = OG.shape.elec.RacewayShape;
+
+/**
+ * &#xB4DC;&#xB85C;&#xC789;&#xD560; Shape &#xC744; &#xC0DD;&#xC131;&#xD558;&#xC5EC; &#xBC18;&#xD658;&#xD55C;&#xB2E4;.
+ *
+ * @return {OG.geometry.Geometry} Shape &#xC815;&#xBCF4;
+ * @override
+ */
+OG.shape.elec.RacewayShape.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
+    this.geom.style = new OG.geometry.Style({
+        &apos;multi&apos;: [
+            {
+                top: -10,
+                from: &apos;start&apos;,
+                to: &apos;end&apos;,
+                style: {}
+            },
+            {
+                top: 10,
+                from: &apos;start&apos;,
+                to: &apos;end&apos;,
+                style: {}
+            },
+            {
+                top: 0,
+                from: &apos;start&apos;,
+                to: &apos;end&apos;,
+                style: {
+                    pattern: {
+                        &apos;id&apos;: &apos;OG.pattern.HatchedPattern&apos;,
+                        &apos;thickness&apos;: 10,
+                        &apos;unit-width&apos;: 12,
+                        &apos;unit-height&apos;: 12,
+                        &apos;pattern-width&apos;: 8,
+                        &apos;pattern-height&apos;: 8,
+                        &apos;style&apos;: {
+                            &apos;stroke&apos;: &apos;black&apos;
+                        }
+                    },
+                    &apos;stroke&apos;: &apos;none&apos;
+                }
+            }
+        ]
+    });
+    return this.geom;
+};
+
+var rect1 = canvas.drawShape([400, 400], new OG.RectangleShape(&apos;From&apos;), [100, 100]);
+var rect2 = canvas.drawShape([400, 200], new OG.RectangleShape(&apos;CableShape&apos;), [100, 100]);
+var rect3 = canvas.drawShape([200, 600], new OG.RectangleShape(&apos;BusductShape&apos;), [100, 100]);
+var rect4 = canvas.drawShape([600, 600], new OG.RectangleShape(&apos;RacewayShape&apos;), [100, 100]);
+
+canvas.connect(rect1, rect2, null, null, null, null, null, null, new OG.CableShape());
+canvas.connect(rect1, rect3, null, null, null, null, null, null, new OG.BusductShape());
+canvas.connect(rect1, rect4, null, null, null, null, null, null, new OG.RacewayShape());
+</code></pre>
+<p><img src="images/multi/multi3.png" alt=""></p>
+</div></div></section>
+
+ <footer>
+  <div><p class="w-fixed-width"><span id="dg-web-footer">Version 0.1.2 released on 11/18/2016.</span></p></div>
+  <div class="w-fixed-width">
+    <p><span id="dg-copyright">&#xA9; 2016 <a href="sppark@uengine.org">Seunpil park</a></span></p>
+    <p>
+      <span id="dg-marking"></span>
+      <span id="dg-legalese"></span>
+      <span id="dg-attribution">Created by DocGen 2.1.3 on 18/11/2016 at 02:53:20.</span>
+    </p>
+  </div>
+ </footer>
+ 
+ </body>
+</html>

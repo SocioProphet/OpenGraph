@@ -57,14 +57,14 @@ MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX",
 
 <body>
 
-<div id="dg-toc"><div><table class="unstyled"><tr><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Overview</li><li><a href="README.html">Overview</a></li><li><a href="getting-start.html">Getting Started</a></li><li><a href="examples.html">Examples</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Canvas</li><li><a href="canvas.html">Canvas Drawing</a></li><li><a href="selector.html">Canvas Selector</a></li><li><a href="data.html">Canvas Data</a></li><li><a href="event.html">Canvas Event</a></li><li><a href="renderer.html">Developer - Renderer</a></li><li><a href="handler.html">Developer - Handler</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Element</li><li><a href="element.html">Element</a></li><li><a href="geometry.html">Geometry</a></li><li><a href="shapes.html">Shape</a></li><li><a href="extend-shape.html">Extend Shape</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Api reference</li><li><a href="jsdoc.html">Api reference</a></li></ul></td><td class="dg-tocGroup" id="dg-tocFixedColumn"><ul><li><span class="w-icon dg-tocIcon" data-name="person_group" title="archive"></span><a href="ownership.html">Ownership</a></li><li><span class="w-icon dg-tocIcon" data-name="refresh" title="archive"></span><a href="release-notes.html">Release Notes</a></li></ul><div></div></td></tr></table></div></div>
+<div id="dg-toc"><div><table class="unstyled"><tr><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Overview</li><li><a href="README.html">Overview</a></li><li><a href="getting-start.html">Getting Started</a></li><li><a href="examples.html">Examples</a></li><li><a href="github.html">Fork on Github</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Canvas</li><li><a href="canvas.html">Canvas Drawing</a></li><li><a href="selector.html">Canvas Selector</a></li><li><a href="data.html">Canvas Data</a></li><li><a href="event.html">Canvas Event</a></li><li><a href="renderer.html">Developer - Renderer</a></li><li><a href="handler.html">Developer - Handler</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Element</li><li><a href="element.html">Element</a></li><li><a href="geometry.html">Geometry</a></li><li><a href="shapes.html">Shape</a></li><li><a href="extend-shape.html">Extend Shape</a></li><li><a href="marker.html">Marker</a></li><li><a href="pattern.html">Pattern</a></li><li><a href="multi.html">Multi Line Edge</a></li><li><a href="animation.html">Animation</a></li><li><a href="subshape.html">Sub Shape</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Api reference</li><li><a href="jsdoc.html">Api reference</a></li></ul></td><td class="dg-tocGroup" id="dg-tocFixedColumn"><ul><li><span class="w-icon dg-tocIcon" data-name="person_group" title="archive"></span><a href="ownership.html">Ownership</a></li><li><span class="w-icon dg-tocIcon" data-name="refresh" title="archive"></span><a href="release-notes.html">Release Notes</a></li></ul><div></div></td></tr></table></div></div>
 <div id="dg-navigator">Table of contents</div>
 
 <header>
  <div class="w-fixed-width">
   <a id="dg-homelink" href="README.html">
     <div id="dg-logo" style="background-image: url(files/images/logo.png); height: 84px; line-height: 84px; padding-left: 109px;">
-      <span id="dg-title">Opengraph Documentation</span> <span id="dg-web-title-version" style="font-weight:normal;">(0.1.1)</span>
+      <span id="dg-title">Opengraph Documentation</span> <span id="dg-web-title-version" style="font-weight:normal;">(0.1.2)</span>
     </div>
   </a>
   <div>
@@ -74,6 +74,40 @@ MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX",
 </header>
 
 <section id="dg-content"><div class="w-fixed-width"><div id="dg-innerContent"><h1 id="dg-autoTitle">Canvas Drawing</h1><h1 id="canvas-drawing">Canvas Drawing</h1>
+<ul>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#more-detail-configuration">More Detail Configuration</a></li>
+<li><a href="#zoom-panel">Zoom Panel</a></li>
+<li><a href="#drawshape">drawShape</a></li>
+<li><a href="#style">style</a></li>
+<li><a href="#label-style">label style</a></li>
+<li><a href="#style">style</a></li>
+<li><a href="#set-id">set Id</a></li>
+<li><a href="#set-parent">set Parent</a></li>
+<li><a href="#setshapestyle">setShapeStyle</a></li>
+<li><a href="#settextlistincontroller">setTextListInController</a></li>
+<li><a href="#drawlabel">drawLabel</a></li>
+<li><a href="#connect">connect</a></li>
+<li><a href="#disconnect">disconnect</a></li>
+<li><a href="#group">group</a></li>
+<li><a href="#clear">clear</a></li>
+<li><a href="#removeshape">removeShape</a></li>
+<li><a href="#removechild">removeChild</a></li>
+<li><a href="#getrootelement">getRootElement</a></li>
+<li><a href="#getrootgroup">getRootGroup</a></li>
+<li><a href="#attribute">attribute</a></li>
+<li><a href="#front-and-back">front and back</a></li>
+<li><a href="#canvas-size">canvas size</a></li>
+<li><a href="#scale">scale</a></li>
+<li><a href="#show-and-hide">show and hide</a></li>
+<li><a href="#append-and-insert">append and insert</a></li>
+<li><a href="#move">move</a></li>
+<li><a href="#rotate">rotate</a></li>
+<li><a href="#resize">resize</a></li>
+<li><a href="#align">align</a></li>
+<li><a href="#undo-&amp;&amp;-redo">undo &amp;&amp; redo</a></li>
+<li><a href="#getboundary">getBoundary</a></li>
+</ul>
 <p>&#xC624;&#xD508;&#xADF8;&#xB798;&#xD504;&#xC758; &#xCE94;&#xBC84;&#xC2A4; &#xAC1D;&#xCCB4;&#xB294; &#xB2E4;&#xC74C;&#xC744; &#xC120;&#xC5B8;&#xD568;&#xC73C;&#xB85C;&#xC368; &#xC5BB;&#xC744; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
 <pre><code>var canvas = new OG.Canvas(&apos;canvas&apos;, [1000, 800], &apos;white&apos;, &apos;url(resources/images/symbol/grid.gif)&apos;);
 </code></pre>
@@ -89,13 +123,12 @@ MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX",
 * - connectRequired    : &#xB4DC;&#xB798;&#xADF8;&#xD558;&#xC5EC; &#xC5F0;&#xACB0;&#xC2DC; &#xC5F0;&#xACB0;&#xB300;&#xC0C1; &#xC788;&#xB294; &#xACBD;&#xC6B0;&#xC5D0;&#xB9CC; Edge &#xB4DC;&#xB85C;&#xC789; &#xCC98;&#xB9AC; &#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
 * - labelEditable      : &#xB77C;&#xBCA8; &#xC218;&#xC815;&#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
 * - groupDropable      : &#xADF8;&#xB8F9;&#xD551; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
-* - collapsible        : &#xCD5C;&#xC18C;&#xD654; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
 * - enableHotKey       : &#xD56B;&#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
 * - enableContextMenu  : &#xB9C8;&#xC6B0;&#xC2A4; &#xC6B0;&#xD074;&#xB9AD; &#xBA54;&#xB274; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
 * - autoExtensional    : &#xCE94;&#xBC84;&#xC2A4; &#xC790;&#xB3D9; &#xD655;&#xC7A5; &#xAE30;&#xB2A5;(&#xB514;&#xD3F4;&#xD2B8; true)
-* - useSlider          : &#xD655;&#xB300;&#xCD95;&#xC18C; &#xC2AC;&#xB77C;&#xC774;&#xB354; &#xC0AC;&#xC6A9; &#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
-* - stickGuide         : &#xC2A4;&#xD2F1; &#xAC00;&#xC774;&#xB4DC; &#xD45C;&#xC2DC; &#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
-* - checkBridgeEdge    : &#xC5F0;&#xACB0;&#xB41C; &#xB450; &#xC624;&#xBE0C;&#xC81D;&#xD2B8;&#xC758; &#xC18C;&#xC18D;&#xC5D0; &#xB530;&#xB978; &#xC5F0;&#xACB0;&#xC120; &#xC2A4;&#xD0C0;&#xC77C; &#xBCC0;&#xD654; &#xC5EC;&#xBD80;(&#xB514;&#xD3F4;&#xD2B8; true)
+* - useSlider          : &#xD655;&#xB300;&#xCD95;&#xC18C; &#xC2AC;&#xB77C;&#xC774;&#xB354; &#xC0AC;&#xC6A9; &#xC5EC;&#xBD80;
+* - stickGuide         : &#xC2A4;&#xD2F1; &#xAC00;&#xC774;&#xB4DC; &#xD45C;&#xC2DC; &#xC5EC;&#xBD80;
+* - checkBridgeEdge    : &#xC5F0;&#xACB0;&#xB41C; &#xB450; &#xC624;&#xBE0C;&#xC81D;&#xD2B8;&#xC758; &#xC18C;&#xC18D;&#xC5D0; &#xB530;&#xB978; &#xC5F0;&#xACB0;&#xC120; &#xC2A4;&#xD0C0;&#xC77C; &#xBCC0;&#xD654; &#xC5EC;&#xBD80;
 </code></pre>
 <p>Configuration &#xC124;&#xC815;&#xC740; canvas &#xB97C; &#xC120;&#xC5B8;&#xD55C; &#xD6C4; initConfig &#xBA54;&#xC18C;&#xB4DC;&#xB85C; &#xC870;&#xC815;&#xD560; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
 <pre><code>canvas.initConfig({
@@ -109,7 +142,6 @@ MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX",
                 connectRequired: true,
                 labelEditable: true,
                 groupDropable: true,
-                collapsible: true,
                 enableHotKey: true,
                 enableContextMenu: true,
                 useSlider: true,
@@ -188,647 +220,653 @@ canvas._CONFIG.CONNECTABLE = false;
 </code></pre>
 <p>&#xC544;&#xB798;&#xC758; &#xBAA9;&#xB85D;&#xC740; _CONFIG &#xB97C; &#xD1B5;&#xD574; &#xC870;&#xC808;&#xD560; &#xC218; &#xC788;&#xB294; Configuration &#xC758; &#xBAA9;&#xB85D;&#xC785;&#xB2C8;&#xB2E4;.</p>
 <pre><code>{
-        /**
-         * &#xC5F0;&#xACB0;&#xB41C; &#xB450; &#xC624;&#xBE0C;&#xC81D;&#xD2B8;&#xC758; &#xC18C;&#xC18D;&#xC5D0; &#xB530;&#xB978; &#xC5F0;&#xACB0;&#xC120; &#xC2A4;&#xD0C0;&#xC77C; &#xBCC0;&#xD654; &#xC5EC;&#xBD80;
-         */
-        CHECK_BRIDGE_EDGE: true,
-        
-        /**
-         * &#xC2A4;&#xD2F1; &#xAC00;&#xC774;&#xB4DC; &#xC0DD;&#xC131; &#xC5EC;&#xBD80;
-         */
-        STICK_GUIDE: true,
-        
-        /**
-         * &#xC2AC;&#xB77C;&#xC774;&#xB354;
-         */
-        SLIDER: null,
-        
-        /**
-         * &#xC11C;&#xBC84; &#xC218;&#xC2E0; &#xB370;&#xC774;&#xD130; &#xCC98;&#xB9AC;&#xC911;
-         */
-        REMOTE_PERFORMED_DURING: false,
-        
-        /**
-         * &#xB9AC;&#xBAA8;&#xD2B8; &#xB370;&#xD53C;&#xB2C8;&#xC158;
-         */
-        REMOTE_IDENTIFIER: null,
-        
-        /**
-         * &#xB9AC;&#xBAA8;&#xD2B8; &#xBAA8;&#xB4DC;
-         */
-        REMOTEABLE: false,
-        
-        /**
-         * &#xB9AC;&#xBAA8;&#xD2B8; &#xBAA8;&#xB4DC; &#xC218;&#xC815;&#xAD8C;&#xD55C;
-         */
-        REMOTE_EDITABLE: false,
-        
-        /**
-         * &#xB9AC;&#xBAA8;&#xD2B8; &#xBAA8;&#xB4DC; &#xB9C8;&#xC2A4;&#xD130;&#xBAA8;&#xB4DC;
-         */
-        REMOTE_ISMASTER: false,
-        
-        /**
-         * &#xD788;&#xC2A4;&#xD1A0;&#xB9AC; &#xC778;&#xB371;&#xC2A4;
-         */
-        HISTORY_INDEX: 0,
-        
-        /**
-         * &#xD788;&#xC2A4;&#xD1A0;&#xB9AC; &#xC800;&#xC7A5;&#xC18C;
-         */
-        HISTORY: [],
-        
-        /**
-         * &#xD788;&#xC2A4;&#xD1A0;&#xB9AC; &#xC800;&#xC7A5; &#xD69F;&#xC218;
-         */
-        HISTORY_SIZE: 100,
 
-        /**
-         * &#xD655;&#xB300;/&#xCD95;&#xC18C; &#xC2AC;&#xB77C;&#xC774;&#xB354;
-         */
-        USE_SLIDER: true,
+    /**
+     * &#xB3C4;&#xD615; &#xC120;&#xD0DD;&#xC2DC; &#xCE94;&#xBC84;&#xC2A4; &#xD3EC;&#xAC70;&#xC2F1; &#xC5EC;&#xBD80;
+     */
+    FOCUS_CANVAS_ONSELECT: true,
+    
+    /**
+     * &#xC5F0;&#xACB0;&#xB41C; &#xB450; &#xC624;&#xBE0C;&#xC81D;&#xD2B8;&#xC758; &#xC18C;&#xC18D;&#xC5D0; &#xB530;&#xB978; &#xC5F0;&#xACB0;&#xC120; &#xC2A4;&#xD0C0;&#xC77C; &#xBCC0;&#xD654; &#xC5EC;&#xBD80;
+     */
+    CHECK_BRIDGE_EDGE: true,
+    
+    /**
+     * &#xC2A4;&#xD2F1; &#xAC00;&#xC774;&#xB4DC; &#xC0DD;&#xC131; &#xC5EC;&#xBD80;
+     */
+    STICK_GUIDE: true,
+    
+    /**
+     * &#xC2AC;&#xB77C;&#xC774;&#xB354;
+     */
+    SLIDER: null,
+    
+    /**
+     * &#xC11C;&#xBC84; &#xC218;&#xC2E0; &#xB370;&#xC774;&#xD130; &#xCC98;&#xB9AC;&#xC911;
+     */
+    REMOTE_PERFORMED_DURING: false,
+    
+    /**
+     * &#xB9AC;&#xBAA8;&#xD2B8; &#xB370;&#xD53C;&#xB2C8;&#xC158;
+     */
+    REMOTE_IDENTIFIER: null,
+    
+    /**
+     * &#xB9AC;&#xBAA8;&#xD2B8; &#xBAA8;&#xB4DC;
+     */
+    REMOTEABLE: false,
+    
+    /**
+     * &#xB9AC;&#xBAA8;&#xD2B8; &#xBAA8;&#xB4DC; &#xC218;&#xC815;&#xAD8C;&#xD55C;
+     */
+    REMOTE_EDITABLE: false,
+    
+    /**
+     * &#xB9AC;&#xBAA8;&#xD2B8; &#xBAA8;&#xB4DC; &#xB9C8;&#xC2A4;&#xD130;&#xBAA8;&#xB4DC;
+     */
+    REMOTE_ISMASTER: false,
+    
+    /**
+     * &#xD788;&#xC2A4;&#xD1A0;&#xB9AC; &#xC778;&#xB371;&#xC2A4;
+     */
+    HISTORY_INDEX: 0,
+    
+    /**
+     * &#xD788;&#xC2A4;&#xD1A0;&#xB9AC; &#xC800;&#xC7A5;&#xC18C;
+     */
+    HISTORY: [],
+    
+    /**
+     * &#xD788;&#xC2A4;&#xD1A0;&#xB9AC; &#xC800;&#xC7A5; &#xD69F;&#xC218;
+     */
+    HISTORY_SIZE: 100,
 
-        /**
-         * &#xD074;&#xB9AD;&#xC120;&#xD0DD; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        SELECTABLE: true,
+    /**
+     * &#xD655;&#xB300;/&#xCD95;&#xC18C; &#xC2AC;&#xB77C;&#xC774;&#xB354;
+     */
+    USE_SLIDER: true,
 
-        /**
-         * &#xB9C8;&#xC6B0;&#xC2A4;&#xB4DC;&#xB798;&#xADF8;&#xC120;&#xD0DD; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        DRAG_SELECTABLE: true,
+    /**
+     * &#xD074;&#xB9AD;&#xC120;&#xD0DD; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    SELECTABLE: true,
 
-        /**
-         * &#xC774;&#xB3D9; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        MOVABLE: true,
-        MOVABLE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+    /**
+     * &#xB9C8;&#xC6B0;&#xC2A4;&#xB4DC;&#xB798;&#xADF8;&#xC120;&#xD0DD; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    DRAG_SELECTABLE: true,
+
+    /**
+     * &#xC774;&#xB3D9; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    MOVABLE: true,
+    MOVABLE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * &#xB9AC;&#xC0AC;&#xC774;&#xC988; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    RESIZABLE: true,
+    RESIZABLE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * &#xC5F0;&#xACB0; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    CONNECTABLE: true,
+
+    /**
+     * Self &#xC5F0;&#xACB0; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    SELF_CONNECTABLE: true,
+
+    /**
+     * &#xAC00;&#xC774;&#xB4DC;&#xC5D0; &#xC790;&#xAE30;&#xC790;&#xC2E0;&#xC744; &#xBCF5;&#xC0AC;&#xD558;&#xB294; &#xCEE8;&#xD2B8;&#xB864;&#xB7EC; &#xC5EC;&#xBD80;.
+     */
+    CONNECT_CLONEABLE: true,
+
+    /**
+     * &#xB4DC;&#xB798;&#xADF8;&#xD558;&#xC5EC; &#xC5F0;&#xACB0;&#xC2DC; &#xC5F0;&#xACB0;&#xB300;&#xC0C1; &#xC788;&#xB294; &#xACBD;&#xC6B0;&#xC5D0;&#xB9CC; Edge &#xB4DC;&#xB85C;&#xC789; &#xCC98;&#xB9AC; &#xC5EC;&#xBD80;
+     */
+    CONNECT_REQUIRED: true,
+
+    /**
+     * &#xB4DC;&#xB798;&#xADF8;&#xD558;&#xC5EC; &#xC5F0;&#xACB0;&#xC2DC; &#xADF8;&#xB8F9;&#xC744; &#xAC74;&#xB108;&#xB6F8;&#xB54C; &#xC2A4;&#xD0C0;&#xC77C; &#xBCC0;&#xACBD; &#xC5EC;&#xBD80;
+     */
+    CONNECT_STYLE_CHANGE: true,
+    CONNECT_STYLE_CHANGE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * &#xAC00;&#xC774;&#xB4DC;&#xC5D0; &#xC0AD;&#xC81C; &#xCEE8;&#xD2B8;&#xB864;&#xB7EC; &#xC5EC;&#xBD80;
+     */
+    DELETABLE: true,
+    DELETABLE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * &#xB77C;&#xBCA8; &#xC218;&#xC815;&#xC5EC;&#xBD80;
+     */
+    LABEL_EDITABLE: true,
+    LABEL_EDITABLE_: {
+        GEOM: true,
+        TEXT: true,
+        HTML: true,
+        IMAGE: true,
+        EDGE: true,
+        GROUP: true
+    },
+
+    /**
+     * &#xADF8;&#xB8F9;&#xD551; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    GROUP_DROPABLE: true,
+
+    /**
+     * &#xC774;&#xB3D9;, &#xB9AC;&#xC0AC;&#xC774;&#xC988; &#xB4DC;&#xB798;&#xADF8;&#xC2DC; MOVE_SNAP_SIZE &#xC801;&#xC6A9; &#xC5EC;&#xBD80;
+     */
+    DRAG_GRIDABLE: true,
+
+    /**
+     * &#xD56B;&#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : UNDO REDO &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_CTRL_Z: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : DELETE &#xC0AD;&#xC81C; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_DELETE: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : Ctrl+A &#xC804;&#xCCB4;&#xC120;&#xD0DD; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_CTRL_A: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : Ctrl+C &#xBCF5;&#xC0AC; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_CTRL_C: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : Ctrl+V &#xBD99;&#xC5EC;&#xB123;&#xAE30; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_CTRL_V: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : Ctrl+D &#xBCF5;&#xC81C;&#xD558;&#xAE30; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_CTRL_D: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : Ctrl+G &#xADF8;&#xB8F9; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_CTRL_G: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : Ctrl+U &#xC5B8;&#xADF8;&#xB8F9; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_CTRL_U: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : &#xBC29;&#xD5A5;&#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_ARROW: true,
+
+    /**
+     * &#xD56B;&#xD0A4; : Shift + &#xBC29;&#xD5A5;&#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_HOTKEY_SHIFT_ARROW: true,
+
+    /**
+     * &#xB9C8;&#xC6B0;&#xC2A4; &#xC6B0;&#xD074;&#xB9AD; &#xBA54;&#xB274; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
+     */
+    ENABLE_CONTEXTMENU: true,
+
+    /**
+     * &#xCE94;&#xBC84;&#xC2A4; &#xC2A4;&#xCF00;&#xC77C;(&#xB9AC;&#xC5BC; &#xC0AC;&#xC774;&#xC988; : Scale = 1)
+     */
+    SCALE: 1,
+
+    /**
+     * &#xCE94;&#xBC84;&#xC2A4; &#xCD5C;&#xC18C; &#xC2A4;&#xCF00;&#xC77C;
+     */
+    SCALE_MIN: 0.1,
+
+    /**
+     * &#xCE94;&#xBC84;&#xC2A4; &#xCD5C;&#xB300; &#xC2A4;&#xCF00;&#xC77C;
+     */
+    SCALE_MAX: 10,
+
+    /**
+     * Edge &#xAEBD;&#xC740;&#xC120; &#xD328;&#xB529; &#xC0AC;&#xC774;&#xC988;
+     */
+    EDGE_PADDING: 20,
+
+    /**
+     * &#xB77C;&#xBCA8;&#xC758; &#xD328;&#xB529; &#xC0AC;&#xC774;&#xC988;
+     */
+    LABEL_PADDING: 5,
+
+    /**
+     * &#xB77C;&#xBCA8; &#xC5D0;&#xB514;&#xD130;(textarea)&#xC758; &#xB514;&#xD3F4;&#xD2B8; width
+     */
+    LABEL_EDITOR_WIDTH: 500,
+
+    /**
+     * &#xB77C;&#xBCA8; &#xC5D0;&#xB514;&#xD130;(textarea)&#xC758; &#xB514;&#xD3F4;&#xD2B8; height
+     */
+    LABEL_EDITOR_HEIGHT: 16,
+
+    /**
+     * &#xC2DC;&#xC791;, &#xB05D;&#xC810; &#xB77C;&#xBCA8;&#xC758; offsetTop &#xAC12;
+     */
+    FROMTO_LABEL_OFFSET_TOP: 15,
+
+    /**
+     * Move &amp; Resize &#xC6A9; &#xAC00;&#xC774;&#xB4DC; &#xC120; &#xCF58;&#xD2B8;&#xB864; Rect &#xC0AC;&#xC774;&#xC988;
+     */
+    GUIDE_LINE_SIZE: 20,
+    /**
+     * Move &amp; Resize &#xC6A9; &#xAC00;&#xC774;&#xB4DC; &#xC120; &#xCF58;&#xD2B8;&#xB864; &#xB9C8;&#xC9C4; &#xC0AC;&#xC774;&#xC988;
+     */
+    GUIDE_LINE_MARGIN: 10,
+
+    /**
+     * Move &amp; Resize &#xC6A9; &#xAC00;&#xC774;&#xB4DC; &#xCF58;&#xD2B8;&#xB864; Rect &#xC0AC;&#xC774;&#xC988;
+     */
+    GUIDE_RECT_SIZE: 8,
+
+    /**
+     * Move &amp; Resize &#xC6A9; &#xAC00;&#xC774;&#xB4DC; &#xAC00;&#xB85C;, &#xC138;&#xB85C; &#xCD5C;&#xC18C; &#xC0AC;&#xC774;&#xC988;
+     */
+    GUIDE_MIN_SIZE: 18,
+
+    /**
+     * &#xB3C4;&#xD615; &#xCEE8;&#xD2B8;&#xB864;&#xB7EC; &#xC544;&#xC774;&#xCF58; &#xCEE4;&#xB125;&#xD2B8; &#xB77C;&#xC778; &#xD45C;&#xC2DC; &#xAC1C;&#xC218;
+     */
+    GUIDE_CONTROL_LINE_NUM: 2,
+
+    /**
+     * Collapse &amp; Expand &#xC6A9; &#xAC00;&#xC774;&#xB4DC; Rect &#xC0AC;&#xC774;&#xC988;
+     */
+    COLLAPSE_SIZE: 10,
+
+    /**
+     * Shape Move &amp; Resize &#xC2DC; &#xC774;&#xB3D9; &#xAC04;&#xACA9;
+     */
+    MOVE_SNAP_SIZE: 8,
+
+    /**
+     * &#xD130;&#xBBF8;&#xB110; cross &#xC0AC;&#xC774;&#xC988;
+     */
+    TERMINAL_SIZE: 5,
+
+    /**
+     * Shape &#xBCF5;&#xC0AC;&#xC2DC; &#xD328;&#xB529; &#xC0AC;&#xC774;&#xC988;
+     */
+    COPY_PASTE_PADDING: 20,
+
+    /**
+     * Fit Canvas &#xC2DC; &#xD328;&#xB529; &#xC0AC;&#xC774;&#xC988;
+     */
+    FIT_CANVAS_PADDING: 20,
+
+    /**
+     * &#xCE94;&#xBC84;&#xC2A4; &#xC601;&#xC5ED; &#xC790;&#xB3D9; &#xD655;&#xC7A5; &#xC5EC;&#xBD80;
+     */
+    AUTO_EXTENSIONAL: true,
+
+    /**
+     * &#xCE94;&#xBC84;&#xC2A4; &#xC601;&#xC5ED; &#xC790;&#xB3D9; &#xD655;&#xC7A5;&#xC2DC; &#xC99D;&#xAC00; &#xC0AC;&#xC774;&#xC988;
+     */
+    AUTO_EXTENSION_SIZE: 100,
+
+    /**
+     * &#xCE94;&#xBC84;&#xC2A4; &#xBC30;&#xACBD;&#xC0C9;
+     */
+    CANVAS_BACKGROUND: &quot;#f9f9f9&quot;,
+
+    /**
+     * &#xC774;&#xBBF8;&#xC9C0; url &#xC815;&#xBCF4;
+     */
+    IMAGE_USER: &quot;http://processcodi.com/images/opengraph/User.png&quot;,
+    IMAGE_SEND: &quot;http://processcodi.com/images/opengraph/Send.png&quot;,
+    IMAGE_RECEIVE: &quot;http://processcodi.com/images/opengraph/Receive.png&quot;,
+    IMAGE_MANUAL: &quot;http://processcodi.com/images/opengraph/Manual.png&quot;,
+    IMAGE_SERVICE: &quot;http://processcodi.com/images/opengraph/Service.png&quot;,
+    IMAGE_RULE: &quot;http://processcodi.com/images/opengraph/BusinessRule.png&quot;,
+    IMAGE_SCRIPT: &quot;http://processcodi.com/images/opengraph/Script.png&quot;,
+    IMAGE_MAPPER: &quot;http://processcodi.com/images/opengraph/mapper.png&quot;,
+    IMAGE_WEB: &quot;http://processcodi.com/images/opengraph/w_services.png&quot;,
+
+    /**
+     * Edge &#xC120; &#xC790;&#xB3D9;&#xB9C8;&#xCDA4; &#xAC01;&#xB3C4; &#xCD5C;&#xC18C;&#xAC12;
+     */
+    TRIM_EDGE_ANGLE_SIZE: 170,
+    /**
+     * Edge &#xC120; &#xC774;&#xB3D9;&#xB51C;&#xB808;&#xC774; &#xAC70;&#xB9AC;
+     */
+    EDGE_MOVE_DELAY_SIZE: 14,
+
+    /**
+     * swimLane &#xB9AC;&#xC0AC;&#xC774;&#xC988; &#xCD5C;&#xC18C; &#xD3ED;
+     */
+    LANE_MIN_SIZE: 50,
+
+    /**
+     * swimLane &#xD655;&#xC7A5; &#xAE30;&#xBCF8; &#xD3ED;
+     */
+    LANE_DEFAULT_SIZE: 100,
+
+    /**
+     * swimLane, pool &#xC0DD;&#xC131; &#xAE30;&#xBCF8; &#xAC00;&#xB85C;,&#xC138;&#xB85C;
+     */
+    POOL_DEFAULT_SIZE: [300, 200],
+
+    /**
+     * &#xADF8;&#xB8F9; &#xD558;&#xC704; shape &#xC640; &#xADF8;&#xB8F9;&#xC0AC;&#xC774;&#xC758; &#xC5EC;&#xC720;&#xD3ED;
+     */
+    GROUP_INNER_SAPCE: 10,
+
+    /**
+     * &#xB77C;&#xBCA8; &#xCD5C;&#xC18C; &#xD06C;&#xAE30;(IE)
+     */
+    LABEL_MIN_SIZE: 0,
+
+    /**
+     * &#xB77C;&#xBCA8; &#xCD5C;&#xB300; &#xD06C;&#xAE30;(IE)
+     */
+    LABEL_MAX_SIZE: 300,
+
+    /**
+     * &#xB514;&#xD3F4;&#xD2B8; &#xC2A4;&#xD0C0;&#xC77C; &#xC815;&#xC758;
+     */
+    DEFAULT_STYLE: {
+        SHAPE: {cursor: &quot;default&quot;},
+        GEOM: {
+            stroke: &quot;black&quot;,
+            &quot;fill-r&quot;: &quot;.5&quot;,
+            &quot;fill-cx&quot;: &quot;.5&quot;,
+            &quot;fill-cy&quot;: &quot;.5&quot;,
+            fill: &quot;white&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;label-position&quot;: &quot;center&quot;
         },
-
-        /**
-         * &#xB9AC;&#xC0AC;&#xC774;&#xC988; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        RESIZABLE: true,
-        RESIZABLE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+        TEXT: {stroke: &quot;none&quot;, &quot;text-anchor&quot;: &quot;middle&quot;},
+        HTML: {&quot;label-position&quot;: &quot;bottom&quot;, &quot;text-anchor&quot;: &quot;middle&quot;, &quot;vertical-align&quot;: &quot;top&quot;},
+        IMAGE: {&quot;label-position&quot;: &quot;bottom&quot;, &quot;text-anchor&quot;: &quot;middle&quot;, &quot;vertical-align&quot;: &quot;top&quot;},
+        EDGE: {
+            stroke: &quot;black&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 1.5,
+            &quot;stroke-opacity&quot;: 1,
+            &quot;edge-type&quot;: &quot;plain&quot;,
+            &quot;arrow-start&quot;: &quot;none&quot;,
+            &quot;arrow-end&quot;: &quot;block&quot;,
+            &quot;stroke-dasharray&quot;: &quot;&quot;,
+            &quot;label-position&quot;: &quot;center&quot;,
+            &quot;stroke-linejoin&quot;: &quot;round&quot;,
+            cursor: &quot;pointer&quot;
         },
-
-        /**
-         * &#xC5F0;&#xACB0; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        CONNECTABLE: true,
-
-        /**
-         * Self &#xC5F0;&#xACB0; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        SELF_CONNECTABLE: true,
-
-        /**
-         * &#xAC00;&#xC774;&#xB4DC;&#xC5D0; &#xC790;&#xAE30;&#xC790;&#xC2E0;&#xC744; &#xBCF5;&#xC0AC;&#xD558;&#xB294; &#xCEE8;&#xD2B8;&#xB864;&#xB7EC; &#xC5EC;&#xBD80;.
-         */
-        CONNECT_CLONEABLE: true,
-
-        /**
-         * &#xB4DC;&#xB798;&#xADF8;&#xD558;&#xC5EC; &#xC5F0;&#xACB0;&#xC2DC; &#xC5F0;&#xACB0;&#xB300;&#xC0C1; &#xC788;&#xB294; &#xACBD;&#xC6B0;&#xC5D0;&#xB9CC; Edge &#xB4DC;&#xB85C;&#xC789; &#xCC98;&#xB9AC; &#xC5EC;&#xBD80;
-         */
-        CONNECT_REQUIRED: true,
-
-        /**
-         * &#xB4DC;&#xB798;&#xADF8;&#xD558;&#xC5EC; &#xC5F0;&#xACB0;&#xC2DC; &#xADF8;&#xB8F9;&#xC744; &#xAC74;&#xB108;&#xB6F8;&#xB54C; &#xC2A4;&#xD0C0;&#xC77C; &#xBCC0;&#xACBD; &#xC5EC;&#xBD80;
-         */
-        CONNECT_STYLE_CHANGE: true,
-        CONNECT_STYLE_CHANGE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+        EDGE_SHADOW: {
+            stroke: &quot;#00FF00&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 1,
+            &quot;stroke-opacity&quot;: 1,
+            &quot;arrow-start&quot;: &quot;none&quot;,
+            &quot;arrow-end&quot;: &quot;none&quot;,
+            &quot;stroke-dasharray&quot;: &quot;- &quot;,
+            &quot;edge-type&quot;: &quot;plain&quot;,
+            cursor: &quot;pointer&quot;
         },
-
-        /**
-         * &#xAC00;&#xC774;&#xB4DC;&#xC5D0; &#xC0AD;&#xC81C; &#xCEE8;&#xD2B8;&#xB864;&#xB7EC; &#xC5EC;&#xBD80;
-         */
-        DELETABLE: true,
-        DELETABLE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+        EDGE_HIDDEN: {
+            stroke: &quot;white&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 10,
+            &quot;stroke-opacity&quot;: 0,
+            cursor: &quot;pointer&quot;
         },
-
-        /**
-         * &#xB77C;&#xBCA8; &#xC218;&#xC815;&#xC5EC;&#xBD80;
-         */
-        LABEL_EDITABLE: true,
-        LABEL_EDITABLE_: {
-            GEOM: true,
-            TEXT: true,
-            HTML: true,
-            IMAGE: true,
-            EDGE: true,
-            GROUP: true
+        GROUP: {
+            stroke: &quot;black&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;label-position&quot;: &quot;bottom&quot;,
+            &quot;text-anchor&quot;: &quot;middle&quot;,
+            &quot;vertical-align&quot;: &quot;top&quot;
         },
-
-        /**
-         * &#xADF8;&#xB8F9;&#xD551; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        GROUP_DROPABLE: true,
-
-        /**
-         * &#xCD5C;&#xC18C;&#xD654; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        GROUP_COLLAPSIBLE: true,
-
-        /**
-         * &#xC774;&#xB3D9;, &#xB9AC;&#xC0AC;&#xC774;&#xC988; &#xB4DC;&#xB798;&#xADF8;&#xC2DC; MOVE_SNAP_SIZE &#xC801;&#xC6A9; &#xC5EC;&#xBD80;
-         */
-        DRAG_GRIDABLE: true,
-
-        /**
-         * &#xD56B;&#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : UNDO REDO &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_CTRL_Z: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : DELETE &#xC0AD;&#xC81C; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_DELETE: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : Ctrl+A &#xC804;&#xCCB4;&#xC120;&#xD0DD; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_CTRL_A: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : Ctrl+C &#xBCF5;&#xC0AC; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_CTRL_C: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : Ctrl+V &#xBD99;&#xC5EC;&#xB123;&#xAE30; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_CTRL_V: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : Ctrl+D &#xBCF5;&#xC81C;&#xD558;&#xAE30; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_CTRL_D: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : Ctrl+G &#xADF8;&#xB8F9; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_CTRL_G: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : Ctrl+U &#xC5B8;&#xADF8;&#xB8F9; &#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_CTRL_U: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : &#xBC29;&#xD5A5;&#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_ARROW: true,
-
-        /**
-         * &#xD56B;&#xD0A4; : Shift + &#xBC29;&#xD5A5;&#xD0A4; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_HOTKEY_SHIFT_ARROW: true,
-
-        /**
-         * &#xB9C8;&#xC6B0;&#xC2A4; &#xC6B0;&#xD074;&#xB9AD; &#xBA54;&#xB274; &#xAC00;&#xB2A5;&#xC5EC;&#xBD80;
-         */
-        ENABLE_CONTEXTMENU: true,
-
-        /**
-         * &#xCE94;&#xBC84;&#xC2A4; &#xC2A4;&#xCF00;&#xC77C;(&#xB9AC;&#xC5BC; &#xC0AC;&#xC774;&#xC988; : Scale = 1)
-         */
-        SCALE: 1,
-
-        /**
-         * &#xCE94;&#xBC84;&#xC2A4; &#xCD5C;&#xC18C; &#xC2A4;&#xCF00;&#xC77C;
-         */
-        SCALE_MIN: 0.1,
-
-        /**
-         * &#xCE94;&#xBC84;&#xC2A4; &#xCD5C;&#xB300; &#xC2A4;&#xCF00;&#xC77C;
-         */
-        SCALE_MAX: 10,
-
-        /**
-         * Edge &#xAEBD;&#xC740;&#xC120; &#xD328;&#xB529; &#xC0AC;&#xC774;&#xC988;
-         */
-        EDGE_PADDING: 20,
-
-        /**
-         * &#xB77C;&#xBCA8;&#xC758; &#xD328;&#xB529; &#xC0AC;&#xC774;&#xC988;
-         */
-        LABEL_PADDING: 5,
-
-        /**
-         * &#xB77C;&#xBCA8; &#xC5D0;&#xB514;&#xD130;(textarea)&#xC758; &#xB514;&#xD3F4;&#xD2B8; width
-         */
-        LABEL_EDITOR_WIDTH: 500,
-
-        /**
-         * &#xB77C;&#xBCA8; &#xC5D0;&#xB514;&#xD130;(textarea)&#xC758; &#xB514;&#xD3F4;&#xD2B8; height
-         */
-        LABEL_EDITOR_HEIGHT: 16,
-
-        /**
-         * &#xC2DC;&#xC791;, &#xB05D;&#xC810; &#xB77C;&#xBCA8;&#xC758; offsetTop &#xAC12;
-         */
-        FROMTO_LABEL_OFFSET_TOP: 15,
-
-        /**
-         * Move &amp; Resize &#xC6A9; &#xAC00;&#xC774;&#xB4DC; &#xC120; &#xCF58;&#xD2B8;&#xB864; Rect &#xC0AC;&#xC774;&#xC988;
-         */
-        GUIDE_LINE_SIZE: 20,
-        /**
-         * Move &amp; Resize &#xC6A9; &#xAC00;&#xC774;&#xB4DC; &#xC120; &#xCF58;&#xD2B8;&#xB864; &#xB9C8;&#xC9C4; &#xC0AC;&#xC774;&#xC988;
-         */
-        GUIDE_LINE_MARGIN: 10,
-
-        /**
-         * Move &amp; Resize &#xC6A9; &#xAC00;&#xC774;&#xB4DC; &#xCF58;&#xD2B8;&#xB864; Rect &#xC0AC;&#xC774;&#xC988;
-         */
-        GUIDE_RECT_SIZE: 8,
-
-        /**
-         * Move &amp; Resize &#xC6A9; &#xAC00;&#xC774;&#xB4DC; &#xAC00;&#xB85C;, &#xC138;&#xB85C; &#xCD5C;&#xC18C; &#xC0AC;&#xC774;&#xC988;
-         */
-        GUIDE_MIN_SIZE: 18,
-
-        /**
-         * Collapse &amp; Expand &#xC6A9; &#xAC00;&#xC774;&#xB4DC; Rect &#xC0AC;&#xC774;&#xC988;
-         */
-        COLLAPSE_SIZE: 10,
-
-        /**
-         * Shape Move &amp; Resize &#xC2DC; &#xC774;&#xB3D9; &#xAC04;&#xACA9;
-         */
-        MOVE_SNAP_SIZE: 8,
-
-        /**
-         * &#xD130;&#xBBF8;&#xB110; cross &#xC0AC;&#xC774;&#xC988;
-         */
-        TERMINAL_SIZE: 5,
-
-        /**
-         * Shape &#xBCF5;&#xC0AC;&#xC2DC; &#xD328;&#xB529; &#xC0AC;&#xC774;&#xC988;
-         */
-        COPY_PASTE_PADDING: 20,
-
-        /**
-         * Fit Canvas &#xC2DC; &#xD328;&#xB529; &#xC0AC;&#xC774;&#xC988;
-         */
-        FIT_CANVAS_PADDING: 20,
-
-        /**
-         * &#xCE94;&#xBC84;&#xC2A4; &#xC601;&#xC5ED; &#xC790;&#xB3D9; &#xD655;&#xC7A5; &#xC5EC;&#xBD80;
-         */
-        AUTO_EXTENSIONAL: true,
-
-        /**
-         * &#xCE94;&#xBC84;&#xC2A4; &#xC601;&#xC5ED; &#xC790;&#xB3D9; &#xD655;&#xC7A5;&#xC2DC; &#xC99D;&#xAC00; &#xC0AC;&#xC774;&#xC988;
-         */
-        AUTO_EXTENSION_SIZE: 100,
-
-        /**
-         * &#xCE94;&#xBC84;&#xC2A4; &#xBC30;&#xACBD;&#xC0C9;
-         */
-        CANVAS_BACKGROUND: &quot;#f9f9f9&quot;,
-
-        /**
-         * &#xC774;&#xBBF8;&#xC9C0; url &#xC815;&#xBCF4;
-         */
-        IMAGE_USER: &quot;http://processcodi.com/images/opengraph/User.png&quot;,
-        IMAGE_SEND: &quot;http://processcodi.com/images/opengraph/Send.png&quot;,
-        IMAGE_RECEIVE: &quot;http://processcodi.com/images/opengraph/Receive.png&quot;,
-        IMAGE_MANUAL: &quot;http://processcodi.com/images/opengraph/Manual.png&quot;,
-        IMAGE_SERVICE: &quot;http://processcodi.com/images/opengraph/Service.png&quot;,
-        IMAGE_RULE: &quot;http://processcodi.com/images/opengraph/BusinessRule.png&quot;,
-        IMAGE_SCRIPT: &quot;http://processcodi.com/images/opengraph/Script.png&quot;,
-        IMAGE_MAPPER: &quot;http://processcodi.com/images/opengraph/mapper.png&quot;,
-        IMAGE_WEB: &quot;http://processcodi.com/images/opengraph/w_services.png&quot;,
-
-        /**
-         * Edge &#xC120; &#xC790;&#xB3D9;&#xB9C8;&#xCDA4; &#xAC01;&#xB3C4; &#xCD5C;&#xC18C;&#xAC12;
-         */
-        TRIM_EDGE_ANGLE_SIZE: 170,
-        /**
-         * Edge &#xC120; &#xC774;&#xB3D9;&#xB51C;&#xB808;&#xC774; &#xAC70;&#xB9AC;
-         */
-        EDGE_MOVE_DELAY_SIZE: 14,
-
-        /**
-         * swimLane &#xB9AC;&#xC0AC;&#xC774;&#xC988; &#xCD5C;&#xC18C; &#xD3ED;
-         */
-        LANE_MIN_SIZE: 50,
-
-        /**
-         * swimLane &#xD655;&#xC7A5; &#xAE30;&#xBCF8; &#xD3ED;
-         */
-        LANE_DEFAULT_SIZE: 100,
-
-        /**
-         * swimLane, pool &#xC0DD;&#xC131; &#xAE30;&#xBCF8; &#xAC00;&#xB85C;,&#xC138;&#xB85C;
-         */
-        POOL_DEFAULT_SIZE: [300, 200],
-
-        /**
-         * &#xADF8;&#xB8F9; &#xD558;&#xC704; shape &#xC640; &#xADF8;&#xB8F9;&#xC0AC;&#xC774;&#xC758; &#xC5EC;&#xC720;&#xD3ED;
-         */
-        GROUP_INNER_SAPCE: 10,
-
-        /**
-         * &#xB77C;&#xBCA8; &#xCD5C;&#xC18C; &#xD06C;&#xAE30;(IE)
-         */
-        LABEL_MIN_SIZE: 100,
-
-        /**
-         * &#xB77C;&#xBCA8; &#xCD5C;&#xB300; &#xD06C;&#xAE30;(IE)
-         */
-        LABEL_MAX_SIZE: 300,
-
-        /**
-         * &#xB514;&#xD3F4;&#xD2B8; &#xC2A4;&#xD0C0;&#xC77C; &#xC815;&#xC758;
-         */
-        DEFAULT_STYLE: {
-            SHAPE: {cursor: &quot;default&quot;},
-            GEOM: {
-                stroke: &quot;black&quot;,
-                &quot;fill-r&quot;: &quot;.5&quot;,
-                &quot;fill-cx&quot;: &quot;.5&quot;,
-                &quot;fill-cy&quot;: &quot;.5&quot;,
-                fill: &quot;white&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;label-position&quot;: &quot;center&quot;
-            },
-            TEXT: {stroke: &quot;none&quot;, &quot;text-anchor&quot;: &quot;middle&quot;},
-            HTML: {&quot;label-position&quot;: &quot;bottom&quot;, &quot;text-anchor&quot;: &quot;middle&quot;, &quot;vertical-align&quot;: &quot;top&quot;},
-            IMAGE: {&quot;label-position&quot;: &quot;bottom&quot;, &quot;text-anchor&quot;: &quot;middle&quot;, &quot;vertical-align&quot;: &quot;top&quot;},
-            EDGE: {
-                stroke: &quot;black&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 1.5,
-                &quot;stroke-opacity&quot;: 1,
-                &quot;edge-type&quot;: &quot;plain&quot;,
-                &quot;arrow-start&quot;: &quot;none&quot;,
-                &quot;arrow-end&quot;: &quot;block&quot;,
-                &quot;stroke-dasharray&quot;: &quot;&quot;,
-                &quot;label-position&quot;: &quot;center&quot;,
-                &quot;stroke-linejoin&quot;: &quot;round&quot;,
-                cursor: &quot;pointer&quot;
-            },
-            EDGE_SHADOW: {
-                stroke: &quot;#00FF00&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 1,
-                &quot;stroke-opacity&quot;: 1,
-                &quot;arrow-start&quot;: &quot;none&quot;,
-                &quot;arrow-end&quot;: &quot;none&quot;,
-                &quot;stroke-dasharray&quot;: &quot;- &quot;,
-                &quot;edge-type&quot;: &quot;plain&quot;,
-                cursor: &quot;pointer&quot;
-            },
-            EDGE_HIDDEN: {
-                stroke: &quot;white&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 10,
-                &quot;stroke-opacity&quot;: 0,
-                cursor: &quot;pointer&quot;
-            },
-            GROUP: {
-                stroke: &quot;black&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;label-position&quot;: &quot;bottom&quot;,
-                &quot;text-anchor&quot;: &quot;middle&quot;,
-                &quot;vertical-align&quot;: &quot;top&quot;
-            },
-            GROUP_HIDDEN: {stroke: &quot;black&quot;, fill: &quot;white&quot;, &quot;fill-opacity&quot;: 0, &quot;stroke-opacity&quot;: 0, cursor: &quot;move&quot;},
-            GROUP_SHADOW: {
-                stroke: &quot;white&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 15,
-                &quot;stroke-opacity&quot;: 0,
-                cursor: &quot;pointer&quot;
-            },
-            GROUP_SHADOW_MAPPER: {
-                stroke: &quot;white&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 1,
-                &quot;stroke-opacity&quot;: 0,
-                cursor: &quot;pointer&quot;
-            },
-            GUIDE_BBOX: {
-                stroke: &quot;#00FF00&quot;,
-                fill: &quot;white&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-dasharray&quot;: &quot;- &quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;,
-                cursor: &quot;move&quot;
-            },
-            GUIDE_UL: {
-                stroke: &quot;#03689a&quot;,
-                fill: &quot;#03689a&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;nwse-resize&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            GUIDE_UR: {
-                stroke: &quot;#03689a&quot;,
-                fill: &quot;#03689a&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;nesw-resize&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            GUIDE_LL: {
-                stroke: &quot;#03689a&quot;,
-                fill: &quot;#03689a&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;nesw-resize&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            GUIDE_LR: {
-                stroke: &quot;#03689a&quot;,
-                fill: &quot;#03689a&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;nwse-resize&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            GUIDE_LC: {
-                stroke: &quot;#03689a&quot;,
-                fill: &quot;#03689a&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;ew-resize&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            GUIDE_UC: {
-                stroke: &quot;black&quot;,
-                fill: &quot;#03689a&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;ns-resize&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            GUIDE_RC: {
-                stroke: &quot;black&quot;,
-                fill: &quot;#03689a&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;ew-resize&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            GUIDE_LWC: {
-                stroke: &quot;black&quot;,
-                fill: &quot;#03689a&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;ns-resize&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            GUIDE_FROM: {stroke: &quot;black&quot;, fill: &quot;#00FF00&quot;, cursor: &quot;move&quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
-            GUIDE_TO: {stroke: &quot;black&quot;, fill: &quot;#00FF00&quot;, cursor: &quot;move&quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
-            GUIDE_CTL_H: {stroke: &quot;black&quot;, fill: &quot;#00FF00&quot;, cursor: &quot;ew-resize&quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
-            GUIDE_CTL_V: {stroke: &quot;black&quot;, fill: &quot;#00FF00&quot;, cursor: &quot;ns-resize&quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
-            GUIDE_SHADOW: {stroke: &quot;black&quot;, fill: &quot;none&quot;, &quot;stroke-dasharray&quot;: &quot;- &quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
-            GUIDE_LINE: {
-                stroke: &quot;black&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 1.2,
-                &quot;stroke-opacity&quot;: 1,
-                &quot;stroke-dasharray&quot;: &quot;&quot;,
-                &quot;arrow-end&quot;: &quot;block&quot;,
-                &quot;stroke-linejoin&quot;: &quot;round&quot;,
-                cursor: &quot;pointer&quot;
-            },
-            GUIDE_LINE_ESSENSIA: {
-                stroke: &quot;black&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 1.2,
-                &quot;stroke-opacity&quot;: 1,
-                &quot;stroke-dasharray&quot;: &quot;&quot;,
-                &quot;arrow-start&quot;: &quot;diamond&quot;,
-                &quot;arrow-end&quot;: &quot;none&quot;,
-                &quot;stroke-linejoin&quot;: &quot;round&quot;,
-                cursor: &quot;pointer&quot;
-            },
-            GUIDE_VIRTUAL_EDGE: {
-                stroke: &quot;black&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 1,
-                &quot;stroke-opacity&quot;: 1,
-                &quot;stroke-dasharray&quot;: &quot;- &quot;,
-                &quot;stroke-linejoin&quot;: &quot;round&quot;,
-                &quot;arrow-start&quot;: &quot;none&quot;,
-                &quot;arrow-end&quot;: &quot;none&quot;
-            },
-            GUIDE_LINE_AREA: {
-                stroke: &quot;#ffffff&quot;,
-                fill: &quot;#ffffff&quot;,
-                &quot;fill-opacity&quot;: 0.1,
-                &quot;stroke-width&quot;: 1,
-                &quot;stroke-opacity&quot;: 0.2,
-                cursor: &quot;pointer&quot;
-            },
-            GUIDE_RECT_AREA: {
-                stroke: &quot;black&quot;,
-                fill: &quot;#ffffff&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 1,
-                &quot;stroke-opacity&quot;: 1,
-                cursor: &quot;pointer&quot;
-            },
-            RUBBER_BAND: {stroke: &quot;#0000FF&quot;, opacity: 0.2, fill: &quot;#0077FF&quot;},
-            DROP_OVER_BBOX: {stroke: &quot;#0077FF&quot;, fill: &quot;none&quot;, opacity: 0.3, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
-            LABEL: {&quot;font-size&quot;: 12, &quot;font-color&quot;: &quot;black&quot;, &quot;fill&quot;: &quot;white&quot;},
-            LABEL_EDITOR: {
-                position: &quot;absolute&quot;,
-                overflow: &quot;visible&quot;,
-                resize: &quot;none&quot;,
-                &quot;text-align&quot;: &quot;center&quot;,
-                display: &quot;block&quot;,
-                padding: 0
-            },
-            COLLAPSE: {
-                stroke: &quot;black&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                cursor: &quot;pointer&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            COLLAPSE_BBOX: {stroke: &quot;none&quot;, fill: &quot;none&quot;, &quot;fill-opacity&quot;: 0},
-            BUTTON: {
-                stroke: &quot;#9FD7FF&quot;,
-                fill: &quot;white&quot;,
-                &quot;fill-opacity&quot;: 0,
-                cursor: &quot;pointer&quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            CONNECT_GUIDE_EVENT_AREA: {
-                stroke: &quot;#ffffff&quot;,
-                fill: &quot;none&quot;,
-                &quot;fill-opacity&quot;: 0,
-                &quot;stroke-width&quot;: 20,
-                &quot;stroke-opacity&quot;: 0
-            },
-            CONNECT_GUIDE_BBOX: {
-                stroke: &quot;#00FF00&quot;,
-                fill: &quot;none&quot;,
-                &quot;stroke-dasharray&quot;: &quot;- &quot;,
-                &quot;shape-rendering&quot;: &quot;crispEdges&quot;
-            },
-            CONNECT_GUIDE_BBOX_EXPEND: 10,
-            CONNECT_GUIDE_SPOT_CIRCLE: {
-                r: 7,
-                stroke: &quot;#A6A6A6&quot;,
-                &quot;stroke-width&quot;: 1,
-                fill: &quot;#FFE400&quot;,
-                &quot;fill-opacity&quot;: 0.5,
-                cursor: &quot;pointer&quot;
-            },
-            CONNECT_GUIDE_SPOT_RECT: {
-                stroke: &quot;#A6A6A6&quot;,
-                &quot;stroke-width&quot;: 1,
-                fill: &quot;#FFE400&quot;,
-                &quot;fill-opacity&quot;: 0.2,
-                cursor: &quot;ns-resize&quot;,
-                w: 20,
-                h: 10
-            },
-            CONNECTABLE_HIGHLIGHT: {
-                &quot;stroke-width&quot;: 2
-            },
-            NOT_CONNECTABLE_HIGHLIGHT: {
-                fill: &quot;#FAAFBE&quot;,
-                &quot;fill-opacity&quot;: 0.5
-            }
+        GROUP_HIDDEN: {stroke: &quot;black&quot;, fill: &quot;white&quot;, &quot;fill-opacity&quot;: 0, &quot;stroke-opacity&quot;: 0, cursor: &quot;move&quot;},
+        GROUP_SHADOW: {
+            stroke: &quot;white&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 15,
+            &quot;stroke-opacity&quot;: 0,
+            cursor: &quot;pointer&quot;
+        },
+        GROUP_SHADOW_MAPPER: {
+            stroke: &quot;white&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 1,
+            &quot;stroke-opacity&quot;: 0,
+            cursor: &quot;pointer&quot;
+        },
+        GUIDE_BBOX: {
+            stroke: &quot;#00FF00&quot;,
+            fill: &quot;white&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-dasharray&quot;: &quot;- &quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;,
+            cursor: &quot;move&quot;
+        },
+        GUIDE_UL: {
+            stroke: &quot;#03689a&quot;,
+            fill: &quot;#03689a&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;nwse-resize&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        GUIDE_UR: {
+            stroke: &quot;#03689a&quot;,
+            fill: &quot;#03689a&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;nesw-resize&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        GUIDE_LL: {
+            stroke: &quot;#03689a&quot;,
+            fill: &quot;#03689a&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;nesw-resize&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        GUIDE_LR: {
+            stroke: &quot;#03689a&quot;,
+            fill: &quot;#03689a&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;nwse-resize&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        GUIDE_LC: {
+            stroke: &quot;#03689a&quot;,
+            fill: &quot;#03689a&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;ew-resize&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        GUIDE_UC: {
+            stroke: &quot;black&quot;,
+            fill: &quot;#03689a&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;ns-resize&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        GUIDE_RC: {
+            stroke: &quot;black&quot;,
+            fill: &quot;#03689a&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;ew-resize&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        GUIDE_LWC: {
+            stroke: &quot;black&quot;,
+            fill: &quot;#03689a&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;ns-resize&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        GUIDE_FROM: {stroke: &quot;black&quot;, fill: &quot;#00FF00&quot;, cursor: &quot;move&quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
+        GUIDE_TO: {stroke: &quot;black&quot;, fill: &quot;#00FF00&quot;, cursor: &quot;move&quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
+        GUIDE_CTL_H: {stroke: &quot;black&quot;, fill: &quot;#00FF00&quot;, cursor: &quot;ew-resize&quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
+        GUIDE_CTL_V: {stroke: &quot;black&quot;, fill: &quot;#00FF00&quot;, cursor: &quot;ns-resize&quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
+        GUIDE_SHADOW: {stroke: &quot;black&quot;, fill: &quot;none&quot;, &quot;stroke-dasharray&quot;: &quot;- &quot;, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
+        GUIDE_LINE: {
+            stroke: &quot;black&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 1.2,
+            &quot;stroke-opacity&quot;: 1,
+            &quot;stroke-dasharray&quot;: &quot;&quot;,
+            &quot;arrow-end&quot;: &quot;block&quot;,
+            &quot;stroke-linejoin&quot;: &quot;round&quot;,
+            cursor: &quot;pointer&quot;
+        },
+        GUIDE_LINE_ESSENSIA: {
+            stroke: &quot;black&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 1.2,
+            &quot;stroke-opacity&quot;: 1,
+            &quot;stroke-dasharray&quot;: &quot;&quot;,
+            &quot;arrow-start&quot;: &quot;diamond&quot;,
+            &quot;arrow-end&quot;: &quot;none&quot;,
+            &quot;stroke-linejoin&quot;: &quot;round&quot;,
+            cursor: &quot;pointer&quot;
+        },
+        GUIDE_VIRTUAL_EDGE: {
+            stroke: &quot;black&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 1,
+            &quot;stroke-opacity&quot;: 1,
+            &quot;stroke-dasharray&quot;: &quot;- &quot;,
+            &quot;stroke-linejoin&quot;: &quot;round&quot;,
+            &quot;arrow-start&quot;: &quot;none&quot;,
+            &quot;arrow-end&quot;: &quot;none&quot;
+        },
+        GUIDE_LINE_AREA: {
+            stroke: &quot;#ffffff&quot;,
+            fill: &quot;#ffffff&quot;,
+            &quot;fill-opacity&quot;: 0.1,
+            &quot;stroke-width&quot;: 1,
+            &quot;stroke-opacity&quot;: 0.2,
+            cursor: &quot;pointer&quot;
+        },
+        GUIDE_RECT_AREA: {
+            stroke: &quot;black&quot;,
+            fill: &quot;#ffffff&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 1,
+            &quot;stroke-opacity&quot;: 1,
+            cursor: &quot;pointer&quot;
+        },
+        RUBBER_BAND: {stroke: &quot;#0000FF&quot;, opacity: 0.2, fill: &quot;#0077FF&quot;},
+        DROP_OVER_BBOX: {stroke: &quot;#0077FF&quot;, fill: &quot;none&quot;, opacity: 0.3, &quot;shape-rendering&quot;: &quot;crispEdges&quot;},
+        LABEL: {&quot;font-size&quot;: 12, &quot;font-color&quot;: &quot;black&quot;, &quot;fill&quot;: &quot;none&quot;},
+        LABEL_EDITOR: {
+            position: &quot;absolute&quot;,
+            overflow: &quot;visible&quot;,
+            resize: &quot;none&quot;,
+            &quot;text-align&quot;: &quot;center&quot;,
+            display: &quot;block&quot;,
+            padding: 0
+        },
+        COLLAPSE: {
+            stroke: &quot;black&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            cursor: &quot;pointer&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        COLLAPSE_BBOX: {stroke: &quot;none&quot;, fill: &quot;none&quot;, &quot;fill-opacity&quot;: 0},
+        BUTTON: {
+            stroke: &quot;#9FD7FF&quot;,
+            fill: &quot;white&quot;,
+            &quot;fill-opacity&quot;: 0,
+            cursor: &quot;pointer&quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        CONNECT_GUIDE_EVENT_AREA: {
+            stroke: &quot;#ffffff&quot;,
+            fill: &quot;none&quot;,
+            &quot;fill-opacity&quot;: 0,
+            &quot;stroke-width&quot;: 20,
+            &quot;stroke-opacity&quot;: 0
+        },
+        CONNECT_GUIDE_BBOX: {
+            stroke: &quot;#00FF00&quot;,
+            fill: &quot;none&quot;,
+            &quot;stroke-dasharray&quot;: &quot;- &quot;,
+            &quot;shape-rendering&quot;: &quot;crispEdges&quot;
+        },
+        CONNECT_GUIDE_BBOX_EXPEND: 10,
+        CONNECT_GUIDE_SPOT_CIRCLE: {
+            r: 7,
+            stroke: &quot;#A6A6A6&quot;,
+            &quot;stroke-width&quot;: 1,
+            fill: &quot;#FFE400&quot;,
+            &quot;fill-opacity&quot;: 0.5,
+            cursor: &quot;pointer&quot;
+        },
+        CONNECT_GUIDE_SPOT_RECT: {
+            stroke: &quot;#A6A6A6&quot;,
+            &quot;stroke-width&quot;: 1,
+            fill: &quot;#FFE400&quot;,
+            &quot;fill-opacity&quot;: 0.2,
+            cursor: &quot;ns-resize&quot;,
+            w: 20,
+            h: 10
+        },
+        CONNECTABLE_HIGHLIGHT: {
+            &quot;stroke-width&quot;: 2
+        },
+        NOT_CONNECTABLE_HIGHLIGHT: {
+            fill: &quot;#FAAFBE&quot;,
+            &quot;fill-opacity&quot;: 0.5
         }
+    }
 }
 </code></pre>
 <h2 id="zoom-panel">Zoom Panel</h2>
@@ -1393,13 +1431,13 @@ console.log(boundary.getLowerRight().x,boundary.getLowerRight().y);
 </div></div></section>
 
  <footer>
-  <div><p class="w-fixed-width"><span id="dg-web-footer">Version 0.1.1 released on 10/17/2016.</span></p></div>
+  <div><p class="w-fixed-width"><span id="dg-web-footer">Version 0.1.2 released on 11/18/2016.</span></p></div>
   <div class="w-fixed-width">
     <p><span id="dg-copyright">&#xA9; 2016 <a href="sppark@uengine.org">Seunpil park</a></span></p>
     <p>
       <span id="dg-marking"></span>
       <span id="dg-legalese"></span>
-      <span id="dg-attribution">Created by DocGen 2.1.3 on 02/11/2016 at 22:37:32.</span>
+      <span id="dg-attribution">Created by DocGen 2.1.3 on 18/11/2016 at 02:53:20.</span>
     </p>
   </div>
  </footer>

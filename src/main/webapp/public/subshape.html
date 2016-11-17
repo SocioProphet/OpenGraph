@@ -1,0 +1,550 @@
+<!doctype html>
+<html>
+ <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><!--Prevent IE using compatibility mode on local or intranet pages. Do not put scripts before this line.-->
+  <meta name="viewport" content="width=device-width, user-scalable=yes"><!--Mobile device scaling-->
+  <meta charset="UTF-8">
+  <title>Opengraph Documentation</title>
+
+  <!--load stylesheets first (rationale: https://developers.google.com/speed/docs/best-practices/rtt#PutStylesBeforeScripts)-->
+  <link rel="stylesheet" href="require/webknife/framework.min.css" type="text/css">
+  <link rel="stylesheet" href="require/webknife/highlight.min.css" type="text/css">
+  <link rel="stylesheet" href="require/docgen.css" type="text/css">
+  <link rel="stylesheet" href="require/print.css" media="print">
+
+  <!--load scripts second-->
+
+  <script src="require/webknife/framework.min.js"></script>
+  <script src="require/webknife/framework.icons.js"></script>
+  <script src="require/webknife/highlight.min.js"></script>
+
+  <!--inline scripts last-->
+
+<script type="text/javascript">
+
+$(document).ready( function () {
+  $("#dg-toc").hide(); //hide the table of contents
+
+  //instantiate an svg injector to show SVG icons
+  var injector = new svgInject();
+  injector.inject();
+
+  //code syntax highlighting
+  $('pre code, .w-inline-code').each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+
+  //toggle visibility of table of contents
+  $("#dg-navigator").click(function()
+  {
+    $("#dg-toc").slideToggle("fast");
+    $(this).toggleClass("active");
+  });
+
+});
+</script>
+
+<script type="text/x-mathjax-config">
+//MathJax configuration is the same as used by math.stackexchange.com
+MathJax.Hub.Config({"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"], linebreaks: { automatic:true }, EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50) },
+  tex2jax: { inlineMath: [ ["$", "$"], ["\\\\(","\\\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+  TeX: {  noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } }, Macros: { href: "{}" } },
+  messageStyle: "none"
+});
+</script>
+
+</head>
+
+<body>
+
+<div id="dg-toc"><div><table class="unstyled"><tr><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Overview</li><li><a href="README.html">Overview</a></li><li><a href="getting-start.html">Getting Started</a></li><li><a href="examples.html">Examples</a></li><li><a href="github.html">Fork on Github</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Canvas</li><li><a href="canvas.html">Canvas Drawing</a></li><li><a href="selector.html">Canvas Selector</a></li><li><a href="data.html">Canvas Data</a></li><li><a href="event.html">Canvas Event</a></li><li><a href="renderer.html">Developer - Renderer</a></li><li><a href="handler.html">Developer - Handler</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Element</li><li><a href="element.html">Element</a></li><li><a href="geometry.html">Geometry</a></li><li><a href="shapes.html">Shape</a></li><li><a href="extend-shape.html">Extend Shape</a></li><li><a href="marker.html">Marker</a></li><li><a href="pattern.html">Pattern</a></li><li><a href="multi.html">Multi Line Edge</a></li><li><a href="animation.html">Animation</a></li><li><a href="subshape.html">Sub Shape</a></li></ul></td><td class="dg-tocGroup"><ul><li class="dg-tocHeading">Api reference</li><li><a href="jsdoc.html">Api reference</a></li></ul></td><td class="dg-tocGroup" id="dg-tocFixedColumn"><ul><li><span class="w-icon dg-tocIcon" data-name="person_group" title="archive"></span><a href="ownership.html">Ownership</a></li><li><span class="w-icon dg-tocIcon" data-name="refresh" title="archive"></span><a href="release-notes.html">Release Notes</a></li></ul><div></div></td></tr></table></div></div>
+<div id="dg-navigator">Table of contents</div>
+
+<header>
+ <div class="w-fixed-width">
+  <a id="dg-homelink" href="README.html">
+    <div id="dg-logo" style="background-image: url(files/images/logo.png); height: 84px; line-height: 84px; padding-left: 109px;">
+      <span id="dg-title">Opengraph Documentation</span> <span id="dg-web-title-version" style="font-weight:normal;">(0.1.2)</span>
+    </div>
+  </a>
+  <div>
+    <span id="dg-backlink"></span>
+  </div>
+ </div>
+</header>
+
+<section id="dg-content"><div class="w-fixed-width"><div id="dg-innerContent"><h1 id="dg-autoTitle">Sub Shape</h1><h1 id="sub-shape">Sub Shape</h1>
+<ul>
+<li><a href="#basic-sub-shape">Basic Sub Shape</a></li>
+<li><a href="#sub-shape-size-&amp;&amp;-position">Sub Shape Size &amp;&amp; Position</a></li>
+<li><a href="#sub-shape-index">Sub Shape index</a></li>
+<li><a href="#sub-shape-data-model">Sub Shape Data model</a></li>
+</ul>
+<p>&#xC55E;&#xC11C; <a href="extend-shape.html#define-custom-shape">Define Custom Shape</a> &#xD30C;&#xD2B8;&#xB97C; &#xD1B5;&#xD574; &#xBCF5;&#xC7A1;&#xD55C; &#xAE30;&#xD558;&#xD559; &#xB3C4;&#xD615;&#xC744; &#xD45C;&#xD604;&#xD558;&#xB294; &#xAC83;&#xC744; &#xC0B4;&#xD3B4;&#xBCF4;&#xC558;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>Sub Shape &#xAE30;&#xB2A5;&#xC774; &#xC704;&#xC640; &#xCC28;&#xC774;&#xAC00; &#xC788;&#xB2E4;&#xBA74; &#xC704;&#xC640; &#xAC19;&#xC740; &#xB3C4;&#xD615;&#xC740; &#xC815;&#xD574;&#xC9C4; geometry &#xB300;&#xB85C; &#xB3C4;&#xD615;&#xC744; &#xADF8;&#xB9AC;&#xC9C0;&#xB9CC;,
+Sub Shape &#xAE30;&#xB2A5;&#xC740; &#xB2E4;&#xC218;&#xC758; Shape &#xC744; &#xB3C4;&#xD615;&#xC758; &#xC0C1;&#xD0DC; &#xB610;&#xB294; &#xB370;&#xC774;&#xD130;&#xC5D0; &#xB530;&#xB77C; &#xC720;&#xAE30;&#xC801;&#xC73C;&#xB85C; &#xBC30;&#xCE58;&#xD560; &#xC218; &#xC788;&#xB3C4;&#xB85D; &#xBAA8;&#xB378;&#xB9C1; &#xD55C; &#xB3C4;&#xD615;&#xC785;&#xB2C8;&#xB2E4;.</p>
+<h2 id="basic-sub-shape">Basic Sub Shape</h2>
+<p>Sub Shape &#xC740; &#xB3C4;&#xD615; &#xD074;&#xB798;&#xC2A4; &#xC815;&#xC758;&#xC2DC; createSubShape &#xBA54;&#xC18C;&#xB4DC;&#xB97C; &#xC815;&#xC758;&#xD568;&#xC73C;&#xB85C;&#xC368; &#xC0AC;&#xC6A9;&#xD560; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>&#xBA3C;&#xC800;, &#xBCA0;&#xC774;&#xC2A4;&#xAC00; &#xB420; &#xB77C;&#xC6B4;&#xB4DC; &#xC0AC;&#xAC01;&#xD615; &#xBAA8;&#xC591;&#xC758; &#xB3C4;&#xD615; &#xD074;&#xB798;&#xC2A4;&#xB97C; &#xC815;&#xD76C;&#xD574;&#xBCF4;&#xB3C4;&#xB85D; &#xD569;&#xB2C8;&#xB2E4;.</p>
+<pre><code>OG.shape.SampleShape = function (label) {
+    OG.shape.SampleShape.superclass.call(this);
+
+    this.GROUP_DROPABLE = false;
+    this.SHAPE_ID = &apos;OG.shape.SampleShape&apos;;
+    this.label = label;
+    this.CONNECTABLE = true;
+    this.GROUP_COLLAPSIBLE = false;
+    this.LoopType = &quot;None&quot;;
+    this.TaskType = &quot;None&quot;;
+    this.status = &quot;None&quot;;
+    this.Events = [];
+
+};
+OG.shape.SampleShape.prototype = new OG.shape.GeomShape();
+OG.shape.SampleShape.superclass = OG.shape.GeomShape;
+OG.shape.SampleShape.prototype.constructor = OG.shape.SampleShape;
+OG.SampleShape = OG.shape.SampleShape;
+
+/**
+ * &#xB4DC;&#xB85C;&#xC789;&#xD560; Shape &#xC744; &#xC0DD;&#xC131;&#xD558;&#xC5EC; &#xBC18;&#xD658;&#xD55C;&#xB2E4;.
+ *
+ * @return {OG.geometry.Geometry} Shape &#xC815;&#xBCF4;
+ * @override
+ */
+OG.shape.SampleShape.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+    this.geom.style = new OG.geometry.Style({
+        &apos;fill-r&apos;: 1,
+        &apos;fill-cx&apos;: .1,
+        &apos;fill-cy&apos;: .1,
+        &quot;stroke-width&quot;: 1.2,
+        fill: &apos;r(.1, .1)#FFFFFF-#FFFFCC&apos;,
+        &apos;fill-opacity&apos;: 1,
+        r: &apos;10&apos;
+    });
+    return this.geom;
+};
+
+canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
+</code></pre>
+<p><img src="images/subshape/subshape1.png" alt=""></p>
+<p>&#xC774;&#xC81C; &#xC774; &#xD074;&#xB798;&#xC2A4;&#xC5D0; createSubShape &#xBA54;&#xC18C;&#xB4DC;&#xB97C; &#xC815;&#xC758;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>createSubShape &#xBA54;&#xC18C;&#xB4DC;&#xB294; this.sub &#xAC1D;&#xCCB4;&#xB97C; &#xB9AC;&#xD134;&#xD558;&#xB3C4;&#xB85D; &#xD558;&#xB294;&#xB370;, this.sub &#xC548;&#xC5D0;&#xB294; &#xCD94;&#xAC00;&#xC801;&#xC73C;&#xB85C; &#xADF8;&#xB824;&#xC57C; &#xD560; sub shapes &#xB4E4;&#xC744; &#xAE30;&#xC220;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<p>&#xAE30;&#xC220; &#xB0B4;&#xC6A9;&#xC5D0; &#xB300;&#xD55C; &#xD504;&#xB85C;&#xD37C;&#xD2F0;&#xB294; &#xB2E4;&#xC74C;&#xACFC; &#xAC19;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<table class="w-table w-fixed w-stripe">
+<thead>
+<tr>
+<th>&#xD504;&#xB85C;&#xD37C;&#xD2F0;</th>
+<th>&#xD0C0;&#xC785;</th>
+<th>&#xC124;&#xBA85;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>shape</td>
+<td>OG.shape.IShape</td>
+<td>&#xC11C;&#xBE0C; &#xB3C4;&#xD615; &#xD074;&#xB798;&#xC2A4;</td>
+</tr>
+<tr>
+<td>width</td>
+<td>number or string</td>
+<td>&#xC11C;&#xBE0C; &#xB3C4;&#xD615; &#xAC00;&#xB85C;</td>
+</tr>
+<tr>
+<td>height</td>
+<td>number or string</td>
+<td>&#xC11C;&#xBE0C; &#xB3C4;&#xD615; &#xC138;&#xB85C;</td>
+</tr>
+<tr>
+<td>top</td>
+<td>number or string</td>
+<td>&#xC11C;&#xBE0C; &#xB3C4;&#xD615; top &#xD3EC;&#xC9C0;&#xC158;</td>
+</tr>
+<tr>
+<td>bottom</td>
+<td>number or string</td>
+<td>&#xC11C;&#xBE0C; &#xB3C4;&#xD615; bottom &#xD3EC;&#xC9C0;&#xC158;</td>
+</tr>
+<tr>
+<td>left</td>
+<td>number or string</td>
+<td>&#xC11C;&#xBE0C; &#xB3C4;&#xD615; left &#xD3EC;&#xC9C0;&#xC158;</td>
+</tr>
+<tr>
+<td>right</td>
+<td>number or string</td>
+<td>&#xC11C;&#xBE0C; &#xB3C4;&#xD615; right &#xD3EC;&#xC9C0;&#xC158;</td>
+</tr>
+<tr>
+<td>align</td>
+<td>string</td>
+<td>&#xAC00;&#xB85C; &#xC815;&#xB82C; (start,center,right)</td>
+</tr>
+<tr>
+<td>vertical-align</td>
+<td>string</td>
+<td>&#xC138;&#xB85C; &#xC815;&#xB82C; (start,center,right)</td>
+</tr>
+<tr>
+<td>style</td>
+<td>Object</td>
+<td>&#xC11C;&#xBE0C; &#xB3C4;&#xD615; &#xC2A4;&#xD0C0;&#xC77C;</td>
+</tr>
+</tbody>
+</table>
+<pre><code>OG.shape.SampleShape.prototype.createSubShape = function () {
+    this.sub = [
+        {
+            shape: new OG.RectangleShape(&apos;Sub shape&apos;),
+            width: &apos;50%&apos;,
+            height: &apos;50%&apos;,
+            align: &apos;center&apos;,
+            &apos;vertical-align&apos;: &apos;center&apos;,
+            style: {
+                fill: &apos;gray&apos;,
+                &apos;fill-opacity&apos;: 1
+            }
+        }
+    ];
+
+    return this.sub;
+};
+
+canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
+</code></pre>
+<p><img src="images/subshape/subshape2.png" alt=""></p>
+<h2 id="sub-shape-size-&amp;&amp;-position">Sub Shape Size &amp;&amp; Position</h2>
+<p>&#xC11C;&#xBE0C; &#xB3C4;&#xD615;&#xC758; &#xC0AC;&#xC774;&#xC988;&#xC640; &#xD3EC;&#xC9C0;&#xC158;&#xC740; CSS &#xC5B4;&#xD2B8;&#xB9AC;&#xBDF0;&#xD2B8; &#xD45C;&#xAE30;&#xBC95;&#xACFC; &#xB3D9;&#xC77C;&#xD558;&#xAC8C; &#xD45C;&#xD604;&#xD560; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>&#xC11C;&#xBE0C; &#xB3C4;&#xD615;&#xC758; &#xC0AC;&#xC774;&#xC988;&#xB294; width &#xC640; height &#xD504;&#xB85C;&#xD37C;&#xD2F0;&#xB85C; &#xACB0;&#xC815;&#xD569;&#xB2C8;&#xB2E4;. px &#xB85C; &#xD45C;&#xAE30;&#xD560;&#xACBD;&#xC6B0; &#xD45C;&#xAE30;&#xD55C; px &#xB9CC;&#xD07C; &#xD45C;&#xD604;&#xB418;&#xACE0;,
+% &#xB85C; &#xD45C;&#xAE30;&#xD560; &#xACBD;&#xC6B0; &#xBD80;&#xBAA8; &#xB3C4;&#xD615;&#xC758; &#xAC00;&#xB85C;, &#xC138;&#xB85C; &#xB300;&#xBE44; % &#xB85C; &#xACC4;&#xC0B0;&#xB418;&#xC5B4; &#xD45C;&#xD604;&#xB429;&#xB2C8;&#xB2E4;.</p>
+<pre><code>OG.shape.SampleShape.prototype.createSubShape = function () {
+    this.sub = [
+        {
+            shape: new OG.RectangleShape(&apos;Sub shape&apos;),
+            width: &apos;70%&apos;,
+            height: &apos;50px&apos;,
+            align: &apos;center&apos;,
+            &apos;vertical-align&apos;: &apos;center&apos;,
+            style: {
+                fill: &apos;gray&apos;,
+                &apos;fill-opacity&apos;: 1
+            }
+        }
+    ];
+
+    return this.sub;
+};
+
+canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
+</code></pre>
+<p><img src="images/subshape/subshape3.png" alt=""></p>
+<p>&#xC11C;&#xBE0C; &#xB3C4;&#xD615;&#xC758; &#xD3EC;&#xC9C0;&#xC158;&#xC740; CSS position &#xC5B4;&#xD2B8;&#xB9AC;&#xBDF0;&#xD2B8; &#xC911;, &quot;absolute&quot; &#xD3EC;&#xC9C0;&#xC158; &#xACC4;&#xC0B0;&#xACFC; &#xB3D9;&#xC77C;&#xD569;&#xB2C8;&#xB2E4;.</p>
+<pre><code>OG.shape.SampleShape.prototype.createSubShape = function () {
+    this.sub = [
+        {
+            shape: new OG.RectangleShape(&apos;Sub1&apos;),
+            width: &apos;50px&apos;,
+            height: &apos;50px&apos;,
+            align: &apos;start&apos;,
+            &apos;vertical-align&apos;: &apos;end&apos;,
+            style: {
+                fill: &apos;gray&apos;,
+                &apos;fill-opacity&apos;: 1
+            }
+        },
+        {
+            shape: new OG.RectangleShape(&apos;Sub2&apos;),
+            width: &apos;50px&apos;,
+            height: &apos;50px&apos;,
+            align: &apos;end&apos;,
+            &apos;vertical-align&apos;: &apos;start&apos;,
+            style: {
+                fill: &apos;gray&apos;,
+                &apos;fill-opacity&apos;: 1
+            }
+        },
+        {
+            shape: new OG.RectangleShape(&apos;Sub3&apos;),
+            width: &apos;50px&apos;,
+            height: &apos;50px&apos;,
+            top: &apos;40px&apos;,
+            left: &apos;40px&apos;,
+            style: {
+                fill: &apos;gray&apos;,
+                &apos;fill-opacity&apos;: 1
+            }
+        },
+        {
+            shape: new OG.RectangleShape(&apos;Sub4&apos;),
+            width: &apos;50px&apos;,
+            height: &apos;50px&apos;,
+            right: &apos;20%&apos;,
+            bottom: &apos;20%&apos;,
+            style: {
+                fill: &apos;gray&apos;,
+                &apos;fill-opacity&apos;: 1
+            }
+        },
+        {
+            shape: new OG.RectangleShape(&apos;Sub5&apos;),
+            width: &apos;50px&apos;,
+            height: &apos;50px&apos;,
+            right: &apos;-150px&apos;,
+            &apos;vertical-align&apos;: &apos;center&apos;,
+            style: {
+                fill: &apos;gray&apos;,
+                &apos;fill-opacity&apos;: 1
+            }
+        },
+        {
+            shape: new OG.RectangleShape(&apos;Sub6&apos;),
+            width: &apos;50px&apos;,
+            height: &apos;50px&apos;,
+            left: &apos;-150px&apos;,
+            &apos;vertical-align&apos;: &apos;center&apos;,
+            style: {
+                fill: &apos;gray&apos;,
+                &apos;fill-opacity&apos;: 1
+            }
+        }
+    ];
+
+    return this.sub;
+};
+
+canvas.drawShape([500, 300], new OG.SampleShape(), [300, 300]);
+</code></pre>
+<p><img src="images/subshape/subshape4.png" alt=""></p>
+<h2 id="sub-shape-index">Sub Shape index</h2>
+<p>z-index &#xD504;&#xB85C;&#xD37C;&#xD2F0;&#xB85C; &#xC11C;&#xBE0C; &#xB3C4;&#xD615;&#xAC04;&#xC758; &#xC55E;,&#xB4A4; &#xC21C;&#xC11C;&#xB97C; &#xD45C;&#xD604;&#xD560; &#xC218; &#xC788;&#xC2B5;&#xB2C8;&#xB2E4;.</p>
+<p>&#xC774; &#xB584;, &#xC74C;&#xC758; &#xAC12;&#xC774;&#xBA74; &#xBD80;&#xBAA8; &#xB3C4;&#xD615;&#xC758; &#xB4A4;&#xC5D0;, &#xC591;&#xC758; &#xAC12;&#xC774;&#xBA74; &#xBD80;&#xBAA8; &#xB3C4;&#xD615;&#xC758; &#xC55E;&#xC5D0; &#xC704;&#xCE58;&#xD558;&#xAC8C; &#xB429;&#xB2C8;&#xB2E4;.</p>
+<pre><code>OG.shape.SampleShape.prototype.createSubShape = function () {
+this.sub = [
+    {
+        shape: new OG.RectangleShape(&apos;Sub1&apos;),
+        width: &apos;50%&apos;,
+        height: &apos;40%&apos;,
+        left: &apos;-30%&apos;,
+        &apos;vertical-align&apos; : &apos;center&apos;,
+        style: {
+            &apos;fill&apos; : &apos;gray&apos;,
+            &apos;fill-opacity&apos; : 1
+        },
+        &apos;z-index&apos;: -1
+    },
+    {
+        shape: new OG.RectangleShape(&apos;Sub2&apos;),
+        width: &apos;50%&apos;,
+        height: &apos;40%&apos;,
+        left: &apos;20%&apos;,
+        &apos;vertical-align&apos; : &apos;center&apos;,
+        style: {
+            &apos;fill&apos; : &apos;red&apos;,
+            &apos;fill-opacity&apos; : 1
+        },
+        &apos;z-index&apos;: 1
+    }
+];
+
+return this.sub;
+};
+
+canvas.drawShape([500, 300], new OG.SampleShape(), [300, 300]);
+</code></pre>
+<p><img src="images/subshape/subshape5.png" alt=""></p>
+<h2 id="sub-shape-data-model">Sub Shape Data model</h2>
+<p>&#xB3C4;&#xD615;&#xC774; &#xC9C0;&#xB2C8;&#xACE0; &#xC788;&#xB294; &#xB370;&#xC774;&#xD130; &#xAC12;&#xC5D0; &#xB530;&#xB77C; &#xC11C;&#xBE0C; &#xB3C4;&#xD615;&#xB4E4;&#xC774; &#xC720;&#xAE30;&#xC801;&#xC73C;&#xB85C; &#xB300;&#xC751;&#xD560; &#xC218; &#xC788;&#xAC8C; &#xBAA8;&#xB378;&#xB9C1; &#xD574; &#xBD05;&#xB2C8;&#xB2E4;.</p>
+<pre><code>OG.shape.SampleShape.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+    this.geom.style = new OG.geometry.Style({
+        &apos;fill-r&apos;: 1,
+        &apos;fill-cx&apos;: .1,
+        &apos;fill-cy&apos;: .1,
+        &quot;stroke-width&quot;: 1.2,
+        fill: &apos;r(.1, .1)#FFFFFF-#FFFFCC&apos;,
+        &apos;fill-opacity&apos;: 1,
+        r: &apos;10&apos;
+    });
+    return this.geom;
+};
+
+OG.shape.SampleShape.prototype.createSubShape = function () {
+    this.sub = [];
+
+    var loopShape;
+    switch (this.data.LoopType) {
+        case &apos;Standard&apos; :
+            loopShape = new OG.ImageShape(&apos;resources/images/symbol/loop_standard.png&apos;);
+            break;
+        case &apos;MIParallel&apos; :
+            loopShape = new OG.MIParallel();
+            break;
+        case &apos;MISequential&apos; :
+            loopShape = new OG.MISequential();
+            break;
+    }
+    if (loopShape) {
+        this.sub.push({
+            shape: loopShape,
+            width: &apos;15px&apos;,
+            height: &apos;15px&apos;,
+            bottom: &apos;5px&apos;,
+            align: &apos;center&apos;,
+            style: {}
+        })
+    }
+
+    var taskTypeShape;
+    switch (this.data.TaskType) {
+        case &quot;User&quot;:
+            taskTypeShape = new OG.ImageShape(&quot;resources/images/symbol/User.png&quot;);
+            break;
+        case &quot;Send&quot;:
+            taskTypeShape = new OG.ImageShape(&apos;resources/images/symbol/Send.png&apos;);
+            break;
+        case &quot;Receive&quot;:
+            taskTypeShape = new OG.ImageShape(&quot;resources/images/symbol/Receive.png&quot;);
+            break;
+        case &quot;Manual&quot;:
+            taskTypeShape = new OG.ImageShape(&quot;resources/images/symbol/Manual.png&quot;);
+            break;
+        case &quot;Service&quot;:
+            taskTypeShape = new OG.ImageShape(&quot;resources/images/symbol/Service.png&quot;);
+            break;
+        case &quot;BusinessRule&quot;:
+            taskTypeShape = new OG.ImageShape(&quot;resources/images/symbol/BusinessRule.png&quot;);
+            break;
+        case &quot;Script&quot;:
+            taskTypeShape = new OG.ImageShape(&quot;resources/images/symbol/Script.png&quot;);
+            break;
+        case &quot;Mapper&quot;:
+            taskTypeShape = new OG.ImageShape(&quot;resources/images/symbol/Mapper.png&quot;);
+            break;
+        case &quot;WebService&quot;:
+            taskTypeShape = new OG.ImageShape(&quot;resources/images/symbol/WebService.png&quot;);
+            break;
+    }
+    if (taskTypeShape) {
+        this.sub.push({
+            shape: taskTypeShape,
+            width: &apos;20px&apos;,
+            height: &apos;20px&apos;,
+            top: &apos;5px&apos;,
+            left: &apos;5px&apos;,
+            style: {}
+        })
+    }
+
+    var statusShape, statusAnimation;
+    switch (this.data.status) {
+        case &quot;Completed&quot;:
+            statusShape = new OG.ImageShape(&quot;resources/images/symbol/complete.png&quot;);
+            break;
+        case &quot;Running&quot;:
+            statusShape = new OG.ImageShape(&apos;resources/images/symbol/running.png&apos;);
+            statusAnimation = new OG.RectangleShape();
+            break;
+    }
+    if (statusShape) {
+        this.sub.push({
+            shape: statusShape,
+            width: &apos;20px&apos;,
+            height: &apos;20px&apos;,
+            right: &apos;25px&apos;,
+            top: &apos;5px&apos;,
+            style: {}
+        })
+    }
+    if (statusAnimation) {
+        this.sub.push({
+            shape: statusAnimation,
+            &apos;z-index&apos;: -1,
+            width: &apos;120%&apos;,
+            height: &apos;120%&apos;,
+            left: &apos;-10%&apos;,
+            top: &apos;-10%&apos;,
+            style: {
+                &apos;fill-opacity&apos;: 1,
+                animation: [
+                    {
+                        start: {
+                            fill: &apos;white&apos;
+                        },
+                        to: {
+                            fill: &apos;#C9E2FC&apos;
+                        },
+                        ms: 1000
+                    },
+                    {
+                        start: {
+                            fill: &apos;#C9E2FC&apos;
+                        },
+                        to: {
+                            fill: &apos;white&apos;
+                        },
+                        ms: 1000,
+                        delay: 1000
+                    }
+                ],
+                &apos;animation-repeat&apos;: true,
+                &quot;fill&quot;: &quot;#C9E2FC&quot;,
+                &quot;stroke-width&quot;: &quot;0.2&quot;,
+                &quot;r&quot;: &quot;10&quot;,
+                &apos;stroke-dasharray&apos;: &apos;--&apos;
+            }
+        })
+    }
+
+    return this.sub;
+};
+
+var sampleShape1 = new OG.SampleShape();
+sampleShape1.data = {
+    LoopType: &apos;Standard&apos;,
+    TaskType: &apos;User&apos;,
+    status : &apos;Completed&apos;
+};
+canvas.drawShape([300, 300], sampleShape1, [100, 100]);
+
+var sampleShape2 = new OG.SampleShape();
+sampleShape2.data = {
+    LoopType: &apos;MIParallel&apos;,
+    TaskType: &apos;Send&apos;,
+    status : &apos;Running&apos;
+};
+canvas.drawShape([500, 300], sampleShape2, [100, 100]);
+
+var sampleShape3 = new OG.SampleShape();
+sampleShape2.data = {
+    LoopType: &apos;MISequential&apos;,
+    TaskType: &apos;Manual&apos;,
+    status : &apos;Completed&apos;
+};
+canvas.drawShape([700, 300], sampleShape3, [100, 100]);
+
+</code></pre>
+<p><img src="images/subshape/subshape6.png" alt=""></p>
+</div></div></section>
+
+ <footer>
+  <div><p class="w-fixed-width"><span id="dg-web-footer">Version 0.1.2 released on 11/18/2016.</span></p></div>
+  <div class="w-fixed-width">
+    <p><span id="dg-copyright">&#xA9; 2016 <a href="sppark@uengine.org">Seunpil park</a></span></p>
+    <p>
+      <span id="dg-marking"></span>
+      <span id="dg-legalese"></span>
+      <span id="dg-attribution">Created by DocGen 2.1.3 on 18/11/2016 at 02:53:20.</span>
+    </p>
+  </div>
+ </footer>
+ 
+ </body>
+</html>
