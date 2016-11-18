@@ -16558,7 +16558,7 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         });
 
         //가상의 그룹노드를 삭제한다.
-        me._remove(me._getREleById(node.id));
+        me._remove(me._getREleById($(node).attr('id')));
     }
 };
 
