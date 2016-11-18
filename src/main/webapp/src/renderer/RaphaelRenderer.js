@@ -232,19 +232,19 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         }
 
         //align 이나 vertice-algin 이 start,center,end 일 경우 left 와 top 값을 오버라이드 한다.
-        if (align == 'start') {
+        if (align == 'left') {
             left = bL;
         } else if (align == 'center') {
             left = bL + (bW / 2) - (width / 2);
-        } else if (align == 'end') {
+        } else if (align == 'right') {
             left = bL + bW - width;
         }
 
-        if (verticalAlign == 'start') {
+        if (verticalAlign == 'top') {
             top = bT;
-        } else if (verticalAlign == 'center') {
+        } else if (verticalAlign == 'middle') {
             top = bT + (bH / 2) - (height / 2);
-        } else if (verticalAlign == 'end') {
+        } else if (verticalAlign == 'bottom') {
             top = bT + bH - height;
         }
 

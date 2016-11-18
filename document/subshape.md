@@ -82,8 +82,8 @@ createSubShape 메소드는 this.sub 객체를 리턴하도록 하는데, this.s
 | bottom         | number or string | 서브 도형 bottom 포지션        |
 | left           | number or string | 서브 도형 left 포지션          |
 | right          | number or string | 서브 도형 right 포지션         |
-| align          | string           | 가로 정렬 (start,center,end) |
-| vertical-align | string           | 세로 정렬 (start,center,end) |
+| align          | string           | 가로 정렬 (left,center,right) |
+| vertical-align | string           | 세로 정렬 (top,middle,bottom) |
 | style          | Object           | 서브 도형 스타일               |
 
 
@@ -95,7 +95,7 @@ OG.shape.SampleShape.prototype.createSubShape = function () {
 			width: '50%',
 			height: '50%',
 			align: 'center',
-			'vertical-align': 'center',
+			'vertical-align': 'middle',
 			style: {
 				fill: 'gray',
 				'fill-opacity': 1
@@ -127,7 +127,7 @@ OG.shape.SampleShape.prototype.createSubShape = function () {
 			width: '70%',
 			height: '50px',
 			align: 'center',
-			'vertical-align': 'center',
+			'vertical-align': 'middle',
 			style: {
 				fill: 'gray',
 				'fill-opacity': 1
@@ -153,8 +153,8 @@ OG.shape.SampleShape.prototype.createSubShape = function () {
 			shape: new OG.RectangleShape('Sub1'),
 			width: '50px',
 			height: '50px',
-			align: 'start',
-			'vertical-align': 'end',
+			align: 'left',
+			'vertical-align': 'bottom',
 			style: {
 				fill: 'gray',
 				'fill-opacity': 1
@@ -164,8 +164,8 @@ OG.shape.SampleShape.prototype.createSubShape = function () {
 			shape: new OG.RectangleShape('Sub2'),
 			width: '50px',
 			height: '50px',
-			align: 'end',
-			'vertical-align': 'start',
+			align: 'right',
+			'vertical-align': 'top',
 			style: {
 				fill: 'gray',
 				'fill-opacity': 1
@@ -198,7 +198,7 @@ OG.shape.SampleShape.prototype.createSubShape = function () {
 			width: '50px',
 			height: '50px',
 			right: '-150px',
-			'vertical-align': 'center',
+			'vertical-align': 'middle',
 			style: {
 				fill: 'gray',
 				'fill-opacity': 1
@@ -209,7 +209,7 @@ OG.shape.SampleShape.prototype.createSubShape = function () {
 			width: '50px',
 			height: '50px',
 			left: '-150px',
-			'vertical-align': 'center',
+			'vertical-align': 'middle',
 			style: {
 				fill: 'gray',
 				'fill-opacity': 1
@@ -240,7 +240,7 @@ this.sub = [
 		width: '50%',
 		height: '40%',
 		left: '-30%',
-		'vertical-align' : 'center',
+		'vertical-align' : 'middle',
 		style: {
 			'fill' : 'gray',
 			'fill-opacity' : 1
@@ -252,7 +252,7 @@ this.sub = [
 		width: '50%',
 		height: '40%',
 		left: '20%',
-		'vertical-align' : 'center',
+		'vertical-align' : 'middle',
 		style: {
 			'fill' : 'red',
 			'fill-opacity' : 1

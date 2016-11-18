@@ -182,12 +182,12 @@ canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
 <tr>
 <td>align</td>
 <td>string</td>
-<td>&#xAC00;&#xB85C; &#xC815;&#xB82C; (start,center,right)</td>
+<td>&#xAC00;&#xB85C; &#xC815;&#xB82C; (left,center,right)</td>
 </tr>
 <tr>
 <td>vertical-align</td>
 <td>string</td>
-<td>&#xC138;&#xB85C; &#xC815;&#xB82C; (start,center,right)</td>
+<td>&#xC138;&#xB85C; &#xC815;&#xB82C; (top,middle,bottom)</td>
 </tr>
 <tr>
 <td>style</td>
@@ -203,7 +203,7 @@ canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
             width: &apos;50%&apos;,
             height: &apos;50%&apos;,
             align: &apos;center&apos;,
-            &apos;vertical-align&apos;: &apos;center&apos;,
+            &apos;vertical-align&apos;: &apos;middle&apos;,
             style: {
                 fill: &apos;gray&apos;,
                 &apos;fill-opacity&apos;: 1
@@ -228,7 +228,7 @@ canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
             width: &apos;70%&apos;,
             height: &apos;50px&apos;,
             align: &apos;center&apos;,
-            &apos;vertical-align&apos;: &apos;center&apos;,
+            &apos;vertical-align&apos;: &apos;middle&apos;,
             style: {
                 fill: &apos;gray&apos;,
                 &apos;fill-opacity&apos;: 1
@@ -249,8 +249,8 @@ canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
             shape: new OG.RectangleShape(&apos;Sub1&apos;),
             width: &apos;50px&apos;,
             height: &apos;50px&apos;,
-            align: &apos;start&apos;,
-            &apos;vertical-align&apos;: &apos;end&apos;,
+            align: &apos;left&apos;,
+            &apos;vertical-align&apos;: &apos;bottom&apos;,
             style: {
                 fill: &apos;gray&apos;,
                 &apos;fill-opacity&apos;: 1
@@ -260,8 +260,8 @@ canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
             shape: new OG.RectangleShape(&apos;Sub2&apos;),
             width: &apos;50px&apos;,
             height: &apos;50px&apos;,
-            align: &apos;end&apos;,
-            &apos;vertical-align&apos;: &apos;start&apos;,
+            align: &apos;right&apos;,
+            &apos;vertical-align&apos;: &apos;top&apos;,
             style: {
                 fill: &apos;gray&apos;,
                 &apos;fill-opacity&apos;: 1
@@ -294,7 +294,7 @@ canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
             width: &apos;50px&apos;,
             height: &apos;50px&apos;,
             right: &apos;-150px&apos;,
-            &apos;vertical-align&apos;: &apos;center&apos;,
+            &apos;vertical-align&apos;: &apos;middle&apos;,
             style: {
                 fill: &apos;gray&apos;,
                 &apos;fill-opacity&apos;: 1
@@ -305,7 +305,7 @@ canvas.drawShape([300,200],new OG.SampleShape(), [200,200]);
             width: &apos;50px&apos;,
             height: &apos;50px&apos;,
             left: &apos;-150px&apos;,
-            &apos;vertical-align&apos;: &apos;center&apos;,
+            &apos;vertical-align&apos;: &apos;middle&apos;,
             style: {
                 fill: &apos;gray&apos;,
                 &apos;fill-opacity&apos;: 1
@@ -329,7 +329,7 @@ this.sub = [
         width: &apos;50%&apos;,
         height: &apos;40%&apos;,
         left: &apos;-30%&apos;,
-        &apos;vertical-align&apos; : &apos;center&apos;,
+        &apos;vertical-align&apos; : &apos;middle&apos;,
         style: {
             &apos;fill&apos; : &apos;gray&apos;,
             &apos;fill-opacity&apos; : 1
@@ -341,7 +341,7 @@ this.sub = [
         width: &apos;50%&apos;,
         height: &apos;40%&apos;,
         left: &apos;20%&apos;,
-        &apos;vertical-align&apos; : &apos;center&apos;,
+        &apos;vertical-align&apos; : &apos;middle&apos;,
         style: {
             &apos;fill&apos; : &apos;red&apos;,
             &apos;fill-opacity&apos; : 1
@@ -541,7 +541,7 @@ canvas.drawShape([700, 300], sampleShape3, [100, 100]);
     <p>
       <span id="dg-marking"></span>
       <span id="dg-legalese"></span>
-      <span id="dg-attribution">Created by DocGen 2.1.3 on 18/11/2016 at 02:53:20.</span>
+      <span id="dg-attribution">Created by DocGen 2.1.3 on 18/11/2016 at 16:23:53.</span>
     </p>
   </div>
  </footer>
