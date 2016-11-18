@@ -875,6 +875,8 @@ canvas.drawShape([100, 100], new OG.CircleShape(), [50, 50], {stroke:'red'});
 | label-direction   | vertical,horizontal          | 라벨 세로 표기,가로 표기                     |
 | label-width       | number                       | 라벨의 길이                                  |
 | vertical-align    | top,bottom,middle            | 라벨의 텍스트의 상단 정렬,하단 정렬          |
+| label-fill    | string            | 그룹 도형 한정. 라벨 배경 색상          |
+| label-fill-opacity    | string            | 그룹 도형 한정. 라벨 opacity          |
 
 ### set Id
 
@@ -944,6 +946,12 @@ console.log(canvas.getTextListInController(rectangleShape));
 ```
 
 ![](images/canvas/canvas-6.png)
+
+만일, 위의 'One', 'Two', 'Three' 를 선택하여 도형 연결시 연결선을 각기다른 shape 로 표현하기 위해서 다음과 같이 표현하도록 합니다.
+   
+```
+
+```
 
 ## drawLabel
 

@@ -82,8 +82,8 @@ createSubShape 메소드는 this.sub 객체를 리턴하도록 하는데, this.s
 | bottom         | number or string | 서브 도형 bottom 포지션        |
 | left           | number or string | 서브 도형 left 포지션          |
 | right          | number or string | 서브 도형 right 포지션         |
-| align          | string           | 가로 정렬 (start,center,right) |
-| vertical-align | string           | 세로 정렬 (start,center,right) |
+| align          | string           | 가로 정렬 (start,center,end) |
+| vertical-align | string           | 세로 정렬 (start,center,end) |
 | style          | Object           | 서브 도형 스타일               |
 
 
