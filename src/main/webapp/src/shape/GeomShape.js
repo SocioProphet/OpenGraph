@@ -27,6 +27,7 @@ OG.GeomShape = OG.shape.GeomShape;
 OG.shape.GeomShape.prototype.clone = function () {
 	var shape = eval('new ' + this.SHAPE_ID + '()');
 	shape.label = this.label;
+	shape.setData(JSON.parse(JSON.stringify(this.getData())));
 
 	return shape;
 };

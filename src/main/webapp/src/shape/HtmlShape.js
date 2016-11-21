@@ -55,6 +55,7 @@ OG.shape.HtmlShape.prototype.clone = function () {
 	shape.html = this.html;
 	shape.label = this.label;
 	shape.angle = this.angle;
+	shape.setData(JSON.parse(JSON.stringify(this.getData())));
 
 	return shape;
 };

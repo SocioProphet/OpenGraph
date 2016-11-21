@@ -52,6 +52,6 @@ OG.shape.TextShape.prototype.clone = function () {
 	var shape = eval('new ' + this.SHAPE_ID + '()');
 	shape.text = this.text;
 	shape.angle = this.angle;
-
+	shape.setData(JSON.parse(JSON.stringify(this.getData())));
 	return shape;
 };

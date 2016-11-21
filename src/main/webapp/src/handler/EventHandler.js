@@ -1912,8 +1912,7 @@ OG.handler.EventHandler.prototype = {
                             var target = renderer.getTargetfromVirtualEdge();
                             renderer.removeAllVirtualEdge();
                             var shapeId = $(target).attr('_shape_id');
-                            var newShape;
-                            eval('newShape = new ' + shapeId + '()');
+                            var newShape = target.shape.clone();
 
                             var style = target.shape.geom.style;
                             var boundary = renderer.getBoundary(target);
@@ -2127,6 +2126,7 @@ OG.handler.EventHandler.prototype = {
                         isConnectable = false;
                     }
                     if (isConnectable) {
+                        newShape.setData(JSON.parse(JSON.stringify(target.shape.getData())));
                         var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
                         $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
 

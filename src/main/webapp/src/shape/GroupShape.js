@@ -71,6 +71,7 @@ OG.shape.GroupShape.prototype.createShape = function () {
 OG.shape.GroupShape.prototype.clone = function () {
 	var shape = eval('new ' + this.SHAPE_ID + '()');
 	shape.label = this.label;
+	shape.setData(JSON.parse(JSON.stringify(this.getData())));
 
 	return shape;
 };

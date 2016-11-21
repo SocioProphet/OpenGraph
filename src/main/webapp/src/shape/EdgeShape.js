@@ -78,6 +78,7 @@ OG.shape.EdgeShape.prototype.clone = function () {
 	shape.label = this.label;
 	shape.fromLabel = this.fromLabel;
 	shape.toLabel = this.toLabel;
+	shape.setData(JSON.parse(JSON.stringify(this.getData())));
 
 	return shape;
 };

@@ -55,6 +55,6 @@ OG.shape.ImageShape.prototype.clone = function () {
 	shape.image = this.image;
 	shape.label = this.label;
 	shape.angle = this.angle;
-
+	shape.setData(JSON.parse(JSON.stringify(this.getData())));
 	return shape;
 };
