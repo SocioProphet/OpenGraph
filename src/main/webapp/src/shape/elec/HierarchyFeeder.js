@@ -5,6 +5,34 @@ OG.shape.elec.HierarchyFeeder = function (label) {
     this.label = label;
     this.CONNECT_CLONEABLE = false;
     this.LABEL_EDITABLE = false;
+
+    this.textList = [
+        {
+            text: 'cable',
+            label: '',
+            shape: 'OG.CableShape'
+        },
+        {
+            text: 'IPB',
+            label: 'IPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'SPB',
+            label: 'SPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'NSPB',
+            label: 'NSPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'CRB',
+            label: 'CRB',
+            shape: 'OG.BusductShape'
+        }
+    ];
 };
 OG.shape.elec.HierarchyFeeder.prototype = new OG.shape.GeomShape();
 OG.shape.elec.HierarchyFeeder.superclass = OG.shape.GeomShape;
@@ -74,3 +102,4 @@ OG.shape.elec.HierarchyFeeder.prototype.createSubShape = function () {
     ];
     return this.sub;
 };
+

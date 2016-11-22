@@ -74,3 +74,21 @@ OG.shape.bpmn.Value_Chain.prototype.createSubShape = function () {
 
     return this.sub;
 };
+
+OG.shape.bpmn.Value_Chain.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'copy': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '속성', callback: function () {
+                me.currentCanvas.getEventHandler().showProperty();
+            }
+        }
+    };
+    return this.contextMenu;
+};

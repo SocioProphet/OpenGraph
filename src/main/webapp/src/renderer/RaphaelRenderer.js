@@ -1395,6 +1395,10 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
     }
 
+    //shape 에 현재 캔버스,엘리먼트 등록
+    shape.currentElement = groupNode;
+    shape.currentCanvas = this._CANVAS;
+
     return groupNode;
 };
 
@@ -2316,6 +2320,10 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
 
         //서브 도형 그리기
         me._drawSubShape(element);
+
+        //shape 에 현재 캔버스,엘리먼트 등록
+        element.shape.currentElement = element;
+        element.shape.currentCanvas = this._CANVAS;
     }
 
     // redrawShape event fire

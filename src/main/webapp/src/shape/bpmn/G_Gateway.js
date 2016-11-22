@@ -41,3 +41,54 @@ OG.shape.bpmn.G_Gateway.prototype.createShape = function () {
 
 	return this.geom;
 };
+
+OG.shape.bpmn.G_Gateway.prototype.createContextMenu = function(){
+	var me = this;
+	this.contextMenu = {
+		'delete': true,
+		'copy': true,
+		'format': true,
+		'text': true,
+		'bringToFront': true,
+		'sendToBack': true,
+		'changegateway': {
+			name: '변경',
+			items: {
+				'G_Gateway': {
+					name: '베타적',
+					type: 'radio',
+					radio: 'changegateway',
+					value: 'OG.shape.bpmn.G_Gateway',
+					events: {
+						change: function (e) {
+							me.currentCanvas.getEventHandler().changeShape(e.target.value);
+						}
+					}
+				},
+				'G_Parallel': {
+					name: '병렬',
+					type: 'radio',
+					radio: 'changegateway',
+					value: 'OG.shape.bpmn.G_Parallel',
+					events: {
+						change: function (e) {
+							me.currentCanvas.getEventHandler().changeShape(e.target.value);
+						}
+					}
+				},
+				'G_Inclusive': {
+					name: '포괄적',
+					type: 'radio',
+					radio: 'changegateway',
+					value: 'OG.shape.bpmn.G_Inclusive',
+					events: {
+						change: function (e) {
+							me.currentCanvas.getEventHandler().changeShape(e.target.value);
+						}
+					}
+				}
+			}
+		}
+	};
+	return this.contextMenu;
+};

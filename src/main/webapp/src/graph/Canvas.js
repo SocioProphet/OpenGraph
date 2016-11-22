@@ -671,6 +671,9 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 };
 
 OG.graph.Canvas.prototype = {
+    getEventHandler: function () {
+        return this._HANDLER;
+    },
     setRemoteDuring: function (during) {
         this._CONFIG.REMOTE_PERFORMED_DURING = during;
     },
@@ -1319,6 +1322,7 @@ OG.graph.Canvas.prototype = {
 
         //if label null, convert undefined
         label = label ? label : undefined;
+
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, preventTrigger);
 
@@ -1336,7 +1340,7 @@ OG.graph.Canvas.prototype = {
     ,
 
     /**
-     * 두개의 터미널 아이디로 부터 얻어진 Shape를 Edge 로 연결한다.
+     * 두개의 터미널 아이디로 부터 얻어진 도형들을 Edge 로 연결한다.
      *
      * @param {String} fromTerminal from Terminal Id
      * @param {String} toTerminal to Terminal Id
@@ -1363,6 +1367,9 @@ OG.graph.Canvas.prototype = {
 
         fromto = JSON.stringify(vertices[0]) + ',' + JSON.stringify(vertices[vertices.length - 1]);
         shape = eval('new ' + shapeId + '(' + fromto + ')');
+
+        //if label null, convert undefined
+        label = label ? label : undefined;
         if (label) {
             shape.label = label;
         }
@@ -2023,6 +2030,30 @@ OG.graph.Canvas.prototype = {
     getExtCustomData: function (shapeElement) {
         var element = OG.Util.isElement(shapeElement) ? shapeElement : document.getElementById(shapeElement);
         return element.dataExt;
+    }
+    ,
+
+    /**
+     * 주어진 Shape 엘리먼트에 커스텀 컨텍스트 메뉴를 지정한다.
+     *
+     * @param {Element|String} shapeElement Shape DOM Element or ID
+     * @param {Object} data JSON 포맷의 context Object
+     */
+    setCustomContextMenu: function (shapeElement, data) {
+        var element = OG.Util.isElement(shapeElement) ? shapeElement : document.getElementById(shapeElement);
+
+        element.shape.customContextMenu = data;
+    },
+
+    /**
+     * 주어진 Shape 엘리먼트에 저장된 커스텀 컨텍스트 메뉴를 반환한다.
+     *
+     * @param {Element|String} shapeElement Shape DOM Element or ID
+     * @return {Object} JSON 포맷의 context Object
+     */
+    getCustomContextMenu: function (shapeElement) {
+        var element = OG.Util.isElement(shapeElement) ? shapeElement : document.getElementById(shapeElement);
+        return element.shape.customContextMenu;
     }
     ,
 

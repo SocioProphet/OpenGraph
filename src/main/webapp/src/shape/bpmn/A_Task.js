@@ -184,3 +184,119 @@ OG.shape.bpmn.A_Task.prototype.createSubShape = function () {
 
     return this.sub;
 };
+
+OG.shape.bpmn.A_Task.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'copy': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'changeshape': {
+            name: '변경',
+            items: {
+                'A_Task': {
+                    name: '추상',
+                    type: 'radio',
+                    radio: 'changeshape',
+                    value: 'OG.shape.bpmn.A_Task',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value);
+                        }
+                    }
+                },
+                'A_HumanTask': {
+                    name: '사용자',
+                    type: 'radio',
+                    radio: 'changeshape',
+                    value: 'OG.shape.bpmn.A_HumanTask',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value);
+                        }
+                    }
+                },
+                'A_WebServiceTask': {
+                    name: '서비스',
+                    type: 'radio',
+                    radio: 'changeshape',
+                    value: 'OG.shape.bpmn.A_WebServiceTask',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value);
+                        }
+                    }
+                },
+                'A_ManualTask': {
+                    name: '수동',
+                    type: 'radio',
+                    radio: 'changeshape',
+                    value: "OG.shape.bpmn.A_ManualTask",
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value);
+                        }
+                    }
+                }
+            }
+        },
+        'addEvent': {
+            name: '이벤트 추가',
+            items: {
+                'Message': {
+                    name: '메시지',
+                    type: 'radio',
+                    radio: 'addEvent',
+                    value: 'Message',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().setAddEventSelectedShape(e.target.value);
+                        }
+                    }
+                },
+                'Timer': {
+                    name: '타이머',
+                    type: 'radio',
+                    radio: 'addEvent',
+                    value: 'Timer',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().setAddEventSelectedShape(e.target.value);
+                        }
+                    }
+                },
+                'Error': {
+                    name: '에러',
+                    type: 'radio',
+                    radio: 'addEvent',
+                    value: 'Error',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().setAddEventSelectedShape(e.target.value);
+                        }
+                    }
+                },
+                'Conditional': {
+                    name: '조건부',
+                    type: 'radio',
+                    radio: 'addEvent',
+                    value: "Conditional",
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().setAddEventSelectedShape(e.target.value);
+                        }
+                    }
+                }
+            }
+        },
+        'property': {
+            name: '속성', callback: function () {
+                me.currentCanvas.getEventHandler().showProperty();
+            }
+        }
+    };
+    return this.contextMenu;
+};

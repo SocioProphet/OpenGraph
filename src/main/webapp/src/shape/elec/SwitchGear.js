@@ -79,5 +79,21 @@ OG.shape.elec.SwitchGear.prototype.createSubShape = function () {
     ];
 
     return this.sub;
-}
-;
+};
+
+
+OG.shape.elec.SwitchGear.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};

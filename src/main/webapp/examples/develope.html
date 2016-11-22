@@ -144,13 +144,20 @@
 
     <!-- elec -->
     <script type="text/javascript" src="../src/shape/elec/SwitchGear.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/WireShape.js"></script>
     <script type="text/javascript" src="../src/shape/elec/BusductShape.js"></script>
     <script type="text/javascript" src="../src/shape/elec/RacewayShape.js"></script>
     <script type="text/javascript" src="../src/shape/elec/CableShape.js"></script>
     <script type="text/javascript" src="../src/shape/elec/SwitchTransformer.js"></script>
     <script type="text/javascript" src="../src/shape/elec/Load.js"></script>
-    <script type="text/javascript" src="../src/shape/elec/NMLoad.js"></script>
     <script type="text/javascript" src="../src/shape/elec/SHLoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/NMLoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/EHLoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/EHSLoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/MILoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/MKLoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/MOLoad.js"></script>
+    <script type="text/javascript" src="../src/shape/elec/PKGLoad.js"></script>
     <script type="text/javascript" src="../src/shape/elec/HierarchyFeeder.js"></script>
     <script type="text/javascript" src="../src/shape/elec/HierarchyFloor.js"></script>
     <script type="text/javascript" src="../src/shape/elec/HierarchyBldg.js"></script>
@@ -479,29 +486,64 @@
                 return this.sub;
             };
 
-            var sampleShape1 = new OG.SampleShape();
+            var sampleShape1 = new OG.A_HumanTask();
             sampleShape1.data = {
                 LoopType: 'Standard',
                 TaskType: 'User',
-                status : 'Completed'
+                status: 'Completed'
             };
             canvas.drawShape([300, 300], sampleShape1, [100, 100]);
 
-            var sampleShape2 = new OG.SampleShape();
+            var sampleShape2 = new OG.A_HumanTask();
             sampleShape2.data = {
                 LoopType: 'MIParallel',
                 TaskType: 'Send',
-                status : 'Running'
+                status: 'Running'
             };
             canvas.drawShape([500, 300], sampleShape2, [100, 100]);
 
-            var sampleShape3 = new OG.SampleShape();
+            var sampleShape3 = new OG.A_HumanTask();
             sampleShape3.data = {
                 LoopType: 'MISequential',
                 TaskType: 'Manual',
-                status : 'Completed'
+                status: 'Completed'
             };
-            canvas.drawShape([700, 300], sampleShape3, [100, 100]);
+
+            var contextMenu = {
+                'delete': true,
+                'copy': true,
+                'format': true,
+                'alert': {
+                    name: 'alert',
+                    callback: function () {
+                        console.log(123123);
+                    }
+                },
+                'text': true,
+                'bringToFront': true,
+                'sendToBack': true
+            };
+            //sampleShape3.customContextMenu = contextMenu;
+
+//            var element = canvas.drawShape([700, 300], sampleShape3, [100, 100]);
+//
+//            canvas.setCustomContextMenu(element,contextMenu);
+//
+//            var loadData = {
+//                LO_TYPE : 'EH'
+//            };
+//            var loadShape = new OG.PKGLoad();
+//            loadShape.data = loadData;
+//
+//            canvas.drawShape([300, 100], loadShape, [100, 100]);
+
+            canvas.drawShape([300, 100], new OG.SwitchGear(), [100, 100]);
+
+            canvas.drawShape([300, 100], new OG.Location(), [100, 100]);
+
+            $(canvas.getRootElement()).bind('showProperty', function (event, shapeElement) {
+                console.log(shapeElement);
+            });
 
         });
 

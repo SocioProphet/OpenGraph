@@ -9,6 +9,14 @@ OG.shape.elec.Manhole = function (image, label) {
     if (!image) {
         this.image = 'resources/images/elec/manhole.svg'
     }
+
+    this.textList = [
+        {
+            text: 'Raceway',
+            label: '',
+            shape: 'OG.RacewayShape'
+        }
+    ];
 };
 OG.shape.elec.Manhole.prototype = new OG.shape.ImageShape();
 OG.shape.elec.Manhole.superclass = OG.shape.ImageShape;
@@ -24,4 +32,22 @@ OG.shape.elec.Manhole.prototype.createSubShape = function () {
 
     ];
     return this.sub;
+};
+
+
+OG.shape.elec.Manhole.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
 };

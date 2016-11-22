@@ -3291,129 +3291,6 @@ OG.handler.EventHandler.prototype = {
         }
     },
 
-    makeProperty: function () {
-        var me = this;
-
-        return {
-            'property': {
-                name: '속성', callback: function () {
-                    me.showProperty();
-                }
-            }
-        }
-    },
-
-    makeTaskChange: function () {
-        var me = this;
-
-        return {
-            'changeshape': {
-                name: '변경',
-                items: {
-                    'A_Task': {
-                        name: '추상',
-                        type: 'radio',
-                        radio: 'changeshape',
-                        value: 'OG.shape.bpmn.A_Task',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    },
-                    'A_HumanTask': {
-                        name: '사용자',
-                        type: 'radio',
-                        radio: 'changeshape',
-                        value: 'OG.shape.bpmn.A_HumanTask',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    },
-                    'A_WebServiceTask': {
-                        name: '서비스',
-                        type: 'radio',
-                        radio: 'changeshape',
-                        value: 'OG.shape.bpmn.A_WebServiceTask',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    },
-                    'A_ManualTask': {
-                        name: '수동',
-                        type: 'radio',
-                        radio: 'changeshape',
-                        value: "OG.shape.bpmn.A_ManualTask",
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-
-    makeAddEvent: function () {
-        var me = this;
-
-        return {
-            'addEvent': {
-                name: '이벤트 추가',
-                items: {
-                    'Message': {
-                        name: '메시지',
-                        type: 'radio',
-                        radio: 'addEvent',
-                        value: 'Message',
-                        events: {
-                            change: function (e) {
-                                me.setAddEventSelectedShape(e.target.value);
-                            }
-                        }
-                    },
-                    'Timer': {
-                        name: '타이머',
-                        type: 'radio',
-                        radio: 'addEvent',
-                        value: 'Timer',
-                        events: {
-                            change: function (e) {
-                                me.setAddEventSelectedShape(e.target.value);
-                            }
-                        }
-                    },
-                    'Error': {
-                        name: '에러',
-                        type: 'radio',
-                        radio: 'addEvent',
-                        value: 'Error',
-                        events: {
-                            change: function (e) {
-                                me.setAddEventSelectedShape(e.target.value);
-                            }
-                        }
-                    },
-                    'Conditional': {
-                        name: '조건부',
-                        type: 'radio',
-                        radio: 'addEvent',
-                        value: "Conditional",
-                        events: {
-                            change: function (e) {
-                                me.setAddEventSelectedShape(e.target.value);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
 
     makeDelete: function () {
         var me = this;
@@ -3499,309 +3376,19 @@ OG.handler.EventHandler.prototype = {
         }
     },
 
-    makeEventChange: function () {
-        var me = this;
-
+    makeFormat: function () {
         return {
-            'change': {
-                name: '변경',
-                items: {
-                    'start': {
-                        name: '시작',
-                        items: {
-                            'start': {
-                                name: '시작',
-                                type: 'radio',
-                                radio: 'start',
-                                value: 'OG.shape.bpmn.E_Start',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'start_message': {
-                                name: '메시지 시작',
-                                type: 'radio',
-                                radio: 'start',
-                                value: 'OG.shape.bpmn.E_Start_Message',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'start_timer': {
-                                name: '타이머 시작',
-                                type: 'radio',
-                                radio: 'start',
-                                value: 'OG.shape.bpmn.E_Start_Timer',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'start_conditional': {
-                                name: '조건부 시작',
-                                type: 'radio',
-                                radio: 'start',
-                                value: 'OG.shape.bpmn.E_Start_Rule',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    'intermediate': {
-                        name: '중간',
-                        items: {
-                            'intermediate': {
-                                name: '중간',
-                                type: 'radio',
-                                radio: 'intermediate',
-                                value: 'OG.shape.bpmn.E_Intermediate',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'intermediate_openMessage': {
-                                name: '열린 메시지 중간',
-                                type: 'radio',
-                                radio: 'intermediate',
-                                value: 'OG.shape.bpmn.E_Intermediate_Message',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'intermediate_closeMessage': {
-                                name: '닫힌 메시지 중간',
-                                type: 'radio',
-                                radio: 'intermediate',
-                                value: 'OG.shape.bpmn.E_Intermediate_MessageFill',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'intermediate_timer': {
-                                name: '타이머 중간',
-                                type: 'radio',
-                                radio: 'intermediate',
-                                value: 'OG.shape.bpmn.E_Intermediate_Timer',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'intermediate_conditional': {
-                                name: '조건부 중간',
-                                type: 'radio',
-                                radio: 'intermediate',
-                                value: 'OG.shape.bpmn.E_Intermediate_Rule',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    'end': {
-                        name: '종료',
-                        items: {
-                            'end': {
-                                name: '종료',
-                                type: 'radio',
-                                radio: 'end',
-                                value: 'OG.shape.bpmn.E_End',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'end_message': {
-                                name: '메시지 종료',
-                                type: 'radio',
-                                radio: 'end',
-                                value: 'OG.shape.bpmn.E_End_Message',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            },
-                            'end_process': {
-                                name: '프로세스 종료',
-                                type: 'radio',
-                                radio: 'end',
-                                value: 'OG.shape.bpmn.E_Terminate',
-                                events: {
-                                    change: function (e) {
-                                        me.changeShape(e.target.value);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            format: {
+                name: '형식',
+                items: this.mergeContextMenu(
+                    this.makeFillColor(),
+                    this.makeFillOpacity(),
+                    this.makeLineStyle(),
+                    this.makeLineColor(),
+                    this.makeLineWidth()
+                )
             }
         }
-    },
-
-    makeGatewayChange: function () {
-        var me = this;
-
-        return {
-            'changegateway': {
-                name: '변경',
-                items: {
-                    'G_Gateway': {
-                        name: '베타적',
-                        type: 'radio',
-                        radio: 'changegateway',
-                        value: 'OG.shape.bpmn.G_Gateway',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    },
-                    'G_Parallel': {
-                        name: '병렬',
-                        type: 'radio',
-                        radio: 'changegateway',
-                        value: 'OG.shape.bpmn.G_Parallel',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    },
-                    'G_Inclusive': {
-                        name: '포괄적',
-                        type: 'radio',
-                        radio: 'changegateway',
-                        value: 'OG.shape.bpmn.G_Inclusive',
-                        events: {
-                            change: function (e) {
-                                me.changeShape(e.target.value);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-
-    makeFormat: function (isEdge) {
-        if (isEdge) {
-            return {
-                format: {
-                    name: '형식',
-                    items: this.mergeContextMenu(
-                        this.makeLineStyle(),
-                        this.makeLineColor(),
-                        this.makeLineWidth()
-                    )
-                }
-            }
-        } else {
-            return {
-                format: {
-                    name: '형식',
-                    items: this.mergeContextMenu(
-                        this.makeFillColor(),
-                        this.makeFillOpacity(),
-                        this.makeLineStyle(),
-                        this.makeLineColor(),
-                        this.makeLineWidth()
-                    )
-                }
-            }
-        }
-    },
-
-    makeEdgeContextMenu: function (isEdge) {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(isEdge),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend()
-        )
-    },
-
-    makeTaskContextMenu: function () {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend(),
-            this.makeTaskChange(),
-            this.makeAddEvent(),
-            this.makeProperty()
-        );
-    },
-
-    makeValueChainContextMenu: function () {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend(),
-            this.makeProperty()
-        );
-    },
-
-    makeSubprocessContextMenu: function () {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend(),
-            this.makeProperty()
-        );
-    },
-
-    makeEventContextMenu: function () {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend(),
-            this.makeEventChange()
-        );
-    },
-
-    makeGatewayContextMenu: function () {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend(),
-            this.makeGatewayChange()
-        );
     },
 
     makeMultiContextMenu: function () {
@@ -3813,7 +3400,6 @@ OG.handler.EventHandler.prototype = {
     },
 
     mergeContextMenu: function () {
-
         var menu = {};
         for (var i = 0; i < arguments.length; i++) {
             for (var key in arguments[i]) {
@@ -3824,15 +3410,36 @@ OG.handler.EventHandler.prototype = {
         return menu;
     },
 
-    makeDefaultContextMenu: function () {
-        return this.mergeContextMenu(
-            this.makeDelete(),
-            this.makeCopy(),
-            this.makeFormat(),
-            this.makeFont(),
-            this.makeBring(),
-            this.makeSend()
-        );
+    makeDefaultContextMenu: function (key) {
+        if (key) {
+            if (key == 'delete') {
+                return this.makeDelete();
+            }
+            else if (key == 'copy') {
+                return this.makeCopy();
+            }
+            else if (key == 'format') {
+                return this.makeFormat();
+            }
+            else if (key == 'text') {
+                return this.makeFont();
+            }
+            else if (key == 'bringToFront') {
+                return this.makeBring();
+            }
+            else if (key == 'sendToBack') {
+                return this.makeSend();
+            }
+        } else {
+            return this.mergeContextMenu(
+                this.makeDelete(),
+                this.makeCopy(),
+                this.makeFormat(),
+                this.makeFont(),
+                this.makeBring(),
+                this.makeSend()
+            );
+        }
     },
 
     /**
@@ -3843,30 +3450,55 @@ OG.handler.EventHandler.prototype = {
         $.contextMenu({
             position: function (opt, x, y) {
                 opt.$menu.css({top: y + 10, left: x + 10});
+                opt.canvas = me._CANVAS;
             },
             selector: '#' + me._RENDERER.getRootElement().id + ' [_type=SHAPE]',
             build: function ($trigger, event) {
+                //1. shape 에 contextMenu 를 정의시 실행된다.
+
+                //2. canvas.setContextMenu 실행시 shape 의 콘텍스트에 오버라이드 된다.
+
+                //$trigger 실행시 shape 에 커스텀 컨텍스트 메뉴가 있을 경우, 그에 맞는 컨텍스트 메뉴를 빌드한다.
+
+                //default 컨텍스트 메뉴를 설정한다.
+
                 if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
                     $(me._RENDERER.getContainer()).focus();
                 }
-                var items;
+                var items = {};
 
                 if (me._getSelectedElement().length == 1) {
-                    if (me._getSelectedElement()[0].shape instanceof OG.shape.EdgeShape) {
-                        items = me.makeEdgeContextMenu(true);
-                    } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.G_Gateway) {
-                        items = me.makeGatewayContextMenu();
-                    } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.Event) {
-                        items = me.makeEventContextMenu();
-                    } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.A_Task) {
-                        items = me.makeTaskContextMenu();
-                    } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.A_Subprocess) {
-                        items = me.makeSubprocessContextMenu();
-                    } else if (me._getSelectedElement()[0].shape instanceof OG.shape.bpmn.Value_Chain) {
-                        items = me.makeValueChainContextMenu();
-                    } else {
+                    var defaultList = ['delete', 'copy', 'format', 'text', 'bringToFront', 'sendToBack'];
+                    var eventShape = $trigger.get(0).shape;
+                    //사용자가 지정한 customContextMenu 가 있다면 기본 createContextMenu 보다 우선한다.
+                    var customMenu = eventShape.customContextMenu;
+                    if (!customMenu) {
+                        if (eventShape.createContextMenu) {
+                            customMenu = eventShape.createContextMenu();
+                        }
+                    }
+
+                    //커스텀 콘텍스트 메뉴가 있을경우 처리
+                    if (customMenu) {
+                        for (var key in customMenu) {
+                            if (!customMenu[key]) {
+                                continue;
+                            }
+                            //기본 메뉴인경우
+                            if (defaultList.indexOf(key) != -1) {
+                                items[key] = me.makeDefaultContextMenu()[key];
+                            }
+                            //기본 메뉴가 아닌경우
+                            else {
+                                items[key] = customMenu[key];
+                            }
+                        }
+                    }
+                    //커스텀 콘텍스트 메뉴가 없을경우 처리
+                    else {
                         items = me.makeDefaultContextMenu();
                     }
+
                 } else {
                     items = me.makeMultiContextMenu();
                 }
@@ -4085,25 +3717,38 @@ OG.handler.EventHandler.prototype = {
     /**
      * 메뉴 : Shape를 선택한 모양으로 변경한다.
      */
-    changeShape: function (value) {
+    changeShape: function (value, label) {
         var me = this, geometry, position, width, height, shape;
 
         $(me._RENDERER.getRootElement()).find("[_selected=true]").each(function (index, item) {
-            if (item.shape.label) {
-                shape = eval('new ' + value + '(\'' + item.shape.label + '\')');
-            } else {
-                shape = eval('new ' + value + '()');
+            shape = eval('new ' + value + '()');
+            if (label) {
+                shape.label = label;
             }
-            position = [item.shape.geom.boundary.getCentroid().x, item.shape.geom.boundary.getCentroid().y];
-            width = item.shape.geom.boundary.getWidth();
-            height = item.shape.geom.boundary.getHeight();
+            else if (item.shape.label) {
+                shape.label = item.shape.label;
+            }
 
-            geometry = shape.createShape();
+            if(shape instanceof OG.EdgeShape){
+                geometry = shape.createShape();
+                geometry.vertices = item.shape.geom.vertices;
+                shape.geom = geometry;
+            }else{
+                position = [item.shape.geom.boundary.getCentroid().x, item.shape.geom.boundary.getCentroid().y];
+                width = item.shape.geom.boundary.getWidth();
+                height = item.shape.geom.boundary.getHeight();
+                geometry = shape.createShape();
 
-            // 좌상단으로 이동 및 크기 조정
-            geometry.moveCentroid(position);
-            geometry.resizeBox(width, height);
-            shape.geom = geometry;
+                // 좌상단으로 이동 및 크기 조정
+                geometry.moveCentroid(position);
+                geometry.resizeBox(width, height);
+                shape.geom = geometry;
+            }
+
+            //데이터 복제
+            shape.setData(JSON.parse(JSON.stringify(item.shape.getData())));
+
+            //shape 등록
             item.shape = shape;
 
             me._RENDERER.redrawShape(item);
@@ -4600,6 +4245,19 @@ OG.handler.EventHandler.prototype = {
         var me = this;
         element.shape.inclusion = inclusion;
         me._RENDERER.redrawShape(element, null, true);
+        me._RENDERER.addHistory();
+    },
+
+    /**
+     * 메뉴 : 선택된 Shape 들의 Fill Opacity 를 설정한다.
+     *
+     * @param {String} opacity
+     */
+    setFillOpacitySelectedShape: function (opacity) {
+        var me = this;
+        $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (idx, item) {
+            me._RENDERER.setShapeStyle(item, {"fill-opacity": opacity});
+        });
         me._RENDERER.addHistory();
     },
 
@@ -5482,11 +5140,14 @@ OG.handler.EventHandler.prototype = {
             var isConnectable;
             var vertices = element.shape.geom.getVertices();
             if ($(spot).data('type') === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
-                if ($(spot).data("start")) {
-                    isConnectable = 'from';
-                }
-                if ($(spot).data("end")) {
-                    isConnectable = 'to';
+                var index = $(spot).data("index");
+                if (index || index === 0) {
+                    if (index === 0) {
+                        isConnectable = 'from'
+                    }
+                    if (index === vertices.length - 1) {
+                        isConnectable = 'to'
+                    }
                 }
             }
             return isConnectable;
@@ -5594,7 +5255,6 @@ OG.handler.EventHandler.prototype = {
                                 renderer.selectSpot(virtualSpot);
                             },
                             drag: function (event) {
-
                                 if (!renderer._getREleById(virtualSpot.id)) {
                                     renderer.removeAllConnectGuide();
                                     $(root).data(OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_EVENT_DRAG, false);
@@ -5624,7 +5284,6 @@ OG.handler.EventHandler.prototype = {
                                 renderer.trimConnectIntersection(element);
                             },
                             stop: function (event) {
-
                                 $(root).data(OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_EVENT_DRAG, false);
                                 $(root).data(OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_EVENT_MOUSEROVER, false);
 
@@ -5692,7 +5351,7 @@ OG.handler.EventHandler.prototype = {
                             && eventOffset.y >= spotBBOX.y && eventOffset.y <= spotBBOX.y2) {
                             skipRemove = true;
                         }
-                    })
+                    });
 
                     //가상스팟이 선택되어 바운더리 영역 밖으로 나갔다고 판단될 경우 예외처리한다.
                     var virtualSpot = renderer.getVirtualSpot(element);
@@ -5985,6 +5644,7 @@ OG.handler.EventHandler.prototype = {
                                     if (frontElement) {
                                         renderer.removeHighlight(frontElement, enableStyle);
                                     }
+                                    console.log(connectableDirection, frontElement);
                                     if (connectableDirection && frontElement) {
                                         var point = [newX, newY];
                                         var terminal = renderer.createTerminalString(frontElement, point);

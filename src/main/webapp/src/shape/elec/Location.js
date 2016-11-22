@@ -5,6 +5,14 @@ OG.shape.elec.Location = function (label) {
     this.label = label;
     this.CONNECT_CLONEABLE = false;
     this.LABEL_EDITABLE = false;
+
+    this.textList = [
+        {
+            text: 'Raceway',
+            label: '',
+            shape: 'OG.RacewayShape'
+        }
+    ];
 };
 OG.shape.elec.Location.prototype = new OG.shape.GeomShape();
 OG.shape.elec.Location.superclass = OG.shape.GeomShape;
@@ -39,4 +47,21 @@ OG.shape.elec.Location.prototype.createSubShape = function () {
 
     ];
     return this.sub;
+};
+
+OG.shape.elec.Location.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
 };

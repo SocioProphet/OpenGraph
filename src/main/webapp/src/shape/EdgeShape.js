@@ -61,7 +61,7 @@ OG.shape.EdgeShape.prototype.createShape = function () {
 		return this.geom;
 	}
 
-	this.geom = new OG.Line(this.from, this.to);
+	this.geom = new OG.PolyLine([this.from || [0, 0], this.to || [70, 0]]);
 	return this.geom;
 };
 
