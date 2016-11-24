@@ -2399,7 +2399,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
             if (!excludeEdgeId || excludeEdgeId.toString().indexOf(item) < 0) {
-                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item))
+                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item), null, null, true);
             }
         });
     }
@@ -2408,7 +2408,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
             if (!excludeEdgeId || excludeEdgeId.toString().indexOf(item) < 0) {
-                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item))
+                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item), null, null, true);
             }
         });
     }
@@ -2500,6 +2500,9 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
     } else {
         return null;
     }
+
+    //if label null, convert undefined
+    label = label ? label : undefined;
 
     var me = this, _style = {}, fromShape, toShape, fromXY, toXY,
         isSelf, beforeEvent,

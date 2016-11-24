@@ -15397,6 +15397,1522 @@ OG.shape.bpmn.Value_Chain.prototype.createSubShape = function () {
     return this.sub;
 };
 /**
+ * ELECTRONIC : Wire Shape
+ *
+ * @class
+ * @extends OG.shape.WireShape
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @param {Number[]} from 와이어 시작 좌표
+ * @param {Number[]} to 와이어 끝 좌표
+ * @param {String} label 라벨 [Optional]
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
+ */
+OG.shape.elec.WireShape = function (from, to, label) {
+    OG.shape.elec.WireShape.superclass.call(this, from, to, label);
+
+    this.SHAPE_ID = 'OG.shape.elec.WireShape';
+};
+OG.shape.elec.WireShape.prototype = new OG.shape.EdgeShape();
+OG.shape.elec.WireShape.superclass = OG.shape.EdgeShape;
+OG.shape.elec.WireShape.prototype.constructor = OG.shape.elec.WireShape;
+OG.WireShape = OG.shape.elec.WireShape;
+
+OG.shape.elec.WireShape.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        },
+        'changeShape': {
+            name: '변경',
+            items: {
+                'Wire': {
+                    name: 'Cable',
+                    type: 'radio',
+                    radio: 'changeShape',
+                    value: 'OG.shape.elec.CableShape',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value, null);
+                        }
+                    }
+                },
+                'IPB': {
+                    name: 'IPB',
+                    type: 'radio',
+                    radio: 'changeShape',
+                    value: 'OG.shape.elec.BusductShape',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value, 'IPB');
+                        }
+                    }
+                },
+                'SPB': {
+                    name: 'SPB',
+                    type: 'radio',
+                    radio: 'changeShape',
+                    value: 'OG.shape.elec.BusductShape',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value, 'SPB');
+                        }
+                    }
+                },
+                'NSPB': {
+                    name: 'NSPB',
+                    type: 'radio',
+                    radio: 'changeShape',
+                    value: 'OG.shape.elec.BusductShape',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value, 'NSPB');
+                        }
+                    }
+                },
+                'CRB': {
+                    name: 'CRB',
+                    type: 'radio',
+                    radio: 'changeShape',
+                    value: 'OG.shape.elec.BusductShape',
+                    events: {
+                        change: function (e) {
+                            me.currentCanvas.getEventHandler().changeShape(e.target.value, 'CRB');
+                        }
+                    }
+                }
+            }
+        }
+    };
+    return this.contextMenu;
+};
+
+OG.shape.elec.Load = function (label) {
+    OG.shape.elec.Load.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.Load';
+    this.label = label;
+};
+OG.shape.elec.Load.prototype = new OG.shape.GeomShape();
+OG.shape.elec.Load.superclass = OG.shape.GeomShape;
+OG.shape.elec.Load.prototype.constructor = OG.shape.elec.Load;
+OG.Load = OG.shape.elec.Load;
+
+OG.shape.elec.Load.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+OG.shape.elec.BLDG = function (label) {
+    OG.shape.elec.BLDG.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.BLDG';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.CONNECTABLE = false;
+};
+OG.shape.elec.BLDG.prototype = new OG.shape.HorizontalPoolShape();
+OG.shape.elec.BLDG.superclass = OG.shape.HorizontalPoolShape;
+OG.shape.elec.BLDG.prototype.constructor = OG.shape.elec.BLDG;
+OG.BLDG = OG.shape.elec.BLDG;
+OG.shape.elec.BLDG.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+    this.geom.style = new OG.geometry.Style({
+        'label-direction': 'horizontal',
+        'vertical-align' : 'top',
+        'fill': '#ffffff',
+        'fill-opacity': 0,
+        'title-size' : 26,
+        'label-fill': '#428bca',
+        'label-fill-opacity': 1,
+        'font-weight': 700,
+        'font-color' : 'white'
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.BLDG.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+
+/**
+ * ELECTRONIC : Busduct Shape
+ *
+ * @class
+ * @extends OG.shape.BusductShape
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @param {Number[]} from 와이어 시작 좌표
+ * @param {Number[]} to 와이어 끝 좌표
+ * @param {String} label 라벨 [Optional]
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
+ */
+OG.shape.elec.BusductShape = function (from, to, label) {
+    OG.shape.elec.BusductShape.superclass.call(this, from, to, label);
+
+    this.SHAPE_ID = 'OG.shape.elec.BusductShape';
+};
+OG.shape.elec.BusductShape.prototype = new OG.shape.elec.WireShape();
+OG.shape.elec.BusductShape.superclass = OG.shape.elec.WireShape;
+OG.shape.elec.BusductShape.prototype.constructor = OG.shape.elec.BusductShape;
+OG.BusductShape = OG.shape.elec.BusductShape;
+
+/**
+ * 드로잉할 Shape 을 생성하여 반환한다.
+ *
+ * @return {OG.geometry.Geometry} Shape 정보
+ * @override
+ */
+OG.shape.elec.BusductShape.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.PolyLine([this.from || [0, 0], this.to || [70, 0]]);
+    this.geom.style = new OG.geometry.Style({
+        'multi': [
+            {
+                top: -10,
+                from: '20px',
+                to: 'end-20px',
+                style: {
+                    'marker': {
+                        'start': {
+                            'id': 'OG.marker.SwitchRMarker',
+                            'size': [8, 8],
+                            'ref': [8, 0]
+                        },
+                        'end': {
+                            'id': 'OG.marker.SwitchLMarker',
+                            'size': [8, 8],
+                            'ref': [1, 0]
+                        }
+                    }
+                }
+            },
+            {
+                top: 10,
+                from: '20px',
+                to: 'end-20px',
+                style: {
+                    'marker': {
+                        'start': {
+                            'id': 'OG.marker.SwitchLMarker',
+                            'size': [8, 8],
+                            'ref': [7, 8]
+                        },
+                        'end': {
+                            'id': 'OG.marker.SwitchRMarker',
+                            'size': [8, 8],
+                            'ref': [0, 8]
+                        }
+                    }
+                }
+            },
+            {
+                top: 0,
+                from: 'start',
+                to: 'end',
+                style: {}
+            }
+        ]
+    });
+    return this.geom;
+};
+
+/**
+ * ELECTRONIC : CableShape
+ *
+ * @class
+ * @extends OG.shape.CableShape
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @param {Number[]} from 와이어 시작 좌표
+ * @param {Number[]} to 와이어 끝 좌표
+ * @param {String} label 라벨 [Optional]
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
+ */
+OG.shape.elec.CableShape = function (from, to, label) {
+    OG.shape.elec.CableShape.superclass.call(this, from, to, label);
+
+    this.SHAPE_ID = 'OG.shape.elec.CableShape';
+};
+OG.shape.elec.CableShape.prototype = new OG.shape.elec.WireShape();
+OG.shape.elec.CableShape.superclass = OG.shape.elec.WireShape;
+OG.shape.elec.CableShape.prototype.constructor = OG.shape.elec.CableShape;
+OG.CableShape = OG.shape.elec.CableShape;
+
+/**
+ * 드로잉할 Shape 을 생성하여 반환한다.
+ *
+ * @return {OG.geometry.Geometry} Shape 정보
+ * @override
+ */
+OG.shape.elec.CableShape.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.PolyLine([this.from || [0, 0], this.to || [70, 0]]);
+    this.geom.style = new OG.geometry.Style({
+        'multi': [
+            {
+                top: 0,
+                from: 'start',
+                to: 'center',
+                style: {
+                    'marker': {
+                        'end': {
+                            'id': 'OG.marker.SwitchLMarker',
+                            'size': [20, 8],
+                            'ref': [3, 0]
+                        }
+                    }
+                }
+            },
+            {
+                top: 0,
+                from: 'center',
+                to: 'end',
+                style: {
+                    'marker': {
+                        'start': {
+                            'id': 'OG.marker.SwitchXMarker',
+                            'size': [6, 6]
+                        }
+                    }
+                }
+            }
+        ]
+    });
+    return this.geom;
+};
+
+OG.shape.elec.EHLoad = function (label) {
+    OG.shape.elec.EHLoad.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.EHLoad';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.ENABLE_FROM = false;
+};
+OG.shape.elec.EHLoad.prototype = new OG.shape.elec.Load();
+OG.shape.elec.EHLoad.superclass = OG.shape.elec.Load;
+OG.shape.elec.EHLoad.prototype.constructor = OG.shape.elec.EHLoad;
+OG.EHLoad = OG.shape.elec.EHLoad;
+
+OG.shape.elec.EHLoad.prototype.createShape = function () {
+    var geom1, geom2,geom3,geom4, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Circle([30, 30], 30);
+
+    geom2 = new OG.geometry.Curve([
+        [0, 0],
+        [40, 10],
+        [20, 20]
+    ]);
+    geom3 = new OG.geometry.Curve([
+        [20, 20],
+        [40, 30],
+        [20, 40]
+    ]);
+    geom4 = new OG.geometry.Curve([
+        [20, 40],
+        [40, 50],
+        [0, 60]
+    ]);
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+    geomCollection.push(geom3);
+    geomCollection.push(geom4);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200,
+        'stroke-width': 2
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.EHLoad.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+        {
+            shape: new OG.TextShape(this.data['LO_TYPE'] + ' Load'),
+            width: '200%',
+            height: '15%',
+            left: '-50%',
+            top: '-20%',
+            style: {
+                'font-size': 8,
+                'font-color': 'red',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    return this.sub;
+};
+OG.shape.elec.EHSLoad = function (label) {
+    OG.shape.elec.EHSLoad.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.EHSLoad';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.ENABLE_FROM = false;
+};
+OG.shape.elec.EHSLoad.prototype = new OG.shape.elec.Load();
+OG.shape.elec.EHSLoad.superclass = OG.shape.elec.Load;
+OG.shape.elec.EHSLoad.prototype.constructor = OG.shape.elec.EHSLoad;
+OG.EHSLoad = OG.shape.elec.EHSLoad;
+
+OG.shape.elec.EHSLoad.prototype.createShape = function () {
+    var geom1, geom2,geom3,geom4, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Circle([30, 30], 30);
+
+    geom2 = new OG.geometry.Curve([
+        [0, 0],
+        [40, 10],
+        [20, 20]
+    ]);
+    geom3 = new OG.geometry.Curve([
+        [20, 20],
+        [40, 30],
+        [20, 40]
+    ]);
+    geom4 = new OG.geometry.Curve([
+        [20, 40],
+        [40, 50],
+        [0, 60]
+    ]);
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+    geomCollection.push(geom3);
+    geomCollection.push(geom4);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200,
+        'stroke-width': 2
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.EHSLoad.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+        {
+            shape: new OG.TextShape(this.data['LO_TYPE'] + ' Load'),
+            width: '200%',
+            height: '15%',
+            left: '-50%',
+            top: '-20%',
+            style: {
+                'font-size': 8,
+                'font-color': 'red',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    return this.sub;
+};
+OG.shape.elec.HierarchyBldg = function (label) {
+    OG.shape.elec.HierarchyBldg.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.HierarchyBldg';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.CONNECTABLE = false;
+};
+OG.shape.elec.HierarchyBldg.prototype = new OG.shape.HorizontalPoolShape();
+OG.shape.elec.HierarchyBldg.superclass = OG.shape.HorizontalPoolShape;
+OG.shape.elec.HierarchyBldg.prototype.constructor = OG.shape.elec.HierarchyBldg;
+OG.HierarchyBldg = OG.shape.elec.HierarchyBldg;
+
+OG.shape.elec.HierarchyBldg.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+    this.geom.style = new OG.geometry.Style({
+        'label-direction': 'vertical',
+        'vertical-align' : 'top',
+        'fill' : '#ffffff',
+        'fill-opacity': 0,
+        'title-size' : 26,
+        'label-fill': '#428bca',
+        'label-fill-opacity': 1,
+        'font-weight': 700,
+        'font-color' : 'white'
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.HierarchyBldg.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+OG.shape.elec.HierarchyFeeder = function (label) {
+    OG.shape.elec.HierarchyFeeder.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.HierarchyFeeder';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+
+    this.textList = [
+        {
+            text: 'cable',
+            label: '',
+            shape: 'OG.CableShape'
+        },
+        {
+            text: 'IPB',
+            label: 'IPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'SPB',
+            label: 'SPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'NSPB',
+            label: 'NSPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'CRB',
+            label: 'CRB',
+            shape: 'OG.BusductShape'
+        }
+    ];
+};
+OG.shape.elec.HierarchyFeeder.prototype = new OG.shape.GeomShape();
+OG.shape.elec.HierarchyFeeder.superclass = OG.shape.GeomShape;
+OG.shape.elec.HierarchyFeeder.prototype.constructor = OG.shape.elec.HierarchyFeeder;
+OG.HierarchyFeeder = OG.shape.elec.HierarchyFeeder;
+
+OG.shape.elec.HierarchyFeeder.prototype.createShape = function () {
+    var geom1, geom2, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Circle([50, 50], 50);
+    geom1.style = new OG.geometry.Style({
+        "stroke-width": 4
+    });
+
+    geom2 = new OG.geometry.Polygon([
+        [30, 80],
+        [30, 20],
+        [70, 20],
+        [70, 30],
+        [40, 30],
+        [40, 40],
+        [70, 40],
+        [70, 50],
+        [40, 50],
+        [40, 80],
+        [30, 80]
+    ]);
+    geom2.style = new OG.geometry.Style({
+        "fill": "black",
+        "fill-opacity": 1
+    });
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.HierarchyFeeder.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+        {
+            shape: new OG.TextShape(this.data['SWGR_TYPE'] + ' Swgr'),
+            width: '200%',
+            height: '15%',
+            left: '-50%',
+            top: '-20%',
+            style: {
+                'font-size': 8,
+                'font-color': 'red',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    return this.sub;
+};
+
+
+OG.shape.elec.HierarchyFloor = function (label) {
+    OG.shape.elec.HierarchyFloor.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.HierarchyFloor';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.CONNECTABLE = false;
+};
+OG.shape.elec.HierarchyFloor.prototype = new OG.shape.HorizontalPoolShape();
+OG.shape.elec.HierarchyFloor.superclass = OG.shape.HorizontalPoolShape;
+OG.shape.elec.HierarchyFloor.prototype.constructor = OG.shape.elec.HierarchyFloor;
+OG.HierarchyFloor = OG.shape.elec.HierarchyFloor;
+
+
+OG.shape.elec.HierarchyFloor.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+    this.geom.style = new OG.geometry.Style({
+        'label-direction': 'vertical',
+        'vertical-align' : 'top',
+        'fill' : '#ffffff',
+        'fill-opacity': 0,
+        'title-size' : 26,
+        'label-fill': '#428bca',
+        'label-fill-opacity': 1,
+        'font-weight': 700,
+        'font-color' : 'white'
+    });
+
+    return this.geom;
+};
+
+OG.shape.elec.HierarchyFloor.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+
+
+OG.shape.elec.HierarchyFloor.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+OG.shape.elec.Location = function (label) {
+    OG.shape.elec.Location.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.Location';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+
+    this.textList = [
+        {
+            text: 'Raceway',
+            label: '',
+            shape: 'OG.RacewayShape'
+        }
+    ];
+};
+OG.shape.elec.Location.prototype = new OG.shape.GeomShape();
+OG.shape.elec.Location.superclass = OG.shape.GeomShape;
+OG.shape.elec.Location.prototype.constructor = OG.shape.elec.Location;
+OG.Location = OG.shape.elec.Location;
+OG.shape.elec.Location.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
+    this.geom.style = new OG.geometry.Style({
+        'fill-r': 1,
+        'fill-cx': .1,
+        'fill-cy': .1,
+        "stroke-width": 1.2,
+        fill: 'r(.1, .1)#428bca-#ffffff',
+        'fill-opacity': 1,
+        r: '10'
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.Location.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+
+    ];
+    return this.sub;
+};
+
+OG.shape.elec.Location.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+OG.shape.elec.MILoad = function (label) {
+    OG.shape.elec.MILoad.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.MILoad';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.ENABLE_FROM = false;
+};
+OG.shape.elec.MILoad.prototype = new OG.shape.elec.Load();
+OG.shape.elec.MILoad.superclass = OG.shape.elec.Load;
+OG.shape.elec.MILoad.prototype.constructor = OG.shape.elec.MILoad;
+OG.MILoad = OG.shape.elec.MILoad;
+
+OG.shape.elec.MILoad.prototype.createShape = function () {
+    var geom1, geom2, geom3, geom4, geom5,
+        geom6, geom7, geom8, geom9, geom10,
+        geom11, geom12, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Polygon([[10, 0], [27, 10], [10, 20]]);
+    geom2 = new OG.geometry.Polygon([[44, 0], [27, 10], [44, 20]]);
+    geom3 = new OG.geometry.Line([27, 10], [27, 20]);
+    geom4 = new OG.geometry.Circle([27, 27], 7);
+    geom5 = new OG.geometry.PolyLine([[24, 30], [24, 24], [27, 28], [30, 24], [30, 30]]);
+
+    geom6 = new OG.geometry.Polygon([[10, 40], [27, 50], [10, 60]]);
+    geom7 = new OG.geometry.Polygon([[44, 40], [27, 50], [44, 60]]);
+    geom8 = new OG.geometry.Line([27, 50], [27, 60]);
+    geom9 = new OG.geometry.Circle([27, 67], 7);
+    geom10 = new OG.geometry.PolyLine([[24, 70], [24, 64], [27, 68], [30, 64], [30, 70]]);
+
+    geom11 = new OG.geometry.PolyLine([[10, 10], [0, 10], [0, 34], [10, 34], [10, 40]]);
+    geom12 = new OG.geometry.PolyLine([[44, 10], [54, 10], [54, 34], [44, 34], [44, 40]]);
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+    geomCollection.push(geom3);
+    geomCollection.push(geom4);
+    geomCollection.push(geom5);
+    geomCollection.push(geom6);
+    geomCollection.push(geom7);
+    geomCollection.push(geom8);
+    geomCollection.push(geom9);
+    geomCollection.push(geom10);
+    geomCollection.push(geom11);
+    geomCollection.push(geom12);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200,
+        'stroke-width': 2
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.MILoad.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+        {
+            shape: new OG.TextShape(this.data['LO_TYPE'] + ' Load'),
+            width: '200%',
+            height: '15%',
+            left: '-50%',
+            top: '-20%',
+            style: {
+                'font-size': 8,
+                'font-color': 'red',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    return this.sub;
+};
+OG.shape.elec.MKLoad = function (label) {
+    OG.shape.elec.MKLoad.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.MKLoad';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.ENABLE_FROM = false;
+};
+OG.shape.elec.MKLoad.prototype = new OG.shape.elec.Load();
+OG.shape.elec.MKLoad.superclass = OG.shape.elec.Load;
+OG.shape.elec.MKLoad.prototype.constructor = OG.shape.elec.MKLoad;
+OG.MKLoad = OG.shape.elec.MKLoad;
+
+OG.shape.elec.MKLoad.prototype.createShape = function () {
+    var geom1, geom2,geom3,geom4,geom5, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Polygon([[10, 0],[27,10],[10,20]]);
+    geom2 = new OG.geometry.Polygon([[44, 0],[27,10],[44,20]]);
+    geom3 = new OG.geometry.Line([27,10],[27,20]);
+    geom4 = new OG.geometry.Circle([27,27],7);
+    geom5 = new OG.geometry.PolyLine([[24,30],[24,24],[27,28],[30,24],[30,30]]);
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+    geomCollection.push(geom3);
+    geomCollection.push(geom4);
+    geomCollection.push(geom5);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200,
+        'stroke-width': 2
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.MKLoad.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+        {
+            shape: new OG.TextShape(this.data['LO_TYPE'] + ' Load'),
+            width: '200%',
+            height: '15%',
+            left: '-50%',
+            top: '-20%',
+            style: {
+                'font-size': 8,
+                'font-color': 'red',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    return this.sub;
+};
+OG.shape.elec.MOLoad = function (label) {
+    OG.shape.elec.MOLoad.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.MOLoad';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.ENABLE_FROM = false;
+};
+OG.shape.elec.MOLoad.prototype = new OG.shape.elec.Load();
+OG.shape.elec.MOLoad.superclass = OG.shape.elec.Load;
+OG.shape.elec.MOLoad.prototype.constructor = OG.shape.elec.MOLoad;
+OG.MOLoad = OG.shape.elec.MOLoad;
+
+OG.shape.elec.MOLoad.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Circle([50, 50], 50);
+
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200,
+        'stroke-width': 2
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.MOLoad.prototype.createSubShape = function () {
+    this.sub = [
+        {
+            shape: new OG.TextShape('M'),
+            width: '100%',
+            height: '50%',
+            align: 'center',
+            'vertical-align': 'middle',
+            style: {
+                'font-size': 20,
+                'font-color': 'black',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    if (this.data) {
+        this.sub.push(
+            {
+                shape: new OG.TextShape(this.data['LO_TYPE'] + ' Load'),
+                width: '200%',
+                height: '15%',
+                left: '-50%',
+                top: '-20%',
+                style: {
+                    'font-size': 8,
+                    'font-color': 'red',
+                    'text-anchor': 'middle'
+                }
+            }
+        )
+    }
+    return this.sub;
+};
+OG.shape.elec.Manhole = function (image, label) {
+    OG.shape.elec.Manhole.superclass.call(this, image, label);
+
+    this.SHAPE_ID = 'OG.shape.elec.Manhole';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+
+    if (!image) {
+        this.image = 'resources/images/elec/manhole.svg'
+    }
+
+    this.textList = [
+        {
+            text: 'Raceway',
+            label: '',
+            shape: 'OG.RacewayShape'
+        }
+    ];
+};
+OG.shape.elec.Manhole.prototype = new OG.shape.ImageShape();
+OG.shape.elec.Manhole.superclass = OG.shape.ImageShape;
+OG.shape.elec.Manhole.prototype.constructor = OG.shape.elec.Manhole;
+OG.Manhole = OG.shape.elec.Manhole;
+
+OG.shape.elec.Manhole.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+
+    ];
+    return this.sub;
+};
+
+
+OG.shape.elec.Manhole.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+OG.shape.elec.NMLoad = function (label) {
+    OG.shape.elec.NMLoad.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.NMLoad';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.ENABLE_FROM = false;
+};
+OG.shape.elec.NMLoad.prototype = new OG.shape.elec.Load();
+OG.shape.elec.NMLoad.superclass = OG.shape.elec.Load;
+OG.shape.elec.NMLoad.prototype.constructor = OG.shape.elec.NMLoad;
+OG.NMLoad = OG.shape.elec.NMLoad;
+
+OG.shape.elec.NMLoad.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 80);
+
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200,
+        'stroke-width': 2
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.NMLoad.prototype.createSubShape = function () {
+    this.sub = [
+        {
+            shape: new OG.TextShape('NM'),
+            width: '100%',
+            height: '50%',
+            align: 'center',
+            'vertical-align': 'middle',
+            style: {
+                'font-size': 20,
+                'font-color': 'black',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    if (this.data) {
+        this.sub.push(
+            {
+                shape: new OG.TextShape(this.data['LO_TYPE'] + ' Load'),
+                width: '200%',
+                height: '15%',
+                left: '-50%',
+                top: '-20%',
+                style: {
+                    'font-size': 8,
+                    'font-color': 'red',
+                    'text-anchor': 'middle'
+                }
+            }
+        )
+    }
+    return this.sub;
+};
+OG.shape.elec.PKGLoad = function (label) {
+    OG.shape.elec.PKGLoad.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.PKGLoad';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.ENABLE_FROM = false;
+};
+OG.shape.elec.PKGLoad.prototype = new OG.shape.elec.Load();
+OG.shape.elec.PKGLoad.superclass = OG.shape.elec.Load;
+OG.shape.elec.PKGLoad.prototype.constructor = OG.shape.elec.PKGLoad;
+OG.PKGLoad = OG.shape.elec.PKGLoad;
+
+OG.shape.elec.PKGLoad.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Rectangle([0, 0], 100, 80);
+
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200,
+        'stroke-width': 2
+    });
+
+    return this.geom;
+};
+
+
+OG.shape.elec.PKGLoad.prototype.createSubShape = function () {
+    this.sub = [
+        {
+            shape: new OG.TextShape('PKG'),
+            width: '100%',
+            height: '50%',
+            align: 'center',
+            'vertical-align': 'middle',
+            style: {
+                'font-size': 20,
+                'font-color': 'black',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    if (this.data) {
+        this.sub.push(
+            {
+                shape: new OG.TextShape(this.data['LO_TYPE'] + ' Load'),
+                width: '200%',
+                height: '15%',
+                left: '-50%',
+                top: '-20%',
+                style: {
+                    'font-size': 8,
+                    'font-color': 'red',
+                    'text-anchor': 'middle'
+                }
+            }
+        )
+    }
+    return this.sub;
+};
+/**
+ * ELECTRONIC : Raceway Shape
+ *
+ * @class
+ * @extends OG.shape.RacewayShape
+ * @requires OG.common.*
+ * @requires OG.geometry.*
+ *
+ * @param {Number[]} from 와이어 시작 좌표
+ * @param {Number[]} to 와이어 끝 좌표
+ * @param {String} label 라벨 [Optional]
+ * @author <a href="mailto:sppark@uengine.org">Seungpil Park</a>
+ * @private
+ */
+OG.shape.elec.RacewayShape = function (from, to, label) {
+    OG.shape.elec.RacewayShape.superclass.call(this, from, to, label);
+
+    this.SHAPE_ID = 'OG.shape.elec.RacewayShape';
+};
+OG.shape.elec.RacewayShape.prototype = new OG.shape.EdgeShape();
+OG.shape.elec.RacewayShape.superclass = OG.shape.EdgeShape;
+OG.shape.elec.RacewayShape.prototype.constructor = OG.shape.elec.RacewayShape;
+OG.RacewayShape = OG.shape.elec.RacewayShape;
+
+/**
+ * 드로잉할 Shape 을 생성하여 반환한다.
+ *
+ * @return {OG.geometry.Geometry} Shape 정보
+ * @override
+ */
+OG.shape.elec.RacewayShape.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.Line(this.from || [0, 0], this.to || [70, 0]);
+
+    var style = {
+        'multi': [
+            {
+                top: -10,
+                from: 'start',
+                to: 'end',
+                style: {}
+            },
+            {
+                top: 10,
+                from: 'start',
+                to: 'end',
+                style: {}
+            },
+            {
+                top: 0,
+                from: 'start',
+                to: 'end',
+                style: {
+                    pattern: {
+                        'id': 'OG.pattern.HatchedPattern',
+                        'thickness': 10,
+                        'unit-width': 12,
+                        'unit-height': 12,
+                        'pattern-width': 8,
+                        'pattern-height': 8,
+                        'style': {
+                            'stroke': 'black'
+                        }
+                    },
+                    'stroke': 'none'
+                }
+            }
+        ]
+    };
+    if (this.data && this.data.selected) {
+        style['stroke'] = '#d9534f';
+        style['stroke-width'] = 2;
+        style['multi'][2]['style']['pattern']['style']['stroke'] = '#d9534f';
+    }
+    this.geom.style = new OG.geometry.Style(style);
+    return this.geom;
+};
+
+
+OG.shape.elec.RacewayShape.prototype.createContextMenu = function () {
+    var me = this;
+    var options = {'':''};
+    if (this.data && this.data.pathList) {
+        for (var i = 0; i < this.data.pathList.length; i++) {
+            options[this.data.pathList[i]['value']] = this.data.pathList[i]['name'];
+        }
+    }
+
+    this.contextMenu = {
+        'delete': true,
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        },
+        'pathList': {
+            name: '라우트 보기',
+            items: {
+                'selectPath': {
+                    name: '선택',
+                    type: 'select',
+                    options: options,
+                    selected: '',
+                    events: {
+                        change: function (e) {
+                            if (e.target.value !== '') {
+                                $(me.currentCanvas.getRootElement()).trigger('showRouteList', [me.currentElement, e.target.value]);
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        'alternative': {
+            name: '라우트 변경', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('changeRoute', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+
+OG.shape.elec.SHLoad = function (label) {
+    OG.shape.elec.SHLoad.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.SHLoad';
+    this.label = label;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+    this.ENABLE_FROM = false;
+};
+OG.shape.elec.SHLoad.prototype = new OG.shape.elec.Load();
+OG.shape.elec.SHLoad.superclass = OG.shape.elec.Load;
+OG.shape.elec.SHLoad.prototype.constructor = OG.shape.elec.SHLoad;
+OG.SHLoad = OG.shape.elec.SHLoad;
+
+OG.shape.elec.SHLoad.prototype.createShape = function () {
+    var geom1, geom2, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Circle([50, 50], 50);
+    geom1.style = new OG.geometry.Style({
+        "stroke-width": 4
+    });
+
+    geom2 = new OG.geometry.Polygon([
+        [20, 20],
+        [20, 80],
+        [30, 80],
+        [30, 50],
+        [70, 50],
+        [70, 80],
+        [80, 80],
+        [80, 20],
+        [70, 20],
+        [70, 40],
+        [30, 40],
+        [30, 20],
+        [20, 20]
+    ]);
+    geom2.style = new OG.geometry.Style({
+        "fill": "black",
+        "fill-opacity": 1
+    });
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 200
+    });
+
+    return this.geom;
+};
+
+OG.shape.elec.SHLoad.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+        {
+            shape: new OG.TextShape(this.data['LO_TYPE'] + ' Load'),
+            width: '200%',
+            height: '15%',
+            left: '-50%',
+            top: '-20%',
+            style: {
+                'font-size': 8,
+                'font-color': 'red',
+                'text-anchor': 'middle'
+            }
+        }
+    ];
+    return this.sub;
+};
+OG.shape.elec.SwitchGear = function (label) {
+    OG.shape.elec.SwitchGear.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.SwitchGear';
+    this.label = label;
+    this.DELETABLE = false;
+    this.ENABLE_TO = false;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+
+    this.textList = [
+        {
+            text: 'cable',
+            label: '',
+            shape: 'OG.CableShape'
+        },
+        {
+            text: 'IPB',
+            label: 'IPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'SPB',
+            label: 'SPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'NSPB',
+            label: 'NSPB',
+            shape: 'OG.BusductShape'
+        },
+        {
+            text: 'CRB',
+            label: 'CRB',
+            shape: 'OG.BusductShape'
+        }
+    ];
+};
+OG.shape.elec.SwitchGear.prototype = new OG.shape.GeomShape();
+OG.shape.elec.SwitchGear.superclass = OG.shape.GeomShape;
+OG.shape.elec.SwitchGear.prototype.constructor = OG.shape.elec.SwitchGear;
+OG.SwitchGear = OG.shape.elec.SwitchGear;
+
+OG.shape.elec.SwitchGear.prototype.createShape = function () {
+    if (this.geom) {
+        return this.geom;
+    }
+
+    this.geom = new OG.geometry.Line([-100, 0], [100, 0]);
+    this.geom.style = new OG.geometry.Style({
+        'cursor': 'default',
+        'stroke': '#d9534f',
+        'stroke-width': '3',
+        'fill': 'none',
+        'fill-opacity': 0
+    });
+    return this.geom;
+};
+
+
+OG.shape.elec.SwitchGear.prototype.createSubShape = function () {
+    if (!this.data) {
+        return;
+    }
+
+    this.sub = [
+        {
+            shape: new OG.TextShape(this.data['PJT_SQ']),
+            width: '100%',
+            height: '15px',
+            right: '0px',
+            top: '-25px',
+            style: {
+                'font-size': 12,
+                'font-color': 'red',
+                'text-anchor': 'end'
+            }
+        }
+    ];
+
+    return this.sub;
+};
+
+
+OG.shape.elec.SwitchGear.prototype.createContextMenu = function () {
+    var me = this;
+    this.contextMenu = {
+        'format': true,
+        'text': true,
+        'bringToFront': true,
+        'sendToBack': true,
+        'property': {
+            name: '정보보기', callback: function () {
+                $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
+            }
+        }
+    };
+    return this.contextMenu;
+};
+OG.shape.elec.SwitchTransformer = function (label) {
+    OG.shape.elec.SwitchTransformer.superclass.call(this);
+
+    this.SHAPE_ID = 'OG.shape.elec.SwitchTransformer';
+    this.label = label;
+    this.DELETABLE = false;
+    this.ENABLE_TO = false;
+    this.CONNECT_CLONEABLE = false;
+    this.LABEL_EDITABLE = false;
+};
+OG.shape.elec.SwitchTransformer.prototype = new OG.shape.GeomShape();
+OG.shape.elec.SwitchTransformer.superclass = OG.shape.GeomShape;
+OG.shape.elec.SwitchTransformer.prototype.constructor = OG.shape.elec.SwitchTransformer;
+OG.SwitchTransformer = OG.shape.elec.SwitchTransformer;
+
+OG.shape.elec.SwitchTransformer.prototype.createShape = function () {
+    var geom1, geom2, geomCollection = [];
+    if (this.geom) {
+        return this.geom;
+    }
+
+    geom1 = new OG.geometry.Circle([50, 50], 50);
+    geom2 = new OG.geometry.Circle([50, 125], 50);
+
+    geomCollection.push(geom1);
+    geomCollection.push(geom2);
+
+    this.geom = new OG.geometry.GeometryCollection(geomCollection);
+    this.geom.style = new OG.geometry.Style({
+        'label-position': 'bottom',
+        'label-width': 300,
+        'vertical-align': 'top'
+    });
+
+    return this.geom;
+};
+
+/**
  * 도형의 Style 과 Shape 정보를 통해 캔버스에 렌더링 기능을 정의한 인터페이스
  *
  * @class
@@ -19049,7 +20565,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
             if (!excludeEdgeId || excludeEdgeId.toString().indexOf(item) < 0) {
-                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item))
+                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item), null, null, true);
             }
         });
     }
@@ -19058,7 +20574,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
             if (!excludeEdgeId || excludeEdgeId.toString().indexOf(item) < 0) {
-                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item))
+                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item), null, null, true);
             }
         });
     }
@@ -19150,6 +20666,9 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
     } else {
         return null;
     }
+
+    //if label null, convert undefined
+    label = label ? label : undefined;
 
     var me = this, _style = {}, fromShape, toShape, fromXY, toXY,
         isSelf, beforeEvent,

@@ -537,9 +537,14 @@
 //
 //            canvas.drawShape([300, 100], loadShape, [100, 100]);
 
-            canvas.drawShape([300, 100], new OG.SwitchGear(), [100, 100]);
+            var location = canvas.drawShape([300, 100], new OG.Location(), [100, 100]);
+            var location2 = canvas.drawShape([600, 200], new OG.Location(), [100, 100]);
+            var raceway = new OG.RacewayShape();
+            raceway.setData({
+               selected: true
+            });
 
-            canvas.drawShape([300, 100], new OG.Location(), [100, 100]);
+            canvas.connect(location,location2,null, null, null, null, null, null, raceway);
 
             $(canvas.getRootElement()).bind('showProperty', function (event, shapeElement) {
                 console.log(shapeElement);
