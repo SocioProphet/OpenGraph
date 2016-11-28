@@ -6359,6 +6359,7 @@ OG.common.Constants = {
      * Move & Resize 용 가이드 ID 의 suffix 정의
      */
     GUIDE_SUFFIX: {
+        ONRESIZE: "_ONRESIZE",
         GUIDE: "_GUIDE",
         BBOX: "_GUIDE_BBOX",
         UL: "_GUIDE_UL",
@@ -26691,7 +26692,7 @@ OG.handler.EventHandler.prototype = {
      */
     setResizable: function (element, guide, isResizable) {
         var me = this;
-
+        var root = me._RENDERER.getRootGroup();
         if (!element || !guide) {
             return;
         }
@@ -27320,6 +27321,7 @@ OG.handler.EventHandler.prototype = {
                     $(guide[_handleName]).data('handleName', _handleName);
                     $(guide[_handleName]).draggable({
                         start: function (event) {
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE, true);
                             var handleName = $(this).data('handleName');
                             var eventOffset = me._getOffset(event);
                             var hx = renderer.getAttr(guide[handleName], "x");
@@ -27410,6 +27412,7 @@ OG.handler.EventHandler.prototype = {
                             renderer.removeAllConnectGuide();
                         },
                         stop: function (event) {
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE, false);
                             var handleName = $(this).data('handleName');
                             var eventOffset = me._getOffset(event),
                                 start = $(this).data("start"),
@@ -27710,13 +27713,122 @@ OG.handler.EventHandler.prototype = {
             renderer.offDropablePool();
         });
     },
+
+    /**
+     * 드래그하여 페이지 이동이 가능하게 한다.
+     * @param {Boolean} dragPageMovable 드래그 페이지 이동 가능 여부
+     */
+    setDragPageMovable: function (dragPageMovable) {
+        var renderer = this._RENDERER;
+        var me = this, rootEle = renderer.getRootElement();
+        var root = renderer.getRootGroup();
+        var container = renderer._CANVAS._CONTAINER;
+        $(rootEle).bind("mousedown", function (event) {
+            var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+            var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+            if (isConnectMode === 'active' || isRectMode === 'active') {
+                return;
+            }
+            var eventOffset = me._getOffset(event);
+            $(root).data("dragPageMove", {x: eventOffset.x, y: eventOffset.y});
+        });
+        $(rootEle).bind("mousemove", function (event) {
+            var isResizing = $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE);
+            var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+            var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+            if (isConnectMode === 'active' || isRectMode === 'active' || isResizing) {
+                return;
+            }
+            var pageMove = $(root).data("dragPageMove"),
+                eventOffset, width, height, x, y;
+
+            if (pageMove) {
+                eventOffset = me._getOffset(event);
+                var moveX = eventOffset.x - pageMove.x;
+                var moveY = eventOffset.y - pageMove.y;
+                var cuScrollLeft = container.scrollLeft;
+                var cuScrollTop = container.scrollTop;
+                $(container).scrollLeft(cuScrollLeft - moveX);
+                $(container).scrollTop(cuScrollTop - moveY);
+            }
+        });
+        $(rootEle).bind("mouseup", function (event) {
+            var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+            var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+            if (isConnectMode === 'active' || isRectMode === 'active') {
+                return;
+            }
+            $(root).removeData('dragPageMove');
+        });
+    },
+
+    /**
+     * 휠 스케일을 가능하게 한다.
+     * @param {Boolean} wheelScalable 휠 스케일 가능 여부
+     */
+    setWheelScale: function (wheelScalable) {
+        if (!wheelScalable) {
+            return;
+        }
+        var renderer = this._RENDERER;
+        var me = this, rootEle = renderer.getRootElement();
+        var updateScale = function (pageX, pageY, isUp) {
+            var scrollLeft = rootEle.scrollLeft;
+            var scrollTop = rootEle.scrollTop;
+            var cuScale;
+            var preScale = renderer.getScale();
+            if (isUp) {
+                cuScale = preScale + 0.1;
+            } else {
+                cuScale = preScale - 0.1;
+            }
+            if (cuScale < 0.25) {
+                cuScale = 0.25;
+            }
+            if (cuScale > 4) {
+                cuScale = 4;
+            }
+            var container = renderer._CANVAS._CONTAINER;
+            var preCenterX = pageX - $(container).offset().left + container.scrollLeft;
+            var preCenterY = pageY - $(container).offset().top + container.scrollTop;
+            preCenterX = preCenterX / preScale;
+            preCenterY = preCenterY / preScale;
+
+            renderer.setScale(cuScale);
+
+            var cuCenterX = preCenterX * (cuScale / preScale);
+            var cuCenterY = preCenterY * (cuScale / preScale);
+
+            var moveX = (preCenterX - cuCenterX) * cuScale;
+            var moveY = (preCenterY - cuCenterY) * cuScale;
+            var cuScrollLeft = container.scrollLeft;
+            var cuScrollTop = container.scrollTop;
+            $(container).scrollLeft(cuScrollLeft - moveX);
+            $(container).scrollTop(cuScrollTop - moveY);
+            renderer._CANVAS.updateNavigatior();
+
+        };
+        $(rootEle).bind('mousewheel DOMMouseScroll', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+                // scroll up
+                updateScale(event.pageX, event.pageY, true);
+            }
+            else {
+                updateScale(event.pageX, event.pageY, false);
+            }
+        });
+    },
+
     /**
      * 마우스 드래그 영역지정 선택가능여부를 설정한다.
      * 선택가능해야 리사이즈가 가능하다.
      *
      * @param {Boolean} isSelectable 선택가능여부
+     * @param {Boolean} dragPageMovable 드래그 페이지 이동 가능 여부
      */
-    setDragSelectable: function (isSelectable) {
+    setDragSelectable: function (isSelectable, dragPageMovable) {
         var renderer = this._RENDERER;
         var me = this, rootEle = renderer.getRootElement(),
             root = renderer.getRootGroup();
@@ -27889,9 +28001,11 @@ OG.handler.EventHandler.prototype = {
                 if (isConnectMode === 'active' || isRectMode === 'active') {
                     return;
                 }
-                var eventOffset = me._getOffset(event);
-                $(this).data("dragBox_first", {x: eventOffset.x, y: eventOffset.y});
-                $(this).removeData("dragBox");
+                if (!dragPageMovable) {
+                    var eventOffset = me._getOffset(event);
+                    $(this).data("dragBox_first", {x: eventOffset.x, y: eventOffset.y});
+                    $(this).removeData("dragBox");
+                }
             });
             $(rootEle).bind("mousemove", function (event) {
                 var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
@@ -27903,7 +28017,7 @@ OG.handler.EventHandler.prototype = {
                 var first = $(this).data("dragBox_first"),
                     eventOffset, width, height, x, y;
 
-                if (first) {
+                if (first && !dragPageMovable) {
                     eventOffset = me._getOffset(event);
                     width = eventOffset.x - first.x;
                     height = eventOffset.y - first.y;
@@ -27924,7 +28038,7 @@ OG.handler.EventHandler.prototype = {
                 if (isConnectMode === 'active' || isRectMode === 'active') {
                     return;
                 }
-                if ("start" == $(this).data("rubber_band_status")) {
+                if ("start" == $(this).data("rubber_band_status") && !dragPageMovable) {
                     var first = $(this).data("dragBox_first"),
                         eventOffset, width, height, x, y, envelope, guide, elements = [];
                     renderer.removeRubberBand(rootEle);
@@ -29439,11 +29553,11 @@ OG.handler.EventHandler.prototype = {
                 shape.label = item.shape.label;
             }
 
-            if(shape instanceof OG.EdgeShape){
+            if (shape instanceof OG.EdgeShape) {
                 geometry = shape.createShape();
                 geometry.vertices = item.shape.geom.vertices;
                 shape.geom = geometry;
-            }else{
+            } else {
                 position = [item.shape.geom.boundary.getCentroid().x, item.shape.geom.boundary.getCentroid().y];
                 width = item.shape.geom.boundary.getWidth();
                 height = item.shape.geom.boundary.getHeight();
@@ -31354,7 +31468,6 @@ OG.handler.EventHandler.prototype = {
                                     if (frontElement) {
                                         renderer.removeHighlight(frontElement, enableStyle);
                                     }
-                                    console.log(connectableDirection, frontElement);
                                     if (connectableDirection && frontElement) {
                                         var point = [newX, newY];
                                         var terminal = renderer.createTerminalString(frontElement, point);
@@ -31874,6 +31987,14 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 
     this._CONFIG = {
         /**
+         * 마우스 휠 스케일 변경 여부
+         */
+        WHEEL_SCALABLE: false,
+        /**
+         * 마우스 드래그 페이지 이동 가능 여부
+         */
+        DRAG_PAGE_MOVABLE: false,
+        /**
          * 도형 선택시 캔버스 포거싱 여부
          */
         FOCUS_CANVAS_ONSELECT: true,
@@ -31948,7 +32069,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
             IMAGE: true,
             EDGE: true,
             GROUP: true
-        },
+        }
+        ,
 
         /**
          * 리사이즈 가능여부
@@ -31961,7 +32083,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
             IMAGE: true,
             EDGE: true,
             GROUP: true
-        },
+        }
+        ,
 
         /**
          * 연결 가능여부
@@ -31994,7 +32117,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
             IMAGE: true,
             EDGE: true,
             GROUP: true
-        },
+        }
+        ,
 
         /**
          * 가이드에 삭제 컨트롤러 여부
@@ -32007,7 +32131,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
             IMAGE: true,
             EDGE: true,
             GROUP: true
-        },
+        }
+        ,
 
         /**
          * 라벨 수정여부
@@ -32020,7 +32145,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
             IMAGE: true,
             EDGE: true,
             GROUP: true
-        },
+        }
+        ,
 
         /**
          * 그룹핑 가능여부
@@ -32252,7 +32378,10 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * 디폴트 스타일 정의
          */
         DEFAULT_STYLE: {
-            SHAPE: {cursor: "default"},
+            SHAPE: {
+                cursor: "default"
+            }
+            ,
             GEOM: {
                 stroke: "black",
                 "fill-r": ".5",
@@ -32261,10 +32390,20 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 fill: "white",
                 "fill-opacity": 0,
                 "label-position": "center"
-            },
-            TEXT: {stroke: "none", "text-anchor": "middle"},
-            HTML: {"label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"},
-            IMAGE: {"label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"},
+            }
+            ,
+            TEXT: {
+                stroke: "none", "text-anchor": "middle"
+            }
+            ,
+            HTML: {
+                "label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"
+            }
+            ,
+            IMAGE: {
+                "label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"
+            }
+            ,
             EDGE: {
                 stroke: "black",
                 fill: "none",
@@ -32278,7 +32417,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "label-position": "center",
                 "stroke-linejoin": "round",
                 cursor: "pointer"
-            },
+            }
+            ,
             EDGE_SHADOW: {
                 stroke: "#00FF00",
                 fill: "none",
@@ -32290,7 +32430,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-dasharray": "- ",
                 "edge-type": "plain",
                 cursor: "pointer"
-            },
+            }
+            ,
             EDGE_HIDDEN: {
                 stroke: "white",
                 fill: "none",
@@ -32298,7 +32439,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-width": 10,
                 "stroke-opacity": 0,
                 cursor: "pointer"
-            },
+            }
+            ,
             GROUP: {
                 stroke: "black",
                 fill: "none",
@@ -32306,8 +32448,12 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "label-position": "bottom",
                 "text-anchor": "middle",
                 "vertical-align": "top"
-            },
-            GROUP_HIDDEN: {stroke: "black", fill: "white", "fill-opacity": 0, "stroke-opacity": 0, cursor: "move"},
+            }
+            ,
+            GROUP_HIDDEN: {
+                stroke: "black", fill: "white", "fill-opacity": 0, "stroke-opacity": 0, cursor: "move"
+            }
+            ,
             GROUP_SHADOW: {
                 stroke: "white",
                 fill: "none",
@@ -32315,7 +32461,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-width": 15,
                 "stroke-opacity": 0,
                 cursor: "pointer"
-            },
+            }
+            ,
             GROUP_SHADOW_MAPPER: {
                 stroke: "white",
                 fill: "none",
@@ -32323,7 +32470,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-width": 1,
                 "stroke-opacity": 0,
                 cursor: "pointer"
-            },
+            }
+            ,
             GUIDE_BBOX: {
                 stroke: "#00FF00",
                 fill: "white",
@@ -32331,68 +32479,92 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-dasharray": "- ",
                 "shape-rendering": "crispEdges",
                 cursor: "move"
-            },
+            }
+            ,
             GUIDE_UL: {
                 stroke: "#03689a",
                 fill: "#03689a",
                 "fill-opacity": 0.5,
                 cursor: "nwse-resize",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             GUIDE_UR: {
                 stroke: "#03689a",
                 fill: "#03689a",
                 "fill-opacity": 0.5,
                 cursor: "nesw-resize",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             GUIDE_LL: {
                 stroke: "#03689a",
                 fill: "#03689a",
                 "fill-opacity": 0.5,
                 cursor: "nesw-resize",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             GUIDE_LR: {
                 stroke: "#03689a",
                 fill: "#03689a",
                 "fill-opacity": 0.5,
                 cursor: "nwse-resize",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             GUIDE_LC: {
                 stroke: "#03689a",
                 fill: "#03689a",
                 "fill-opacity": 0.5,
                 cursor: "ew-resize",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             GUIDE_UC: {
                 stroke: "black",
                 fill: "#03689a",
                 "fill-opacity": 0.5,
                 cursor: "ns-resize",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             GUIDE_RC: {
                 stroke: "black",
                 fill: "#03689a",
                 "fill-opacity": 0.5,
                 cursor: "ew-resize",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             GUIDE_LWC: {
                 stroke: "black",
                 fill: "#03689a",
                 "fill-opacity": 0.5,
                 cursor: "ns-resize",
                 "shape-rendering": "crispEdges"
-            },
-            GUIDE_FROM: {stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"},
-            GUIDE_TO: {stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"},
-            GUIDE_CTL_H: {stroke: "black", fill: "#00FF00", cursor: "ew-resize", "shape-rendering": "crispEdges"},
-            GUIDE_CTL_V: {stroke: "black", fill: "#00FF00", cursor: "ns-resize", "shape-rendering": "crispEdges"},
-            GUIDE_SHADOW: {stroke: "black", fill: "none", "stroke-dasharray": "- ", "shape-rendering": "crispEdges"},
+            }
+            ,
+            GUIDE_FROM: {
+                stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"
+            }
+            ,
+            GUIDE_TO: {
+                stroke: "black", fill: "#00FF00", cursor: "move", "shape-rendering": "crispEdges"
+            }
+            ,
+            GUIDE_CTL_H: {
+                stroke: "black", fill: "#00FF00", cursor: "ew-resize", "shape-rendering": "crispEdges"
+            }
+            ,
+            GUIDE_CTL_V: {
+                stroke: "black", fill: "#00FF00", cursor: "ns-resize", "shape-rendering": "crispEdges"
+            }
+            ,
+            GUIDE_SHADOW: {
+                stroke: "black", fill: "none", "stroke-dasharray": "- ", "shape-rendering": "crispEdges"
+            }
+            ,
             GUIDE_LINE: {
                 stroke: "black",
                 fill: "none",
@@ -32403,7 +32575,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "arrow-end": "block",
                 "stroke-linejoin": "round",
                 cursor: "pointer"
-            },
+            }
+            ,
             GUIDE_LINE_ESSENSIA: {
                 stroke: "black",
                 fill: "none",
@@ -32415,7 +32588,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "arrow-end": "none",
                 "stroke-linejoin": "round",
                 cursor: "pointer"
-            },
+            }
+            ,
             GUIDE_VIRTUAL_EDGE: {
                 stroke: "black",
                 fill: "none",
@@ -32426,7 +32600,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-linejoin": "round",
                 "arrow-start": "none",
                 "arrow-end": "none"
-            },
+            }
+            ,
             GUIDE_LINE_AREA: {
                 stroke: "#ffffff",
                 fill: "#ffffff",
@@ -32434,7 +32609,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-width": 1,
                 "stroke-opacity": 0.2,
                 cursor: "pointer"
-            },
+            }
+            ,
             GUIDE_RECT_AREA: {
                 stroke: "black",
                 fill: "#ffffff",
@@ -32442,10 +32618,20 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "stroke-width": 1,
                 "stroke-opacity": 1,
                 cursor: "pointer"
-            },
-            RUBBER_BAND: {stroke: "#0000FF", opacity: 0.2, fill: "#0077FF"},
-            DROP_OVER_BBOX: {stroke: "#0077FF", fill: "none", opacity: 0.3, "shape-rendering": "crispEdges"},
-            LABEL: {"font-size": 12, "font-color": "black", "fill": "none"},
+            }
+            ,
+            RUBBER_BAND: {
+                stroke: "#0000FF", opacity: 0.2, fill: "#0077FF"
+            }
+            ,
+            DROP_OVER_BBOX: {
+                stroke: "#0077FF", fill: "none", opacity: 0.3, "shape-rendering": "crispEdges"
+            }
+            ,
+            LABEL: {
+                "font-size": 12, "font-color": "black", "fill": "none"
+            }
+            ,
             LABEL_EDITOR: {
                 position: "absolute",
                 overflow: "visible",
@@ -32453,35 +32639,43 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 "text-align": "center",
                 display: "block",
                 padding: 0
-            },
+            }
+            ,
             COLLAPSE: {
                 stroke: "black",
                 fill: "none",
                 "fill-opacity": 0,
                 cursor: "pointer",
                 "shape-rendering": "crispEdges"
-            },
-            COLLAPSE_BBOX: {stroke: "none", fill: "none", "fill-opacity": 0},
+            }
+            ,
+            COLLAPSE_BBOX: {
+                stroke: "none", fill: "none", "fill-opacity": 0
+            }
+            ,
             BUTTON: {
                 stroke: "#9FD7FF",
                 fill: "white",
                 "fill-opacity": 0,
                 cursor: "pointer",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             CONNECT_GUIDE_EVENT_AREA: {
                 stroke: "#ffffff",
                 fill: "none",
                 "fill-opacity": 0,
                 "stroke-width": 20,
                 "stroke-opacity": 0
-            },
+            }
+            ,
             CONNECT_GUIDE_BBOX: {
                 stroke: "#00FF00",
                 fill: "none",
                 "stroke-dasharray": "- ",
                 "shape-rendering": "crispEdges"
-            },
+            }
+            ,
             CONNECT_GUIDE_BBOX_EXPEND: 10,
             CONNECT_GUIDE_SPOT_CIRCLE: {
                 r: 7,
@@ -32490,7 +32684,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 fill: "#FFE400",
                 "fill-opacity": 0.5,
                 cursor: "pointer"
-            },
+            }
+            ,
             CONNECT_GUIDE_SPOT_RECT: {
                 stroke: "#A6A6A6",
                 "stroke-width": 1,
@@ -32499,10 +32694,12 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
                 cursor: "ns-resize",
                 w: 20,
                 h: 10
-            },
+            }
+            ,
             CONNECTABLE_HIGHLIGHT: {
                 "stroke-width": 2
-            },
+            }
+            ,
             NOT_CONNECTABLE_HIGHLIGHT: {
                 fill: "#FAAFBE",
                 "fill-opacity": 0.5
@@ -32514,7 +32711,8 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
     this._RENDERER._CANVAS = this;
     this._HANDLER = new OG.EventHandler(this._RENDERER, this._CONFIG);
     this._CONTAINER = OG.Util.isElement(container) ? container : document.getElementById(container);
-};
+}
+;
 
 OG.graph.Canvas.prototype = {
     getEventHandler: function () {
@@ -32598,7 +32796,9 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.CHECK_BRIDGE_EDGE = config.checkBridgeEdge === undefined ? this._CONFIG.CHECK_BRIDGE_EDGE : config.checkBridgeEdge;
         }
 
-        this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE);
+        this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE, this._CONFIG.DRAG_PAGE_MOVABLE);
+        this._HANDLER.setWheelScale(this._CONFIG.WHEEL_SCALABLE);
+        this._HANDLER.setDragPageMovable(this._CONFIG.DRAG_PAGE_MOVABLE);
         this._HANDLER.setEnableHotKey(this._CONFIG.ENABLE_HOTKEY);
         if (this._CONFIG.ENABLE_CONTEXTMENU) {
             this._HANDLER.enableRootContextMenu();
@@ -32880,7 +33080,12 @@ OG.graph.Canvas.prototype = {
         sliderNavigator.css({
             left: (vx * xImgRate) + 'px',
             top: (vy * yImgRate) + 'px'
-        })
+        });
+
+        var sliderText = slider.find('.scaleSliderText');
+        var sliderBar = slider.find('.scaleSlider');
+        sliderText.html(Math.round(this._CONFIG.SCALE * 100));
+        sliderBar.val(Math.round(this._CONFIG.SCALE * 100));
     }
     ,
     updateSlider: function (val) {
@@ -32899,8 +33104,8 @@ OG.graph.Canvas.prototype = {
         var sliderNavigator = slider.find('.sliderNavigator');
         var sliderImageWrapper = slider.find('.sliderImageWrapper');
 
-        sliderText.html(val);
-        sliderBar.val(val);
+        sliderText.html(Math.round(val));
+        sliderBar.val(Math.round(val));
         me._RENDERER.setScale(val / 100);
 
         var svg = me._RENDERER.getRootElement();

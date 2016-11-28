@@ -981,7 +981,7 @@ OG.handler.EventHandler.prototype = {
      */
     setResizable: function (element, guide, isResizable) {
         var me = this;
-
+        var root = me._RENDERER.getRootGroup();
         if (!element || !guide) {
             return;
         }
@@ -1610,6 +1610,7 @@ OG.handler.EventHandler.prototype = {
                     $(guide[_handleName]).data('handleName', _handleName);
                     $(guide[_handleName]).draggable({
                         start: function (event) {
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE, true);
                             var handleName = $(this).data('handleName');
                             var eventOffset = me._getOffset(event);
                             var hx = renderer.getAttr(guide[handleName], "x");
@@ -1700,6 +1701,7 @@ OG.handler.EventHandler.prototype = {
                             renderer.removeAllConnectGuide();
                         },
                         stop: function (event) {
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE, false);
                             var handleName = $(this).data('handleName');
                             var eventOffset = me._getOffset(event),
                                 start = $(this).data("start"),
@@ -2000,13 +2002,122 @@ OG.handler.EventHandler.prototype = {
             renderer.offDropablePool();
         });
     },
+
+    /**
+     * 드래그하여 페이지 이동이 가능하게 한다.
+     * @param {Boolean} dragPageMovable 드래그 페이지 이동 가능 여부
+     */
+    setDragPageMovable: function (dragPageMovable) {
+        var renderer = this._RENDERER;
+        var me = this, rootEle = renderer.getRootElement();
+        var root = renderer.getRootGroup();
+        var container = renderer._CANVAS._CONTAINER;
+        $(rootEle).bind("mousedown", function (event) {
+            var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+            var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+            if (isConnectMode === 'active' || isRectMode === 'active') {
+                return;
+            }
+            var eventOffset = me._getOffset(event);
+            $(root).data("dragPageMove", {x: eventOffset.x, y: eventOffset.y});
+        });
+        $(rootEle).bind("mousemove", function (event) {
+            var isResizing = $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE);
+            var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+            var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+            if (isConnectMode === 'active' || isRectMode === 'active' || isResizing) {
+                return;
+            }
+            var pageMove = $(root).data("dragPageMove"),
+                eventOffset, width, height, x, y;
+
+            if (pageMove) {
+                eventOffset = me._getOffset(event);
+                var moveX = eventOffset.x - pageMove.x;
+                var moveY = eventOffset.y - pageMove.y;
+                var cuScrollLeft = container.scrollLeft;
+                var cuScrollTop = container.scrollTop;
+                $(container).scrollLeft(cuScrollLeft - moveX);
+                $(container).scrollTop(cuScrollTop - moveY);
+            }
+        });
+        $(rootEle).bind("mouseup", function (event) {
+            var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+            var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+            if (isConnectMode === 'active' || isRectMode === 'active') {
+                return;
+            }
+            $(root).removeData('dragPageMove');
+        });
+    },
+
+    /**
+     * 휠 스케일을 가능하게 한다.
+     * @param {Boolean} wheelScalable 휠 스케일 가능 여부
+     */
+    setWheelScale: function (wheelScalable) {
+        if (!wheelScalable) {
+            return;
+        }
+        var renderer = this._RENDERER;
+        var me = this, rootEle = renderer.getRootElement();
+        var updateScale = function (pageX, pageY, isUp) {
+            var scrollLeft = rootEle.scrollLeft;
+            var scrollTop = rootEle.scrollTop;
+            var cuScale;
+            var preScale = renderer.getScale();
+            if (isUp) {
+                cuScale = preScale + 0.1;
+            } else {
+                cuScale = preScale - 0.1;
+            }
+            if (cuScale < 0.25) {
+                cuScale = 0.25;
+            }
+            if (cuScale > 4) {
+                cuScale = 4;
+            }
+            var container = renderer._CANVAS._CONTAINER;
+            var preCenterX = pageX - $(container).offset().left + container.scrollLeft;
+            var preCenterY = pageY - $(container).offset().top + container.scrollTop;
+            preCenterX = preCenterX / preScale;
+            preCenterY = preCenterY / preScale;
+
+            renderer.setScale(cuScale);
+
+            var cuCenterX = preCenterX * (cuScale / preScale);
+            var cuCenterY = preCenterY * (cuScale / preScale);
+
+            var moveX = (preCenterX - cuCenterX) * cuScale;
+            var moveY = (preCenterY - cuCenterY) * cuScale;
+            var cuScrollLeft = container.scrollLeft;
+            var cuScrollTop = container.scrollTop;
+            $(container).scrollLeft(cuScrollLeft - moveX);
+            $(container).scrollTop(cuScrollTop - moveY);
+            renderer._CANVAS.updateNavigatior();
+
+        };
+        $(rootEle).bind('mousewheel DOMMouseScroll', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+                // scroll up
+                updateScale(event.pageX, event.pageY, true);
+            }
+            else {
+                updateScale(event.pageX, event.pageY, false);
+            }
+        });
+    },
+
     /**
      * 마우스 드래그 영역지정 선택가능여부를 설정한다.
      * 선택가능해야 리사이즈가 가능하다.
      *
      * @param {Boolean} isSelectable 선택가능여부
+     * @param {Boolean} dragPageMovable 드래그 페이지 이동 가능 여부
      */
-    setDragSelectable: function (isSelectable) {
+    setDragSelectable: function (isSelectable, dragPageMovable) {
         var renderer = this._RENDERER;
         var me = this, rootEle = renderer.getRootElement(),
             root = renderer.getRootGroup();
@@ -2179,9 +2290,11 @@ OG.handler.EventHandler.prototype = {
                 if (isConnectMode === 'active' || isRectMode === 'active') {
                     return;
                 }
-                var eventOffset = me._getOffset(event);
-                $(this).data("dragBox_first", {x: eventOffset.x, y: eventOffset.y});
-                $(this).removeData("dragBox");
+                if (!dragPageMovable) {
+                    var eventOffset = me._getOffset(event);
+                    $(this).data("dragBox_first", {x: eventOffset.x, y: eventOffset.y});
+                    $(this).removeData("dragBox");
+                }
             });
             $(rootEle).bind("mousemove", function (event) {
                 var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
@@ -2193,7 +2306,7 @@ OG.handler.EventHandler.prototype = {
                 var first = $(this).data("dragBox_first"),
                     eventOffset, width, height, x, y;
 
-                if (first) {
+                if (first && !dragPageMovable) {
                     eventOffset = me._getOffset(event);
                     width = eventOffset.x - first.x;
                     height = eventOffset.y - first.y;
@@ -2214,7 +2327,7 @@ OG.handler.EventHandler.prototype = {
                 if (isConnectMode === 'active' || isRectMode === 'active') {
                     return;
                 }
-                if ("start" == $(this).data("rubber_band_status")) {
+                if ("start" == $(this).data("rubber_band_status") && !dragPageMovable) {
                     var first = $(this).data("dragBox_first"),
                         eventOffset, width, height, x, y, envelope, guide, elements = [];
                     renderer.removeRubberBand(rootEle);
@@ -3729,11 +3842,11 @@ OG.handler.EventHandler.prototype = {
                 shape.label = item.shape.label;
             }
 
-            if(shape instanceof OG.EdgeShape){
+            if (shape instanceof OG.EdgeShape) {
                 geometry = shape.createShape();
                 geometry.vertices = item.shape.geom.vertices;
                 shape.geom = geometry;
-            }else{
+            } else {
                 position = [item.shape.geom.boundary.getCentroid().x, item.shape.geom.boundary.getCentroid().y];
                 width = item.shape.geom.boundary.getWidth();
                 height = item.shape.geom.boundary.getHeight();
@@ -5644,7 +5757,6 @@ OG.handler.EventHandler.prototype = {
                                     if (frontElement) {
                                         renderer.removeHighlight(frontElement, enableStyle);
                                     }
-                                    console.log(connectableDirection, frontElement);
                                     if (connectableDirection && frontElement) {
                                         var point = [newX, newY];
                                         var terminal = renderer.createTerminalString(frontElement, point);
