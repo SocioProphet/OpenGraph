@@ -145,7 +145,7 @@ OG.common.Constants = {
      * Move & Resize 용 가이드 ID 의 suffix 정의
      */
     GUIDE_SUFFIX: {
-        ONRESIZE: "_ONRESIZE",
+        ONRESIZE: "ONRESIZE",
         GUIDE: "_GUIDE",
         BBOX: "_GUIDE_BBOX",
         UL: "_GUIDE_UL",

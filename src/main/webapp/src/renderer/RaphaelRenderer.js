@@ -2749,7 +2749,7 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
                         $(me._PAPER.canvas).trigger('disconnectShape', [fromEdge, fromShape, element]);
                     }
 
-                    me.remove(fromEdge);
+                    me.removeShape(fromEdge);
                 });
             }
 
@@ -2768,7 +2768,7 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
                         $(me._PAPER.canvas).trigger('disconnectShape', [toEdge, element, toShape]);
                     }
 
-                    me.remove(toEdge);
+                    me.removeShape(toEdge);
                 });
             }
         }

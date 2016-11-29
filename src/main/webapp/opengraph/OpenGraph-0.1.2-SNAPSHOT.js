@@ -6359,7 +6359,7 @@ OG.common.Constants = {
      * Move & Resize 용 가이드 ID 의 suffix 정의
      */
     GUIDE_SUFFIX: {
-        ONRESIZE: "_ONRESIZE",
+        ONRESIZE: "ONRESIZE",
         GUIDE: "_GUIDE",
         BBOX: "_GUIDE_BBOX",
         UL: "_GUIDE_UL",
@@ -20916,7 +20916,7 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
                         $(me._PAPER.canvas).trigger('disconnectShape', [fromEdge, fromShape, element]);
                     }
 
-                    me.remove(fromEdge);
+                    me.removeShape(fromEdge);
                 });
             }
 
@@ -20935,7 +20935,7 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
                         $(me._PAPER.canvas).trigger('disconnectShape', [toEdge, element, toShape]);
                     }
 
-                    me.remove(toEdge);
+                    me.removeShape(toEdge);
                 });
             }
         }
@@ -27318,10 +27318,11 @@ OG.handler.EventHandler.prototype = {
                     if (indexOfHandle === -1) {
                         continue;
                     }
+
                     $(guide[_handleName]).data('handleName', _handleName);
                     $(guide[_handleName]).draggable({
                         start: function (event) {
-                            $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE, true);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE, 'active');
                             var handleName = $(this).data('handleName');
                             var eventOffset = me._getOffset(event);
                             var hx = renderer.getAttr(guide[handleName], "x");
@@ -27338,6 +27339,7 @@ OG.handler.EventHandler.prototype = {
                             renderer.removeRubberBand(renderer.getRootElement());
                         },
                         drag: function (event) {
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE, 'active');
                             var handleName = $(this).data('handleName');
                             var eventOffset = me._getOffset(event),
                                 start = $(this).data("start"),
@@ -27553,6 +27555,7 @@ OG.handler.EventHandler.prototype = {
             // 마우스 클릭하여 선택 처리
             $(element).bind({
                 click: function (event, param) {
+                    root = me._RENDERER.getRootGroup();
                     if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
                         $(me._RENDERER.getContainer()).focus();
                     }
@@ -27582,6 +27585,7 @@ OG.handler.EventHandler.prototype = {
                     event.stopPropagation();
                 },
                 mouseup: function (event) {
+                    root = me._RENDERER.getRootGroup();
                     if (element.shape) {
                         var isConnectable = me._isConnectable(element.shape);
                         var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
@@ -27611,6 +27615,9 @@ OG.handler.EventHandler.prototype = {
                                         eval('connectShape = new ' + connectShape + '()');
                                     }
                                     me._RENDERER._CANVAS.connect(target, element, null, connectLabel, null, null, null, null, connectShape);
+                                    $(root).removeData(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_SHAPE);
+                                    $(root).removeData(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_TEXT);
+                                    $(root).removeData(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_LABEL);
                                     renderer.addHistory();
                                 }
                             } else {
@@ -27719,11 +27726,15 @@ OG.handler.EventHandler.prototype = {
      * @param {Boolean} dragPageMovable 드래그 페이지 이동 가능 여부
      */
     setDragPageMovable: function (dragPageMovable) {
+        if (!dragPageMovable) {
+            return;
+        }
         var renderer = this._RENDERER;
         var me = this, rootEle = renderer.getRootElement();
         var root = renderer.getRootGroup();
         var container = renderer._CANVAS._CONTAINER;
         $(rootEle).bind("mousedown", function (event) {
+            root = renderer.getRootGroup();
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
             var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
             if (isConnectMode === 'active' || isRectMode === 'active') {
@@ -27733,10 +27744,11 @@ OG.handler.EventHandler.prototype = {
             $(root).data("dragPageMove", {x: eventOffset.x, y: eventOffset.y});
         });
         $(rootEle).bind("mousemove", function (event) {
+            root = renderer.getRootGroup();
             var isResizing = $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE);
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
             var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
-            if (isConnectMode === 'active' || isRectMode === 'active' || isResizing) {
+            if (isConnectMode === 'active' || isRectMode === 'active' || isResizing === 'active') {
                 return;
             }
             var pageMove = $(root).data("dragPageMove"),
@@ -27753,6 +27765,7 @@ OG.handler.EventHandler.prototype = {
             }
         });
         $(rootEle).bind("mouseup", function (event) {
+            root = renderer.getRootGroup();
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
             var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
             if (isConnectMode === 'active' || isRectMode === 'active') {
@@ -27902,6 +27915,7 @@ OG.handler.EventHandler.prototype = {
 
         // 배경클릭한 경우 deselect 하도록
         $(rootEle).bind("click", function (event) {
+            root = me._RENDERER.getRootGroup();
             if (!$(this).data("dragBox")) {
                 me.deselectAll();
                 renderer.removeRubberBand(rootEle);
