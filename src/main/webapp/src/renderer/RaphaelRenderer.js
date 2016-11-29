@@ -2260,6 +2260,10 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
     };
 
     if (element && element.shape.geom) {
+        if(element.shape.redrawShape){
+            element.shape.redrawShape();
+        }
+
         switch ($(element).attr("_shape")) {
             case OG.Constants.SHAPE_TYPE.GEOM:
                 element = this.drawGeom(element.shape.geom, {}, element.id);

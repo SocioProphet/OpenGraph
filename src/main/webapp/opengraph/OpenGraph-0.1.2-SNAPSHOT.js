@@ -16637,7 +16637,40 @@ OG.shape.elec.RacewayShape.prototype.createShape = function () {
                             'stroke': 'black'
                         }
                     },
-                    'stroke': 'none'
+                    'stroke': 'none',
+                }
+            },
+            {
+                top: 0,
+                from: 'start',
+                to: 'end',
+                style:{
+                    //'stroke': 'none',
+                    'fill-opacity': 1,
+                    animation: [
+                        {
+                            start: {
+                                stroke: 'white'
+                            },
+                            to: {
+                                stroke: '#d9534f'
+                            },
+                            ms: 1000
+                        },
+                        {
+                            start: {
+                                stroke: '#d9534f'
+                            },
+                            to: {
+                                stroke: 'white'
+                            },
+                            ms: 1000,
+                            delay: 1000
+                        }
+                    ],
+                    'animation-repeat': true,
+                    "stroke": "#d9534f",
+                    "stroke-width": "5"
                 }
             }
         ]
@@ -20427,6 +20460,10 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
     };
 
     if (element && element.shape.geom) {
+        if(element.shape.redrawShape){
+            element.shape.redrawShape();
+        }
+
         switch ($(element).attr("_shape")) {
             case OG.Constants.SHAPE_TYPE.GEOM:
                 element = this.drawGeom(element.shape.geom, {}, element.id);
@@ -27662,7 +27699,7 @@ OG.handler.EventHandler.prototype = {
                 $(element).bind("contextmenu", function (event) {
 
                     //중복된 콘텍스트를 방지
-                    var eventOffset = me._getOffset(event)
+                    var eventOffset = me._getOffset(event);
                     var frontElement = renderer.getFrontForCoordinate([eventOffset.x, eventOffset.y]);
                     if (!frontElement) {
                         return;
@@ -27751,8 +27788,7 @@ OG.handler.EventHandler.prototype = {
             if (isConnectMode === 'active' || isRectMode === 'active' || isResizing === 'active') {
                 return;
             }
-            var pageMove = $(root).data("dragPageMove"),
-                eventOffset, width, height, x, y;
+            var pageMove = $(root).data("dragPageMove"), eventOffset;
 
             if (pageMove) {
                 eventOffset = me._getOffset(event);
@@ -27785,7 +27821,8 @@ OG.handler.EventHandler.prototype = {
         }
         var renderer = this._RENDERER;
         var me = this, rootEle = renderer.getRootElement();
-        var updateScale = function (pageX, pageY, isUp) {
+        var updateScale = function (event, isUp) {
+            var eventOffset = me._getOffset(event);
             var scrollLeft = rootEle.scrollLeft;
             var scrollTop = rootEle.scrollTop;
             var cuScale;
@@ -27802,22 +27839,22 @@ OG.handler.EventHandler.prototype = {
                 cuScale = 4;
             }
             var container = renderer._CANVAS._CONTAINER;
-            var preCenterX = pageX - $(container).offset().left + container.scrollLeft;
-            var preCenterY = pageY - $(container).offset().top + container.scrollTop;
-            preCenterX = preCenterX / preScale;
-            preCenterY = preCenterY / preScale;
+            var preCenterX = eventOffset.x;
+            var preCenterY = eventOffset.y;
 
             renderer.setScale(cuScale);
 
-            var cuCenterX = preCenterX * (cuScale / preScale);
-            var cuCenterY = preCenterY * (cuScale / preScale);
+            eventOffset = me._getOffset(event);
+            var cuCenterX = eventOffset.x;
+            var cuCenterY = eventOffset.y;
 
             var moveX = (preCenterX - cuCenterX) * cuScale;
             var moveY = (preCenterY - cuCenterY) * cuScale;
+
             var cuScrollLeft = container.scrollLeft;
             var cuScrollTop = container.scrollTop;
-            $(container).scrollLeft(cuScrollLeft - moveX);
-            $(container).scrollTop(cuScrollTop - moveY);
+            $(container).scrollLeft(cuScrollLeft + moveX);
+            $(container).scrollTop(cuScrollTop + moveY);
             renderer._CANVAS.updateNavigatior();
 
         };
@@ -27826,10 +27863,10 @@ OG.handler.EventHandler.prototype = {
             event.stopPropagation();
             if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
                 // scroll up
-                updateScale(event.pageX, event.pageY, true);
+                updateScale(event, true);
             }
             else {
-                updateScale(event.pageX, event.pageY, false);
+                updateScale(event, false);
             }
         });
     },

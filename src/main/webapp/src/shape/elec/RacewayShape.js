@@ -65,7 +65,40 @@ OG.shape.elec.RacewayShape.prototype.createShape = function () {
                             'stroke': 'black'
                         }
                     },
-                    'stroke': 'none'
+                    'stroke': 'none',
+                }
+            },
+            {
+                top: 0,
+                from: 'start',
+                to: 'end',
+                style:{
+                    //'stroke': 'none',
+                    'fill-opacity': 1,
+                    animation: [
+                        {
+                            start: {
+                                stroke: 'white'
+                            },
+                            to: {
+                                stroke: '#d9534f'
+                            },
+                            ms: 1000
+                        },
+                        {
+                            start: {
+                                stroke: '#d9534f'
+                            },
+                            to: {
+                                stroke: 'white'
+                            },
+                            ms: 1000,
+                            delay: 1000
+                        }
+                    ],
+                    'animation-repeat': true,
+                    "stroke": "#d9534f",
+                    "stroke-width": "5"
                 }
             }
         ]
