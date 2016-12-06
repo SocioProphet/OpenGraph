@@ -4487,18 +4487,19 @@ window.Raphael.svg && function (R) {
                             } else {
                                 // Inserts new line at first whitespace of the line
                                 for (i = maxWidth - 1; i >= 0; i--) {
-                                    if (testWhite(str.charAt(i))) {
-                                        res = res + text.slice(0, i)
+                                    if (testWhite(text.charAt(i))) {
+                                        res = res + text.slice(0, i);
                                         text = text.slice(i + 1);
                                         found = true;
                                         lines.push(res);
                                         break;
                                     }
                                 }
+
                                 // Inserts new line at maxWidth position, the word is too long to wrap
                                 if (!found) {
                                     res = res + text.slice(0, maxWidth);
-                                    text = text.slice(maxWidth);
+                                    text = text.slice(maxWidth - 1);
                                     lines.push(res);
                                 }
                             }

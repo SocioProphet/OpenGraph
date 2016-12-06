@@ -3851,9 +3851,8 @@ OG.handler.EventHandler.prototype = {
             shape = eval('new ' + value + '()');
             if (label) {
                 shape.label = label;
-            }
-            else if (item.shape.label) {
-                shape.label = item.shape.label;
+            } else{
+                shape.label = undefined;
             }
 
             if (shape instanceof OG.EdgeShape) {

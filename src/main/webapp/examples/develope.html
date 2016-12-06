@@ -487,7 +487,7 @@
                 return this.sub;
             };
 
-            var sampleShape1 = new OG.A_HumanTask();
+            var sampleShape1 = new OG.A_HumanTask('[Act] Ensure Stakeholder Satisfaction');
             sampleShape1.data = {
                 LoopType: 'Standard',
                 TaskType: 'User',
@@ -495,7 +495,7 @@
             };
             canvas.drawShape([300, 300], sampleShape1, [100, 100]);
 
-            var sampleShape2 = new OG.A_HumanTask();
+            var sampleShape2 = new OG.A_HumanTask('[Act] Understand the Requirements');
             sampleShape2.data = {
                 LoopType: 'MIParallel',
                 TaskType: 'Send',
@@ -538,18 +538,34 @@
 //
 //            canvas.drawShape([300, 100], loadShape, [100, 100]);
 
-            var location = canvas.drawShape([300, 100], new OG.Location(), [100, 100]);
-            var location2 = canvas.drawShape([600, 200], new OG.Location(), [100, 100]);
-            var raceway = new OG.RacewayShape();
-            raceway.setData({
-               selected: true
-            });
+//            var location = canvas.drawShape([300, 100], new OG.Location(), [100, 100]);
+//            var location2 = canvas.drawShape([600, 200], new OG.Location(), [100, 100]);
+//            var raceway = new OG.RacewayShape();
+//            raceway.setData({
+//               selected: true
+//            });
+//
+//            canvas.connect(location,location2,null, null, null, null, null, null, raceway);
+//
+//            $(canvas.getRootElement()).bind('showProperty', function (event, shapeElement) {
+//                console.log(shapeElement);
+//            });
+//
+//            console.log(canvas.getRelatedEdgeFromShapes([location,location2]));
+
+            var location = canvas.drawShape([300, 100], new OG.HierarchyFeeder(), [100, 100]);
+
+            var location2 = canvas.drawShape([600, 200], new OG.HierarchyFeeder(), [100, 100]);
+            var raceway = new OG.CableShape();
+
 
             canvas.connect(location,location2,null, null, null, null, null, null, raceway);
 
             $(canvas.getRootElement()).bind('showProperty', function (event, shapeElement) {
                 console.log(shapeElement);
             });
+
+            console.log(canvas.getRelatedEdgeFromShapes([location,location2]));
 
         });
 

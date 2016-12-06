@@ -1951,6 +1951,15 @@ OG.graph.Canvas.prototype = {
     ,
 
     /**
+     * 두 도형 사이의 연결된 Edge 를 반환한다.
+     * @param elements
+     * @returns {Element} edge
+     */
+    getRelatedEdgeFromShapes: function (elements) {
+        return this._RENDERER.getRelatedEdgeFromShapes(elements);
+    },
+
+    /**
      * Edge 엘리먼트와 연결된 fromShape, toShape 엘리먼트를 반환한다.
      *
      * @param {Element|String} edgeElement Element 또는 ID
