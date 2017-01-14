@@ -41,9 +41,9 @@ OG.GeometryCollection = OG.geometry.GeometryCollection;
  */
 OG.geometry.GeometryCollection.prototype.getVertices = function () {
 	var vertices = [], _vertices, i, j;
-	for (i = 0; i < this.geometries.length; i++) {
+	for (var i = 0,leni = this.geometries.length; i < leni; i++) {
 		_vertices = this.geometries[i].getVertices();
-		for (j = 0; j < _vertices.length; j++) {
+		for (var j = 0,lenj = _vertices.length; j < lenj; j++) {
 			vertices.push(_vertices[j]);
 		}
 	}
@@ -63,9 +63,8 @@ OG.geometry.GeometryCollection.prototype.getVerticess = function(){
  * @override
  */
 OG.geometry.GeometryCollection.prototype.move = function (offsetX, offsetY) {
-	var i;
 	this.getBoundary().move(offsetX, offsetY);
-	for (i = 0; i < this.geometries.length; i++) {
+	for (var i = 0,leni = this.geometries.length; i < leni; i++) {
 		this.geometries[i].move(offsetX, offsetY);
 		this.geometries[i].reset();
 	}
@@ -98,9 +97,9 @@ OG.geometry.GeometryCollection.prototype.resize = function (upper, lower, left, 
 		throw new OG.ParamError();
 	}
 
-	for (i = 0; i < this.geometries.length; i++) {
+	for (var i = 0,leni = this.geometries.length; i < leni; i++) {
 		vertices = this.geometries[i].vertices;
-		for (j = 0; j < vertices.length; j++) {
+		for (var j = 0,lenj = vertices.length; j < lenj; j++) {
 			vertices[j].x = OG.Util.round((upperLeft.x - left) + (vertices[j].x - upperLeft.x) * rateWidth);
 			vertices[j].y = OG.Util.round((upperLeft.y - upper) + (vertices[j].y - upperLeft.y) * rateHeight);
 		}
@@ -138,9 +137,8 @@ OG.geometry.GeometryCollection.prototype.resizeBox = function (width, height) {
  * @override
  */
 OG.geometry.GeometryCollection.prototype.rotate = function (angle, origin) {
-	var i;
 	origin = origin || this.getCentroid();
-	for (i = 0; i < this.geometries.length; i++) {
+	for (var i = 0,leni = this.geometries.length; i < leni; i++) {
 		this.geometries[i].rotate(angle, origin);
 		this.geometries[i].reset();
 	}
@@ -177,7 +175,7 @@ OG.geometry.GeometryCollection.prototype.fitToBoundary = function (envelope) {
 OG.geometry.GeometryCollection.prototype.toString = function () {
 	var s = [], i;
 
-	for (i = 0; i < this.geometries.length; i++) {
+	for (var i = 0,leni = this.geometries.length; i < leni; i++) {
 		s.push(this.geometries[i].toString());
 	}
 

@@ -875,7 +875,7 @@ OG.renderer.IRenderer.prototype = {
                 y2: 0
             };
 
-        for (i = 0; i < shapeElements.length; i++) {
+        for (var i = 0,leni = shapeElements.length; i < leni; i++) {
             shape = shapeElements[i].shape;
             if (shape && shape.geom) {
                 envelope = shape.geom.getBoundary();
@@ -944,7 +944,7 @@ OG.renderer.IRenderer.prototype = {
         var prevShapeId, nextShapeId;
         var prevEdges = this.getPrevEdges(fromElement);
         var nextEdges = this.getNextEdges(fromElement);
-        for (var i = 0; i < prevEdges.length; i++) {
+        for (var i = 0,leni = prevEdges.length; i < leni; i++) {
             prevShapeId = $(prevEdges[i]).attr('_from');
             if (prevShapeId) {
                 prevShapeId = prevShapeId.substring(0, prevShapeId.indexOf(OG.Constants.TERMINAL));
@@ -953,7 +953,7 @@ OG.renderer.IRenderer.prototype = {
                 }
             }
         }
-        for (var i = 0; i < nextEdges.length; i++) {
+        for (var i = 0,leni = nextEdges.length; i < leni; i++) {
             nextShapeId = $(nextEdges[i]).attr('_to');
             if (nextShapeId) {
                 nextShapeId = nextShapeId.substring(0, nextShapeId.indexOf(OG.Constants.TERMINAL));
@@ -977,7 +977,7 @@ OG.renderer.IRenderer.prototype = {
 
         if (prevEdgeIds) {
             edgeIds = prevEdgeIds.split(',');
-            for (i = 0; i < edgeIds.length; i++) {
+            for (var i = 0,leni = edgeIds.length; i < leni; i++) {
                 edge = this.getElementById(edgeIds[i]);
                 if (edge) {
                     edgeArray.push(edge);
@@ -1001,7 +1001,7 @@ OG.renderer.IRenderer.prototype = {
 
         if (nextEdgeIds) {
             edgeIds = nextEdgeIds.split(',');
-            for (i = 0; i < edgeIds.length; i++) {
+            for (var i = 0,leni = edgeIds.length; i < leni; i++) {
                 edge = this.getElementById(edgeIds[i]);
                 if (edge) {
                     edgeArray.push(edge);
@@ -1023,7 +1023,7 @@ OG.renderer.IRenderer.prototype = {
             shapeArray = [],
             prevShapeId, shape, i;
 
-        for (i = 0; i < prevEdges.length; i++) {
+        for (var i = 0,leni = prevEdges.length; i < leni; i++) {
             prevShapeId = $(prevEdges[i]).attr('_from');
             if (prevShapeId) {
                 prevShapeId = prevShapeId.substring(0, prevShapeId.indexOf(OG.Constants.TERMINAL));
@@ -1048,7 +1048,7 @@ OG.renderer.IRenderer.prototype = {
             shapeArray = [],
             prevShapeId, i;
 
-        for (i = 0; i < prevEdges.length; i++) {
+        for (var i = 0,leni = prevEdges.length; i < leni; i++) {
             prevShapeId = $(prevEdges[i]).attr('_from');
             if (prevShapeId) {
                 prevShapeId = prevShapeId.substring(0, prevShapeId.indexOf(OG.Constants.TERMINAL));
@@ -1069,7 +1069,7 @@ OG.renderer.IRenderer.prototype = {
             shapeArray = [],
             nextShapeId, shape, i;
 
-        for (i = 0; i < nextEdges.length; i++) {
+        for (var i = 0,leni = nextEdges.length; i < leni; i++) {
             nextShapeId = $(nextEdges[i]).attr('_to');
             if (nextShapeId) {
                 nextShapeId = nextShapeId.substring(0, nextShapeId.indexOf(OG.Constants.TERMINAL));
@@ -1094,7 +1094,7 @@ OG.renderer.IRenderer.prototype = {
             shapeArray = [],
             nextShapeId, i;
 
-        for (i = 0; i < nextEdges.length; i++) {
+        for (var i = 0,leni = nextEdges.length; i < leni; i++) {
             nextShapeId = $(nextEdges[i]).attr('_to');
             if (nextShapeId) {
                 nextShapeId = nextShapeId.substring(0, nextShapeId.indexOf(OG.Constants.TERMINAL));

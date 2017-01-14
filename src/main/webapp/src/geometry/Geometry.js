@@ -77,7 +77,7 @@ OG.geometry.Geometry.prototype = {
         if (this.boundary === null) {
             var minX, minY, maxX, maxY, upperLeft, width, height,
                 vertices = this.getVertices(), i;
-            for (i = 0; i < vertices.length; i++) {
+            for (var i = 0, leni = vertices.length; i < leni; i++) {
                 if (i === 0) {
                     minX = maxX = vertices[i].x;
                     minY = maxY = vertices[i].y;
@@ -134,7 +134,7 @@ OG.geometry.Geometry.prototype = {
             return _coordinate.distance(vertices[0]);
         }
 
-        for (i = 0; i < vertices.length - 1; i++) {
+        for (var i = 0,leni = vertices.length - 1; i < leni; i++) {
             distance = this.distanceToLine(_coordinate, [vertices[i], vertices[i + 1]]);
             if (distance < minDistance) {
                 minDistance = distance;
@@ -163,7 +163,7 @@ OG.geometry.Geometry.prototype = {
         var length = 0,
             vertices = this.getVertices(),
             i;
-        for (i = 0; i < vertices.length - 1; i++) {
+        for (var i = 0,leni = vertices.length - 1; i < leni; i++) {
             length += vertices[i].distance(vertices[i + 1]);
         }
 
@@ -371,8 +371,7 @@ OG.geometry.Geometry.prototype = {
     intersectToLine: function (line) {
         var vertices = this.getVertices(), result = [], point, i,
             contains = function (coordinateArray, coordinate) {
-                var k;
-                for (k = 0; k < coordinateArray.length; k++) {
+                for (var k = 0,lenk = coordinateArray.length; k < lenk; k++) {
                     if (coordinateArray[k].isEquals(coordinate)) {
                         return true;
                     }
@@ -380,7 +379,7 @@ OG.geometry.Geometry.prototype = {
                 return false;
             };
 
-        for (i = 0; i < vertices.length - 1; i++) {
+        for (var i = 0,leni = vertices.length - 1; i < leni; i++) {
             point = this.intersectLineToLine(line, [vertices[i], vertices[i + 1]]);
             if (point && !contains(result, point)) {
                 result.push(point);

@@ -760,7 +760,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
         var maxDuration = 0;
         var monitorAnimationIndex;
         var delay, ms;
-        for (var i = 0; i < animationData.length; i++) {
+        for (var i = 0, leni = animationData.length; i < leni; i++) {
             ms = animationData[i].ms ? animationData[i].ms : 0;
             delay = animationData[i].delay ? animationData[i].delay : 0;
             if (maxDuration < ms + delay) {
@@ -770,7 +770,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
         }
 
         var startAnimation = function () {
-            for (var i = 0; i < animationData.length; i++) {
+            for (var i = 0, leni = animationData.length; i < leni; i++) {
                 var ani;
                 if (i == monitorAnimationIndex && animationRepeat) {
                     ani = Raphael.animation(animationData[i].to, animationData[i].ms, startAnimation);
@@ -806,7 +806,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
         case OG.Constants.GEOM_TYPE.POLYGON:
             pathStr = "";
             vertices = geometry.getVertices();
-            for (i = 0; i < vertices.length; i++) {
+            for (var i = 0, leni = vertices.length; i < leni; i++) {
                 if (i === 0) {
                     pathStr = "M" + vertices[i].x + " " + vertices[i].y;
                 } else {
@@ -862,7 +862,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             if ((_style.r || 0) === 0) {
                 pathStr = "";
                 vertices = geometry.getVertices();
-                for (i = 0; i < vertices.length; i++) {
+                for (var i = 0, leni = vertices.length; i < leni; i++) {
                     if (i === 0) {
                         pathStr = "M" + vertices[i].x + " " + vertices[i].y;
                     } else {
@@ -955,7 +955,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
         case OG.Constants.GEOM_TYPE.CURVE:
             pathStr = "";
             vertices = geometry.getControlPoints();
-            for (i = 0; i < vertices.length; i++) {
+            for (var i = 0, leni = vertices.length; i < leni; i++) {
                 if (i === 0) {
                     pathStr = "M" + vertices[i].x + " " + vertices[i].y;
                 } else if (i === 1) {
@@ -983,7 +983,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
         case OG.Constants.GEOM_TYPE.BEZIER_CURVE:
             pathStr = "";
             vertices = geometry.getControlPoints();
-            for (i = 0; i < vertices.length; i++) {
+            for (var i = 0, leni = vertices.length; i < leni; i++) {
                 if (i === 0) {
                     pathStr = "M" + vertices[i].x + " " + vertices[i].y;
                 } else if (i === 1) {
@@ -1010,7 +1010,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             break;
 
         case OG.Constants.GEOM_TYPE.COLLECTION:
-            for (i = 0; i < geometry.geometries.length; i++) {
+            for (var i = 0, leni = geometry.geometries.length; i < leni; i++) {
                 // recursive call
                 this._drawGeometry(groupElement, geometry.geometries[i], style, geometry.style.map);
             }
@@ -2061,7 +2061,7 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
                 vertices = element.shape.geom.getVertices();
                 lineLength = element.shape.geom.getLength();
 
-                for (i = 0; i < vertices.length - 1; i++) {
+                for (var i = 0, leni = vertices.length - 1; i < leni; i++) {
                     distance += vertices[i].distance(vertices[i + 1]);
                     if (distance > lineLength / 2) {
                         intersectArray = element.shape.geom.intersectCircleToLine(
@@ -2223,7 +2223,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
             edgeIdArray = $(_childNodes[i]).attr("_fromedge");
             if (edgeIdArray) {
                 edgeIdArray = edgeIdArray.split(",");
-                for (j = 0; j < edgeIdArray.length; j++) {
+                for (var j = 0, lenj = edgeIdArray.length; j < lenj; j++) {
                     fromEdge = me.getElementById(edgeIdArray[j]);
                     if (fromEdge) {
                         otherShape = me._getShapeFromTerminal($(fromEdge).attr("_from"));
@@ -2239,7 +2239,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
             edgeIdArray = $(_childNodes[i]).attr("_toedge");
             if (edgeIdArray) {
                 edgeIdArray = edgeIdArray.split(",");
-                for (j = 0; j < edgeIdArray.length; j++) {
+                for (var j = 0, lenj = edgeIdArray.length; j < lenj; j++) {
                     toEdge = me.getElementById(edgeIdArray[j]);
                     if (toEdge) {
                         otherShape = me._getShapeFromTerminal($(toEdge).attr("_to"));
@@ -2260,7 +2260,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
     };
 
     if (element && element.shape.geom) {
-        if(element.shape.redrawShape){
+        if (element.shape.redrawShape) {
             element.shape.redrawShape();
         }
 
@@ -3493,7 +3493,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
             this._remove(this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX));
             pathStr = "";
             if (_style["edge-type"] === OG.Constants.EDGE_TYPE.BEZIER) {
-                for (i = 0; i < vertices.length; i++) {
+                for (var i = 0, leni = vertices.length; i < leni; i++) {
                     if (i === 0) {
                         pathStr = "M" + vertices[i].x + " " + vertices[i].y;
                     } else if (i === 1) {
@@ -3503,7 +3503,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
                     }
                 }
             } else {
-                for (i = 0; i < vertices.length; i++) {
+                for (var i = 0, leni = vertices.length; i < leni; i++) {
                     if (i === 0) {
                         pathStr = "M" + vertices[i].x + " " + vertices[i].y;
                     } else {
@@ -3527,7 +3527,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
 
             // 콘트롤 가이드 Update
             if (!isSelf && _style["edge-type"] !== OG.Constants.EDGE_TYPE.BEZIER) {
-                for (i = 1; i < vertices.length - 2; i++) {
+                for (var i = 1, leni = vertices.length - 2; i < leni; i++) {
                     if (vertices[i].x === vertices[i + 1].x) {
                         _controlRect = this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.CTL_H + i);
                         if (_controlRect) {
@@ -3562,7 +3562,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
         // 쉐도우 가이드
         pathStr = "";
         if (_style["edge-type"] === OG.Constants.EDGE_TYPE.BEZIER) {
-            for (i = 0; i < vertices.length; i++) {
+            for (var i = 0, leni = vertices.length; i < leni; i++) {
                 if (i === 0) {
                     pathStr = "M" + vertices[i].x + " " + vertices[i].y;
                 } else if (i === 1) {
@@ -3572,7 +3572,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
                 }
             }
         } else {
-            for (i = 0; i < vertices.length; i++) {
+            for (var i = 0, leni = vertices.length; i < leni; i++) {
                 if (i === 0) {
                     pathStr = "M" + vertices[i].x + " " + vertices[i].y;
                 } else {
@@ -3597,7 +3597,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
 
         // 콘트롤 가이드
         if (!isSelf && _style["edge-type"] !== OG.Constants.EDGE_TYPE.BEZIER) {
-            for (i = 1; i < vertices.length - 2; i++) {
+            for (var i = 1, leni = vertices.length - 2; i < leni; i++) {
                 if (vertices[i].x === vertices[i + 1].x) {
                     _controlRect = this._PAPER.rect(vertices[i].x - _hSize,
                         OG.Util.round((vertices[i].y + vertices[i + 1].y) / 2) - _hSize, _size, _size);
@@ -3955,7 +3955,7 @@ OG.renderer.RaphaelRenderer.prototype.group = function (elements) {
 
     if (elements && elements.length > 1) {
         // 그룹핑할 Shape 의 전체 영역 계산
-        for (i = 0; i < elements.length; i++) {
+        for (var i = 0, leni = elements.length; i < leni; i++) {
             geometryArray.push(elements[i].shape.geom);
         }
         geometryCollection = new OG.GeometryCollection(geometryArray);
@@ -3970,7 +3970,7 @@ OG.renderer.RaphaelRenderer.prototype.group = function (elements) {
         groupShapeEle = this.drawShape(position, shape, size);
 
         // append child
-        for (i = 0; i < elements.length; i++) {
+        for (var i = 0, leni = elements.length; i < leni; i++) {
             groupShapeEle.appendChild(elements[i]);
         }
 
@@ -3991,9 +3991,9 @@ OG.renderer.RaphaelRenderer.prototype.group = function (elements) {
 OG.renderer.RaphaelRenderer.prototype.ungroup = function (groupElements) {
     var ungroupElements = [], children, i, j;
     if (groupElements && groupElements.length > 0) {
-        for (i = 0; i < groupElements.length; i++) {
+        for (var i = 0, leni = groupElements.length; i < leni; i++) {
             children = $(groupElements[i]).children("[_type='" + OG.Constants.NODE_TYPE.SHAPE + "']");
-            for (j = 0; j < children.length; j++) {
+            for (var j = 0, lenj = children.length; j < lenj; j++) {
                 groupElements[i].parentNode.appendChild(children[j]);
                 ungroupElements.push(children[j]);
             }
@@ -4015,8 +4015,7 @@ OG.renderer.RaphaelRenderer.prototype.ungroup = function (groupElements) {
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.addToGroup = function (groupElement, elements) {
-    var i;
-    for (i = 0; i < elements.length; i++) {
+    for (var i = 0,leni = elements.length; i < leni; i++) {
         groupElement.appendChild(elements[i]);
     }
 };
@@ -4910,7 +4909,7 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
         var spots = [];
 
         //변곡점 스팟
-        for (var i = 0; i < vertices.length; i++) {
+        for (var i = 0,leni = vertices.length; i < leni; i++) {
             var spot = me._PAPER.circle(vertices[i].x, vertices[i].y, spotCircleStyle.r);
             spot.attr(spotCircleStyle);
             me._add(spot);
@@ -5427,7 +5426,7 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (elemen
         }
     }
     if (fromShape) {
-        for (var i = 0; i < vertices.length; i++) {
+        for (var i = 0,leni = vertices.length; i < leni; i++) {
             if (i == 0) {
                 startVertice = vertices[i];
                 startVerticeIdx = i;
@@ -5729,7 +5728,7 @@ OG.renderer.RaphaelRenderer.prototype.toFrontEdges = function () {
     var root = me.getRootGroup();
     var edges = me.getAllEdges();
 
-    for (var i = 0; i < edges.length; i++) {
+    for (var i = 0,leni = edges.length; i < leni; i++) {
         root.removeChild(edges[i]);
         root.appendChild(edges[i]);
     }
@@ -5898,40 +5897,43 @@ OG.renderer.RaphaelRenderer.prototype.initHistory = function () {
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
-    var me = this;
-    var history = me._CONFIG.HISTORY;
-    var historySize = me._CONFIG.HISTORY_SIZE;
-    var historyIndex = me._CONFIG.HISTORY_INDEX;
 
-    if (history.length == 0) {
-        historyIndex = 0;
-        history.push(me._CANVAS.toJSON());
+    if(this._CONFIG.AUTO_HISTORY){
+        var me = this;
+        var history = me._CONFIG.HISTORY;
+        var historySize = me._CONFIG.HISTORY_SIZE;
+        var historyIndex = me._CONFIG.HISTORY_INDEX;
 
-    } else {
-        if (historySize <= history.length) {
-            history.splice(0, 1);
-            historyIndex = historyIndex - 1;
+        if (history.length == 0) {
+            historyIndex = 0;
+            history.push(me._CANVAS.toJSON());
+
+        } else {
+            if (historySize <= history.length) {
+                history.splice(0, 1);
+                historyIndex = historyIndex - 1;
+            }
+            history.splice(historyIndex + 1);
+            history.push(me._CANVAS.toJSON());
+            historyIndex = history.length - 1;
         }
-        history.splice(historyIndex + 1);
-        history.push(me._CANVAS.toJSON());
-        historyIndex = history.length - 1;
-    }
 
-    me._CONFIG.HISTORY = history;
-    me._CONFIG.HISTORY_INDEX = historyIndex;
+        me._CONFIG.HISTORY = history;
+        me._CONFIG.HISTORY_INDEX = historyIndex;
 
 
-    //캔버스가 서버로부터 받은 데이터를 적용시키는 과정이 아닐 경우 브로드캐스트 수행.
-    if (me._CANVAS.getRemotable()) {
-        if (!me._CANVAS.getRemoteDuring()) {
-            OG.RemoteHandler.broadCastCanvas(me._CANVAS, function (canvas) {
+        //캔버스가 서버로부터 받은 데이터를 적용시키는 과정이 아닐 경우 브로드캐스트 수행.
+        if (me._CANVAS.getRemotable()) {
+            if (!me._CANVAS.getRemoteDuring()) {
+                OG.RemoteHandler.broadCastCanvas(me._CANVAS, function (canvas) {
 
-            });
+                });
+            }
         }
-    }
 
-    //슬라이더가 있을경우 슬라이더 업데이트
-    me._CANVAS.updateSlider();
+        //슬라이더가 있을경우 슬라이더 업데이트
+        me._CANVAS.updateSlider();
+    }
 };
 
 /**
@@ -6375,7 +6377,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
     }
 
     if (divedLanes.length) {
-        for (var i = 0; i < divedLanes.length; i++) {
+        for (var i = 0,leni = divedLanes.length; i < leni; i++) {
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
     }
@@ -6404,7 +6406,7 @@ OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
     function chooseBaseLane(lane) {
         var _childLanes = me.getChildLane(lane);
         if (_childLanes.length) {
-            for (var i = 0; i < _childLanes.length; i++) {
+            for (var i = 0,leni = _childLanes.length; i < leni; i++) {
                 chooseBaseLane(_childLanes[i]);
             }
         } else {
@@ -6672,7 +6674,7 @@ OG.renderer.RaphaelRenderer.prototype.getBoundaryOfElements = function (elements
     var geometryArray = [], geometryCollection, envelope, i;
 
     if (elements && elements.length > 0) {
-        for (i = 0; i < elements.length; i++) {
+        for (var i = 0,leni = elements.length; i < leni; i++) {
 
             geometryArray.push(elements[i].shape.geom);
         }

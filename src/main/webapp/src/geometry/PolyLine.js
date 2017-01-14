@@ -28,7 +28,7 @@ OG.geometry.PolyLine = function (vertices) {
 
     // Array 좌표를 OG.geometry.Coordinate 로 변환
     if (vertices && vertices.length > 0) {
-        for (i = 0; i < vertices.length; i++) {
+        for (var i = 0,leni = vertices.length; i < leni; i++) {
             this.vertices.push(this.convertCoordinate(vertices[i]));
         }
     }
@@ -61,9 +61,8 @@ OG.geometry.PolyLine.prototype.setVertices = function (vertices) {
  * @override
  */
 OG.geometry.PolyLine.prototype.move = function (offsetX, offsetY) {
-    var i;
     this.getBoundary().move(offsetX, offsetY);
-    for (i = 0; i < this.vertices.length; i++) {
+    for (var i = 0,leni = this.vertices.length; i < leni; i++) {
         this.vertices[i].move(offsetX, offsetY);
     }
 
@@ -95,7 +94,7 @@ OG.geometry.PolyLine.prototype.resize = function (upper, lower, left, right) {
         throw new OG.ParamError();
     }
 
-    for (i = 0; i < this.vertices.length; i++) {
+    for (var i = 0,leni = this.vertices.length; i < leni; i++) {
         this.vertices[i].x = OG.Util.round((upperLeft.x - left) + (this.vertices[i].x - upperLeft.x) * rateWidth);
         this.vertices[i].y = OG.Util.round((upperLeft.y - upper) + (this.vertices[i].y - upperLeft.y) * rateHeight);
     }
@@ -113,9 +112,8 @@ OG.geometry.PolyLine.prototype.resize = function (upper, lower, left, right) {
  * @override
  */
 OG.geometry.PolyLine.prototype.rotate = function (angle, origin) {
-    var i;
     origin = origin || this.getCentroid();
-    for (i = 0; i < this.vertices.length; i++) {
+    for (var i = 0,leni = this.vertices.length; i < leni; i++) {
         this.vertices[i].rotate(angle, origin);
     }
     this.reset();

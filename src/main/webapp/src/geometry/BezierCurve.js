@@ -30,7 +30,7 @@ OG.geometry.BezierCurve = function (controlPoints) {
 
     // Array 좌표를 OG.geometry.Coordinate 로 변환
     if (controlPoints && controlPoints.length > 0) {
-        for (i = 0; i < controlPoints.length; i++) {
+        for (var i = 0,leni = controlPoints.length; i < leni; i++) {
             this.controlPoints.push(this.convertCoordinate(controlPoints[i]));
         }
     }
@@ -40,7 +40,7 @@ OG.geometry.BezierCurve = function (controlPoints) {
 
     // t 는 0 ~ maxT 의 값으로, t 값의 증분값이 작을수록 세밀한 BezierCurve 를 그린다.
     this.vertices = [];
-    for (t = 0; t <= bezier.maxT; t += 0.02) {
+    for (var t = 0,lent = bezier.maxT; t <= lent; t += 0.02) {
         this.vertices.push(new OG.geometry.Coordinate(
             OG.Util.round(bezier.getX(t)),
             OG.Util.round(bezier.getY(t))
@@ -78,7 +78,7 @@ OG.geometry.BezierCurve.prototype.getVertices = function () {
 
         // t 는 0 ~ maxT 의 값으로, t 값의 증분값이 작을수록 세밀한 BezierCurve 를 그린다.
         this.vertices = [];
-        for (t = 0; t <= bezier.maxT; t += 0.02) {
+        for (var t = 0,lent = bezier.maxT; t <= lent; t += 0.02) {
             this.vertices.push(new OG.geometry.Coordinate(
                 OG.Util.round(bezier.getX(t)),
                 OG.Util.round(bezier.getY(t))
@@ -99,8 +99,7 @@ OG.geometry.BezierCurve.prototype.getVertices = function () {
  * @override
  */
 OG.geometry.BezierCurve.prototype.move = function (offsetX, offsetY) {
-    var i;
-    for (i = 0; i < this.controlPoints.length; i++) {
+    for (var i = 0,leni = this.controlPoints.length; i < leni; i++) {
         this.controlPoints[i].move(offsetX, offsetY);
     }
     this.reset();
@@ -131,9 +130,8 @@ OG.geometry.BezierCurve.prototype.resize = function (upper, lower, left, right) 
  * @override
  */
 OG.geometry.BezierCurve.prototype.rotate = function (angle, origin) {
-    var i;
     origin = origin || this.getCentroid();
-    for (i = 0; i < this.controlPoints.length; i++) {
+    for (var i = 0,leni = this.controlPoints.length; i < leni; i++) {
         this.controlPoints[i].rotate(angle, origin);
     }
     this.reset();

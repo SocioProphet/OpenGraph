@@ -60,7 +60,7 @@ OG.handler.EventHandler.prototype = {
                             vertices = element.shape.geom.getVertices();
                             lineLength = element.shape.geom.getLength();
 
-                            for (i = 0; i < vertices.length - 1; i++) {
+                            for (var i = 0,leni = vertices.length - 1; i < leni; i++) {
                                 distance += vertices[i].distance(vertices[i + 1]);
                                 if (distance > lineLength / 2) {
                                     intersectArray = element.shape.geom.intersectCircleToLine(
@@ -2113,7 +2113,7 @@ OG.handler.EventHandler.prototype = {
         $(rootEle).bind('mousewheel DOMMouseScroll', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+            if (event.originalEvent.wheelDelta > 0 || event.deltaY > 0) {
                 // scroll up
                 updateScale(event, true);
             }
@@ -3528,7 +3528,7 @@ OG.handler.EventHandler.prototype = {
 
     mergeContextMenu: function () {
         var menu = {};
-        for (var i = 0; i < arguments.length; i++) {
+        for (var i = 0,leni = arguments.length; i < leni; i++) {
             for (var key in arguments[i]) {
                 menu[key] = arguments[i][key];
             }
@@ -3851,7 +3851,7 @@ OG.handler.EventHandler.prototype = {
             shape = eval('new ' + value + '()');
             if (label) {
                 shape.label = label;
-            } else{
+            } else {
                 shape.label = undefined;
             }
 
@@ -4044,7 +4044,7 @@ OG.handler.EventHandler.prototype = {
                     copiedFrom = undefined, copiedTo = undefined, pastedFrom = undefined, pastedTo = undefined, pastedEdge = undefined;
                     copiedEdge = item;
 
-                    for (var i = 0; i < copiedElement.length; i++) {
+                    for (var i = 0,leni = copiedElement.length; i < leni; i++) {
                         if (relatedFrom) {
                             if (copiedElement[i].id == relatedFrom.id) {
                                 copiedFrom = copiedElement[i];
@@ -4083,7 +4083,7 @@ OG.handler.EventHandler.prototype = {
                         relatedTo = relatedElementsFromEdge.to;
                         copiedFrom = undefined, copiedTo = undefined, copiedEdge = undefined, pastedFrom = undefined, pastedTo = undefined, pastedEdge = undefined;
 
-                        for (var c = 0; c < copiedElement.length; c++) {
+                        for (var c = 0,lenc = copiedElement.length; c < lenc; c++) {
                             if (relatedFrom) {
                                 if (copiedElement[c].id == relatedFrom.id) {
                                     copiedFrom = copiedElement[c];
@@ -4706,7 +4706,7 @@ OG.handler.EventHandler.prototype = {
             toShape = me._getShapeFromTerminal(toTerminal);
         }
 
-        for (i = 0; i < bBoxArray.length; i++) {
+        for (var i = 0,leni = bBoxArray.length; i < leni; i++) {
             if (fromShape && bBoxArray[i].id === fromShape.id) {
                 isContainsFrom = true;
             }

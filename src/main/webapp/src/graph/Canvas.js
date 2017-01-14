@@ -27,6 +27,15 @@
 OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroundImage) {
 
     this._CONFIG = {
+
+        /**
+         * 자동 슬라이더 업데이트 여부
+         */
+        AUTO_SLIDER_UPDATE: true,
+        /**
+         * 자동 히스토리 저장
+         */
+        AUTO_HISTORY: true,
         /**
          * 마우스 휠 스케일 변경 여부
          */
@@ -756,6 +765,15 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 ;
 
 OG.graph.Canvas.prototype = {
+    fastLoadingON: function () {
+        this._CONFIG.AUTO_SLIDER_UPDATE = false;
+        this._CONFIG.AUTO_HISTORY = false;
+    },
+    fastLoadingOFF: function () {
+        this._CONFIG.AUTO_SLIDER_UPDATE = true;
+        this._CONFIG.AUTO_HISTORY = true;
+        this.updateSlider();
+    },
     getEventHandler: function () {
         return this._HANDLER;
     },
@@ -1130,39 +1148,41 @@ OG.graph.Canvas.prototype = {
     }
     ,
     updateSlider: function (val) {
-        var me = this;
-        if (!this._CONFIG.SLIDER) {
-            return;
+        if(this._CONFIG.AUTO_SLIDER_UPDATE){
+            var me = this;
+            if (!this._CONFIG.SLIDER) {
+                return;
+            }
+            if (!val) {
+                val = this._CONFIG.SCALE * 100;
+            }
+
+            var slider = this._CONFIG.SLIDER;
+            var sliderText = slider.find('.scaleSliderText');
+            var sliderBar = slider.find('.scaleSlider');
+            var sliderImage = slider.find('.sliderImage');
+            var sliderNavigator = slider.find('.sliderNavigator');
+            var sliderImageWrapper = slider.find('.sliderImageWrapper');
+
+            sliderText.html(Math.round(val));
+            sliderBar.val(Math.round(val));
+            me._RENDERER.setScale(val / 100);
+
+            var svg = me._RENDERER.getRootElement();
+            var svgData = new XMLSerializer().serializeToString(svg);
+
+            var image = new Image();
+            image.src = 'data:image/svg+xml;utf-8,' + svgData;
+            image.onload = function () {
+                var canvas = document.getElementById(sliderImage.attr('id'));
+                canvas.width = sliderImageWrapper.width();
+                canvas.height = sliderImageWrapper.width() * image.height / image.width;
+                var context = canvas.getContext('2d');
+                context.drawImage(image, 0, 0, sliderImageWrapper.width(), sliderImageWrapper.width() * image.height / image.width);
+                $(image).remove();
+            };
+            me.updateNavigatior();
         }
-        if (!val) {
-            val = this._CONFIG.SCALE * 100;
-        }
-
-        var slider = this._CONFIG.SLIDER;
-        var sliderText = slider.find('.scaleSliderText');
-        var sliderBar = slider.find('.scaleSlider');
-        var sliderImage = slider.find('.sliderImage');
-        var sliderNavigator = slider.find('.sliderNavigator');
-        var sliderImageWrapper = slider.find('.sliderImageWrapper');
-
-        sliderText.html(Math.round(val));
-        sliderBar.val(Math.round(val));
-        me._RENDERER.setScale(val / 100);
-
-        var svg = me._RENDERER.getRootElement();
-        var svgData = new XMLSerializer().serializeToString(svg);
-
-        var image = new Image();
-        image.src = 'data:image/svg+xml;utf-8,' + svgData;
-        image.onload = function () {
-            var canvas = document.getElementById(sliderImage.attr('id'));
-            canvas.width = sliderImageWrapper.width();
-            canvas.height = sliderImageWrapper.width() * image.height / image.width;
-            var context = canvas.getContext('2d');
-            context.drawImage(image, 0, 0, sliderImageWrapper.width(), sliderImageWrapper.width() * image.height / image.width);
-            $(image).remove();
-        };
-        me.updateNavigatior();
 
         //$('#testImg').remove();
         //$('body').append('<img id="testImg"/>');
@@ -1225,7 +1245,6 @@ OG.graph.Canvas.prototype = {
         if (this._HANDLER._isLabelEditable(element.shape)) {
             this._HANDLER.enableEditLabel(element);
         }
-
         if (!id) {
             this._RENDERER.addHistory();
         }
@@ -2263,7 +2282,7 @@ OG.graph.Canvas.prototype = {
                 } else if (shape instanceof OG.shape.EdgeShape) {
                     vertices = geom.getVertices();
                     cell['@value'] = '';
-                    for (i = 0; i < vertices.length; i++) {
+                    for (var i = 0, leni = vertices.length; i < leni; i++) {
                         cell['@value'] = cell['@value'] + vertices[i];
                         if (i < vertices.length - 1) {
                             cell['@value'] = cell['@value'] + ','
@@ -2355,6 +2374,7 @@ OG.graph.Canvas.prototype = {
      * @return {Object} {width, height, x, y, x2, y2}
      */
     loadJSON: function (json) {
+        this.fastLoadingON();
         var canvasWidth, canvasHeight, rootGroup,
             minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE,
             i, cell, shape, id, parent, shapeType, shapeId, x, y, width, height, style, geom, from, to,
@@ -2378,7 +2398,7 @@ OG.graph.Canvas.prototype = {
             }
 
             cell = json.opengraph.cell;
-            for (i = 0; i < cell.length; i++) {
+            for (var i = 0, leni = cell.length; i < leni; i++) {
                 id = cell[i]['@id'];
                 parent = cell[i]['@parent'];
                 swimlane = cell[i]['@swimlane'];
@@ -2530,6 +2550,8 @@ OG.graph.Canvas.prototype = {
 
             this.setCanvasSize([canvasWidth, canvasHeight]);
 
+            this.fastLoadingOFF();
+
             return {
                 width: maxX - minX,
                 height: maxY - minY,
@@ -2539,6 +2561,8 @@ OG.graph.Canvas.prototype = {
                 y2: maxY
             };
         }
+
+        this.fastLoadingOFF();
 
         return {
             width: 0,

@@ -49,7 +49,7 @@ OG.Ellipse = OG.geometry.Ellipse;
  */
 OG.geometry.Ellipse.prototype.getVertices = function () {
 	var vertices = [], i;
-	for (i = 20; i < this.vertices.length - 20; i++) {
+	for (var i = 20,leni = this.vertices.length - 20; i < leni; i++) {
 		vertices.push(this.vertices[i]);
 	}
 
@@ -64,7 +64,7 @@ OG.geometry.Ellipse.prototype.getVertices = function () {
  */
 OG.geometry.Ellipse.prototype.getControlPoints = function () {
 	var controlPoints = [], i;
-	for (i = 10; i <= this.vertices.length - 10; i += 10) {
+	for (var i = 10,leni = this.vertices.length - 10; i <= leni; i += 10) {
 		controlPoints.push(this.vertices[i]);
 	}
 

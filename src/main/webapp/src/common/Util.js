@@ -379,11 +379,11 @@ OG.common.Util = {
                     } else {
                         obj[nodeName] = p;
                     }
-                    for (var j = 0; j < node.childNodes.length; j++) {
+                    for (var j = 0,lenj = node.childNodes.length; j < lenj; j++) {
                         process(node.childNodes[j], p, cloneNS(ns));
                     }
                 } else if (node.nodeType === 9) {
-                    for (var k = 0; k < node.childNodes.length; k++) {
+                    for (var k = 0,lenk = node.childNodes.length; k < lenk; k++) {
                         process(node.childNodes[k], obj, cloneNS(ns));
                     }
                 }
@@ -407,7 +407,7 @@ OG.common.Util = {
         var processLeaf = function (lname, child, ns) {
             var body = "";
             if (child instanceof Array) {
-                for (var i = 0; i < child.length; i++) {
+                for (var i = 0,leni = child.length; i < leni; i++) {
                     body += processLeaf(lname, child[i], cloneNS(ns));
                 }
                 return body;

@@ -313,8 +313,7 @@ OG.geometry.Envelope.prototype = {
 	 * @return {Boolean} true:포함, false:비포함
 	 */
 	isContainsAll: function (coordinateArray) {
-		var i;
-		for (i = 0; i < coordinateArray.length; i++) {
+		for (var i = 0,leni = coordinateArray.length; i < leni; i++) {
 			if (!this.isContains(coordinateArray[i])) {
 				return false;
 			}
@@ -331,7 +330,7 @@ OG.geometry.Envelope.prototype = {
 	 */
 	getHowManyContains: function (coordinateArray) {
 		var i, time = 0;
-		for (i = 0; i < coordinateArray.length; i++) {
+		for (var i = 0,leni = coordinateArray.length; i < leni; i++) {
 			if (this.isContains(coordinateArray[i])) {
 				time += 1;
 			}
@@ -348,7 +347,7 @@ OG.geometry.Envelope.prototype = {
 	 */
 	isContainsOnce: function (coordinateArray) {
 		var i;
-		for (i = 0; i < coordinateArray.length; i++) {
+		for (var i = 0,leni = coordinateArray.length; i < leni; i++) {
 			if (this.isContains(coordinateArray[i])) {
 				return true;
 			}

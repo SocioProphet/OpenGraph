@@ -17,21 +17,21 @@
  */
 OG.geometry.Curve = function (controlPoints) {
 
-	OG.geometry.Curve.superclass.call(this, controlPoints);
+    OG.geometry.Curve.superclass.call(this, controlPoints);
 
-	var t, cmRomSpline = OG.CurveUtil.CatmullRomSpline(eval("[" + this.vertices.toString() + "]"));
+    var t, cmRomSpline = OG.CurveUtil.CatmullRomSpline(eval("[" + this.vertices.toString() + "]"));
 
-	// t 는 0 ~ maxT 의 값으로, t 값의 증분값이 작을수록 세밀한 Curve 를 그린다.
-	this.vertices = [];
-	for (t = 0; t <= cmRomSpline.maxT; t += 0.1) {
-		this.vertices.push(new OG.geometry.Coordinate(
-			cmRomSpline.getX(t),
-			cmRomSpline.getY(t)
-		));
-	}
+    // t 는 0 ~ maxT 의 값으로, t 값의 증분값이 작을수록 세밀한 Curve 를 그린다.
+    this.vertices = [];
+    for (var t = 0, lent = cmRomSpline.maxT; t <= lent; t += 0.1) {
+        this.vertices.push(new OG.geometry.Coordinate(
+            cmRomSpline.getX(t),
+            cmRomSpline.getY(t)
+        ));
+    }
 
-	this.TYPE = OG.Constants.GEOM_TYPE.CURVE;
-	this.style = new OG.geometry.Style();
+    this.TYPE = OG.Constants.GEOM_TYPE.CURVE;
+    this.style = new OG.geometry.Style();
 };
 OG.geometry.Curve.prototype = new OG.geometry.PolyLine();
 OG.geometry.Curve.superclass = OG.geometry.PolyLine;
@@ -44,12 +44,12 @@ OG.Curve = OG.geometry.Curve;
  * @return {OG.geometry.Coordinate[]} controlPoints Array
  */
 OG.geometry.Curve.prototype.getControlPoints = function () {
-	var controlPoints = [], i;
-	for (i = 10; i <= this.vertices.length - 10; i += 10) {
-		controlPoints.push(this.vertices[i]);
-	}
+    var controlPoints = [], i;
+    for (var i = 10, leni = this.vertices.length - 10; i <= leni; i += 10) {
+        controlPoints.push(this.vertices[i]);
+    }
 
-	return controlPoints;
+    return controlPoints;
 };
 
 /**
@@ -59,12 +59,12 @@ OG.geometry.Curve.prototype.getControlPoints = function () {
  * @override
  */
 OG.geometry.Curve.prototype.getVertices = function () {
-	var vertices = [], i;
-	for (i = 10; i <= this.vertices.length - 10; i++) {
-		vertices.push(this.vertices[i]);
-	}
+    var vertices = [], i;
+    for (var i = 10, leni = this.vertices.length - 10; i <= leni; i++) {
+        vertices.push(this.vertices[i]);
+    }
 
-	return vertices;
+    return vertices;
 };
 
 
@@ -75,10 +75,10 @@ OG.geometry.Curve.prototype.getVertices = function () {
  * @override
  */
 OG.geometry.Curve.prototype.toString = function () {
-	var s = [];
-	s.push("type:'" + OG.Constants.GEOM_NAME[this.TYPE] + "'");
-	s.push("vertices:[" + this.getVertices() + "]");
-	s.push("controlPoints:[" + this.getControlPoints() + "]");
+    var s = [];
+    s.push("type:'" + OG.Constants.GEOM_NAME[this.TYPE] + "'");
+    s.push("vertices:[" + this.getVertices() + "]");
+    s.push("controlPoints:[" + this.getControlPoints() + "]");
 
-	return "{" + s.join() + "}";
+    return "{" + s.join() + "}";
 };

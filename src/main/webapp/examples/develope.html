@@ -23,7 +23,7 @@
     <script type="text/javascript" src="./layout/js/jquery.layout-latest.js"></script>
 
     <!-- Opengraph -->
-    <script type="text/javascript" src="../opengraph/OpenGraph-0.1.2-SNAPSHOT.js"></script>
+    <!--<script type="text/javascript" src="../opengraph/OpenGraph-0.1.2-SNAPSHOT.js"></script>-->
 
     <script type="text/javascript" src="../src/raphael-2.1.0-custom.js"></script>
     <script type="text/javascript" src="../src/common/Constants.js"></script>
@@ -165,6 +165,8 @@
     <script type="text/javascript" src="../src/shape/elec/Location.js"></script>
     <script type="text/javascript" src="../src/shape/elec/Manhole.js"></script>
 
+    <!--<script type="text/javascript" src="../src/worker/og-worker.js"></script>-->
+
     <style type="text/css">
         .ui-layout-center {
             padding: 0;
@@ -285,7 +287,7 @@
 
             // Shape 이 처음 Draw 되었을 때의 이벤트 리스너
             canvas.onDrawShape(function (event, shapeElement) {
-                console.log('onDrawShape');
+
             });
 
             // Undo 되었을 때의 이벤트 리스너
@@ -319,254 +321,79 @@
             // Shape 이 Disconnect 되었을 때의 이벤트 리스너
             canvas.onDisconnectShape(function (event, edgeElement, fromElement, toElement) {
             });
-
-
-            OG.shape.SampleShape = function (label) {
-                OG.shape.SampleShape.superclass.call(this);
-
-                this.SHAPE_ID = 'OG.shape.SampleShape';
-                this.label = label;
-
-            };
-            OG.shape.SampleShape.prototype = new OG.shape.GeomShape();
-            OG.shape.SampleShape.superclass = OG.shape.GeomShape;
-            OG.shape.SampleShape.prototype.constructor = OG.shape.SampleShape;
-            OG.SampleShape = OG.shape.SampleShape;
-
-            /**
-             * 드로잉할 Shape 을 생성하여 반환한다.
-             *
-             * @return {OG.geometry.Geometry} Shape 정보
-             * @override
-             */
-            OG.shape.SampleShape.prototype.createShape = function () {
-                if (this.geom) {
-                    return this.geom;
-                }
-
-                this.geom = new OG.geometry.Rectangle([0, 0], 100, 100);
-                this.geom.style = new OG.geometry.Style({
-                    'fill-r': 1,
-                    'fill-cx': .1,
-                    'fill-cy': .1,
-                    "stroke-width": 1.2,
-                    fill: 'r(.1, .1)#FFFFFF-#FFFFCC',
-                    'fill-opacity': 1,
-                    r: '10'
-                });
-                return this.geom;
-            };
-
-            OG.shape.SampleShape.prototype.createSubShape = function () {
-                this.sub = [];
-
-                var loopShape;
-                switch (this.data.LoopType) {
-                    case 'Standard' :
-                        loopShape = new OG.ImageShape('resources/images/symbol/loop_standard.png');
-                        break;
-                    case 'MIParallel' :
-                        loopShape = new OG.MIParallel();
-                        break;
-                    case 'MISequential' :
-                        loopShape = new OG.MISequential();
-                        break;
-                }
-                if (loopShape) {
-                    this.sub.push({
-                        shape: loopShape,
-                        width: '15px',
-                        height: '15px',
-                        bottom: '5px',
-                        align: 'center',
-                        style: {}
-                    })
-                }
-
-                var taskTypeShape;
-                switch (this.data.TaskType) {
-                    case "User":
-                        taskTypeShape = new OG.ImageShape("resources/images/symbol/User.png");
-                        break;
-                    case "Send":
-                        taskTypeShape = new OG.ImageShape('resources/images/symbol/Send.png');
-                        break;
-                    case "Receive":
-                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Receive.png");
-                        break;
-                    case "Manual":
-                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Manual.png");
-                        break;
-                    case "Service":
-                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Service.png");
-                        break;
-                    case "BusinessRule":
-                        taskTypeShape = new OG.ImageShape("resources/images/symbol/BusinessRule.png");
-                        break;
-                    case "Script":
-                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Script.png");
-                        break;
-                    case "Mapper":
-                        taskTypeShape = new OG.ImageShape("resources/images/symbol/Mapper.png");
-                        break;
-                    case "WebService":
-                        taskTypeShape = new OG.ImageShape("resources/images/symbol/WebService.png");
-                        break;
-                }
-                if (taskTypeShape) {
-                    this.sub.push({
-                        shape: taskTypeShape,
-                        width: '20px',
-                        height: '20px',
-                        top: '5px',
-                        left: '5px',
-                        style: {}
-                    })
-                }
-
-                var statusShape, statusAnimation;
-                switch (this.data.status) {
-                    case "Completed":
-                        statusShape = new OG.ImageShape("resources/images/symbol/complete.png");
-                        break;
-                    case "Running":
-                        statusShape = new OG.ImageShape('resources/images/symbol/running.png');
-                        statusAnimation = new OG.RectangleShape();
-                        break;
-                }
-                if (statusShape) {
-                    this.sub.push({
-                        shape: statusShape,
-                        width: '20px',
-                        height: '20px',
-                        right: '25px',
-                        top: '5px',
-                        style: {}
-                    })
-                }
-                if (statusAnimation) {
-                    this.sub.push({
-                        shape: statusAnimation,
-                        'z-index': -1,
-                        width: '120%',
-                        height: '120%',
-                        left: '-10%',
-                        top: '-10%',
-                        style: {
-                            'fill-opacity': 1,
-                            animation: [
-                                {
-                                    start: {
-                                        fill: 'white'
-                                    },
-                                    to: {
-                                        fill: '#C9E2FC'
-                                    },
-                                    ms: 1000
-                                },
-                                {
-                                    start: {
-                                        fill: '#C9E2FC'
-                                    },
-                                    to: {
-                                        fill: 'white'
-                                    },
-                                    ms: 1000,
-                                    delay: 1000
-                                }
-                            ],
-                            'animation-repeat': true,
-                            "fill": "#C9E2FC",
-                            "stroke-width": "0.2",
-                            "r": "10",
-                            'stroke-dasharray': '--'
-                        }
-                    })
-                }
-
-                return this.sub;
-            };
-
-            var sampleShape1 = new OG.A_HumanTask('[Act] Ensure Stakeholder Satisfaction');
-            sampleShape1.data = {
-                LoopType: 'Standard',
-                TaskType: 'User',
-                status: 'Completed'
-            };
-            canvas.drawShape([300, 300], sampleShape1, [100, 100]);
-
-            var sampleShape2 = new OG.A_HumanTask('[Act] Understand the Requirements');
-            sampleShape2.data = {
-                LoopType: 'MIParallel',
-                TaskType: 'Send',
-                status: 'Running'
-            };
-            canvas.drawShape([500, 300], sampleShape2, [100, 100]);
-
-            var sampleShape3 = new OG.A_HumanTask();
-            sampleShape3.data = {
-                LoopType: 'MISequential',
-                TaskType: 'Manual',
-                status: 'Completed'
-            };
-
-            var contextMenu = {
-                'delete': true,
-                'copy': true,
-                'format': true,
-                'alert': {
-                    name: 'alert',
-                    callback: function () {
-                        console.log(123123);
-                    }
-                },
-                'text': true,
-                'bringToFront': true,
-                'sendToBack': true
-            };
-            //sampleShape3.customContextMenu = contextMenu;
-
-//            var element = canvas.drawShape([700, 300], sampleShape3, [100, 100]);
+//            window.canvas = canvas;
 //
-//            canvas.setCustomContextMenu(element,contextMenu);
+//            var worker = new Worker('../src/worker/og-worker.js');
 //
-//            var loadData = {
-//                LO_TYPE : 'EH'
-//            };
-//            var loadShape = new OG.PKGLoad();
-//            loadShape.data = loadData;
+//            worker.addEventListener('message', function(e) {
+//                console.log('Worker said: ', e.data);
+//            }, false);
 //
-//            canvas.drawShape([300, 100], loadShape, [100, 100]);
+//            worker.postMessage('Hello');
 
-//            var location = canvas.drawShape([300, 100], new OG.Location(), [100, 100]);
-//            var location2 = canvas.drawShape([600, 200], new OG.Location(), [100, 100]);
-//            var raceway = new OG.RacewayShape();
-//            raceway.setData({
-//               selected: true
-//            });
-//
-//            canvas.connect(location,location2,null, null, null, null, null, null, raceway);
-//
-//            $(canvas.getRootElement()).bind('showProperty', function (event, shapeElement) {
-//                console.log(shapeElement);
-//            });
-//
-//            console.log(canvas.getRelatedEdgeFromShapes([location,location2]));
+//            for(var i = 0; i < 3000; i++){
+//                canvas.getRenderer()._PAPER.path("M40,65L40,35L60,35L60,40L45,40L45,45L60,45L60,50L45,50L45,65L40,65")
+//            }
 
-            var location = canvas.drawShape([300, 100], new OG.HierarchyFeeder(), [100, 100]);
+            canvas.fastLoadingON();
 
-            var location2 = canvas.drawShape([600, 200], new OG.HierarchyFeeder(), [100, 100]);
-            var raceway = new OG.CableShape();
+            var date1 = new Date();
+            for (var i = 0; i < 100; i++) {
+                var p1 = [i * 10, i * 10];
+                var p2 = [i * 10 + 50, i * 10 + 50];
+                var location = canvas.drawShape(p1, new OG.MILoad(), [50, 50]);
+                var location2 = canvas.drawShape(p2, new OG.MILoad(), [50, 50]);
+//                    var raceway = new OG.CableShape();
+//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
+            }
+            var date2 = new Date();
+            console.log(date2 - date1);
 
+            var date1 = new Date();
+            for (var i = 0; i < 40; i++) {
+                var p1 = [i * 10, i * 10];
+                var p2 = [i * 10 + 50, i * 10 + 50];
+                var location = canvas.drawShape(p1, new OG.MILoad(), [50, 50]);
+                var location2 = canvas.drawShape(p2, new OG.MILoad(), [50, 50]);
+//                    var raceway = new OG.CableShape();
+//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
+            }
+            var date2 = new Date();
+            console.log(date2 - date1);
 
-            canvas.connect(location,location2,null, null, null, null, null, null, raceway);
+            var date1 = new Date();
+            for (var i = 0; i < 1; i++) {
+                var p1 = [i * 10, i * 10];
+                var p2 = [i * 10 + 50, i * 10 + 50];
+                var location = canvas.drawShape(p1, new OG.MILoad(), [50, 50]);
+                var location2 = canvas.drawShape(p2, new OG.MILoad(), [50, 50]);
+//                    var raceway = new OG.CableShape();
+//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
+            }
+            var date2 = new Date();
+            console.log(date2 - date1);
 
-            $(canvas.getRootElement()).bind('showProperty', function (event, shapeElement) {
-                console.log(shapeElement);
-            });
-
-            console.log(canvas.getRelatedEdgeFromShapes([location,location2]));
-
+            canvas.fastLoadingOFF();
+//            setTimeout(function(){
+//                for (var i = 20; i < 40; i++) {
+//                    var p1 = [i * 10, i * 10];
+//                    var p2 = [i * 10 + 50, i * 10 + 50];
+//                    var location = canvas.drawShape(p1, new OG.HierarchyFeeder(), [50, 50]);
+//                    var location2 = canvas.drawShape(p2, new OG.HierarchyFeeder(), [50, 50]);
+//                    var raceway = new OG.CableShape();
+//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
+//                }
+//            },100);
+//            setTimeout(function(){
+//                for (var i = 40; i < 60; i++) {
+//                    var p1 = [i * 10, i * 10];
+//                    var p2 = [i * 10 + 50, i * 10 + 50];
+//                    var location = canvas.drawShape(p1, new OG.HierarchyFeeder(), [50, 50]);
+//                    var location2 = canvas.drawShape(p2, new OG.HierarchyFeeder(), [50, 50]);
+//                    var raceway = new OG.CableShape();
+//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
+//                }
+//            },100);
         });
 
         function save() {
