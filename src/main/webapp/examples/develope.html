@@ -338,37 +338,13 @@
             canvas.fastLoadingON();
 
             var date1 = new Date();
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < 50; i++) {
                 var p1 = [i * 10, i * 10];
                 var p2 = [i * 10 + 50, i * 10 + 50];
                 var location = canvas.drawShape(p1, new OG.MILoad(), [50, 50]);
                 var location2 = canvas.drawShape(p2, new OG.MILoad(), [50, 50]);
-//                    var raceway = new OG.CableShape();
-//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
-            }
-            var date2 = new Date();
-            console.log(date2 - date1);
-
-            var date1 = new Date();
-            for (var i = 0; i < 40; i++) {
-                var p1 = [i * 10, i * 10];
-                var p2 = [i * 10 + 50, i * 10 + 50];
-                var location = canvas.drawShape(p1, new OG.MILoad(), [50, 50]);
-                var location2 = canvas.drawShape(p2, new OG.MILoad(), [50, 50]);
-//                    var raceway = new OG.CableShape();
-//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
-            }
-            var date2 = new Date();
-            console.log(date2 - date1);
-
-            var date1 = new Date();
-            for (var i = 0; i < 1; i++) {
-                var p1 = [i * 10, i * 10];
-                var p2 = [i * 10 + 50, i * 10 + 50];
-                var location = canvas.drawShape(p1, new OG.MILoad(), [50, 50]);
-                var location2 = canvas.drawShape(p2, new OG.MILoad(), [50, 50]);
-//                    var raceway = new OG.CableShape();
-//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
+                var raceway = new OG.CableShape();
+                canvas.connect(location, location2, null, null, null, null, null, null, raceway);
             }
             var date2 = new Date();
             console.log(date2 - date1);
