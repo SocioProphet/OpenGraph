@@ -321,6 +321,10 @@
             // Shape 이 Disconnect 되었을 때의 이벤트 리스너
             canvas.onDisconnectShape(function (event, edgeElement, fromElement, toElement) {
             });
+
+            canvas.onLoading(function(event, progress){
+                console.log(progress);
+            });
 //            window.canvas = canvas;
 //
 //            var worker = new Worker('../src/worker/og-worker.js');

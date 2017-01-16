@@ -972,7 +972,7 @@ OG.graph.Canvas.prototype = {
         });
         sliderBar.css({
             position: 'relative',
-            'writing-mode': 'bt-lr', /* IE */
+            //'writing-mode': 'bt-lr', /* IE */
             'width': '100%',
             'height': '8px'
         });
@@ -2384,6 +2384,8 @@ OG.graph.Canvas.prototype = {
             fromEdge, toEdge, label, fromLabel, toLabel, angle, value, data, dataExt, element, loopType, taskType, swimlane, textList;
 
         this._RENDERER.clear();
+        var renderer = this._RENDERER;
+        $(renderer._PAPER.canvas).trigger('loading', ['start']);
 
         if (json && json.opengraph && json.opengraph.cell && OG.Util.isArray(json.opengraph.cell)) {
             canvasWidth = json.opengraph['@width'];
@@ -2408,6 +2410,9 @@ OG.graph.Canvas.prototype = {
             }
 
             cell = json.opengraph.cell;
+            var totalCount = cell.length;
+            var cellCount = 0;
+
             for (var i = 0, leni = cell.length; i < leni; i++) {
                 id = cell[i]['@id'];
                 parent = cell[i]['@parent'];
@@ -2556,9 +2561,13 @@ OG.graph.Canvas.prototype = {
                 if (dataExt) {
                     element.dataExt = OG.JSON.decode(unescape(dataExt));
                 }
+
+                cellCount++;
+                $(renderer._PAPER.canvas).trigger('loading', [Math.round((cellCount/totalCount)*100)]);
             }
 
             this.fastLoadingOFF();
+            $(renderer._PAPER.canvas).trigger('loading', ['end']);
 
             return {
                 width: maxX - minX,
@@ -2571,6 +2580,7 @@ OG.graph.Canvas.prototype = {
         }
 
         this.fastLoadingOFF();
+        $(renderer._PAPER.canvas).trigger('loading', ['end']);
 
         return {
             width: 0,
@@ -2907,6 +2917,15 @@ OG.graph.Canvas.prototype = {
     onExpanded: function (callbackFunc) {
         $(this.getRootElement()).bind('expanded', function (event, element) {
             callbackFunc(event, element);
+        });
+    },
+
+    /**
+     * 캔버스 로딩 이벤트 리스너
+     */
+    onLoading: function(callbackFunc){
+        $(this.getRootElement()).bind('loading', function (event, progress) {
+            callbackFunc(event, progress);
         });
     }
 }
