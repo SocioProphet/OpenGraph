@@ -33209,18 +33209,50 @@ OG.graph.Canvas.prototype = {
 
             var svg = me._RENDERER.getRootElement();
             var svgData = new XMLSerializer().serializeToString(svg);
+            var canvasSize = this.getCanvasSize();
 
-            var image = new Image();
-            image.src = 'data:image/svg+xml;utf-8,' + svgData;
-            image.onload = function () {
-                var canvas = document.getElementById(sliderImage.attr('id'));
-                canvas.width = sliderImageWrapper.width();
-                canvas.height = sliderImageWrapper.width() * image.height / image.width;
-                var context = canvas.getContext('2d');
-                context.drawImage(image, 0, 0, sliderImageWrapper.width(), sliderImageWrapper.width() * image.height / image.width);
-                $(image).remove();
-            };
-            me.updateNavigatior();
+            if (OG.Util.isIE()) {
+                svgData = '<?xml version="1.0" encoding="utf-8"?>' + svgData.replace('xmlns="http://www.w3.org/2000/svg"', '').replace('xmlns:NS1=""', '').replace('NS1:', '');
+                var encoded = window.btoa(unescape(encodeURIComponent(svgData)));
+                var image = document.createElement('img');
+                $(image).css({
+                    position: 'absolute',
+                    top: '0px',
+                    left: '0px',
+                    opacity: 0
+                });
+                document.body.appendChild(image);
+                image.src = 'data:image/svg+xml;base64,' + encoded;
+                image.onload = function () {
+                    var canvas = document.getElementById(sliderImage.attr('id'));
+                    canvas.width = sliderImageWrapper.width();
+                    canvas.height = sliderImageWrapper.width() * image.height / image.width;
+                    var context = canvas.getContext('2d');
+                    try {
+                        context.drawImage(image, 0, 0, sliderImageWrapper.width(), sliderImageWrapper.width() * image.height / image.width);
+                        $(image).remove();
+                        me.updateNavigatior();
+                    } catch (e) {
+                        $(image).remove();
+                    }
+                };
+            } else {
+                var image = new Image();
+                image.src = 'data:image/svg+xml;utf-8,' + svgData;
+                image.onload = function () {
+                    var canvas = document.getElementById(sliderImage.attr('id'));
+                    canvas.width = sliderImageWrapper.width();
+                    canvas.height = sliderImageWrapper.width() * image.height / image.width;
+                    var context = canvas.getContext('2d');
+                    try {
+                        context.drawImage(image, 0, 0, sliderImageWrapper.width(), sliderImageWrapper.width() * image.height / image.width);
+                        $(image).remove();
+                        me.updateNavigatior();
+                    } catch (e) {
+                        $(image).remove();
+                    }
+                };
+            }
         }
 
         //$('#testImg').remove();
@@ -34336,6 +34368,8 @@ OG.graph.Canvas.prototype = {
                 }
                 if (item.data) {
                     cell['@data'] = escape(OG.JSON.encode(item.data));
+                } else {
+                    cell['@data'] = escape(OG.JSON.encode(item.shape.data));
                 }
                 if (shape.textList) {
                     cell['@textList'] = escape(OG.JSON.encode(shape.textList));
@@ -34602,7 +34636,7 @@ OG.graph.Canvas.prototype = {
                 }
 
                 cellCount++;
-                $(renderer._PAPER.canvas).trigger('loading', [Math.round((cellCount/totalCount)*100)]);
+                $(renderer._PAPER.canvas).trigger('loading', [Math.round((cellCount / totalCount) * 100)]);
             }
 
             this.fastLoadingOFF();
@@ -34962,7 +34996,7 @@ OG.graph.Canvas.prototype = {
     /**
      * 캔버스 로딩 이벤트 리스너
      */
-    onLoading: function(callbackFunc){
+    onLoading: function (callbackFunc) {
         $(this.getRootElement()).bind('loading', function (event, progress) {
             callbackFunc(event, progress);
         });
