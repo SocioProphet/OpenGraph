@@ -4485,6 +4485,12 @@ window.Raphael.svg && function (R) {
                                 lines.push(text);
                                 done = true;
                             } else {
+                                // maxWidth 1인경우 처리
+                                if(maxWidth == 1) {
+                                    lines.push(text);
+                                    done = true;
+                                    break;
+                                }
                                 // Inserts new line at first whitespace of the line
                                 for (i = maxWidth - 1; i >= 0; i--) {
                                     if (testWhite(text.charAt(i))) {
@@ -4499,7 +4505,7 @@ window.Raphael.svg && function (R) {
                                 // Inserts new line at maxWidth position, the word is too long to wrap
                                 if (!found) {
                                     res = res + text.slice(0, maxWidth);
-                                    text = text.slice(maxWidth - 1);
+                                    text = text.slice(maxWidth);
                                     lines.push(res);
                                 }
                             }
