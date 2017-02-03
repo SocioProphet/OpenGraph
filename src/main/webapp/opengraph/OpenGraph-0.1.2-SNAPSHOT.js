@@ -33027,8 +33027,7 @@ OG.graph.Canvas.prototype = {
 
             //기존 캔버스의 백그라운드 속성 초기화
             $(me._RENDERER._PAPER.canvas).css({
-                "background-color": "transparent",
-                "background-image": "none"
+                "background-color": "transparent"
             });
 
             me.updateBackDoor();
