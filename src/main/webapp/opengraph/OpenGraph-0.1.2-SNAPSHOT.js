@@ -19456,7 +19456,11 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
 
         rect = this._PAPER.rect(bBox.x - LABEL_PADDING / 2, bBox.y - LABEL_PADDING / 2,
             bBox.width + LABEL_PADDING, bBox.height + LABEL_PADDING);
-        rect.attr({stroke: "none", fill: this._CANVAS_COLOR, 'fill-opacity': 1});
+        var rectFill = this._CANVAS_COLOR;
+        if(rectFill == 'transparent'){
+            rectFill = 'white';
+        }
+        rect.attr({stroke: "none", fill: rectFill, 'fill-opacity': 1});
         this._add(rect);
         group.node.appendChild(rect.node);
     }

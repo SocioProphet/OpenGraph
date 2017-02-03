@@ -219,6 +219,7 @@
             });
 
             // Canvas
+            //canvas = new OG.Canvas('canvas', [1000, 800], 'transparent');
             canvas = new OG.Canvas('canvas', [1000, 800], 'transparent');
             //canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
             canvas._CONFIG.DEFAULT_STYLE.EDGE["edge-type"] = "plain";
@@ -350,6 +351,11 @@
             update.click(function () {
                 canvas.updateBackDoor(150, 0.7);
             });
+
+            var aaa = canvas.drawShape([100,100],new OG.Location('aaaa'), [100,100]);
+            var bbb = canvas.drawShape([200,100],new OG.Location('aaaa'), [100,100]);
+            var line = canvas.connect(aaa,bbb);
+            canvas.drawLabel(line,'bbb');
         });
 
         function save() {
