@@ -273,7 +273,11 @@ OG.common.Constants = {
         SPOT_EVENT_MOUSEROVER: "SPOT_EVENT_MOUSEROVER",
         CONNECTABLE_SPOT_DRAG: "CONNECTABLE_SPOT_DRAG",
         CONNECT_FOCUS_SHAPE: "CONNECT_FOCUS_SHAPE"
-    }
+    },
+    /**
+     * 백도어 서픽스
+     */
+    BACKDOOR_SUFFIX: "backdoor"
 };
 OG.Constants = OG.common.Constants;
 

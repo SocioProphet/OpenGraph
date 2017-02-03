@@ -29,6 +29,22 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
     this._CONFIG = {
 
         /**
+         * 백도어
+         */
+        BACKDOOR: {
+            url: null,
+            scale: 100,
+            opacity: 1,
+            width: null,
+            height: null,
+            container: null,
+            container_updated: false
+        },
+        /**
+         * 빠른 로딩
+         */
+        FAST_LOADING: false,
+        /**
          * 자동 슬라이더 업데이트 여부
          */
         AUTO_SLIDER_UPDATE: true,
@@ -766,12 +782,14 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 
 OG.graph.Canvas.prototype = {
     fastLoadingON: function () {
-        this._CONFIG.AUTO_SLIDER_UPDATE = false;
-        this._CONFIG.AUTO_HISTORY = false;
+        this._CONFIG.FAST_LOADING = true;
+        // this._CONFIG.AUTO_SLIDER_UPDATE = false;
+        // this._CONFIG.AUTO_HISTORY = false;
     },
     fastLoadingOFF: function () {
-        this._CONFIG.AUTO_SLIDER_UPDATE = true;
-        this._CONFIG.AUTO_HISTORY = true;
+        this._CONFIG.FAST_LOADING = false;
+        // this._CONFIG.AUTO_SLIDER_UPDATE = true;
+        // this._CONFIG.AUTO_HISTORY = true;
         this.updateSlider();
     },
     getEventHandler: function () {
@@ -853,6 +871,8 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.USE_SLIDER = config.useSlider === undefined ? this._CONFIG.USE_SLIDER : config.useSlider;
             this._CONFIG.STICK_GUIDE = config.stickGuide === undefined ? this._CONFIG.STICK_GUIDE : config.stickGuide;
             this._CONFIG.CHECK_BRIDGE_EDGE = config.checkBridgeEdge === undefined ? this._CONFIG.CHECK_BRIDGE_EDGE : config.checkBridgeEdge;
+            this._CONFIG.AUTO_HISTORY = config.autoHistory === undefined ? this._CONFIG.AUTO_HISTORY : config.autoHistory;
+            this._CONFIG.AUTO_SLIDER_UPDATE = config.autoSliderUpdate === undefined ? this._CONFIG.AUTO_SLIDER_UPDATE : config.autoSliderUpdate;
         }
 
         this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE, this._CONFIG.DRAG_PAGE_MOVABLE);
@@ -892,6 +912,101 @@ OG.graph.Canvas.prototype = {
      */
     getEventHandler: function () {
         return this._HANDLER;
+    },
+
+    /**
+     * 백도어를 삽입한다.
+     * @param url
+     * @param scale
+     * @param opacity
+     */
+    addBackDoor: function (url, scale, opacity) {
+        var me = this;
+        var image = new Image();
+        image.src = url;
+        image.onload = function () {
+            var w = image.naturalWidth;
+            var h = image.naturalHeight;
+            me._CONFIG.BACKDOOR.url = url;
+            me._CONFIG.BACKDOOR.scale = scale ? scale : me._CONFIG.BACKDOOR.scale;
+            me._CONFIG.BACKDOOR.opacity = opacity ? opacity : me._CONFIG.BACKDOOR.opacity;
+            me._CONFIG.BACKDOOR.width = w;
+            me._CONFIG.BACKDOOR.height = h;
+            me._CONFIG.BACKDOOR.container_updated = true;
+
+            var container = me._CONTAINER;
+            var backdoorId = container.id + OG.Constants.BACKDOOR_SUFFIX;
+
+            //백도어 생성
+            var existBackdoor = $('#' + container.id).find('#' + backdoorId);
+            if (!existBackdoor || existBackdoor.length < 1) {
+                existBackdoor = $('<img/>');
+                existBackdoor.attr('id', backdoorId);
+                existBackdoor.css({
+                    position: 'absolute',
+                    top: '0px',
+                    left: '0px'
+                });
+                $(me._RENDERER.getRootElement()).before(existBackdoor);
+                existBackdoor.attr('src', url);
+            } else {
+                existBackdoor.attr('src', url);
+            }
+            me._CONFIG.BACKDOOR.container = existBackdoor;
+
+            //최초에는 캔버스 크기를 조정해줌.
+            var canvasScale = canvas.getScale();
+            var canvasSize = canvas.getCanvasSize();
+            if (canvasSize[0] < w * (scale / 100) * canvasScale) {
+                canvasSize[0] = w * (scale / 100) * canvasScale;
+            }
+            if (canvasSize[1] < h * (scale / 100) * canvasScale) {
+                canvasSize[1] = h * (scale / 100) * canvasScale;
+            }
+            canvas.setCanvasSize(canvasSize);
+
+
+            //기존 캔버스의 백그라운드 속성 초기화
+            $(me._RENDERER._PAPER.canvas).css({
+                "background-color": "transparent",
+                "background-image": "none"
+            });
+
+            me.updateBackDoor();
+            me.updateSlider();
+        };
+    },
+    updateBackDoor: function (scale, opacity) {
+        var me = this;
+        if (!me._CONFIG.BACKDOOR.container) {
+            return;
+        }
+        me._CONFIG.BACKDOOR.scale = scale ? scale : me._CONFIG.BACKDOOR.scale;
+        me._CONFIG.BACKDOOR.opacity = opacity ? opacity : me._CONFIG.BACKDOOR.opacity;
+        var backDoorScale = me._CONFIG.BACKDOOR.scale;
+        var backDoorOpacity = me._CONFIG.BACKDOOR.opacity;
+        var width = me._CONFIG.BACKDOOR.width;
+        var height = me._CONFIG.BACKDOOR.height;
+
+        var existBackdoor = me._CONFIG.BACKDOOR.container;
+        var canvasScale = canvas.getScale();
+
+        existBackdoor.width(width * (backDoorScale / 100) * canvasScale);
+        existBackdoor.height(height * (backDoorScale / 100) * canvasScale);
+        existBackdoor.css('opacity', backDoorOpacity);
+
+        //scale 값이 실제로 들어오면 캔버스 사이즈를 조정해준다.
+        if (scale) {
+            var canvasSize = canvas.getCanvasSize();
+            if (canvasSize[0] < width * (backDoorScale / 100) * canvasScale) {
+                canvasSize[0] = width * (backDoorScale / 100) * canvasScale;
+            }
+            if (canvasSize[1] < height * (backDoorScale / 100) * canvasScale) {
+                canvasSize[1] = height * (backDoorScale / 100) * canvasScale;
+            }
+            canvas.setCanvasSize(canvasSize);
+            me.updateSlider();
+        }
     },
 
     /**
@@ -985,8 +1100,10 @@ OG.graph.Canvas.prototype = {
             left: '5px',
             right: '5px',
             'overflow-x': 'hidden',
-            'overflow-y': 'auto'
+            'overflow-y': 'auto',
+            'background': 'white'
         });
+
         sliderImage = $('<canvas class="sliderImage"></canvas>');
         sliderImage.css({
             position: 'absolute',
@@ -995,6 +1112,7 @@ OG.graph.Canvas.prototype = {
         });
         sliderImage.attr("width", "100%");
         sliderImage.attr('id', container.id + 'sliderImage');
+
 
         sliderNavigator = $('<div class="sliderNavigator">' +
             '<div style="position: absolute;top: 2px;left: 2px;bottom: 2px;right: 2px;border: 2px solid #3e77ff;"></div>' +
@@ -1110,6 +1228,10 @@ OG.graph.Canvas.prototype = {
         //슬라이더 업데이트
         this.updateSlider(this._CONFIG.SCALE * 100);
     },
+
+    /**
+     * 슬라이더의 네비게이터 박스를 현재 뷰에 맞게 사이즈 및 위치를 조정한다.
+     */
     updateNavigatior: function () {
         var me = this;
         var svg = me._RENDERER.getRootElement();
@@ -1148,7 +1270,7 @@ OG.graph.Canvas.prototype = {
     }
     ,
     updateSlider: function (val) {
-        if (this._CONFIG.AUTO_SLIDER_UPDATE) {
+        if (this._CONFIG.AUTO_SLIDER_UPDATE && !this._CONFIG.FAST_LOADING) {
             var me = this;
             if (!this._CONFIG.SLIDER) {
                 return;
@@ -1164,6 +1286,8 @@ OG.graph.Canvas.prototype = {
             var sliderNavigator = slider.find('.sliderNavigator');
             var sliderImageWrapper = slider.find('.sliderImageWrapper');
 
+
+            //여기서부터는 캔버스의 내용을 슬라이더에 투영시킨다.
             sliderText.html(Math.round(val));
             sliderBar.val(Math.round(val));
             me._RENDERER.setScale(val / 100);
@@ -1214,17 +1338,56 @@ OG.graph.Canvas.prototype = {
                     }
                 };
             }
-        }
 
-        //$('#testImg').remove();
-        //$('body').append('<img id="testImg"/>');
-        //$('#testImg').attr('src','data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgData).replace(/'/g,"%27").replace(/"/g,"%22"));
-        //$('#testImg').css({
-        //   'z-index': '19999',
-        //    'position': 'absolute',
-        //    'left': '0px', 'top': '0px',
-        //    'width': '300px','height':'300px'
-        //});
+            //여기서부터는 백도어의 내용을 슬라이더에 투영시킨다.
+            if (me._CONFIG.BACKDOOR.container) {
+                var scale = me._CONFIG.BACKDOOR.scale;
+                var opacity = me._CONFIG.BACKDOOR.opacity;
+                var width = me._CONFIG.BACKDOOR.width;
+                var height = me._CONFIG.BACKDOOR.height;
+                var canvasScale = canvas.getScale();
+                var contextWidth = sliderImageWrapper.width();
+                var fixedWidth = (width * (scale / 100) / canvasSize[0] * canvasScale) * contextWidth;
+                var fixedHeight = fixedWidth * height / width;
+                var sliderBackDoorWrapper = sliderImageWrapper.find('.sliderBackDoorWrapper');
+
+                if (!sliderBackDoorWrapper || sliderBackDoorWrapper.length < 1) {
+                    sliderBackDoorWrapper = $('<div class="sliderBackDoorWrapper"></div>');
+                    sliderBackDoorWrapper.css({
+                        position: 'absolute',
+                        top: '0px',
+                        left: '0px',
+                        width: '100%',
+                        height: '100%'
+                    });
+
+                    sliderImageWrapper.data('backdoor', true);
+                    sliderBackDoorWrapper.css({
+                        'background-image': 'url(' + me._CONFIG.BACKDOOR.url + ')',
+                        'background-repeat': 'no-repeat',
+                        'background-size': fixedWidth + 'px ' + fixedHeight + 'px',
+                        'opacity': opacity
+                    });
+                    sliderImage.before(sliderBackDoorWrapper);
+                } else {
+                    //백도어 이미지가 교체되었다면 url 까지, 아니면 사이즈만 조정한다.
+                    if (me._CONFIG.BACKDOOR.container_updated) {
+                        me._CONFIG.BACKDOOR.container_updated = false;
+                        sliderBackDoorWrapper.css({
+                            'background-image': 'url(' + me._CONFIG.BACKDOOR.url + ')',
+                            'background-repeat': 'no-repeat',
+                            'background-size': fixedWidth + 'px ' + fixedHeight + 'px',
+                            'opacity': opacity
+                        });
+                    } else {
+                        sliderBackDoorWrapper.css({
+                            'background-size': fixedWidth + 'px ' + fixedHeight + 'px',
+                            'opacity': opacity
+                        });
+                    }
+                }
+            }
+        }
     }
     ,
     /**
@@ -2231,12 +2394,22 @@ OG.graph.Canvas.prototype = {
             scale = this.getScale(),
             canvasWidth = this.getCanvasSize()[0],
             canvasHeight = this.getCanvasSize()[1],
+            backdoor = this._CONFIG.BACKDOOR,
             jsonObj = {
                 opengraph: {
                     '@width': canvasWidth,
                     '@height': canvasHeight,
                     '@scale': scale,
-                    cell: []
+                    cell: [],
+                    backdoor: [
+                        {
+                            '@url': backdoor.url,
+                            '@scale': backdoor.scale,
+                            '@opacity': backdoor.opacity,
+                            '@width': backdoor.width,
+                            '@height': backdoor.height
+                        }
+                    ]
                 }
             },
             childShape, i, cellMap;
@@ -2255,6 +2428,10 @@ OG.graph.Canvas.prototype = {
                     to,
                     prevShapeIds,
                     nextShapeIds;
+
+                if (shape.ignoreExport) {
+                    return;
+                }
 
                 cell['@id'] = $(item).attr('id');
                 if ($(item).parent().attr('id') === $(node).attr('id')) {
@@ -2365,7 +2542,6 @@ OG.graph.Canvas.prototype = {
 
         //root check
         childShape(rootGroup, true);
-
         return jsonObj;
     }
     ,
@@ -2598,6 +2774,14 @@ OG.graph.Canvas.prototype = {
 
                 cellCount++;
                 $(renderer._PAPER.canvas).trigger('loading', [Math.round((cellCount / totalCount) * 100)]);
+            }
+
+            //백도어를 불러온다.
+            if (json.opengraph.backdoor && OG.Util.isArray(json.opengraph.backdoor) && json.opengraph.backdoor.length) {
+                var backdoor = json.opengraph.backdoor[0];
+                if (backdoor['@url']) {
+                    this.addBackDoor(backdoor['@url'], backdoor['@scale'], backdoor['@opacity'])
+                }
             }
 
             this.fastLoadingOFF();

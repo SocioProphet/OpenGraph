@@ -150,6 +150,12 @@ OG.shape.IShape = function () {
      */
     this.currentCanvas = null;
 
+    /**
+     * toJson 시에 이 요소를 무시함.
+     * @type {boolean}
+     */
+    this.ignoreExport = false;
+
 };
 OG.shape.IShape.prototype = {
 

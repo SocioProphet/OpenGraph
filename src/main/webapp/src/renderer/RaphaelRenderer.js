@@ -4468,6 +4468,8 @@ OG.renderer.RaphaelRenderer.prototype.setScale = function (scale) {
         );
 
         me._CONFIG.SCALE = scale;
+
+        me._CANVAS.updateBackDoor();
     }
 };
 
@@ -5898,7 +5900,7 @@ OG.renderer.RaphaelRenderer.prototype.initHistory = function () {
  */
 OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
 
-    if(this._CONFIG.AUTO_HISTORY){
+    if(this._CONFIG.AUTO_HISTORY && !this._CONFIG.FAST_LOADING){
         var me = this;
         var history = me._CONFIG.HISTORY;
         var historySize = me._CONFIG.HISTORY_SIZE;
@@ -5933,6 +5935,8 @@ OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
 
         //슬라이더가 있을경우 슬라이더 업데이트
         me._CANVAS.updateSlider();
+    }else if(this._CONFIG.AUTO_SLIDER_UPDATE && !this._CONFIG.FAST_LOADING){
+        this._CANVAS.updateSlider();
     }
 };
 

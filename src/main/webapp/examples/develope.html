@@ -219,7 +219,8 @@
             });
 
             // Canvas
-            canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
+            canvas = new OG.Canvas('canvas', [1000, 800], 'transparent');
+            //canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
             canvas._CONFIG.DEFAULT_STYLE.EDGE["edge-type"] = "plain";
             canvas._CONFIG.GUIDE_CONTROL_LINE_NUM = 1;
             canvas._CONFIG.FOCUS_CANVAS_ONSELECT = true;
@@ -242,7 +243,8 @@
                 enableContextMenu: true,
                 useSlider: true,
                 stickGuide: true,
-                checkBridgeEdge: true
+                checkBridgeEdge: true,
+                autoHistory: false
             });
 
 
@@ -275,7 +277,7 @@
                         dropX = dropX / canvas._CONFIG.SCALE;
                         dropY = dropY / canvas._CONFIG.SCALE;
                         element = canvas.drawShape([dropX, dropY],
-                                shape, [parseInt(shapeInfo._width, 10), parseInt(shapeInfo._height, 10)]);
+                            shape, [parseInt(shapeInfo._width, 10), parseInt(shapeInfo._height, 10)]);
                         $('#canvas').removeData('DRAG_SHAPE');
 
                     }
@@ -322,58 +324,32 @@
             canvas.onDisconnectShape(function (event, edgeElement, fromElement, toElement) {
             });
 
-            canvas.onLoading(function(event, progress){
+            canvas.onLoading(function (event, progress) {
                 console.log(progress);
             });
-//            window.canvas = canvas;
+
+//            canvas.fastLoadingON();
 //
-//            var worker = new Worker('../src/worker/og-worker.js');
 //
-//            worker.addEventListener('message', function(e) {
-//                console.log('Worker said: ', e.data);
-//            }, false);
-//
-//            worker.postMessage('Hello');
+//            canvas.fastLoadingOFF();
 
-//            for(var i = 0; i < 3000; i++){
-//                canvas.getRenderer()._PAPER.path("M40,65L40,35L60,35L60,40L45,40L45,45L60,45L60,50L45,50L45,65L40,65")
-//            }
 
-            canvas.fastLoadingON();
+            var fileInput = $('#backdoor-upload');
+            fileInput.bind('change', function (event) {
+                var target = event.delegateTarget;
+                if (target.files && target.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        canvas.addBackDoor(e.target.result, 100, 1);
+                    };
+                    reader.readAsDataURL(target.files[0]);
+                }
+            });
 
-            var date1 = new Date();
-            for (var i = 0; i < 10; i++) {
-                var p1 = [i * 10, i * 10];
-                var p2 = [i * 10 + 50, i * 10 + 50];
-                var location = canvas.drawShape(p1, new OG.MILoad(), [50, 50]);
-                var location2 = canvas.drawShape(p2, new OG.MILoad(), [50, 50]);
-                var raceway = new OG.CableShape();
-                canvas.connect(location, location2, null, null, null, null, null, null, raceway);
-            }
-            var date2 = new Date();
-            console.log(date2 - date1);
-
-            canvas.fastLoadingOFF();
-//            setTimeout(function(){
-//                for (var i = 20; i < 40; i++) {
-//                    var p1 = [i * 10, i * 10];
-//                    var p2 = [i * 10 + 50, i * 10 + 50];
-//                    var location = canvas.drawShape(p1, new OG.HierarchyFeeder(), [50, 50]);
-//                    var location2 = canvas.drawShape(p2, new OG.HierarchyFeeder(), [50, 50]);
-//                    var raceway = new OG.CableShape();
-//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
-//                }
-//            },100);
-//            setTimeout(function(){
-//                for (var i = 40; i < 60; i++) {
-//                    var p1 = [i * 10, i * 10];
-//                    var p2 = [i * 10 + 50, i * 10 + 50];
-//                    var location = canvas.drawShape(p1, new OG.HierarchyFeeder(), [50, 50]);
-//                    var location2 = canvas.drawShape(p2, new OG.HierarchyFeeder(), [50, 50]);
-//                    var raceway = new OG.CableShape();
-//                    canvas.connect(location, location2, null, null, null, null, null, null, raceway);
-//                }
-//            },100);
+            var update = $('#backdoor-update');
+            update.click(function () {
+                canvas.updateBackDoor(150, 0.7);
+            });
         });
 
         function save() {
@@ -390,6 +366,8 @@
     <input type="button" value="loadJSON" onclick="canvas.loadJSON(opengraphJSON);"/>
     <input type="button" value="undo" onclick="canvas.undo();"/>
     <input type="button" value="redo" onclick="canvas.redo();"/>
+    <input type="file" value="upload" id="backdoor-upload"/>
+    <input type="button" value="update" id="backdoor-update"/>
 </div>
 <div class="ui-layout-west">
     <div id="accordion">
@@ -554,11 +532,13 @@
     </div>
 </div>
 
-<div class="ui-layout-center" id="canvas" style="cursor: default;">
+<div class="ui-layout-center" style="cursor: default;">
+    <div style="width: 70%;height: 70%;border: solid 1px #eee; overflow: scroll;" id="canvas">
+
+    </div>
 </div>
 <div id="canvas_slider">
 </div>
-<img src="" id="testImg">
 
 <script type="text/javascript">
     $(function () {
