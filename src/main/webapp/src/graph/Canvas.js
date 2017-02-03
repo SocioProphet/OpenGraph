@@ -955,15 +955,15 @@ OG.graph.Canvas.prototype = {
             me._CONFIG.BACKDOOR.container = existBackdoor;
 
             //최초에는 캔버스 크기를 조정해줌.
-            var canvasScale = canvas.getScale();
-            var canvasSize = canvas.getCanvasSize();
+            var canvasScale = me.getScale();
+            var canvasSize = me.getCanvasSize();
             if (canvasSize[0] < w * (scale / 100) * canvasScale) {
                 canvasSize[0] = w * (scale / 100) * canvasScale;
             }
             if (canvasSize[1] < h * (scale / 100) * canvasScale) {
                 canvasSize[1] = h * (scale / 100) * canvasScale;
             }
-            canvas.setCanvasSize(canvasSize);
+            me.setCanvasSize(canvasSize);
 
 
             //기존 캔버스의 백그라운드 속성 초기화
@@ -989,7 +989,7 @@ OG.graph.Canvas.prototype = {
         var height = me._CONFIG.BACKDOOR.height;
 
         var existBackdoor = me._CONFIG.BACKDOOR.container;
-        var canvasScale = canvas.getScale();
+        var canvasScale = me.getScale();
 
         existBackdoor.width(width * (backDoorScale / 100) * canvasScale);
         existBackdoor.height(height * (backDoorScale / 100) * canvasScale);
@@ -997,14 +997,14 @@ OG.graph.Canvas.prototype = {
 
         //scale 값이 실제로 들어오면 캔버스 사이즈를 조정해준다.
         if (scale) {
-            var canvasSize = canvas.getCanvasSize();
+            var canvasSize = me.getCanvasSize();
             if (canvasSize[0] < width * (backDoorScale / 100) * canvasScale) {
                 canvasSize[0] = width * (backDoorScale / 100) * canvasScale;
             }
             if (canvasSize[1] < height * (backDoorScale / 100) * canvasScale) {
                 canvasSize[1] = height * (backDoorScale / 100) * canvasScale;
             }
-            canvas.setCanvasSize(canvasSize);
+            me.setCanvasSize(canvasSize);
             me.updateSlider();
         }
     },
@@ -1345,7 +1345,7 @@ OG.graph.Canvas.prototype = {
                 var opacity = me._CONFIG.BACKDOOR.opacity;
                 var width = me._CONFIG.BACKDOOR.width;
                 var height = me._CONFIG.BACKDOOR.height;
-                var canvasScale = canvas.getScale();
+                var canvasScale = me.getScale();
                 var contextWidth = sliderImageWrapper.width();
                 var fixedWidth = (width * (scale / 100) / canvasSize[0] * canvasScale) * contextWidth;
                 var fixedHeight = fixedWidth * height / width;
