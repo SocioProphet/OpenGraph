@@ -2048,8 +2048,10 @@ OG.handler.EventHandler.prototype = {
                 var moveY = eventOffset.y - pageMove.y;
                 var cuScrollLeft = container.scrollLeft;
                 var cuScrollTop = container.scrollTop;
-                $(container).scrollLeft(cuScrollLeft - moveX);
-                $(container).scrollTop(cuScrollTop - moveY);
+                if((cuScrollLeft - moveX) >= 0 && (cuScrollTop - moveY) >= 0){
+                    $(container).scrollLeft(cuScrollLeft - moveX);
+                    $(container).scrollTop(cuScrollTop - moveY);
+                }
             }
         });
         $(rootEle).bind("mouseup", function (event) {
