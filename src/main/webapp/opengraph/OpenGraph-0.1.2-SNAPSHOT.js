@@ -20645,13 +20645,16 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
                 }
             }
             edge.shape.geom.setVertices(vertices);
-            return edgeId;
+            return edge;
         };
+
+    var edgeToReconnect;
     edgeId = $(element).attr("_fromedge");
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
             if (!excludeEdgeId || excludeEdgeId.toString().indexOf(item) < 0) {
-                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item), null, null, true);
+                edgeToReconnect = rightAngleCalibration(item);
+                me.connect($(edgeToReconnect).attr('_from'), $(edgeToReconnect).attr('_to'), edgeToReconnect, null, null, true);
             }
         });
     }
@@ -20660,7 +20663,8 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
             if (!excludeEdgeId || excludeEdgeId.toString().indexOf(item) < 0) {
-                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item), null, null, true);
+                edgeToReconnect = rightAngleCalibration(item);
+                me.connect($(edgeToReconnect).attr('_from'), $(edgeToReconnect).attr('_to'), edgeToReconnect, null, null, true);
             }
         });
     }
@@ -27831,8 +27835,8 @@ OG.handler.EventHandler.prototype = {
             if (isConnectMode === 'active' || isRectMode === 'active') {
                 return;
             }
-            var eventOffset = me._getOffset(event);
-            $(root).data("dragPageMove", {x: eventOffset.x, y: eventOffset.y});
+            $(root).data("dragPageMove", {x: event.pageX, y: event.pageY});
+            $(root).data("dragPageScroll", {x: container.scrollLeft, y: container.scrollTop});
         });
         $(rootEle).bind("mousemove", function (event) {
             root = renderer.getRootGroup();
@@ -27842,18 +27846,14 @@ OG.handler.EventHandler.prototype = {
             if (isConnectMode === 'active' || isRectMode === 'active' || isResizing === 'active') {
                 return;
             }
-            var pageMove = $(root).data("dragPageMove"), eventOffset;
+            var pageMove = $(root).data("dragPageMove");
+            var pageScroll = $(root).data("dragPageScroll");
 
             if (pageMove) {
-                eventOffset = me._getOffset(event);
-                var moveX = eventOffset.x - pageMove.x;
-                var moveY = eventOffset.y - pageMove.y;
-                var cuScrollLeft = container.scrollLeft;
-                var cuScrollTop = container.scrollTop;
-                if((cuScrollLeft - moveX) >= 0 && (cuScrollTop - moveY) >= 0){
-                    $(container).scrollLeft(cuScrollLeft - moveX);
-                    $(container).scrollTop(cuScrollTop - moveY);
-                }
+                var moveX = event.pageX - pageMove.x;
+                var moveY = event.pageY - pageMove.y;
+                $(container).scrollLeft(pageScroll.x - moveX);
+                $(container).scrollTop(pageScroll.y - moveY);
             }
         });
         $(rootEle).bind("mouseup", function (event) {
@@ -27864,6 +27864,7 @@ OG.handler.EventHandler.prototype = {
                 return;
             }
             $(root).removeData('dragPageMove');
+            $(root).removeData('dragPageScroll');
         });
     },
 

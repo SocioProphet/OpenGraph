@@ -2401,13 +2401,16 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
                 }
             }
             edge.shape.geom.setVertices(vertices);
-            return edgeId;
+            return edge;
         };
+
+    var edgeToReconnect;
     edgeId = $(element).attr("_fromedge");
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
             if (!excludeEdgeId || excludeEdgeId.toString().indexOf(item) < 0) {
-                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item), null, null, true);
+                edgeToReconnect = rightAngleCalibration(item);
+                me.connect($(edgeToReconnect).attr('_from'), $(edgeToReconnect).attr('_to'), edgeToReconnect, null, null, true);
             }
         });
     }
@@ -2416,7 +2419,8 @@ OG.renderer.RaphaelRenderer.prototype.redrawConnectedEdge = function (element, e
     if (edgeId) {
         $.each(edgeId.split(","), function (idx, item) {
             if (!excludeEdgeId || excludeEdgeId.toString().indexOf(item) < 0) {
-                me.connect($(item).attr('_from'), $(item).attr('_to'), rightAngleCalibration(item), null, null, true);
+                edgeToReconnect = rightAngleCalibration(item);
+                me.connect($(edgeToReconnect).attr('_from'), $(edgeToReconnect).attr('_to'), edgeToReconnect, null, null, true);
             }
         });
     }
