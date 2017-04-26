@@ -51,7 +51,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         /**
          * 자동 히스토리 저장
          */
-        AUTO_HISTORY: true,
+        AUTO_HISTORY: false,
         /**
          * 마우스 휠 스케일 변경 여부
          */

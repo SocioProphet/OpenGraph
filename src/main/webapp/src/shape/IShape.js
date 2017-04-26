@@ -156,6 +156,12 @@ OG.shape.IShape = function () {
      */
     this.ignoreExport = false;
 
+    /**
+     * x,y 축만 이동 가능여부.
+     * @type {null}
+     */
+    this.AXIS = 'none';
+
 };
 OG.shape.IShape.prototype = {
 

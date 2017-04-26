@@ -60,7 +60,7 @@ OG.handler.EventHandler.prototype = {
                             vertices = element.shape.geom.getVertices();
                             lineLength = element.shape.geom.getLength();
 
-                            for (var i = 0,leni = vertices.length - 1; i < leni; i++) {
+                            for (var i = 0, leni = vertices.length - 1; i < leni; i++) {
                                 distance += vertices[i].distance(vertices[i + 1]);
                                 if (distance > lineLength / 2) {
                                     intersectArray = element.shape.geom.intersectCircleToLine(
@@ -818,6 +818,11 @@ OG.handler.EventHandler.prototype = {
                         offset = $(this).data("offset");
 
                     var conditionAnalysis = correctionConditionAnalysis(dx, dy);
+                    if ('Y' == element.shape.AXIS) {
+                        conditionAnalysis.dx = 0;
+                    } else if ('N' == element.shape.AXIS) {
+                        conditionAnalysis.dy = 0;
+                    }
                     dx = me._grid(conditionAnalysis.dx, 'move');
                     dy = me._grid(conditionAnalysis.dy, 'move');
 
@@ -845,6 +850,11 @@ OG.handler.EventHandler.prototype = {
 
                     // 자동 붙기 보정
                     var conditionAnalysis = correctionConditionAnalysis(dx, dy);
+                    if ('Y' == element.shape.AXIS) {
+                        conditionAnalysis.dx = 0;
+                    } else if ('N' == element.shape.AXIS) {
+                        conditionAnalysis.dy = 0;
+                    }
                     dx = me._grid(conditionAnalysis.dx, 'move');
                     dy = me._grid(conditionAnalysis.dy, 'move');
 
@@ -3527,7 +3537,7 @@ OG.handler.EventHandler.prototype = {
 
     mergeContextMenu: function () {
         var menu = {};
-        for (var i = 0,leni = arguments.length; i < leni; i++) {
+        for (var i = 0, leni = arguments.length; i < leni; i++) {
             for (var key in arguments[i]) {
                 menu[key] = arguments[i][key];
             }
@@ -4043,7 +4053,7 @@ OG.handler.EventHandler.prototype = {
                     copiedFrom = undefined, copiedTo = undefined, pastedFrom = undefined, pastedTo = undefined, pastedEdge = undefined;
                     copiedEdge = item;
 
-                    for (var i = 0,leni = copiedElement.length; i < leni; i++) {
+                    for (var i = 0, leni = copiedElement.length; i < leni; i++) {
                         if (relatedFrom) {
                             if (copiedElement[i].id == relatedFrom.id) {
                                 copiedFrom = copiedElement[i];
@@ -4082,7 +4092,7 @@ OG.handler.EventHandler.prototype = {
                         relatedTo = relatedElementsFromEdge.to;
                         copiedFrom = undefined, copiedTo = undefined, copiedEdge = undefined, pastedFrom = undefined, pastedTo = undefined, pastedEdge = undefined;
 
-                        for (var c = 0,lenc = copiedElement.length; c < lenc; c++) {
+                        for (var c = 0, lenc = copiedElement.length; c < lenc; c++) {
                             if (relatedFrom) {
                                 if (copiedElement[c].id == relatedFrom.id) {
                                     copiedFrom = copiedElement[c];
@@ -4705,7 +4715,7 @@ OG.handler.EventHandler.prototype = {
             toShape = me._getShapeFromTerminal(toTerminal);
         }
 
-        for (var i = 0,leni = bBoxArray.length; i < leni; i++) {
+        for (var i = 0, leni = bBoxArray.length; i < leni; i++) {
             if (fromShape && bBoxArray[i].id === fromShape.id) {
                 isContainsFrom = true;
             }
