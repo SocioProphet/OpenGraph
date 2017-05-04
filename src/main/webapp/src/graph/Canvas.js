@@ -1236,6 +1236,9 @@ OG.graph.Canvas.prototype = {
         var svg = me._RENDERER.getRootElement();
         var svgWidth, svgHeight, vx, vy, xRate, yRate, xImgRate, yImgRate;
         var slider = this._CONFIG.SLIDER;
+        if(!slider){
+            return;
+        }
         var sliderImage = slider.find('.sliderImage');
         var sliderNavigator = slider.find('.sliderNavigator');
         var container = me._CONTAINER;
@@ -2090,8 +2093,8 @@ OG.graph.Canvas.prototype = {
      * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
      * @return {Element} Element
      */
-    resize: function (element, offset) {
-        return this._RENDERER.resize(element, offset);
+    resize: function (element, offset, preventEvent) {
+        return this._RENDERER.resize(element, offset, preventEvent);
     }
     ,
 
@@ -2102,8 +2105,8 @@ OG.graph.Canvas.prototype = {
      * @param {Number[]} size [Width, Height]
      * @return {Element} Element
      */
-    resizeBox: function (element, size) {
-        return this._RENDERER.resizeBox(element, size);
+    resizeBox: function (element, size, preventEvent) {
+        return this._RENDERER.resizeBox(element, size, preventEvent);
     }
     ,
 

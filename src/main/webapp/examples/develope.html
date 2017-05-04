@@ -164,6 +164,7 @@
     <script type="text/javascript" src="../src/shape/elec/BLDG.js"></script>
     <script type="text/javascript" src="../src/shape/elec/Location.js"></script>
     <script type="text/javascript" src="../src/shape/elec/Manhole.js"></script>
+    <script type="text/javascript" src="../src/shape/component/DataTable.js"></script>
 
     <!--<script type="text/javascript" src="../src/worker/og-worker.js"></script>-->
 
@@ -242,19 +243,19 @@
                 collapsible: true,
                 enableHotKey: true,
                 enableContextMenu: true,
-                useSlider: true,
+                useSlider: false,
                 stickGuide: true,
                 checkBridgeEdge: true,
                 autoHistory: false
             });
 
 
-            canvas.addSlider({
-                slider: $("#canvas_slider"),
-                width: 200,
-                height: 300,
-                appendTo: "body"
-            });
+//            canvas.addSlider({
+//                slider: $("#canvas_slider"),
+//                width: 200,
+//                height: 300,
+//                appendTo: "body"
+//            });
 
             $(".icon_shape").draggable({
                 start: function () {
@@ -352,10 +353,37 @@
                 canvas.updateBackDoor(150, 0.7);
             });
 
-            var aaa = canvas.drawShape([100,100],new OG.Location('aaaa'), [100,100]);
-            var bbb = canvas.drawShape([200,100],new OG.Location('aaaa'), [100,100]);
-            var line = canvas.connect(aaa,bbb);
-            canvas.drawLabel(line,'bbb');
+
+            var dataTable = new OG.DataTable();
+            var data = [];
+            for(var i = 0 ; i < 100; i++){
+                data.push({
+                    name: "유엔진 솔루션즈" + i,
+                    email: "sppark@uengine.org",
+                    phone: "",
+                    accountBalance: 15,
+                    accountCBA: 30
+                })
+            }
+            dataTable.setData(data);
+            var table = canvas.drawShape([100, 100], dataTable, [100, 100], {});
+            dataTable.draw();
+//            canvas.setShapeStyle(shape,{
+//                'border-top': {
+//                    stroke: 'red'
+//                }
+//            })
+
+//            var table = new OG.DataTable();
+//            var element = canvas.drawShape([0, 0], table, [100, 100]);
+//            element.shape.draw();
+//            canvas.drawShape([200,100],new OG.DataTable('aaaa'), [100,100], null, element.id);
+//            console.log(element);
+            //position, shape, size, style, id, preventEvent
+
+            //var line = canvas.connect(aaa,bbb);
+            //canvas.drawLabel(line,'bbb');
+
         });
 
         function save() {
@@ -539,7 +567,7 @@
 </div>
 
 <div class="ui-layout-center" style="cursor: default;">
-    <div style="width: 70%;height: 70%;border: solid 1px #eee; overflow: scroll;" id="canvas">
+    <div style="width: 90%;height: 90%;border: solid 1px #eee; overflow: scroll;" id="canvas">
 
     </div>
 </div>

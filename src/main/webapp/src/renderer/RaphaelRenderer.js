@@ -1213,7 +1213,7 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
         rect = this._PAPER.rect(bBox.x - LABEL_PADDING / 2, bBox.y - LABEL_PADDING / 2,
             bBox.width + LABEL_PADDING, bBox.height + LABEL_PADDING);
         var rectFill = this._CANVAS_COLOR;
-        if(rectFill == 'transparent'){
+        if (rectFill == 'transparent') {
             rectFill = 'white';
         }
         rect.attr({stroke: "none", fill: rectFill, 'fill-opacity': 1});
@@ -1306,14 +1306,11 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
     // 서브 shape 드로잉
     me._drawSubShape(groupNode);
 
-    // Draw for Task
-
-
     // Draw Label
     if (!(shape instanceof OG.shape.TextShape)) {
         this.drawLabel(groupNode);
 
-        if (shape instanceof  OG.shape.EdgeShape) {
+        if (shape instanceof OG.shape.EdgeShape) {
             this.drawEdgeLabel(groupNode, null, 'FROM');
             this.drawEdgeLabel(groupNode, null, 'TO');
         }
@@ -1388,10 +1385,6 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         //    me.setDropablePool(groupNode);
         //}
         me.putInnerShapeToPool(groupNode);
-    }
-
-    if ($(shape).attr('auto_draw') == 'yes') {
-        $(groupNode).attr('auto_draw', 'yes');
     }
 
     // drawShape event fire
@@ -1953,23 +1946,14 @@ OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id)
     group.node.geom = geometry;
     group.attr(me._CONFIG.DEFAULT_STYLE.SHAPE);
 
-    // Draw Hidden Shadow
+    // // Draw Hidden Shadow
     boundary = geometry.getBoundary();
     group_hidden = new OG.geometry.Rectangle(boundary.getUpperLeft()
         , (boundary.getUpperRight().x - boundary.getUpperLeft().x)
         , (boundary.getLowerLeft().y - boundary.getUpperLeft().y));
-    if (me._CONFIG.ENABLE_CONTEXTMENU) {
-        geom_shadow = this._drawGeometry(group.node, group_hidden, me._CONFIG.DEFAULT_STYLE.GROUP_SHADOW);
-    } else {
-        geom_shadow = this._drawGeometry(group.node, group_hidden, me._CONFIG.DEFAULT_STYLE.GROUP_SHADOW_MAPPER);
-    }
-    geom_shadow.style = new OG.geometry.Style({
-        'cursor': "move"
-    });
 
     // 타이틀 라인 Drawing
     OG.Util.apply(_tempStyle, geometry.style.map, _style);
-
     if (_tempStyle['label-direction'] && _tempStyle['vertical-align'] === 'top') {
         if (_tempStyle['label-direction'] === 'vertical') {
             if (_tempStyle['title-size']) {
@@ -2314,7 +2298,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
                     envelope = element.shape.geom.getBoundary();
                     upperLeft = envelope.getUpperLeft();
                     element = this.drawGroup(new OG.geometry.Rectangle(
-                            upperLeft, me._CONFIG.COLLAPSE_SIZE * 3, me._CONFIG.COLLAPSE_SIZE * 2),
+                        upperLeft, me._CONFIG.COLLAPSE_SIZE * 3, me._CONFIG.COLLAPSE_SIZE * 2),
                         element.shape.geom.style, element.id);
                     redrawChildConnectedEdge(element, element);
                     this.redrawConnectedEdge(element, excludeEdgeId);
@@ -4023,7 +4007,7 @@ OG.renderer.RaphaelRenderer.prototype.ungroup = function (groupElements) {
  * @override
  */
 OG.renderer.RaphaelRenderer.prototype.addToGroup = function (groupElement, elements) {
-    for (var i = 0,leni = elements.length; i < leni; i++) {
+    for (var i = 0, leni = elements.length; i < leni; i++) {
         groupElement.appendChild(elements[i]);
     }
 };
@@ -4400,9 +4384,9 @@ OG.renderer.RaphaelRenderer.prototype.fitCanvasSize = function (minSize, fitScal
         height = realRootBBox.height + me._CONFIG.FIT_CANVAS_PADDING * 2;
     if (realRootBBox.width !== 0 && realRootBBox.height !== 0) {
         offsetX = realRootBBox.x > me._CONFIG.FIT_CANVAS_PADDING ?
-        -1 * (realRootBBox.x - me._CONFIG.FIT_CANVAS_PADDING) : me._CONFIG.FIT_CANVAS_PADDING - realRootBBox.x;
+            -1 * (realRootBBox.x - me._CONFIG.FIT_CANVAS_PADDING) : me._CONFIG.FIT_CANVAS_PADDING - realRootBBox.x;
         offsetY = realRootBBox.y > me._CONFIG.FIT_CANVAS_PADDING ?
-        -1 * (realRootBBox.y - me._CONFIG.FIT_CANVAS_PADDING) : me._CONFIG.FIT_CANVAS_PADDING - realRootBBox.y;
+            -1 * (realRootBBox.y - me._CONFIG.FIT_CANVAS_PADDING) : me._CONFIG.FIT_CANVAS_PADDING - realRootBBox.y;
 
         this.move(this.getRootGroup(), [offsetX, offsetY]);
         this.removeAllGuide();
@@ -4693,10 +4677,11 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle) {
  *
  * @param {Element|String} element Element 또는 ID
  * @param {Number[]} offset [상, 하, 좌, 우] 각 방향으로 + 값
+ * @param preventEvent
  * @return {Element} Element
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset) {
+OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset, preventEvent) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         type = rElement ? rElement.node.getAttribute("_shape") : null,
         geometry = rElement ? rElement.node.shape.geom : null,
@@ -4710,7 +4695,10 @@ OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset) {
         this.redrawShape(rElement.node);
 
         // resizeShape event fire
-        $(this._PAPER.canvas).trigger('resizeShape', [rElement.node, offset]);
+        if (!preventEvent) {
+            rElement.node.shape.onResize(offset);
+            $(this._PAPER.canvas).trigger('resizeShape', [rElement.node, offset]);
+        }
 
         return rElement.node;
     } else if (rElement) {
@@ -4727,7 +4715,10 @@ OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset) {
         rElement.transform("...s" + hRate + "," + vRate + "," + bBox.x + "," + bBox.y);
 
         // resizeShape event fire
-        $(this._PAPER.canvas).trigger('resizeShape', [rElement.node, offset]);
+        if (!preventEvent) {
+            rElement.node.shape.onResize(offset);
+            $(this._PAPER.canvas).trigger('resizeShape', [rElement.node, offset]);
+        }
 
         return rElement.node;
     }
@@ -4740,10 +4731,11 @@ OG.renderer.RaphaelRenderer.prototype.resize = function (element, offset) {
  *
  * @param {Element|String} element Element 또는 ID
  * @param {Number[]} size [Width, Height]
+ * @param preventEvent
  * @return {Element} Element
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.resizeBox = function (element, size) {
+OG.renderer.RaphaelRenderer.prototype.resizeBox = function (element, size, preventEvent) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         geometry = rElement ? rElement.node.shape.geom : null,
         boundary, bBox, offsetWidth, offsetHeight;
@@ -4754,13 +4746,13 @@ OG.renderer.RaphaelRenderer.prototype.resizeBox = function (element, size) {
         offsetWidth = OG.Util.round((size[0] - boundary.getWidth()) / 2);
         offsetHeight = OG.Util.round((size[1] - boundary.getHeight()) / 2);
 
-        return this.resize(element, [offsetHeight, offsetHeight, offsetWidth, offsetWidth]);
+        return this.resize(element, [offsetHeight, offsetHeight, offsetWidth, offsetWidth], preventEvent);
     } else if (rElement) {
         bBox = rElement.getBBox();
         offsetWidth = OG.Util.round((size[0] - bBox.width) / 2);
         offsetHeight = OG.Util.round((size[1] - bBox.height) / 2);
 
-        return this.resize(element, [offsetHeight, offsetHeight, offsetWidth, offsetWidth]);
+        return this.resize(element, [offsetHeight, offsetHeight, offsetWidth, offsetWidth], preventEvent);
     }
 
     return null;
@@ -4919,7 +4911,7 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
         var spots = [];
 
         //변곡점 스팟
-        for (var i = 0,leni = vertices.length; i < leni; i++) {
+        for (var i = 0, leni = vertices.length; i < leni; i++) {
             var spot = me._PAPER.circle(vertices[i].x, vertices[i].y, spotCircleStyle.r);
             spot.attr(spotCircleStyle);
             me._add(spot);
@@ -5436,7 +5428,7 @@ OG.renderer.RaphaelRenderer.prototype.trimConnectInnerVertice = function (elemen
         }
     }
     if (fromShape) {
-        for (var i = 0,leni = vertices.length; i < leni; i++) {
+        for (var i = 0, leni = vertices.length; i < leni; i++) {
             if (i == 0) {
                 startVertice = vertices[i];
                 startVerticeIdx = i;
@@ -5738,7 +5730,7 @@ OG.renderer.RaphaelRenderer.prototype.toFrontEdges = function () {
     var root = me.getRootGroup();
     var edges = me.getAllEdges();
 
-    for (var i = 0,leni = edges.length; i < leni; i++) {
+    for (var i = 0, leni = edges.length; i < leni; i++) {
         root.removeChild(edges[i]);
         root.appendChild(edges[i]);
     }
@@ -5908,7 +5900,7 @@ OG.renderer.RaphaelRenderer.prototype.initHistory = function () {
  */
 OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
 
-    if(this._CONFIG.AUTO_HISTORY && !this._CONFIG.FAST_LOADING){
+    if (this._CONFIG.AUTO_HISTORY && !this._CONFIG.FAST_LOADING) {
         var me = this;
         var history = me._CONFIG.HISTORY;
         var historySize = me._CONFIG.HISTORY_SIZE;
@@ -5943,7 +5935,7 @@ OG.renderer.RaphaelRenderer.prototype.addHistory = function () {
 
         //슬라이더가 있을경우 슬라이더 업데이트
         me._CANVAS.updateSlider();
-    }else if(this._CONFIG.AUTO_SLIDER_UPDATE && !this._CONFIG.FAST_LOADING){
+    } else if (this._CONFIG.AUTO_SLIDER_UPDATE && !this._CONFIG.FAST_LOADING) {
         this._CANVAS.updateSlider();
     }
 };
@@ -6389,7 +6381,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
     }
 
     if (divedLanes.length) {
-        for (var i = 0,leni = divedLanes.length; i < leni; i++) {
+        for (var i = 0, leni = divedLanes.length; i < leni; i++) {
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
     }
@@ -6418,7 +6410,7 @@ OG.renderer.RaphaelRenderer.prototype.getBaseLanes = function (element) {
     function chooseBaseLane(lane) {
         var _childLanes = me.getChildLane(lane);
         if (_childLanes.length) {
-            for (var i = 0,leni = _childLanes.length; i < leni; i++) {
+            for (var i = 0, leni = _childLanes.length; i < leni; i++) {
                 chooseBaseLane(_childLanes[i]);
             }
         } else {
@@ -6686,7 +6678,7 @@ OG.renderer.RaphaelRenderer.prototype.getBoundaryOfElements = function (elements
     var geometryArray = [], geometryCollection, envelope, i;
 
     if (elements && elements.length > 0) {
-        for (var i = 0,leni = elements.length; i < leni; i++) {
+        for (var i = 0, leni = elements.length; i < leni; i++) {
 
             geometryArray.push(elements[i].shape.geom);
         }

@@ -58,6 +58,18 @@ OG.shape.IShape = function () {
     this.RESIZABLE = true;
 
     /**
+     * 가로방향 리사이즈 가능
+     * @type {boolean}
+     */
+    this.RESIZEX = true;
+
+    /**
+     * 세로 방향 리사이즈 가능
+     * @type {boolean}
+     */
+    this.RESIZEY = true;
+
+    /**
      * 연결 가능여부
      * @type Boolean
      */
@@ -197,6 +209,9 @@ OG.shape.IShape.prototype = {
 
     getData: function () {
         return this.data;
+    },
+    onResize: function(element, offset){
+
     }
 };
 OG.shape.IShape.prototype.constructor = OG.shape.IShape;

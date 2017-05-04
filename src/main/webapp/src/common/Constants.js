@@ -34,6 +34,9 @@ OG.shape.bpmn = {};
 /** @namespace */
 OG.shape.elec = {};
 
+/** @namespace */
+OG.shape.component = {};
+
 /**
  * @namespace
  * @private
