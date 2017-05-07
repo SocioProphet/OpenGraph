@@ -200,12 +200,16 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
             } else if (typeof value == 'string') {
                 //픽셀인 경우
                 if (value.indexOf('px') != -1) {
-                    length = parseInt(value.replace('px', ''));
+                    length = parseFloat(value.replace('px', ''));
                 }
                 //퍼센테이지 경우
-                if (value.indexOf('%') != -1) {
-                    value = parseInt(value.replace('%', ''));
+                else if (value.indexOf('%') != -1) {
+                    value = parseFloat(value.replace('%', ''));
                     length = standard * (value / 100);
+                }
+                //그외에는 숫자취급
+                else {
+                    length = parseFloat(value);
                 }
             }
             return length;
@@ -220,6 +224,7 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         bottom = bT + bH - getLength(bH, bottom) - height;
 
         //right 가 있다면 left 보다 우선하고, bottom 이 있다면 top 보다 우선한다.
+        //최종 위치 계산은 top 과 left 로 한다.
         if (!right && right != 0) {
 
         } else {
@@ -231,7 +236,7 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
             top = bottom;
         }
 
-        //align 이나 vertice-algin 이 start,center,end 일 경우 left 와 top 값을 오버라이드 한다.
+        //align 이나 vertice-algin 값이 있을 경우 left 와 top 값을 오버라이드 한다.
         if (align == 'left') {
             left = bL;
         } else if (align == 'center') {
@@ -248,12 +253,39 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
             top = bT + bH - height;
         }
 
-        //Edge 인 도형의 위치값을 구한다. subVertices 의 left,top 기준값으로 정한다.
+        //Edge 인 도형의 위치값을 구한다. subVertices 의 (left,right),(top,bottom) 기준값으로 정한다.
         if (subShape instanceof OG.shape.EdgeShape) {
             if (subVertices && subVertices.length) {
                 for (var v = 0, lenv = subVertices.length; v < lenv; v++) {
-                    subVertices[v][0] = getLength(bW, subVertices[v][0]) + bL;
-                    subVertices[v][1] = getLength(bH, subVertices[v][1]) + bT;
+                    //x 축이 left 기준인 경우
+                    if (subVertices[v][0].indexOf('left') != -1) {
+                        subVertices[v][0] = subVertices[v][0].replace('left', '');
+                        subVertices[v][0] = getLength(bW, subVertices[v][0]) + bL;
+                    }
+                    //x 축이 right 기준인 경우
+                    else if (subVertices[v][0].indexOf('right') != -1) {
+                        subVertices[v][0] = subVertices[v][0].replace('right', '');
+                        subVertices[v][0] = bL + bW - getLength(bW, subVertices[v][0]);
+                    }
+                    //그 외의 경우는 left 처리
+                    else {
+                        subVertices[v][0] = getLength(bW, subVertices[v][0]) + bL;
+                    }
+
+                    //y 축이 top 기준인 경우
+                    if (subVertices[v][1].indexOf('top') != -1) {
+                        subVertices[v][1] = subVertices[v][1].replace('top', '');
+                        subVertices[v][1] = getLength(bH, subVertices[v][1]) + bT;
+                    }
+                    //y 축이 bottom 기준인 경우
+                    else if (subVertices[v][1].indexOf('bottom') != -1) {
+                        subVertices[v][1] = subVertices[v][1].replace('bottom', '');
+                        subVertices[v][1] = bT + bH - getLength(bH, subVertices[v][1]);
+                    }
+                    //그 외의 경우는 top 처리
+                    else {
+                        subVertices[v][1] = getLength(bH, subVertices[v][1]) + bT;
+                    }
                 }
             } else {
                 subVertices = [[bL, bT], [bL + bW, bT]];
@@ -262,7 +294,11 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         }
 
         //노드 복사를 위한 가상의 그룹노드
-        tempNode = me.drawShape([left + width / 2, top + height / 2], subShape, [width, height], subStyle, subShapeId, true);
+        if (subShape instanceof OG.shape.EdgeShape) {
+            tempNode = me.drawShape(null, subShape, null, subStyle, subShapeId, true);
+        } else {
+            tempNode = me.drawShape([left + width / 2, top + height / 2], subShape, [width, height], subStyle, subShapeId, true);
+        }
 
         //z-index 에 따라 tempNodes 에 인서트한다.
         //zIndex 가 없거나 0 이면 0 이다.
