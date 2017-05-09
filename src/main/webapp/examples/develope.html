@@ -327,7 +327,7 @@
             });
 
             canvas.onLoading(function (event, progress) {
-                console.log(progress);
+
             });
 
 //            canvas.fastLoadingON();
@@ -355,33 +355,38 @@
 
 
             var dataTable = new OG.DataTable();
-            var data = [];
-            for(var i = 0 ; i < 100; i++){
-                data.push({
-                    name: "유엔진 솔루션즈" + i,
-                    email: "sppark@uengine.org",
-                    phone: "*82 10 4034 1807",
-                    accountBalance: 15,
-                    accountCBA: 30
-                })
-            }
+            var data = [
+                {
+                    activity: 'FUNCTION'
+                },
+                {
+                    activity: '견적',
+                    '90' : 'ITB 배포'
+                },
+                {
+                    activity: '견적',
+                    '80' : 'Plant Configuration'
+                }
+            ];
             dataTable.setData(data);
             canvas.drawShape([100, 100], dataTable, [100, 100], {});
             dataTable.draw();
 
-            //var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
-            var cell = dataTable.getCellFromTableIndex(0,1);
-            dataTable.updateCell(cell, 'sdfsdf', null, true);
+//            var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 30], {});
+//            var cell = dataTable.getCellFromTableIndex(0,1);
+//            dataTable.updateCell(cell, rect1);
+
+            //dataTable.updateCell(cell, 'sdfsdf', null, true);
 
 //            setTimeout(function () {
-//                dataTable.updateCell(cell, 'sdfsdf', null);
+//                dataTable.updateCell(cell, 'sdfsdf', null ,true);
 //            },3000);
 
 
-            setTimeout(function () {
-                dataTable.emptyCell(cell, true);
-                console.log(dataTable.getCellInformation(cell));
-            },3000);
+//            setTimeout(function () {
+//                dataTable.emptyCell(cell);
+//                dataTable.updateCell(cell, 'sdfsdf', null, true);
+//            },3000);
 
 
             //var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});

@@ -1794,8 +1794,8 @@ OG.graph.Canvas.prototype = {
      *
      * @param {Element|String} element Element 또는 ID
      */
-    removeShape: function (element) {
-        this._RENDERER.removeShape(element);
+    removeShape: function (element, preventEvent) {
+        this._RENDERER.removeShape(element, preventEvent);
     }
     ,
 

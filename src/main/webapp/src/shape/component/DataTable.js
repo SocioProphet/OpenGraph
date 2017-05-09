@@ -9,6 +9,7 @@ OG.shape.component.DataTable = function () {
     this.CONNECT_CLONEABLE = false;
     this.LABEL_EDITABLE = false;
     this.CONNECTABLE = false;
+    this.RESIZABLE = false;
 
 
     /**
@@ -19,6 +20,59 @@ OG.shape.component.DataTable = function () {
      */
     this.OPTION_CHANGE = true;
 
+
+    var renderer = function (value) {
+        if (!value) {
+            return null;
+        }
+        return {
+            /**
+             * 도형 shape
+             */
+            shape: new OG.A_Task(value),
+            'shape-position': {
+                /**
+                 * 도형 가로 (number,px,%)
+                 */
+                width: '80px',
+                /**
+                 * 도형 세로 (number,px,%)
+                 */
+                height: '40px',
+                /**
+                 * 좌측으로 부터 위치값. (number,px,%)
+                 */
+                left: '0',
+                /**
+                 * 상단으로 부터 위치값. (number,px,%)
+                 */
+                top: '0',
+                /**
+                 * 우측으로 부터 위치값. (number,px,%)
+                 */
+                right: '0',
+                /**
+                 * 하단으로 부터 위치값. (number,px,%)
+                 */
+                bottom: '0',
+                /**
+                 * 가로 정렬 (left,center,right).
+                 */
+                align: 'center',
+                /**
+                 * 세로 정렬 (top,middle,bottom)
+                 */
+                'vertical-align': 'middle'
+            },
+            /**
+             * 도형 스타일
+             */
+            'shape-style': {
+                'fill': '#59cac9',
+                'fill-opacity': 1
+            }
+        }
+    }
 
     //옵션데이터
     this.options = {
@@ -33,7 +87,7 @@ OG.shape.component.DataTable = function () {
         /**
          * 디폴트 칼럼 높이
          */
-        columnHeight: 25,
+        columnHeight: 30,
         /**
          * 디폴트 칼럼 가로폭
          */
@@ -79,14 +133,6 @@ OG.shape.component.DataTable = function () {
             'border-bottom': {
                 'stroke': '#abaaad',
                 'stroke-width': '1'
-            },
-            'border-right': {
-                'stroke': '#616063',
-                'stroke-width': '4'
-            },
-            'border-left': {
-                'stroke': '#abaaad',
-                'stroke-width': '1'
             }
         },
         /**
@@ -97,11 +143,11 @@ OG.shape.component.DataTable = function () {
                 /**
                  * 데이터 필드 이름
                  */
-                data: 'name',
+                data: 'activity',
                 /**
                  * 칼럼 타이틀
                  */
-                title: 'NAME',
+                title: '주요 Activity\n일정(D day)',
                 /**
                  * 디폴트 컨텐츠
                  */
@@ -109,7 +155,7 @@ OG.shape.component.DataTable = function () {
                 /**
                  * 칼럼 너비
                  */
-                columnWidth: 120,
+                columnWidth: 100,
                 /**
                  * 칼럼 스타일
                  */
@@ -131,100 +177,55 @@ OG.shape.component.DataTable = function () {
                         'stroke': '#abaaad',
                         'stroke-width': '1'
                     }
-                },
-                /**
-                 * OG Element 렌더러
-                 */
-                renderer: function (value) {
-                    return {
-                        /**
-                         * 도형 shape
-                         */
-                        shape: new OG.Location(value),
-                        'shape-position': {
-                            /**
-                             * 도형 가로 (number,px,%)
-                             */
-                            width: '80%',
-                            /**
-                             * 도형 세로 (number,px,%)
-                             */
-                            height: '80%',
-                            /**
-                             * 좌측으로 부터 위치값. (number,px,%)
-                             */
-                            left: '0',
-                            /**
-                             * 상단으로 부터 위치값. (number,px,%)
-                             */
-                            top: '0',
-                            /**
-                             * 우측으로 부터 위치값. (number,px,%)
-                             */
-                            right: '0',
-                            /**
-                             * 하단으로 부터 위치값. (number,px,%)
-                             */
-                            bottom: '0',
-                            /**
-                             * 가로 정렬 (left,center,right).
-                             */
-                            align: 'center',
-                            /**
-                             * 세로 정렬 (top,middle,bottom)
-                             */
-                            'vertical-align': 'middle'
-                        },
-                        /**
-                         * 도형 스타일
-                         */
-                        'shape-style': {
-                            'fill': '#59cac9',
-                            'fill-opacity': 1
-                        }
-                    }
                 }
             },
             {
-                data: 'email',
-                title: 'EMAIL',
+                data: '90',
+                title: '견적 착수\n90',
                 defaultContent: '',
-                renderer: function (value) {
-                    return {
-                        /**
-                         * 도형 shape
-                         */
-                        shape: new OG.EdgeShape([10, 10], [30, 50]),
-                        'shape-position': {
-                            width: '50%',
-                            height: '50%',
-                            top: 5,
-                            left: 5
-                            //vertices: [['10%', '10%'], ['60%', '60%']]
-                        },
-                        /**
-                         * 도형 스타일
-                         */
-                        'shape-style': {
-                            'stroke': 'red'
-                        }
+                renderer: renderer
+            },
+            {
+                data: '85',
+                title: 'IRS\n85',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '80',
+                title: 'Ref.PJT 선정',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '78',
+                title: 'HBD\n78',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '75',
+                title: 'WBD\n75',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '70',
+                title: 'P&ID\n70',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '67',
+                title: 'Plot Plan\n67',
+                defaultContent: '',
+                cellStyle: {
+                    'border-right': {
+                        'stroke': '#abaaad',
+                        'stroke-width': '1'
                     }
-                }
-            },
-            {
-                data: 'phone',
-                title: 'PHONE',
-                defaultContent: ''
-            },
-            {
-                data: 'accountBalance',
-                title: 'BALANCE',
-                defaultContent: ''
-            },
-            {
-                data: 'accountCBA',
-                title: 'CREDIT',
-                defaultContent: ''
+                },
+                renderer: renderer
             }
         ]
     }
@@ -297,12 +298,13 @@ OG.shape.component.DataTable.prototype.copyCell = function (fromCell, toCell) {
 OG.shape.component.DataTable.prototype.updateCell = function (cell, content, shapePosition, ignoreRenderer) {
     var me = this;
     var data = me.getCellInformation(cell);
-    me.emptyCell(cell, false);
+    me.emptyCell(cell);
 
     //content 가 element 인 경우
-    if (me.currentCanvas.getRenderer().isShape(content)) {
+    if (content && content.nodeType == 1 && me.currentCanvas.getRenderer().isShape(content)) {
+        me.data.viewData.rows[data.rowIndex].cells[data.column]['shapeId'] = content.id;
         me.data.viewData.rows[data.rowIndex].cells[data.column]['shape-position'] = shapePosition;
-        me.drawCellContent(data.columnOption, cell, content);
+        me.drawCell(data.columnOption, null, data.cellIndex, data.rowIndex, data.rowDataIndex, ignoreRenderer);
     }
     //그 외의 경우는 데이터를 업데이트하고, cell 을 다시 그린다.
     else {
@@ -346,11 +348,11 @@ OG.shape.component.DataTable.prototype.getCellInformation = function (cell) {
  * @param cell OG.Cell
  * @param redraw {boolean} 셀을 다시 그리는 여부
  */
-OG.shape.component.DataTable.prototype.emptyCell = function (cell , redraw) {
+OG.shape.component.DataTable.prototype.emptyCell = function (cell) {
     var me = this;
     var data = me.getCellInformation(cell);
     if (data.contentElement) {
-        me.currentCanvas.removeShape(data.contentElement);
+        me.currentCanvas.removeShape(data.contentElement, true);
     }
 
     me.data.viewData.rows[data.rowIndex].cells[data.column]['shapeId'] = null;
@@ -361,9 +363,7 @@ OG.shape.component.DataTable.prototype.emptyCell = function (cell , redraw) {
 
     me.data.tableData[data.rowDataIndex][data.column] = null;
 
-    if(redraw){
-        me.drawCell(data.columnOption, null, data.cellIndex, data.rowIndex, data.rowDataIndex, 'saved');
-    }
+    me.drawCell(data.columnOption, null, data.cellIndex, data.rowIndex, data.rowDataIndex, true);
 }
 
 /**
@@ -410,7 +410,10 @@ OG.shape.component.DataTable.prototype.draw = function () {
     //컨텐트 임의 교체 api. ok
     //컨텐트 임의 교체시, 셀뷰와 셀엘리먼트의 'shape-position' 는 기본적으로 초기화된다.ok
     //별도의 'shape-position' 를 줄 경우 등록된다. ok
-    //라벨 에디팅 시의 처리
+    //라벨 에디팅 시의 처리. ok
+
+    //콘텐트 강제 속성처리. ok
+    //콘텐트 삭제시 처리
 
     //테이블 내에서 콘텐트 이동 처리
 
@@ -501,7 +504,7 @@ OG.shape.component.DataTable.prototype.draw = function () {
     var currentWidth = boundary.getWidth();
     var currentHeight = boundary.getHeight();
     var expectWidth = startX - startP.x;
-    var expectHeight = startY - startP.y;
+    var expectHeight = nextY - startP.y;
     me.currentCanvas.resize(me.currentElement, [0, expectHeight - currentHeight, 0, expectWidth - currentWidth]);
 }
 
@@ -588,38 +591,19 @@ OG.shape.component.DataTable.prototype.getCellStyle = function (type, column, ro
  * 셀 내부의 컨텐츠를 그린다.
  * @param column
  * @param cellElement
- * @param existContentElement
+ * @param contentElement
+ * @param renderData
  * @returns {*}
  */
-OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellElement, existContentElement) {
+OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellElement, contentElement, renderData) {
     var me = this;
-    var contentElement = existContentElement;
     var rowIndex = cellElement.shape.data.dataTable.rowIndex;
-    var value = cellElement.shape.data.dataTable.value;
     var cellView = me.data.viewData.rows[rowIndex].cells[column.data];
-    var ignoreRenderer = cellElement.shape.data.dataTable.ignoreRenderer;
-
-    //렌더링 데이터 구하기.
-    var renderData;
-    //기존 콘텐트가 있을 경우, 셀 뷰데이터의 shape-position 으로 렌더데이터를 작성한다.
-    if (existContentElement) {
-        renderData = {
-            shape: existContentElement.shape,
-            'shape-position': cellView['shape-position']
-        }
-    }
-    //기존 콘텐트가 없고 ignoreRenderer 가 아닐경우, 컬럼 옵션의 renderer 를 기준으로 작성한다.
-    else if (!existContentElement && !ignoreRenderer && column.renderer) {
-        renderData = column.renderer(value);
-    } else {
-        return contentElement;
-    }
 
     //shapePosition 이 없을경우 빈 오브젝트
     if (!renderData['shape-position']) {
         renderData['shape-position'] = {}
     }
-
 
     var shapePosition = JSON.parse(JSON.stringify(renderData['shape-position']));
     var width = shapePosition.width;
@@ -803,9 +787,24 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
                 me.currentCanvas.toFront(contentElement);
             }
         }
+
+        //콘텐트 엘리먼트 속성을 설정한다.
+        if (renderShape.RESIZABLE ||
+            renderShape.COPYABLE ||
+            renderShape.CONNECT_CLONEABLE) {
+            renderShape.RESIZABLE = false;
+            renderShape.COPYABLE = false;
+            renderShape.CONNECT_CLONEABLE = false;
+            me.currentCanvas.getRenderer().redrawShape(contentElement);
+        }
     }
     //신규 콘텐트인 경우
     else {
+        //콘텐트 엘리먼트에 속성을 설정한다.
+        renderShape.RESIZABLE = false;
+        renderShape.COPYABLE = false;
+        renderShape.CONNECT_CLONEABLE = false;
+
         //Edge 이면서 vertices 로 표현하는 경우
         if (renderShape instanceof OG.shape.EdgeShape && vertices && vertices.length) {
             contentElement = me.currentCanvas.drawShape(
@@ -842,6 +841,12 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
         }
     }
 
+    //콘텐트 삭제시 처리
+    contentElement.shape.onRemoveShape = function () {
+        //이벤트 중복 발생함.
+        me.emptyCell(cellElement);
+    }
+
     //셀 뷰데이터를 꾸민다.
     cellView['shapeId'] = contentElement.id;
     cellView['shape-position'] = shapePosition;
@@ -851,7 +856,6 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
     cellElement.shape.data.dataTable['shape-position'] = shapePosition;
 
     //셀 데이터에 컨텐트포지션 데이터를 넣는다.
-    //drawCellContent 호출시 컨텐트 포지션을 바탕으로 렌더 데이터를 넣는다.
     return contentElement;
 }
 
@@ -867,6 +871,7 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
  * @return {*}
  */
 OG.shape.component.DataTable.prototype.drawCell = function (column, value, columnIndex, rowIndex, rowDataIndex, ignoreRenderer, startPosition) {
+
     var me = this;
     var cellIndex = columnIndex;
     var cellStyle = me.getCellStyle('cell', column, rowIndex, rowDataIndex);
@@ -876,13 +881,6 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
     var cellElement = null;
     var contentElement = null;
     var startX, startY;
-
-    //value 가 없는 경우, defaultContent 값으로 대체한다.
-    if (!value) {
-        if(column.defaultContent){
-            value = column.defaultContent;
-        }
-    }
 
     //존재하는 셀과 컨텐트 찾기
     var cells = me.data.viewData.rows[rowIndex].cells;
@@ -910,6 +908,53 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
         ignoreRenderer = false;
     }
 
+    //정리.
+    //이그노어는 렌더링 없이 value 를 바로 쓴다.
+    //이미 생성된 셀은 뷰데이터가 있고, 뷰의 컨텐트아이디와 렌더 데이터를 사용한다.
+    //이미 생성된 셀의 컨텐트 아이디가 없다면 value 를 바로 쓴다.
+    //처음 생성하는 셀은 렌더러를 돌린 후 결과 값으로, 렌더데이터인지, value 인지 확인한다.
+
+    //value 일 경우 라벨을 넣는다.
+    //렌더링일 경우 drawCellContent 로 넘긴다.
+
+    var textData = value;
+    var renderData;
+    var useRenderData = false;
+
+    //컨텐트 엘리먼트가 있는 경우는 ignoreRenderer 에 상관없이 컨텐트를 우선 표현한다.
+    if (contentElement) {
+        renderData = {
+            shape: contentElement.shape,
+            'shape-position': me.data.viewData.rows[rowIndex].cells[column.data]['shape-position']
+        }
+        useRenderData = true;
+    }
+    //컨텐트 엘리먼트가 없는 경우 렌더러가 있을 경우 표현한다. ignoreRenderer 일 경우는 무시한다.
+    else {
+        if (!ignoreRenderer) {
+            if (column.renderer) {
+                renderData = column.renderer(value);
+                //shape 를 반환하는 렌더러일 경우
+                if (renderData && renderData.shape && renderData.shape instanceof OG.IShape) {
+                    useRenderData = true;
+                }
+                //그 외의 경우는 반환된 renderData 를 그대로 쓴다.
+                else {
+                    textData = renderData;
+                }
+            }
+        }
+    }
+
+    //textData 가 없는 경우, defaultContent 값으로 대체한다.
+    if (!textData) {
+        if (column.defaultContent) {
+            textData = column.defaultContent;
+        } else {
+            textData = '';
+        }
+    }
+
     //기존 셀이 없다면 새로 생성한다.
     if (!cellElement) {
         //기존 도형이 없고 시작포지션이 지정되지 않으면 그릴 수 없음.
@@ -920,9 +965,9 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
         startY = startPosition[1];
         var shape;
 
-        //컨텐트 엘리먼트가 없을 경우, 렌더러를 사용하지 않거나 렌더러 클래스가 없는 경우 셀이 직접 value 를 표현한다.
-        if (!contentElement && (ignoreRenderer || !column.renderer)) {
-            shape = new OG.Cell(value);
+        //렌더 데이터를 사용하지 않는 경우 셀이 직접 value 를 표현한다.
+        if (!useRenderData) {
+            shape = new OG.Cell(textData);
         } else {
             shape = new OG.Cell();
         }
@@ -938,19 +983,16 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
     }
     //기존 셀이 있을 경우
     else {
-        //컨텐트 엘리먼트가 없을 경우, 렌더러를 사용하지 않거나 렌더러 클래스가 없는 경우 셀이 직접 value 를 표현한다.
-        if (!contentElement && (ignoreRenderer || !column.renderer)) {
-            if (value != cellElement.shape.label) {
-                cellElement.shape.label = value;
-                if(cellElement.shape.label == null){
-                    cellElement.shape.label = undefined;
-                }
+        //렌더 데이터를 사용하지 않는 경우 셀이 직접 value 를 표현한다.
+        if (!useRenderData) {
+            if (textData != cellElement.shape.label) {
+                cellElement.shape.label = textData;
                 me.currentCanvas.getRenderer().redrawShape(cellElement);
             }
         }
         //그 외의 경우는 셀 라벨이 표현되어서는 안된다.
-        else{
-            if(cellElement.shape.label){
+        else {
+            if (cellElement.shape.label) {
                 cellElement.shape.label = undefined;
                 me.currentCanvas.getRenderer().redrawShape(cellElement);
             }
@@ -1009,7 +1051,9 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
     me.data.viewData.rows[rowIndex].cells[column.data].ignoreRenderer = ignoreRenderer;
 
     //셀 콘텐트 꾸미기
-    me.drawCellContent(column, cellElement, contentElement);
+    if (useRenderData) {
+        me.drawCellContent(column, cellElement, contentElement, renderData);
+    }
 
     return cellElement;
 }
@@ -1177,6 +1221,15 @@ OG.shape.component.DataTable.prototype.onCellResize = function (cell, offset) {
     me.draw();
 }
 
+/**
+ * 셀의 라벨이 변경되었을 경우 처리
+ * @param text
+ * @param beforeText
+ */
+OG.shape.component.DataTable.prototype.onCellLabelChanged = function (cell, text, beforeText) {
+    this.updateCell(cell, text, null, true);
+}
+
 
 OG.shape.component.DataTable.prototype.createContextMenu = function () {
     var me = this;
@@ -1303,6 +1356,19 @@ OG.shape.component.Cell.prototype.onResize = function (offset) {
         var table = me.currentCanvas.getElementById(tableId);
         if (table) {
             table.shape.onCellResize(me.currentElement, offset);
+        }
+    }
+}
+
+OG.shape.component.Cell.prototype.onLabelChanged = function (text, beforeText) {
+    var me = this;
+    if (me.data && me.data.dataTable) {
+        var tableId = me.data.dataTable.tableId;
+        var table = me.currentCanvas.getElementById(tableId);
+        if (table) {
+            if (me.data.dataTable.type == 'cell') {
+                table.shape.onCellLabelChanged(me.currentElement, text, beforeText);
+            }
         }
     }
 }

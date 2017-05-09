@@ -2163,11 +2163,14 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
 
             // drawLabel event fire
             if (text !== undefined) {
+                element.shape.onDrawLabel(text);
                 $(this._PAPER.canvas).trigger('drawLabel', [element, text]);
+
             }
 
             if (text !== undefined && beforeText !== undefined && text !== beforeText) {
                 // labelChanged event fire
+                element.shape.onLabelChanged(text, beforeText);
                 $(this._PAPER.canvas).trigger('labelChanged', [element, text, beforeText]);
             }
         }
@@ -4163,15 +4166,22 @@ OG.renderer.RaphaelRenderer.prototype.alignTop = function () {
  * @param {Element|String} element Element 또는 ID
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
+OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEvent) {
     var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         childNodes, beforeEvent, i, removedElement;
     childNodes = rElement.node.childNodes;
 
     beforeEvent = jQuery.Event("beforeRemoveShape", {element: rElement.node});
-    $(this._PAPER.canvas).trigger(beforeEvent);
-    if (beforeEvent.isPropagationStopped()) {
-        return false;
+
+    if(!preventEvent){
+        var onBeforeRemoveShape = element.shape.onBeforeRemoveShape();
+        if(typeof onBeforeRemoveShape == 'boolean' && !onBeforeRemoveShape){
+            return false;
+        }
+        $(this._PAPER.canvas).trigger(beforeEvent);
+        if (beforeEvent.isPropagationStopped()) {
+            return false;
+        }
     }
 
     this.removeAllConnectGuide();
@@ -4188,10 +4198,15 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element) {
 
     removedElement = OG.Util.clone(rElement.node);
 
+    if(!preventEvent){
+        element.shape.onRemoveShape();
+    }
     this.remove(rElement.node);
 
     // removeShape event fire
-    $(this._PAPER.canvas).trigger('removeShape', [removedElement]);
+    if(!preventEvent){
+        $(this._PAPER.canvas).trigger('removeShape', [removedElement]);
+    }
 };
 
 /**

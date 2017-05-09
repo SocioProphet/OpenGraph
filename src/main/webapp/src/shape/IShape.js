@@ -216,7 +216,19 @@ OG.shape.IShape.prototype = {
     getData: function () {
         return this.data;
     },
-    onResize: function(element, offset){
+    onResize: function(offset){
+
+    },
+    onDrawLabel: function(text){
+
+    },
+    onLabelChanged: function(text, beforeText){
+
+    },
+    onBeforeRemoveShape: function(){
+
+    },
+    onRemoveShape: function(){
 
     }
 };
