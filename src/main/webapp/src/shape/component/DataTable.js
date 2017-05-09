@@ -22,54 +22,141 @@ OG.shape.component.DataTable = function () {
 
 
     var renderer = function (value) {
-        if (!value) {
-            return null;
+        if (!value || !value.type || !value.value) {
+            return value;
         }
-        return {
-            /**
-             * 도형 shape
-             */
-            shape: new OG.A_Task(value),
-            'shape-position': {
+
+        if (value.type == 'activity') {
+            return {
                 /**
-                 * 도형 가로 (number,px,%)
+                 * 도형 shape
                  */
-                width: '80px',
+                shape: new OG.A_Task(value.value),
+                'shape-position': {
+                    /**
+                     * 도형 가로 (number,px,%)
+                     */
+                    width: '80px',
+                    /**
+                     * 도형 세로 (number,px,%)
+                     */
+                    height: '38px',
+                    /**
+                     * 좌측으로 부터 위치값. (number,px,%)
+                     */
+                    left: '0',
+                    /**
+                     * 상단으로 부터 위치값. (number,px,%)
+                     */
+                    top: '0',
+                    /**
+                     * 우측으로 부터 위치값. (number,px,%)
+                     */
+                    right: '0',
+                    /**
+                     * 하단으로 부터 위치값. (number,px,%)
+                     */
+                    bottom: '0',
+                    /**
+                     * 가로 정렬 (left,center,right).
+                     */
+                    align: 'center',
+                    /**
+                     * 세로 정렬 (top,middle,bottom)
+                     */
+                    'vertical-align': 'middle'
+                },
                 /**
-                 * 도형 세로 (number,px,%)
+                 * 도형 스타일
                  */
-                height: '40px',
-                /**
-                 * 좌측으로 부터 위치값. (number,px,%)
-                 */
-                left: '0',
-                /**
-                 * 상단으로 부터 위치값. (number,px,%)
-                 */
-                top: '0',
-                /**
-                 * 우측으로 부터 위치값. (number,px,%)
-                 */
-                right: '0',
-                /**
-                 * 하단으로 부터 위치값. (number,px,%)
-                 */
-                bottom: '0',
-                /**
-                 * 가로 정렬 (left,center,right).
-                 */
-                align: 'center',
-                /**
-                 * 세로 정렬 (top,middle,bottom)
-                 */
-                'vertical-align': 'middle'
-            },
-            /**
-             * 도형 스타일
-             */
-            'shape-style': {
-                'fill': '#59cac9',
-                'fill-opacity': 1
+                'shape-style': {
+                    'fill': '#fff',
+                    'fill-opacity': 1,
+                    'font-size': 9
+                }
+            }
+        }
+
+        if (value.type == 'doubleActivity') {
+            return {
+                shape: new OG.A_Task(value.value),
+                'shape-position': {
+                    width: '80px',
+                    height: '78px',
+                    top: '1px',
+                    align: 'center'
+                },
+                'shape-style': {
+                    'fill': '#f8f8f8',
+                    'fill-opacity': 1,
+                    'font-size': 9
+                }
+            }
+        }
+        if (value.type == 'horizontalActivity') {
+            return {
+                shape: new OG.A_Task(value.value),
+                'shape-position': {
+                    width: '160px',
+                    height: '38px',
+                    align: 'center',
+                    'vertical-align': 'middle'
+                },
+                'shape-style': {
+                    'fill': '#f8f8f8',
+                    'fill-opacity': 1,
+                    'font-size': 9
+                }
+            }
+        }
+        if (value.type == 'largeActivity') {
+            return {
+                shape: new OG.A_Task(value.value),
+                'shape-position': {
+                    width: '80px',
+                    height: '600px',
+                    align: 'center',
+                    'vertical-align': 'middle'
+                },
+                'shape-style': {
+                    'fill': '#f8f8f8',
+                    'fill-opacity': 1,
+                    'font-size': 9
+                }
+            }
+        }
+        if(value.type == 'report'){
+            var customShape = new OG.GeomShape();
+            customShape.label = value.value;
+            customShape.SHAPE_ID = 'OG.shape.PolygonReport';
+            customShape.createShape = function () {
+                if (this.geom) {
+                    return this.geom;
+                }
+                this.geom = new OG.geometry.Polygon([[50, 0], [250, 0], [200, 150], [0, 150], [50, 0]]);
+
+                this.geom.style = new OG.geometry.Style({
+                    'fill': '#fff',
+                    'fill-opacity': 1,
+                    'font-size': 9,
+                    'stroke' : '#000',
+                    'stroke-width' : '1'
+                });
+                return this.geom;
+            };
+            return {
+                shape: customShape,
+                'shape-position': {
+                    width: '100px',
+                    height: '68px',
+                    align: 'center',
+                    'vertical-align': 'middle'
+                },
+                'shape-style': {
+                    'fill': '#f8f8f8',
+                    'fill-opacity': 1,
+                    'font-size': 9
+                }
             }
         }
     }
@@ -79,7 +166,7 @@ OG.shape.component.DataTable = function () {
         /**
          * 페이지당 row 수
          */
-        pageLength: 15,
+        pageLength: 25,
         /**
          * 시작 페이지
          */
@@ -91,7 +178,7 @@ OG.shape.component.DataTable = function () {
         /**
          * 디폴트 칼럼 가로폭
          */
-        columnWidth: 100,
+        columnWidth: 140,
         /**
          * 디폴트 칼럼 스타일
          */
@@ -162,7 +249,7 @@ OG.shape.component.DataTable = function () {
                 columnStyle: {
                     'border-right': {
                         'stroke': '#616063',
-                        'stroke-width': '4'
+                        'stroke-width': '3'
                     }
                 },
                 /**
@@ -171,7 +258,7 @@ OG.shape.component.DataTable = function () {
                 cellStyle: {
                     'border-right': {
                         'stroke': '#616063',
-                        'stroke-width': '4'
+                        'stroke-width': '3'
                     },
                     'border-left': {
                         'stroke': '#abaaad',
@@ -198,26 +285,50 @@ OG.shape.component.DataTable = function () {
                 renderer: renderer
             },
             {
-                data: '78',
-                title: 'HBD\n78',
-                defaultContent: '',
-                renderer: renderer
-            },
-            {
                 data: '75',
-                title: 'WBD\n75',
+                title: 'HBD\n75',
                 defaultContent: '',
                 renderer: renderer
             },
             {
                 data: '70',
-                title: 'P&ID\n70',
+                title: 'WBD\n70',
                 defaultContent: '',
                 renderer: renderer
             },
             {
-                data: '67',
-                title: 'Plot Plan\n67',
+                data: '65',
+                title: 'P&ID\n65',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '60',
+                title: 'P&ID\n60',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '55',
+                title: 'P&ID\n55',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '50',
+                title: 'P&ID\n50',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '45',
+                title: 'P&ID\n45',
+                defaultContent: '',
+                renderer: renderer
+            },
+            {
+                data: '40',
+                title: 'Plot Plan\n40',
                 defaultContent: '',
                 cellStyle: {
                     'border-right': {
@@ -413,7 +524,7 @@ OG.shape.component.DataTable.prototype.draw = function () {
     //라벨 에디팅 시의 처리. ok
 
     //콘텐트 강제 속성처리. ok
-    //콘텐트 삭제시 처리
+    //콘텐트 삭제시 처리. ok
 
     //테이블 내에서 콘텐트 이동 처리
 
@@ -846,6 +957,10 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
         //이벤트 중복 발생함.
         me.emptyCell(cellElement);
     }
+    //콘텐트 이동시 처리
+    contentElement.shape.onMoveShape = function () {
+
+    }
 
     //셀 뷰데이터를 꾸민다.
     cellView['shapeId'] = contentElement.id;
@@ -1020,6 +1135,8 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
     if (moveX != 0 || moveY != 0) {
         me.currentCanvas.move(cellElement, [moveX, moveY]);
     }
+    //셀은 테이블 내부에서 뒤로 이동시킨다.
+    me.currentElement.insertBefore(cellElement, OG.Util.isIE() ? me.currentElement.childNodes[0] : me.currentElement.children[0]);
 
     //셀 데이터 꾸미기
     if (!cellElement.shape.data) {
@@ -1143,6 +1260,9 @@ OG.shape.component.DataTable.prototype.drawColumn = function (column, columnInde
         cellId: columnElement.id
     }
 
+    //뒤로 이동
+    me.currentElement.insertBefore(columnElement, OG.Util.isIE() ? me.currentElement.childNodes[0] : me.currentElement.children[0]);
+
     return columnElement;
 }
 
@@ -1259,7 +1379,7 @@ OG.shape.component.Cell = function (label) {
     this.CONNECTABLE = false;
     this.DELETABLE = false;
     this.MOVABLE = false;
-    this.COPYABLE = false;
+    this.COPYABLE = true;
 };
 OG.shape.component.Cell.prototype = new OG.shape.GeomShape();
 OG.shape.component.Cell.superclass = OG.shape.GeomShape;
@@ -1371,5 +1491,9 @@ OG.shape.component.Cell.prototype.onLabelChanged = function (text, beforeText) {
             }
         }
     }
+}
+
+OG.shape.component.Cell.prototype.onPasteShape = function (copied, pasted) {
+    //console.log(copied, pasted);
 }
 

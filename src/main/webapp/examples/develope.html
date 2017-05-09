@@ -221,7 +221,7 @@
 
             // Canvas
             //canvas = new OG.Canvas('canvas', [1000, 800], 'transparent');
-            canvas = new OG.Canvas('canvas', [1000, 800], 'transparent');
+            canvas = new OG.Canvas('canvas', [2000, 800], 'transparent');
             //canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
             canvas._CONFIG.DEFAULT_STYLE.EDGE["edge-type"] = "plain";
             canvas._CONFIG.GUIDE_CONTROL_LINE_NUM = 1;
@@ -360,12 +360,87 @@
                     activity: 'FUNCTION'
                 },
                 {
-                    activity: '견적',
-                    '90' : 'ITB 배포'
+                    activity: '견적 TFT / EM',
+                    '90': {type: 'activity', value: 'ITB 배포'},
+                    '75': {type: 'activity', value: 'Reference PJT 선정'}
                 },
                 {
-                    activity: '견적',
-                    '80' : 'Plant Configuration'
+                    activity: '성능',
+                    '75': {type: 'activity', value: 'Plant Configuration'},
+                    '70': {type: 'activity', value: 'Performance Guideline'},
+                    '65': {type: 'activity', value: 'Plant HBD\n(보안문서)'}
+                },
+                {
+                    activity: '프로세스',
+                    '60': {type: 'doubleActivity', value: 'Utility\nConsumption\n취합'},
+                    '50': {type: 'doubleActivity', value: 'P&ID\nCalculation'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: '플랜트(보조기기)',
+                    '55': {type: 'activity', value: 'WBD'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: '플랜트(주기기)\nor STG,BLR BG',
+                    '75': {type: 'activity', value: 'MPS'},
+                    '70': {type: 'activity', value: 'GT data / STG\nHBD'},
+                    '65': {type: 'activity', value: 'BLR / HRSG\nPerformance\nData'},
+                    '60': {type: 'activity', value: 'Utility\nConsumption'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: '배관'
+                },
+                {
+                    activity: '배치',
+                    '40': {type: 'activity', value: 'Plot\nplan'}
+                },
+                {
+                    activity: '운반',
+                    '85': {type: 'largeActivity', value: 'IRS\n&\nBIGS'},
+                    '80': {type: 'largeActivity', value: 'Devajtion\n&\nClarification'},
+                    '60': {type: 'activity', value: 'Utility\nConsumption'},
+                    '50': {type: 'activity', value: 'CHS & LHS\nFlowdagram'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: '수처리',
+                    '60': {type: 'activity', value: 'Utility\nConsumption'},
+                    '55': {type: 'activity', value: 'Conceptual\nDesign\nCalculation'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: 'HVAC',
+                    '60': {type: 'activity', value: 'Utility\nConsumption'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: 'Fire Fighting',
+                    '60': {type: 'activity', value: 'Utility\nConsumption'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: '전력',
+                    '60': {type: 'activity', value: 'Utility\nConsumption'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: '계측',
+                    '60': {type: 'activity', value: 'Utility\nConsumption'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: '건축',
+                    '40': {type: 'activity', value: 'Building list'}
+                },
+                {
+                    activity: '토목',
+                    '90': {type: 'report', value: 'SI Report\nPhotography\nStudy'},
+                    '50': {type: 'horizontalActivity', value: 'Coal Jetty Design\n Coal Storage Yard Design'}
+                },
+                {
+                    activity: ''
                 }
             ];
             dataTable.setData(data);
@@ -388,27 +463,6 @@
 //                dataTable.updateCell(cell, 'sdfsdf', null, true);
 //            },3000);
 
-
-            //var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
-//            var rect2 = canvas.drawShape([300, 300], new OG.RectangleShape(), [100, 100], {});
-//            var edge = canvas.connect(rect1,rect2);
-//            canvas.resizeBox(edge, [300,200]);
-//            canvas.moveCentroid(edge, [400,500]);
-//            canvas.setShapeStyle(shape,{
-//                'border-top': {
-//                    stroke: 'red'
-//                }
-//            })
-
-//            var table = new OG.DataTable();
-//            var element = canvas.drawShape([0, 0], table, [100, 100]);
-//            element.shape.draw();
-//            canvas.drawShape([200,100],new OG.DataTable('aaaa'), [100,100], null, element.id);
-//            console.log(element);
-            //position, shape, size, style, id, preventEvent
-
-            //var line = canvas.connect(aaa,bbb);
-            //canvas.drawLabel(line,'bbb');
 
         });
 
