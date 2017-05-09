@@ -123,6 +123,12 @@ OG.shape.IShape = function () {
      */
     this.LABEL_EDITABLE = true;
 
+    /**
+     * 복사 가능 여부
+     * @type {boolean}
+     */
+    this.COPYABLE = true;
+
 
     this.exceptionType = '';
 

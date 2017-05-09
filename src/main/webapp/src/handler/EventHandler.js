@@ -87,7 +87,6 @@ OG.handler.EventHandler.prototype = {
                     return;
                 }
 
-
                 if (element.shape.isCollapsed === false) {
                     // textarea
                     $(container).append("<textarea id='" + element.id + OG.Constants.LABEL_EDITOR_SUFFIX + "'></textarea>");
@@ -3933,7 +3932,9 @@ OG.handler.EventHandler.prototype = {
     copySelectedShape: function () {
         var me = this, root = me._RENDERER.getRootGroup(), selectedElement = [];
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, element) {
-            selectedElement.push(element);
+            if(element.shape.COPYABLE){
+                selectedElement.push(element);
+            }
         });
         $(root).data("copied", selectedElement);
     },

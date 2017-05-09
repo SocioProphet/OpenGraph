@@ -366,10 +366,25 @@
                 })
             }
             dataTable.setData(data);
-            var table = canvas.drawShape([100, 100], dataTable, [100, 100], {});
+            canvas.drawShape([100, 100], dataTable, [100, 100], {});
             dataTable.draw();
 
-//            var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
+            //var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
+            var cell = dataTable.getCellFromTableIndex(0,1);
+            dataTable.updateCell(cell, 'sdfsdf', null, true);
+
+//            setTimeout(function () {
+//                dataTable.updateCell(cell, 'sdfsdf', null);
+//            },3000);
+
+
+            setTimeout(function () {
+                dataTable.emptyCell(cell, true);
+                console.log(dataTable.getCellInformation(cell));
+            },3000);
+
+
+            //var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
 //            var rect2 = canvas.drawShape([300, 300], new OG.RectangleShape(), [100, 100], {});
 //            var edge = canvas.connect(rect1,rect2);
 //            canvas.resizeBox(edge, [300,200]);
