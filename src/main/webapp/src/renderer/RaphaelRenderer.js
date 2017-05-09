@@ -1423,14 +1423,15 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         me.putInnerShapeToPool(groupNode);
     }
 
-    // drawShape event fire
-    if (!preventEvent) {
-        $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
-    }
-
     //shape 에 현재 캔버스,엘리먼트 등록
     shape.currentElement = groupNode;
     shape.currentCanvas = this._CANVAS;
+
+    // drawShape event fire
+    if (!preventEvent) {
+        shape.onDrawShape();
+        $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
+    }
 
     return groupNode;
 };
@@ -2108,6 +2109,10 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
 
         // beforeLabelChange event fire
         if (text !== undefined && text !== beforeText) {
+            var onBeforeLabelChange = element.shape.onBeforeLabelChange(text, beforeText);
+            if (typeof onBeforeLabelChange == 'boolean' && !onBeforeLabelChange) {
+                return false;
+            }
             beforeEvent = jQuery.Event("beforeLabelChange", {
                 element: element,
                 afterText: text,
@@ -2358,6 +2363,7 @@ OG.renderer.RaphaelRenderer.prototype.redrawShape = function (element, excludeEd
     }
 
     // redrawShape event fire
+    element.shape.onRedrawShape();
     $(this._PAPER.canvas).trigger('redrawShape', [element]);
 
     return element;
@@ -2597,6 +2603,16 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
             _style["arrow-end"] = "block-wide-long";
         }
 
+        var onBeforeConnectShapeFrom = fromShape.shape.onBeforeConnectShape(edge, fromShape, toShape);
+        if (typeof onBeforeConnectShapeFrom == 'boolean' && !onBeforeConnectShapeFrom) {
+            this.remove(edge);
+            return null;
+        }
+        var onBeforeConnectShapeTo = toShape.shape.onBeforeConnectShape(edge, fromShape, toShape);
+        if (typeof onBeforeConnectShapeTo == 'boolean' && !onBeforeConnectShapeTo) {
+            this.remove(edge);
+            return null;
+        }
         beforeEvent = jQuery.Event("beforeConnectShape", {edge: edge, fromShape: fromShape, toShape: toShape});
         $(this._PAPER.canvas).trigger(beforeEvent);
         if (beforeEvent.isPropagationStopped()) {
@@ -2658,6 +2674,8 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
     if (fromShape && toShape) {
         // connectShape event fire
         if (!preventTrigger) {
+            fromShape.shape.onConnectShape(edge, fromShape, toShape);
+            toShape.shape.onConnectShape(edge, fromShape, toShape);
             $(this._PAPER.canvas).trigger('connectShape', [edge, fromShape, toShape]);
         }
     }
@@ -2716,6 +2734,8 @@ OG.renderer.RaphaelRenderer.prototype.disconnectOneWay = function (element, conn
 
     // disconnectShape event fire
     if (fromShape && toShape) {
+        fromShape.shape.onDisconnectShape(element, fromShape, toShape);
+        toShape.shape.onDisconnectShape(element, fromShape, toShape);
         $(this._PAPER.canvas).trigger('disconnectShape', [element, fromShape, toShape]);
     }
 };
@@ -2762,6 +2782,8 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
 
             // disconnectShape event fire
             if (fromShape && toShape) {
+                fromShape.shape.onDisconnectShape(element, fromShape, toShape);
+                toShape.shape.onDisconnectShape(element, fromShape, toShape);
                 $(this._PAPER.canvas).trigger('disconnectShape', [element, fromShape, toShape]);
             }
         } else {
@@ -2781,6 +2803,8 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
 
                     // disconnectShape event fire
                     if (fromShape && element) {
+                        fromShape.shape.onDisconnectShape(fromEdge, fromShape, element);
+                        element.shape.onDisconnectShape(fromEdge, fromShape, element);
                         $(me._PAPER.canvas).trigger('disconnectShape', [fromEdge, fromShape, element]);
                     }
 
@@ -2800,6 +2824,8 @@ OG.renderer.RaphaelRenderer.prototype.disconnect = function (element) {
 
                     // disconnectShape event fire
                     if (element && toShape) {
+                        element.shape.onDisconnectShape(toEdge, element, toShape);
+                        toShape.shape.onDisconnectShape(toEdge, element, toShape);
                         $(me._PAPER.canvas).trigger('disconnectShape', [toEdge, element, toShape]);
                     }
 
@@ -3714,244 +3740,6 @@ OG.renderer.RaphaelRenderer.prototype.removeRubberBand = function (root) {
     $(root).removeData("rubberBand");
 };
 
-//Loop Type 드로우
-
-OG.renderer.RaphaelRenderer.prototype.drawLoopType = function (element) {
-    //var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-    //    geometry = rElement ? rElement.node.shape.geom : null,
-    //    envelope, _upperLeft, _bBoxRect, _rect, _rect1, _lowerCenter,
-    //    _size = me._CONFIG.COLLAPSE_SIZE,
-    //    _hSize = _size / 2;
-    //
-    //_rect1 = this._getREleById(rElement.id + OG.Constants.LOOPTYPE_SUFFIX);
-    //if (_rect1) {
-    //    this._remove(_rect1);
-    //}
-    //
-    //envelope = geometry.getBoundary();
-    //_lowerCenter = envelope.getLowerCenter();
-    //
-    //switch (element.shape.LoopType) {
-    //    case "Standard":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/loop_standard.png", _lowerCenter.x - 10, _lowerCenter.y - 25, 20, 20);
-    //        break;
-    //
-    //    case "MIParallel":
-    //        _rect1 = this._PAPER.path(
-    //            "M" + (_lowerCenter.x - 15) + " " + (_lowerCenter.y - 15) +
-    //            "v" + 15 + "M" + (_lowerCenter.x - 10) + " " + (_lowerCenter.y - 15) +
-    //            "v" + 15 + "M" + (_lowerCenter.x - 5) + " " + (_lowerCenter.y - 15) + "v" + 15
-    //        );
-    //        break;
-    //
-    //    case "MISequential":
-    //        _rect1 = this._PAPER.path(
-    //            "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 15) +
-    //            "h" + 15 + "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 10) +
-    //            "h" + 15 + "M" + (_lowerCenter.x - 20) + " " + (_lowerCenter.y - 5) + "h" + 15
-    //        );
-    //        break;
-    //
-    //}
-    //this._add(_rect1, rElement.id + OG.Constants.LOOPTYPE_SUFFIX);
-    //_rect1.insertAfter(rElement);
-    //rElement.appendChild(_rect1);
-    //
-    //return null;
-};
-
-//Marker Draw
-
-OG.renderer.RaphaelRenderer.prototype.drawAttatchEvent = function (element) {
-
-};
-
-//TaskType 드로우
-
-OG.renderer.RaphaelRenderer.prototype.drawTaskType = function (element) {
-
-    //var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-    //    geometry = rElement ? rElement.node.shape.geom : null,
-    //    envelope, _upperLeft, _bBoxRect, _rect, _rect1,
-    //    _size = me._CONFIG.COLLAPSE_SIZE,
-    //    _hSize = _size / 2;
-    //
-    //_rect1 = this._getREleById(rElement.id + OG.Constants.TASKTYPE_SUFFIX);
-    //if (_rect1) {
-    //    this._remove(_rect1);
-    //}
-    //
-    //envelope = geometry.getBoundary();
-    //_upperLeft = envelope.getUpperLeft();
-    //
-    //switch (element.shape.TaskType) {
-    //    case "User":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/User.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //    case "Send":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/Send.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //    case "Receive":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/Receive.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //    case "Manual":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/Manual.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //    case "Service":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/Service.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //    case "BusinessRule":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/BusinessRule.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //    case "Script":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/Script.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //    case "Mapper":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/Mapper.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //    case "WebService":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/WebService.png", _upperLeft.x + 5, _upperLeft.y + 5, 20, 20);
-    //        break;
-    //
-    //}
-    //
-    //this._add(_rect1, rElement.id + OG.Constants.TASKTYPE_SUFFIX);
-    //_rect1.insertAfter(rElement);
-    //rElement.appendChild(_rect1);
-    //
-    //return null;
-};
-
-//Status 드로우
-
-OG.renderer.RaphaelRenderer.prototype.drawStatus = function (element) {
-    //var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-    //    geometry = rElement ? rElement.node.shape.geom : null,
-    //    envelope, _upperLeft, _bBoxRect, _upperRight, _rect, _rect1,
-    //    _size = me._CONFIG.COLLAPSE_SIZE,
-    //    _hSize = _size / 2;
-    //
-    //_rect1 = this._getREleById(rElement.id + OG.Constants.STATUS_SUFFIX);
-    //if (_rect1) {
-    //    this._remove(_rect1);
-    //}
-    //
-    //_rect = this._getREleById(rElement.id + OG.Constants.STATUS_SUFFIX + '_IMG');
-    //if (_rect) {
-    //    this._remove(_rect);
-    //}
-    //
-    //envelope = geometry.getBoundary();
-    //_upperRight = envelope.getUpperRight();
-    //
-    //switch (element.shape.status) {
-    //    case "Completed":
-    //        _rect1 = this._PAPER.image("resources/images/symbol/complete.png", _upperRight.x - 25, _upperRight.y + 5, 20, 20);
-    //        break;
-    //    case "Running":
-    //        _rect = this._PAPER.rect(envelope.getUpperLeft().x - 10, envelope.getUpperLeft().y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
-    //        _rect.attr("fill", "#C9E2FC");
-    //        _rect.attr("stroke-width", "0.2");
-    //        _rect.attr("r", "10");
-    //        _rect.attr("fill-opacity", "1");
-    //        _rect.attr("stroke-dasharray", "--");
-    //
-    //        _rect1 = this._PAPER.image("resources/images/symbol/running.png", _upperRight.x - 25, _upperRight.y + 5, 20, 20);
-    //        break;
-    //}
-    //
-    //if (element.shape.status == "Running") {
-    //    //애니메이션 프로퍼티는,
-    //    var animationRepeat = true;
-    //    var animationData =
-    //        [
-    //            {
-    //                start: {
-    //                    fill: 'white'
-    //                },
-    //                to: {
-    //                    fill: '#C9E2FC'
-    //                },
-    //                ms: 1000
-    //            },
-    //            {
-    //                start: {
-    //                    fill: '#C9E2FC'
-    //                },
-    //                to: {
-    //                    fill: 'white'
-    //                },
-    //                ms: 1000,
-    //                delay: 1000
-    //            }
-    //        ];
-    //    var maxDuration = 0;
-    //    var monitorAnimationIndex;
-    //    var delay, ms;
-    //    for (var i = 0; i < animationData.length; i++) {
-    //        ms = animationData[i].ms ? animationData[i].ms : 0;
-    //        delay = animationData[i].delay ? animationData[i].delay : 0;
-    //        if (maxDuration < ms + delay) {
-    //            maxDuration = ms + delay;
-    //            monitorAnimationIndex = i;
-    //        }
-    //    }
-    //
-    //    var startAnimation = function () {
-    //        for (var i = 0; i < animationData.length; i++) {
-    //            var ani;
-    //            if (i == monitorAnimationIndex && animationRepeat) {
-    //                ani = Raphael.animation(animationData[i].to, animationData[i].ms, startAnimation);
-    //                _rect.attr(animationData[i].start).animate(ani.delay(animationData[i].delay));
-    //            } else {
-    //                ani = Raphael.animation(animationData[i].to, animationData[i].ms);
-    //                _rect.attr(animationData[i].start).animate(ani.delay(animationData[i].delay));
-    //            }
-    //        }
-    //    };
-    //    startAnimation();
-    //}
-    //this._add(_rect1, rElement.id + OG.Constants.STATUS_SUFFIX);
-    //_rect1.insertAfter(rElement);
-    //rElement.appendChild(_rect1);
-    //
-    //if (_rect) {
-    //    this._add(_rect, rElement.id + OG.Constants.STATUS_SUFFIX + '_IMG');
-    //    _rect.insertAfter(rElement);
-    //    rElement.prependChild(_rect);
-    //}
-    //
-    //return null;
-};
-
-OG.renderer.RaphaelRenderer.prototype.drawCheckInclusion = function (element) {
-    //var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
-    //    geometry = rElement ? rElement.node.shape.geom : null,
-    //    envelope, _upperLeft, _bBoxRect, _rect,
-    //    _size = me._CONFIG.COLLAPSE_SIZE,
-    //    _hSize = _size / 2;
-    //
-    //_rect1 = this._getREleById(rElement.id + OG.Constants.INCLUSION_SUFFIX);
-    //if (_rect1) {
-    //    this._remove(_rect1);
-    //}
-    //
-    //envelope = geometry.getBoundary();
-    //_lowerRight = envelope.getLowerRight();
-    //
-    //_rect1 = this._PAPER.image("resources/images/symbol/complete.png", _lowerRight.x, _lowerRight.y - 20, 20, 20);
-    //
-    //this._add(_rect1, rElement.id + OG.Constants.INCLUSION_SUFFIX);
-    //_rect1.insertAfter(rElement);
-    //rElement.appendChild(_rect1);
-    //
-    //$(_rect1[0]).bind("click", function (event) {
-    //    $(rElement[0]).trigger("inclusionclick");
-    //});
-    //
-    //return null;
-};
-
 /**
  * ID에 해당하는 Element 의 Collapse 가이드를 제거한다.
  *
@@ -4006,6 +3794,9 @@ OG.renderer.RaphaelRenderer.prototype.group = function (elements) {
         }
 
         // group event fire
+        for (var c = 0, lenc = elements.length; c < lenc; c++) {
+            elements[c].shape.onGroup(groupShapeEle);
+        }
         $(this._PAPER.canvas).trigger('group', [groupShapeEle]);
     }
 
@@ -4032,6 +3823,9 @@ OG.renderer.RaphaelRenderer.prototype.ungroup = function (groupElements) {
         }
 
         // ungroup event fire
+        for (var c = 0, lenc = ungroupElements.length; c < lenc; c++) {
+            ungroupElements[c].shape.onUnGroup();
+        }
         $(this._PAPER.canvas).trigger('ungroup', [ungroupElements]);
     }
 
@@ -4173,9 +3967,9 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEv
 
     beforeEvent = jQuery.Event("beforeRemoveShape", {element: rElement.node});
 
-    if(!preventEvent){
+    if (!preventEvent) {
         var onBeforeRemoveShape = element.shape.onBeforeRemoveShape();
-        if(typeof onBeforeRemoveShape == 'boolean' && !onBeforeRemoveShape){
+        if (typeof onBeforeRemoveShape == 'boolean' && !onBeforeRemoveShape) {
             return false;
         }
         $(this._PAPER.canvas).trigger(beforeEvent);
@@ -4198,13 +3992,13 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEv
 
     removedElement = OG.Util.clone(rElement.node);
 
-    if(!preventEvent){
+    if (!preventEvent) {
         element.shape.onRemoveShape();
     }
     this.remove(rElement.node);
 
     // removeShape event fire
-    if(!preventEvent){
+    if (!preventEvent) {
         $(this._PAPER.canvas).trigger('removeShape', [removedElement]);
     }
 };
@@ -4625,6 +4419,7 @@ OG.renderer.RaphaelRenderer.prototype.move = function (element, offset, excludeE
             this.redrawShape(rElement.node, excludeEdgeId);
 
             // moveShape event fire
+            rElement.node.shape.onMoveShape(offset);
             $(this._PAPER.canvas).trigger('moveShape', [rElement.node, offset]);
 
             return rElement.node;
@@ -4635,6 +4430,7 @@ OG.renderer.RaphaelRenderer.prototype.move = function (element, offset, excludeE
         rElement.transform("...t" + offset[0] + "," + offset[1]);
 
         // moveShape event fire
+        rElement.node.shape.onMoveShape(offset);
         $(this._PAPER.canvas).trigger('moveShape', [rElement.node, offset]);
 
         return rElement.node;
@@ -4708,6 +4504,7 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle) {
         }
 
         // rotateShape event fire
+        rElement.node.shape.onRotateShape(angle);
         $(this._PAPER.canvas).trigger('rotateShape', [rElement.node, angle]);
 
         return rElement.node;
@@ -4715,6 +4512,7 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle) {
         rElement.rotate(angle);
 
         // rotateShape event fire
+        rElement.node.shape.onRotateShape(angle);
         $(this._PAPER.canvas).trigger('rotateShape', [rElement.node, angle]);
 
         return rElement.node;

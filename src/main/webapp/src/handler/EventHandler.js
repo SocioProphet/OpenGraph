@@ -1946,9 +1946,10 @@ OG.handler.EventHandler.prototype = {
                             }
                             if (isConnectable) {
                                 var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                                $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
-
                                 renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                                $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
+                                target.shape.onDuplicated(target, rectShape);
+                                rectShape.shape.onDuplicated(target, rectShape);
                             }
                         }
                     }
@@ -3973,7 +3974,6 @@ OG.handler.EventHandler.prototype = {
             avgX = avgX / (copiedElement.length);
             avgY = avgY / (copiedElement.length);
 
-            // TODO : 연결된 Shape 인 경우 연결성 유지토록
             $.each(copiedElement, function (idx, item) {
                 // copy
                 var boundary = item.shape.geom.getBoundary(), newShape, newElement, newGuide;
@@ -4149,6 +4149,7 @@ OG.handler.EventHandler.prototype = {
         var setPastedShapes = function (copied, selected) {
             copiedShapes.push(copied);
             pastedShapes.push(selected);
+            selected.shape.onPasteShape(copied, selected);
 
             if (renderer.isGroup(copied)) {
                 var copiedChilds = renderer.getChilds(copied);

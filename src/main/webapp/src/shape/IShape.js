@@ -216,19 +216,55 @@ OG.shape.IShape.prototype = {
     getData: function () {
         return this.data;
     },
-    onResize: function(offset){
+    onResize: function (offset) {
 
     },
-    onDrawLabel: function(text){
+    onDrawLabel: function (text) {
 
     },
-    onLabelChanged: function(text, beforeText){
+    onLabelChanged: function (text, beforeText) {
 
     },
-    onBeforeRemoveShape: function(){
+    onBeforeRemoveShape: function () {
 
     },
-    onRemoveShape: function(){
+    onRemoveShape: function () {
+
+    },
+    onDrawShape: function () {
+
+    },
+    onBeforeLabelChange: function () {
+
+    },
+    onRedrawShape: function () {
+
+    },
+    onBeforeConnectShape: function (edge, fromShape, toShape) {
+
+    },
+    onConnectShape: function (edge, fromShape, toShape) {
+
+    },
+    onDisconnectShape: function(edge, fromShape, toShape){
+
+    },
+    onGroup: function(groupShapeEle){
+
+    },
+    onUnGroup: function(){
+
+    },
+    onMoveShape: function(offset){
+
+    },
+    onRotateShape: function(angle){
+
+    },
+    onDuplicated: function(target, duplicated){
+
+    },
+    onPasteShape: function(copied, pasted){
 
     }
 };
