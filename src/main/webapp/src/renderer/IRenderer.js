@@ -1179,7 +1179,7 @@ OG.renderer.IRenderer.prototype = {
     },
 
     /**
-     * 그룹의 Shape 인지 반환한다. RootGroup 일 경우는 제외.
+     * 그룹 Shape 인지 반환한다. RootGroup 일 경우는 제외.
      *
      * @param {Element} element  엘리먼트
      * @return {boolean} true false

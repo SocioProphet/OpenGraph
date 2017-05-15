@@ -3842,6 +3842,10 @@ OG.renderer.RaphaelRenderer.prototype.ungroup = function (groupElements) {
 OG.renderer.RaphaelRenderer.prototype.addToGroup = function (groupElement, elements) {
     for (var i = 0, leni = elements.length; i < leni; i++) {
         groupElement.appendChild(elements[i]);
+        if(groupElement.shape && groupElement.shape.onAddToGroup){
+            groupElement.shape.onAddToGroup(groupElement, elements[i]);
+        }
+        elements[i].shape.onAddToGroup(groupElement, elements[i]);
     }
 };
 
@@ -7400,4 +7404,56 @@ OG.renderer.RaphaelRenderer.prototype.offDropablePool = function () {
     var root = me.getRootGroup();
     $(root).data('newPool', false);
     $(root).data('poolInnderShape', []);
+};
+
+/**
+ * 주어진 element 를 가로,세로 만큼 이동하여 복사한다.
+ * @param {Element|String} element Element 또는 ID
+ * @param {Number[]} offset [가로, 세로]
+ */
+OG.renderer.RaphaelRenderer.prototype.copyShape = function(element, offset){
+    var me = this;
+    var handler = this._CANVAS._HANDLER;
+    // copy
+    var boundary = element.shape.geom.getBoundary(), newShape, newElement, newGuide;
+    newShape = element.shape.clone();
+    if(!offset){
+        offset = [handler._CONFIG.COPY_PASTE_PADDING, handler._CONFIG.COPY_PASTE_PADDING];
+    }
+
+    if ($(element).attr("_shape") === OG.Constants.SHAPE_TYPE.EDGE) {
+        if (element.shape.geom instanceof OG.geometry.BezierCurve) {
+            newShape.geom = new OG.BezierCurve(element.shape.geom.getControlPoints());
+        } else {
+            newShape.geom = new OG.PolyLine(element.shape.geom.getVertices());
+        }
+        newShape.geom.style = element.shape.geom.style;
+        newShape.geom.move(offset[0], offset[1]);
+        newElement = me.drawShape(
+            null, newShape,
+            null, element.shapeStyle
+        );
+
+    } else {
+        newElement = me.drawShape(
+            [boundary.getCentroid().x + offset[0], boundary.getCentroid().y + offset[1]],
+            newShape, [boundary.getWidth(), boundary.getHeight()], element.shapeStyle
+        );
+    }
+    
+    // enable event
+    //newGuide = me.drawGuide(newElement);
+    handler.setClickSelectable(newElement, handler._isSelectable(newElement.shape));
+    handler.setMovable(newElement, handler._isMovable(newElement.shape));
+    handler.setConnectGuide(newElement, handler._isConnectable(newElement.shape));
+    handler.setResizable(newElement, newGuide, handler._isResizable(newElement.shape));
+    handler.setConnectable(newElement, newGuide, handler._isConnectable(newElement.shape));
+
+    if (handler._isLabelEditable(newElement.shape)) {
+        handler.enableEditLabel(newElement);
+    }
+
+    // copy children
+    handler._copyChildren(element, newElement);
+    return newElement;
 };

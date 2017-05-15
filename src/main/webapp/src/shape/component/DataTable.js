@@ -22,6 +22,9 @@ OG.shape.component.DataTable = function () {
 
 
     var renderer = function (value) {
+        if (value && value.text) {
+            return value.text;
+        }
         if (!value || !value.type || !value.value) {
             return value;
         }
@@ -125,27 +128,9 @@ OG.shape.component.DataTable = function () {
                 }
             }
         }
-        if(value.type == 'report'){
-            var customShape = new OG.GeomShape();
-            customShape.label = value.value;
-            customShape.SHAPE_ID = 'OG.shape.PolygonReport';
-            customShape.createShape = function () {
-                if (this.geom) {
-                    return this.geom;
-                }
-                this.geom = new OG.geometry.Polygon([[50, 0], [250, 0], [200, 150], [0, 150], [50, 0]]);
-
-                this.geom.style = new OG.geometry.Style({
-                    'fill': '#fff',
-                    'fill-opacity': 1,
-                    'font-size': 9,
-                    'stroke' : '#000',
-                    'stroke-width' : '1'
-                });
-                return this.geom;
-            };
+        if (value.type == 'report') {
             return {
-                shape: customShape,
+                shape: new OG.A_Task(value.value),
                 'shape-position': {
                     width: '100px',
                     height: '68px',
@@ -373,14 +358,31 @@ OG.shape.component.DataTable.prototype.createShape = function () {
     return this.geom;
 };
 
-
+/**
+ * 테이블의 옵션을 변경한다.
+ * @param options
+ */
 OG.shape.component.DataTable.prototype.setOptions = function (options) {
     if (options) {
         for (var key in options) {
             this.options[key] = options[key];
         }
+        this.OPTION_CHANGE = true;
     }
 }
+
+/**
+ * 테이블의 옵션을 반환한다.
+ * @return options
+ */
+OG.shape.component.DataTable.prototype.getOptions = function () {
+    return this.options;
+}
+
+/**
+ * 테이블의 데이터를 업데이트 한다.
+ * @param data
+ */
 OG.shape.component.DataTable.prototype.setData = function (data) {
     if (!this.data) {
         this.data = {};
@@ -389,39 +391,205 @@ OG.shape.component.DataTable.prototype.setData = function (data) {
 }
 
 /**
- * 셀의 내용을 다른 셀로 복사한다.
+ * 두개의 셀을 Edge 로 연결한다. 셀에 컨텐츠가 있을 경우만 기능한다.
+ *
+ * @param {Element} fromCell from Cell Element
+ * @param {Element} toCell to Cell Element
+ * @param {OG.geometry.Style|Object} style 스타일
+ * @param {String} label Label
+ * @param fromP fromElement 와 연결될 터미널 좌표 [x,y](optional)
+ * @param toP toElement 와 연결될 터미널 좌표 [x,y](optional)
+ * @param preventTrigger 참 일 경우 이벤트 발생을 방지
+ * @param id 연결선의 아이디
+ * @param {Element} edgeShape 이 값이 없으면 신규 OG.EdgeShape 를 생성
+ * @returns {*|Element}
+ */
+OG.shape.component.DataTable.prototype.connect = function (fromCell, toCell, style, label, fromP, toP, preventTrigger, id, edgeShape) {
+    var me = this;
+    var fromData = me.getCellInformation(fromCell);
+    var toData = me.getCellInformation(toCell);
+    if (fromData.contentElement && toData.contentElement) {
+        return me.currentCanvas.connect(fromData.contentElement, toData.contentElement, style, label, fromP, toP, preventTrigger, id, edgeShape);
+    } else {
+        return null;
+    }
+}
+
+/**
+ * 주어진 좌표를 포함하는 셀을 얻어온다.
+ */
+OG.shape.component.DataTable.prototype.getCellFromOffset = function (offset) {
+    var me = this;
+    var rows, cells, cell, expectCell, boundary;
+    rows = me.data.viewData.rows;
+    $.each(rows, function (index, row) {
+        cells = row.cells;
+        if (cells) {
+            for (var field in cells) {
+                cell = me.currentCanvas.getElementById(cells[field]['cellId']);
+                if (cell) {
+                    boundary = me.currentCanvas.getBoundary(cell);
+                    if (boundary.isContains(offset)) {
+                        expectCell = cell;
+                    }
+                }
+            }
+        }
+    })
+    return expectCell;
+}
+
+/**
+ * 컨텐트 엘리먼트로부터 셀을 얻어온다.
+ * @param contentElement
+ * @return OG.Cell
+ */
+OG.shape.component.DataTable.prototype.getCellFromContent = function (contentElement) {
+    var me = this;
+    var rows, cells, cell = null;
+    if (contentElement && contentElement.nodeType == 1 && me.currentCanvas.getRenderer().isShape(contentElement)) {
+        rows = me.data.viewData.rows;
+        cells = [];
+        $.each(rows, function (index, row) {
+            cells = row.cells;
+            if (cells) {
+                for (var field in cells) {
+                    if (cells[field]['shapeId'] == contentElement.id) {
+                        cell = me.currentCanvas.getElementById(cells[field]['cellId']);
+                    }
+                }
+            }
+        })
+    }
+    return cell;
+}
+
+/**
+ * 셀의 value 를 복사한다.
+ * @param fromCell
+ * @param toCell
+ * @return copyValue
+ */
+OG.shape.component.DataTable.prototype.copyCellValue = function (fromCell, toCell) {
+    var me = this;
+    var fromData = me.getCellInformation(fromCell);
+    var toData = me.getCellInformation(toCell);
+    var value = me.data.tableData[fromData.rowDataIndex][fromData.column];
+    if (typeof value == 'object') {
+        me.data.tableData[toData.rowDataIndex][toData.column] = JSON.parse(JSON.stringify(value));
+    } else {
+        me.data.tableData[toData.rowDataIndex][toData.column] = value;
+    }
+    return me.data.tableData[toData.rowDataIndex][toData.column];
+}
+
+/**
+ * 셀을 원상복귀하여 다시 그린다.
+ * @param cell
+ */
+OG.shape.component.DataTable.prototype.redrawCell = function (cell) {
+    var me = this;
+    var data = me.getCellInformation(cell);
+    me.drawCell(data.columnOption, data.value, null, data.cellIndex, data.rowIndex, data.rowDataIndex, 'saved');
+}
+
+/**
+ * 셀을 잘라내기 하여, 다른 셀로 복사한다.
+ * @param fromCell
+ * @param toCell
+ */
+OG.shape.component.DataTable.prototype.cutAndPasteCell = function (fromCell, toCell) {
+    var me = this;
+    var fromData = me.getCellInformation(fromCell);
+    var fromText = fromData.text;
+
+    //value 복사
+    var copyValue = me.copyCellValue(fromCell, toCell);
+
+    //content 가 있을경우 content update
+    if (fromData.contentElement) {
+        var shapePosition = me.data.viewData.rows[fromData.rowIndex].cells[fromData.column]['shape-position'];
+        me.updateCell(toCell, copyValue, fromText, fromData.contentElement, shapePosition, true);
+    }
+    //content 가 없을경우 value update
+    //ignore 값을 어디서 보충하는지 => 이전의 셀에서 가져오기?
+    else {
+        me.updateCell(toCell, copyValue, fromText, null, null, true);
+    }
+    //기존 셀을 클리어한다.
+    me.emptyCell(fromCell, true);
+}
+
+/**
+ * 셀을 내용을 다른 셀로 복사한다.
  * value, cell 라벨, contentElement 와 그에 따른 shape-position 을 복사한다.
  * @param fromCell
  * @param toCell
  */
-OG.shape.component.DataTable.prototype.copyCell = function (fromCell, toCell) {
+OG.shape.component.DataTable.prototype.copyAndPasteCell = function (fromCell, toCell) {
+    var me = this;
+    var fromData = me.getCellInformation(fromCell);
+    var fromText = fromData.text;
 
+    //value 복사
+    var copyValue = me.copyCellValue(fromCell, toCell);
+
+    //content 가 있을경우
+    if (fromData.contentElement) {
+        var shapePosition = me.data.viewData.rows[fromData.rowIndex].cells[fromData.column]['shape-position'];
+        var copyElement = me.currentCanvas.getRenderer().copyShape(fromData.contentElement, [0, 0]);
+        me.updateCell(toCell, copyValue, fromText, copyElement, shapePosition, true);
+    }
+    //content 가 없을경우
+    else {
+        me.updateCell(toCell, copyValue, fromText, null, null, true);
+    }
 }
 
-
 /**
- * 셀의 내용을 주어진 Element 또는 text 로 교체한다.
+ * 셀의 내용을 주어진 value 와 Element 로 교체한다.
  * @param cell OG.Cell
- * @param content OG Element | string
- * @param shapePosition map 셀 내부 포지션 정보 optional
- * @param ignoreRenderer {boolean} 옵션의 칼럼 렌더러 사용 여부.
+ * @param value 업데이트 할 데이터 값
+ * @param text 셀 텍스트
+ * @param contentElement OG Element | string
+ * @param shapePosition 셀 내부 포지션 정보 optional
+ * @param ignoreRenderer {boolean} 옵션의 칼럼 렌더러를 무시하는 여부.
  */
-OG.shape.component.DataTable.prototype.updateCell = function (cell, content, shapePosition, ignoreRenderer) {
+OG.shape.component.DataTable.prototype.updateCell = function (cell, value, text, contentElement, shapePosition, ignoreRenderer) {
     var me = this;
     var data = me.getCellInformation(cell);
-    me.emptyCell(cell);
 
-    //content 가 element 인 경우
-    if (content && content.nodeType == 1 && me.currentCanvas.getRenderer().isShape(content)) {
-        me.data.viewData.rows[data.rowIndex].cells[data.column]['shapeId'] = content.id;
+    //contentElement 가 있는 경우
+    if (contentElement && contentElement.nodeType == 1 && me.currentCanvas.getRenderer().isShape(contentElement)) {
+
+        //업데이트 대상 셀을 초기화하되, 동일 컨텐트인 경우 컨텐트 삭제를 방지한다.
+        if (data.contentElement && data.contentElement.id == contentElement.id) {
+            me.emptyCell(cell, true);
+        } else {
+            me.emptyCell(cell);
+        }
+
+        //컨텐트의 addToGroup 을 실행시킴으로서 이전 테이블과의 연결고리가 있다면 끊도록 한다.
+        contentElement.shape.onAddToGroup(me.currentElement, contentElement);
+
+        //현재 테이블 내에서 컨텐트를 사용하는 셀을 조회하여, 존재한다면 초기화한다.
+        var beforeCell = me.getCellFromContent(contentElement);
+        if (beforeCell) {
+            me.emptyCell(beforeCell, true);
+        }
+
+        me.data.viewData.rows[data.rowIndex].cells[data.column]['shapeId'] = contentElement.id;
         me.data.viewData.rows[data.rowIndex].cells[data.column]['shape-position'] = shapePosition;
-        me.drawCell(data.columnOption, null, data.cellIndex, data.rowIndex, data.rowDataIndex, ignoreRenderer);
+        me.drawCell(data.columnOption, value, text, data.cellIndex, data.rowIndex, data.rowDataIndex, ignoreRenderer);
     }
-    //그 외의 경우는 데이터를 업데이트하고, cell 을 다시 그린다.
+    //그 외의 경우는 cell 의 내용을 삭제 후 다시 그린다.
     else {
-        me.data.tableData[data.rowDataIndex][data.column] = content;
-        me.drawCell(data.columnOption, content, data.cellIndex, data.rowIndex, data.rowDataIndex, ignoreRenderer);
+        me.emptyCell(cell);
+        me.drawCell(data.columnOption, value, text, data.cellIndex, data.rowIndex, data.rowDataIndex, ignoreRenderer);
     }
+
+    //데이터를 업데이트 한다.
+    me.data.tableData[data.rowDataIndex][data.column] = value;
 }
 
 /**
@@ -441,7 +609,9 @@ OG.shape.component.DataTable.prototype.updateCell = function (cell, content, sha
  *       tableId: "id",
  *       contentElement: OG Element
  *       shapeId: "id",
- *       'shape-position': {top , left, right, bottom, align, vertical-align, width, height, vertices}
+ *       'shape-position': {top , left, right, bottom, align, vertical-align, width, height, vertices},
+ *       ignoreRenderer : true,
+ *       text: "text"
  * }
  */
 OG.shape.component.DataTable.prototype.getCellInformation = function (cell) {
@@ -457,12 +627,12 @@ OG.shape.component.DataTable.prototype.getCellInformation = function (cell) {
 /**
  * 셀의 내용 및 데이터를 삭제한다.
  * @param cell OG.Cell
- * @param redraw {boolean} 셀을 다시 그리는 여부
+ * @param preventRemoveContent {boolean} 컨텐트 삭제 여부
  */
-OG.shape.component.DataTable.prototype.emptyCell = function (cell) {
+OG.shape.component.DataTable.prototype.emptyCell = function (cell, preventRemoveContent) {
     var me = this;
     var data = me.getCellInformation(cell);
-    if (data.contentElement) {
+    if (data.contentElement && !preventRemoveContent) {
         me.currentCanvas.removeShape(data.contentElement, true);
     }
 
@@ -474,7 +644,7 @@ OG.shape.component.DataTable.prototype.emptyCell = function (cell) {
 
     me.data.tableData[data.rowDataIndex][data.column] = null;
 
-    me.drawCell(data.columnOption, null, data.cellIndex, data.rowIndex, data.rowDataIndex, true);
+    me.drawCell(data.columnOption, null, null, data.cellIndex, data.rowIndex, data.rowDataIndex, true);
 }
 
 /**
@@ -492,12 +662,12 @@ OG.shape.component.DataTable.prototype.getColumnByField = function (field) {
 }
 
 /**
- * 현재 테이블의 row, cell 인덱스 값으로 cell 을 반환한다.
- * @param rowIndex
+ * 현재 테이블의 cell, row 인덱스 값으로 cell 을 반환한다.
  * @param cellIndex
+ * @param rowIndex
  * @return OG.Cell
  */
-OG.shape.component.DataTable.prototype.getCellFromTableIndex = function (rowIndex, cellIndex) {
+OG.shape.component.DataTable.prototype.getCellFromTableIndex = function (cellIndex, rowIndex) {
     var me = this;
     var column = me.options.columns[cellIndex];
     if (!column) {
@@ -511,6 +681,8 @@ OG.shape.component.DataTable.prototype.getCellFromTableIndex = function (rowInde
     var cellId = me.data.viewData.rows[rowIndex].cells[field].cellId;
     return me.currentCanvas.getElementById(cellId);
 }
+
+//row 삭제.
 
 OG.shape.component.DataTable.prototype.draw = function () {
     //TODO
@@ -526,12 +698,15 @@ OG.shape.component.DataTable.prototype.draw = function () {
     //콘텐트 강제 속성처리. ok
     //콘텐트 삭제시 처리. ok
 
-    //테이블 내에서 콘텐트 이동 처리
+    //테이블 내에서 콘텐트 이동 처리. ok
+    //테이블에 외부에서 드랍되었을 경우 콘텐트로 등록 처리. ok
+    //셀 복사시에 처리. ok
+    //셀 선 연결 처리. ok
+    //테이블 드래그 시 화면 처리. ok
+    //기존 콘텐트가 있으면 덮어쓰기가 안된다. ok
 
     //옵션 업데이트시 대응
     //페이지 api
-    //테이블에 외부에서 드랍되었을 경우 콘텐트로 등록 처리
-    //테이블 내에서 콘텐트 이동시 등록 처리
     //콘텐트 등록 api, row, cell api
     //http://tutorials.jenkov.com/svg/clip-path.html 클립패스를 사용하여 그리드 부분을 래핑하고, 스크롤을 구현할 것.
 
@@ -544,8 +719,11 @@ OG.shape.component.DataTable.prototype.draw = function () {
         throw new Error('No table data to render');
     }
 
-    //옵션이 변경된 경우, 신규 칼럼에 속하지 않은 도형들을 일괄삭제한다.
+    //옵션이 변경된 경우, 변경된 칼럼 리스트에 속하지 않은 셀과 콘텐트는 삭제한다.
+    //뷰 데이터가 ignoreRenderer 일 경우, 컨텐트가 있다면 그대로 둔다.
+    //ignoreRenderer 가 아닐경우, 렌더러에 맡기기 위해 컨텐트가 있다면 삭제한다.
     if (me.OPTION_CHANGE) {
+        me.OPTION_CHANGE = false;
 
     }
 
@@ -601,7 +779,7 @@ OG.shape.component.DataTable.prototype.draw = function () {
                 }
             }
 
-            cellElement = me.drawCell(columns[c], value, c, rowIndex, rowDataIndex, 'saved', [startX, startY]);
+            cellElement = me.drawCell(columns[c], value, null, c, rowIndex, rowDataIndex, 'saved', [startX, startY]);
             cellBoundary = me.currentCanvas.getBoundary(cellElement);
             //nextY 에는 다음 row 를 위한 값을 지정한다.
             nextY = startY + cellBoundary.getHeight();
@@ -900,11 +1078,7 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
         }
 
         //콘텐트 엘리먼트 속성을 설정한다.
-        if (renderShape.RESIZABLE ||
-            renderShape.COPYABLE ||
-            renderShape.CONNECT_CLONEABLE) {
-            renderShape.RESIZABLE = false;
-            renderShape.COPYABLE = false;
+        if (renderShape.CONNECT_CLONEABLE) {
             renderShape.CONNECT_CLONEABLE = false;
             me.currentCanvas.getRenderer().redrawShape(contentElement);
         }
@@ -912,7 +1086,7 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
     //신규 콘텐트인 경우
     else {
         //콘텐트 엘리먼트에 속성을 설정한다.
-        renderShape.RESIZABLE = false;
+        //renderShape.RESIZABLE = false;
         renderShape.COPYABLE = false;
         renderShape.CONNECT_CLONEABLE = false;
 
@@ -958,8 +1132,21 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
         me.emptyCell(cellElement);
     }
     //콘텐트 이동시 처리
-    contentElement.shape.onMoveShape = function () {
-
+    contentElement.shape.onAddToGroup = function (groupElement, element) {
+        //그룹이 소속된 테이블이 아닐 경우, 셀에 자신의 정보를 삭제한 후, 등록된 이벤트 핸들러들을 스스로 초기화시킨다.
+        if (groupElement.id != me.currentElement.id) {
+            if (cellElement) {
+                me.emptyCell(cellElement, true);
+                contentElement.shape.onRemoveShape = function () {
+                };
+                contentElement.shape.onAddToGroup = function () {
+                };
+            }
+        }
+    }
+    //콘텐트 리사이즈시 처리
+    contentElement.shape.onResize = function (offset) {
+        me.redrawCell(cellElement);
     }
 
     //셀 뷰데이터를 꾸민다.
@@ -978,6 +1165,7 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
  * 셀을 그린다.
  * @param column
  * @param value
+ * @param text
  * @param columnIndex
  * @param rowIndex
  * @param rowDataIndex
@@ -985,7 +1173,7 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
  * @param startPosition
  * @return {*}
  */
-OG.shape.component.DataTable.prototype.drawCell = function (column, value, columnIndex, rowIndex, rowDataIndex, ignoreRenderer, startPosition) {
+OG.shape.component.DataTable.prototype.drawCell = function (column, value, text, columnIndex, rowIndex, rowDataIndex, ignoreRenderer, startPosition) {
 
     var me = this;
     var cellIndex = columnIndex;
@@ -1023,16 +1211,7 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
         ignoreRenderer = false;
     }
 
-    //정리.
-    //이그노어는 렌더링 없이 value 를 바로 쓴다.
-    //이미 생성된 셀은 뷰데이터가 있고, 뷰의 컨텐트아이디와 렌더 데이터를 사용한다.
-    //이미 생성된 셀의 컨텐트 아이디가 없다면 value 를 바로 쓴다.
-    //처음 생성하는 셀은 렌더러를 돌린 후 결과 값으로, 렌더데이터인지, value 인지 확인한다.
 
-    //value 일 경우 라벨을 넣는다.
-    //렌더링일 경우 drawCellContent 로 넘긴다.
-
-    var textData = value;
     var renderData;
     var useRenderData = false;
 
@@ -1055,18 +1234,26 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
                 }
                 //그 외의 경우는 반환된 renderData 를 그대로 쓴다.
                 else {
-                    textData = renderData;
+                    text = renderData;
                 }
             }
         }
     }
 
-    //textData 가 없는 경우, defaultContent 값으로 대체한다.
-    if (!textData) {
-        if (column.defaultContent) {
-            textData = column.defaultContent;
-        } else {
-            textData = '';
+    //1. 렌더 데이터를 사용하는 경우 text 는 '' 이며, 렌더 데이터를 사용하지 않는 경우,
+    //2. text 가 없는 경우, value 값을 쓰며, value 가 없는 경우 defaultContent 값으로 대체한다.
+    if (useRenderData) {
+        text = ''
+    } else {
+        if (!text) {
+            text = value;
+        }
+        if (!text) {
+            if (column.defaultContent) {
+                text = column.defaultContent;
+            } else {
+                text = '';
+            }
         }
     }
 
@@ -1080,9 +1267,9 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
         startY = startPosition[1];
         var shape;
 
-        //렌더 데이터를 사용하지 않는 경우 셀이 직접 value 를 표현한다.
+        //렌더 데이터를 사용하지 않는 경우 셀이 직접 text 를 표현한다.
         if (!useRenderData) {
-            shape = new OG.Cell(textData);
+            shape = new OG.Cell(text);
         } else {
             shape = new OG.Cell();
         }
@@ -1098,10 +1285,10 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
     }
     //기존 셀이 있을 경우
     else {
-        //렌더 데이터를 사용하지 않는 경우 셀이 직접 value 를 표현한다.
+        //렌더 데이터를 사용하지 않는 경우 셀이 직접 text 를 표현한다.
         if (!useRenderData) {
-            if (textData != cellElement.shape.label) {
-                cellElement.shape.label = textData;
+            if (text != cellElement.shape.label) {
+                cellElement.shape.label = text;
                 me.currentCanvas.getRenderer().redrawShape(cellElement);
             }
         }
@@ -1136,7 +1323,11 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
         me.currentCanvas.move(cellElement, [moveX, moveY]);
     }
     //셀은 테이블 내부에서 뒤로 이동시킨다.
-    me.currentElement.insertBefore(cellElement, OG.Util.isIE() ? me.currentElement.childNodes[0] : me.currentElement.children[0]);
+    //테이블 path는 0 번째이므로 이므로 1로 이동
+    var firstChild = OG.Util.isIE() ? me.currentElement.childNodes[1] : me.currentElement.children[1];
+    if (firstChild.id != cellElement.id) {
+        me.currentElement.insertBefore(cellElement, OG.Util.isIE() ? me.currentElement.childNodes[1] : me.currentElement.children[1]);
+    }
 
     //셀 데이터 꾸미기
     if (!cellElement.shape.data) {
@@ -1150,6 +1341,7 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
     cellElement.shape.data.dataTable.cellIndex = cellIndex;
     cellElement.shape.data.dataTable.column = column.data;
     cellElement.shape.data.dataTable.value = value;
+    cellElement.shape.data.dataTable.text = text;
     cellElement.shape.data.dataTable.cellId = cellElement.id;
     cellElement.shape.data.dataTable.tableId = me.currentElement.id;
     cellElement.shape.data.dataTable.ignoreRenderer = ignoreRenderer;
@@ -1165,6 +1357,7 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, colum
     me.data.viewData.rows[rowIndex].cells[column.data].height = cellSize[1];
     me.data.viewData.rows[rowIndex].cells[column.data].cellId = cellElement.id;
     me.data.viewData.rows[rowIndex].cells[column.data].value = value;
+    me.data.viewData.rows[rowIndex].cells[column.data].text = text;
     me.data.viewData.rows[rowIndex].cells[column.data].ignoreRenderer = ignoreRenderer;
 
     //셀 콘텐트 꾸미기
@@ -1261,8 +1454,7 @@ OG.shape.component.DataTable.prototype.drawColumn = function (column, columnInde
     }
 
     //뒤로 이동
-    me.currentElement.insertBefore(columnElement, OG.Util.isIE() ? me.currentElement.childNodes[0] : me.currentElement.children[0]);
-
+    me.currentElement.insertBefore(columnElement, OG.Util.isIE() ? me.currentElement.childNodes[1] : me.currentElement.children[1]);
     return columnElement;
 }
 
@@ -1347,7 +1539,7 @@ OG.shape.component.DataTable.prototype.onCellResize = function (cell, offset) {
  * @param beforeText
  */
 OG.shape.component.DataTable.prototype.onCellLabelChanged = function (cell, text, beforeText) {
-    this.updateCell(cell, text, null, true);
+    this.updateCell(cell, text, text, null, null, true);
 }
 
 
@@ -1368,6 +1560,64 @@ OG.shape.component.DataTable.prototype.createContextMenu = function () {
     return this.contextMenu;
 };
 
+/**
+ * 어떠한 도형이 사용자의 행위로 테이블로 끌어당겨졌을 경우
+ * @param groupElement
+ * @param element
+ */
+OG.shape.component.DataTable.prototype.onAddToGroup = function (groupElement, element) {
+    //해당 엘리먼트가 등록된 셀을 조회한다.
+    //있다면, 기존셀에서 현재셀로 콘텐트를 이동한다.
+    //없다면, 신규 콘텐트로 등록한다.
+    var me = this;
+    var beforeCell;
+    var dropCell, dropCellData;
+    if (groupElement.id == me.currentElement.id) {
+        //콘텐트를 가지고 있던 기존 셀을 구한다.
+        beforeCell = me.getCellFromContent(element);
+
+        //콘텐트의 중심을 포함한 셀을 찾는다.
+        var centroid = me.currentCanvas.getBoundary(element).getCentroid();
+        dropCell = me.getCellFromOffset(centroid);
+
+        //드랍셀이 없고 이전 셀도 없다면 콘텐트를 테이블 밖으로 빼야 한다.
+        //이 경우는 외부에서 드랍되었는데 칼럼으로 떨어진 경우다.
+        if (!dropCell && !beforeCell) {
+            me.currentCanvas.addToGroup(me.currentCanvas.getRootGroup(), [element]);
+            return;
+        }
+        //드랍셀이 없고 이전 셀이 있다면 원복시킨다.
+        //이 경우는 테이블 내에서 이동시켰는데 칼럼으로 떨어진 경우다.
+        if (!dropCell && beforeCell) {
+            me.redrawCell(beforeCell);
+            return;
+        }
+
+        //드랍셀과 이전 셀이 있다면, cutAndPasteCell 처리한다.
+        //이 경우는 테이블 내에서 이동시켰을 경우이다.
+        if (dropCell && beforeCell) {
+            dropCellData = me.getCellInformation(dropCell);
+            if (dropCellData.contentElement) {
+                me.redrawCell(beforeCell);
+                return;
+            }
+            me.cutAndPasteCell(beforeCell, dropCell);
+            return;
+        }
+
+        //드랍셀만 있다면, updateCell 을 한다.
+        //이 경우는 외부에서 드랍되었을 경우이다.
+        if (dropCell && !beforeCell) {
+            dropCellData = me.getCellInformation(dropCell);
+            if (dropCellData.contentElement) {
+                me.redrawCell(beforeCell);
+                return;
+            }
+            me.updateCell(dropCell, element.shape.data, null, element, null, true);
+            return;
+        }
+    }
+}
 
 OG.shape.component.Cell = function (label) {
     OG.shape.component.Cell.superclass.call(this);
@@ -1494,6 +1744,6 @@ OG.shape.component.Cell.prototype.onLabelChanged = function (text, beforeText) {
 }
 
 OG.shape.component.Cell.prototype.onPasteShape = function (copied, pasted) {
-    //console.log(copied, pasted);
+
 }
 

@@ -908,6 +908,20 @@ OG.handler.EventHandler.prototype = {
         } else {
             renderer.setAttr(element, {cursor: me._isSelectable(element.shape) ? 'pointer' : me._CONFIG.DEFAULT_STYLE.SHAPE.cursor});
             OG.Util.apply(element.shape.geom.style.map, {cursor: me._isSelectable(element.shape) ? 'pointer' : me._CONFIG.DEFAULT_STYLE.SHAPE.cursor});
+
+            if(me._CONFIG.DRAG_PAGE_MOVABLE){
+                var container = me._RENDERER._CANVAS._CONTAINER;
+                $(element).bind("mousedown", function (event) {
+                    root = renderer.getRootGroup();
+                    var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
+                    var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
+                    if (isConnectMode === 'active' || isRectMode === 'active') {
+                        return;
+                    }
+                    $(root).data("dragPageMove", {x: event.pageX, y: event.pageY});
+                    $(root).data("dragPageScroll", {x: container.scrollLeft, y: container.scrollTop});
+                });
+            }
         }
     },
 
@@ -5014,11 +5028,6 @@ OG.handler.EventHandler.prototype = {
     _isConnectCloneable: function (shape) {
         var me = this;
         return me._CONFIG.CONNECT_CLONEABLE && shape.CONNECT_CLONEABLE;
-    },
-
-    _isConnectRequired: function (shape) {
-        var me = this;
-        return me._CONFIG.CONNECT_REQUIRED && shape.CONNECT_REQUIRED;
     },
 
     _isMovable: function (shape) {

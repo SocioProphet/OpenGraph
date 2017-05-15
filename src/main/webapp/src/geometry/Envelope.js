@@ -323,7 +323,7 @@ OG.geometry.Envelope.prototype = {
 	},
 
 	/**
-	 * 주어진 모든 좌표값이 Envelope 영역에 포함되는지 비교한다.
+	 * 몇개의 좌표값이 Envelope 영역에 포함되는지 비교한다.
 	 *
 	 * @param {OG.geometry.Coordinate[]} coordinateArray 좌표값 Array
 	 * @return {Boolean} true:포함, false:비포함
@@ -340,7 +340,7 @@ OG.geometry.Envelope.prototype = {
 	},
 
 	/**
-	 * 주어진 모든 좌표값이 Envelope 영역에 포함되는지 비교한다.
+	 * 주어진 좌표값들이 하나라도 Envelope 영역에 포함되는지 비교한다.
 	 *
 	 * @param {OG.geometry.Coordinate[]} coordinateArray 좌표값 Array
 	 * @return {Boolean} true:포함, false:비포함

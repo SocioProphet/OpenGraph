@@ -266,6 +266,9 @@ OG.shape.IShape.prototype = {
     },
     onPasteShape: function(copied, pasted){
 
+    },
+    onAddToGroup: function(groupElement, element){
+
     }
 };
 OG.shape.IShape.prototype.constructor = OG.shape.IShape;

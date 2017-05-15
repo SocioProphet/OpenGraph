@@ -168,11 +168,6 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         CONNECT_CLONEABLE: true,
 
         /**
-         * 드래그하여 연결시 연결대상 있는 경우에만 Edge 드로잉 처리 여부
-         */
-        CONNECT_REQUIRED: true,
-
-        /**
          * 드래그하여 연결시 그룹을 건너뛸때 스타일 변경 여부
          */
         CONNECT_STYLE_CHANGE: true,
@@ -839,7 +834,6 @@ OG.graph.Canvas.prototype = {
      * - connectable        : 연결 가능여부(디폴트 true)
      * - selfConnectable    : Self 연결 가능여부(디폴트 true)
      * - connectCloneable   : 드래그하여 연결시 대상 없을 경우 자동으로 Shape 복사하여 연결 처리 여부(디폴트 true)
-     * - connectRequired    : 드래그하여 연결시 연결대상 있는 경우에만 Edge 드로잉 처리 여부(디폴트 true)
      * - labelEditable      : 라벨 수정여부(디폴트 true)
      * - groupDropable      : 그룹핑 가능여부(디폴트 true)
      * - enableHotKey       : 핫키 가능여부(디폴트 true)
@@ -862,7 +856,6 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.CONNECTABLE = config.connectable === undefined ? this._CONFIG.CONNECTABLE : config.connectable;
             this._CONFIG.SELF_CONNECTABLE = config.selfConnectable === undefined ? this._CONFIG.SELF_CONNECTABLE : config.selfConnectable;
             this._CONFIG.CONNECT_CLONEABLE = config.connectCloneable === undefined ? this._CONFIG.CONNECT_CLONEABLE : config.connectCloneable;
-            this._CONFIG.CONNECT_REQUIRED = config.connectRequired === undefined ? this._CONFIG.CONNECT_REQUIRED : config.connectRequired;
             this._CONFIG.LABEL_EDITABLE = config.labelEditable === undefined ? this._CONFIG.LABEL_EDITABLE : config.labelEditable;
             this._CONFIG.GROUP_DROPABLE = config.groupDropable === undefined ? this._CONFIG.GROUP_DROPABLE : config.groupDropable;
             this._CONFIG.ENABLE_HOTKEY = config.enableHotKey === undefined ? this._CONFIG.ENABLE_HOTKEY : config.enableHotKey;

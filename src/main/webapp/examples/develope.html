@@ -357,7 +357,8 @@
             var dataTable = new OG.DataTable();
             var data = [
                 {
-                    activity: 'FUNCTION'
+                    activity: 'FUNCTION',
+                    '90': {text: 'CCC'}
                 },
                 {
                     activity: '견적 TFT / EM',
@@ -447,7 +448,53 @@
             canvas.drawShape([100, 100], dataTable, [100, 100], {});
             dataTable.draw();
 
+            $('#print-table').click(function(){
+                console.log(dataTable.data);
+            })
+
+            data = [
+                {
+                    activity: 'FUNCTION'
+                },
+                {
+                    activity: '성능',
+                    '75': {type: 'activity', value: 'Plant Configuration'},
+                    '70': {type: 'activity', value: 'Performance Guideline'},
+                    '65': {type: 'activity', value: 'Plant HBD\n(보안문서)'}
+                }
+            ];
+            //데이터 업데이트시, 기존 rows 들 및 ignoreRenderer 되었던 객체들을 삭제처리?
+            //문제는 row 들끼리 무엇이 변경되고 바뀌었는지 알아야 한다.
+            //간단하게는, setData 시에는 컨텐트와 ignoreRenderer 모두 초기화
+            //그럼, 재구성시 기존 Element, edge 는 모두 날아간다?
+            //1. 뷰데이터를 모두 삭제 => 기존 content 정보를 활용할 수 없다.
+            //우리가 아는 정보는, 액티비티 리스트와 y 값.
+            //데이터를 받아온 후, row 의 value 중 존재하는 데이터와 존재안하는 데이터 확인.
+            //칼럼 중 추가 칼럼과 삭제 칼럼을 확인
+            //컨텐트와 렌더러를 모두 초기화한다.
+            //개별적인 api 를 사용하도록 한다.
+            //개별적인 배정 정보를 사용하기 위해서, 개별적인 api 필요.
+            //칼럼 추가, 삭제
+            //rows 삭제.
+            //row 추가.
+            //clear.
+            //setData 시에는? 없는 row 는 삭제.
+
+            //dataTable.setData(data);
+            //dataTable.draw();
+
+
+//            var cell1 = dataTable.getCellFromTableIndex(1, 0);
+//            var cell2 = dataTable.getCellFromTableIndex(2, 0);
+//            dataTable.cutAndPasteCell(cell1, cell2);
+
+            //dataTable.updateCell(cell1, {type: 'activity', value: 'Plant Configuration'}, 'BBB', null, null, true);
+//            dataTable.connect(cell1, cell2);
+
+
 //            var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 30], {});
+//            canvas.setShapeStyle(rect1, {stroke : 'red'});
+//            canvas.getRenderer().copyShape(rect1, [300,10]);
 //            var cell = dataTable.getCellFromTableIndex(0,1);
 //            dataTable.updateCell(cell, rect1);
 
@@ -482,6 +529,7 @@
     <input type="button" value="redo" onclick="canvas.redo();"/>
     <input type="file" value="upload" id="backdoor-upload"/>
     <input type="button" value="update" id="backdoor-update"/>
+    <input type="button" value="table" id="print-table"/>
 </div>
 <div class="ui-layout-west">
     <div id="accordion">
