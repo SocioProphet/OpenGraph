@@ -4076,7 +4076,7 @@ window.Raphael.svg && function (R) {
                 }
                 if (type != "none") {
                     var pathId = "raphael-marker-" + type,
-                        markerId = "raphael-marker-" + se + type + w + h + p.id;
+                        markerId = "raphael-marker-" + se + type + w + h + p.id + "_"+(Math.floor(Math.random() * 100000) + 1);
                     if (!p.canvas.getElementById(pathId)) {
                         p.defs.appendChild($($("path"), {
                             "stroke-linecap": "round",
@@ -10906,7 +10906,7 @@ OG.shape.IShape = function () {
     this.ignoreExport = false;
 
     /**
-     * x,y 축만 이동 가능여부.
+     * x,y 축만 이동 가능여부. Y | N | none
      * @type {null}
      */
     this.AXIS = 'none';
@@ -22297,9 +22297,11 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEv
     beforeEvent = jQuery.Event("beforeRemoveShape", {element: rElement.node});
 
     if (!preventEvent) {
-        var onBeforeRemoveShape = element.shape.onBeforeRemoveShape();
-        if (typeof onBeforeRemoveShape == 'boolean' && !onBeforeRemoveShape) {
-            return false;
+        if(element.shape){
+            var onBeforeRemoveShape = element.shape.onBeforeRemoveShape();
+            if (typeof onBeforeRemoveShape == 'boolean' && !onBeforeRemoveShape) {
+                return false;
+            }
         }
         $(this._PAPER.canvas).trigger(beforeEvent);
         if (beforeEvent.isPropagationStopped()) {
@@ -22322,7 +22324,9 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEv
     removedElement = OG.Util.clone(rElement.node);
 
     if (!preventEvent) {
-        element.shape.onRemoveShape();
+        if(element.shape){
+            element.shape.onRemoveShape();
+        }
     }
     this.remove(rElement.node);
 
@@ -26603,7 +26607,7 @@ OG.handler.EventHandler.prototype = {
                     var conditionAnalysis = correctionConditionAnalysis(dx, dy);
                     if ('Y' == element.shape.AXIS) {
                         conditionAnalysis.dx = 0;
-                    } else if ('N' == element.shape.AXIS) {
+                    } else if ('X' == element.shape.AXIS) {
                         conditionAnalysis.dy = 0;
                     }
                     dx = me._grid(conditionAnalysis.dx, 'move');
@@ -26635,7 +26639,7 @@ OG.handler.EventHandler.prototype = {
                     var conditionAnalysis = correctionConditionAnalysis(dx, dy);
                     if ('Y' == element.shape.AXIS) {
                         conditionAnalysis.dx = 0;
-                    } else if ('N' == element.shape.AXIS) {
+                    } else if ('X' == element.shape.AXIS) {
                         conditionAnalysis.dy = 0;
                     }
                     dx = me._grid(conditionAnalysis.dx, 'move');

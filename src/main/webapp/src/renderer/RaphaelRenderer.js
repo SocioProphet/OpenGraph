@@ -3972,9 +3972,11 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEv
     beforeEvent = jQuery.Event("beforeRemoveShape", {element: rElement.node});
 
     if (!preventEvent) {
-        var onBeforeRemoveShape = element.shape.onBeforeRemoveShape();
-        if (typeof onBeforeRemoveShape == 'boolean' && !onBeforeRemoveShape) {
-            return false;
+        if(element.shape){
+            var onBeforeRemoveShape = element.shape.onBeforeRemoveShape();
+            if (typeof onBeforeRemoveShape == 'boolean' && !onBeforeRemoveShape) {
+                return false;
+            }
         }
         $(this._PAPER.canvas).trigger(beforeEvent);
         if (beforeEvent.isPropagationStopped()) {
@@ -3997,7 +3999,9 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEv
     removedElement = OG.Util.clone(rElement.node);
 
     if (!preventEvent) {
-        element.shape.onRemoveShape();
+        if(element.shape){
+            element.shape.onRemoveShape();
+        }
     }
     this.remove(rElement.node);
 

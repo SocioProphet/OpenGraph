@@ -324,6 +324,7 @@
 
             // Shape 이 Disconnect 되었을 때의 이벤트 리스너
             canvas.onDisconnectShape(function (event, edgeElement, fromElement, toElement) {
+
             });
 
             canvas.onLoading(function (event, progress) {
@@ -353,6 +354,236 @@
                 canvas.updateBackDoor(150, 0.7);
             });
 
+            var renderer = function (value) {
+                if (value && value.text) {
+                    return value.text;
+                }
+                if (!value || !value.type || !value.value) {
+                    return value;
+                }
+
+                if (value.type == 'activity') {
+                    return {
+                        /**
+                         * 도형 shape
+                         */
+                        shape: new OG.A_Task(value.value),
+                        'shape-position': {
+                            /**
+                             * 도형 가로 (number,px,%)
+                             */
+                            width: '80px',
+                            /**
+                             * 도형 세로 (number,px,%)
+                             */
+                            height: '38px',
+                            /**
+                             * 좌측으로 부터 위치값. (number,px,%)
+                             */
+                            left: '0',
+                            /**
+                             * 상단으로 부터 위치값. (number,px,%)
+                             */
+                            top: '0',
+                            /**
+                             * 우측으로 부터 위치값. (number,px,%)
+                             */
+                            right: '0',
+                            /**
+                             * 하단으로 부터 위치값. (number,px,%)
+                             */
+                            bottom: '0',
+                            /**
+                             * 가로 정렬 (left,center,right).
+                             */
+                            align: 'center',
+                            /**
+                             * 세로 정렬 (top,middle,bottom)
+                             */
+                            'vertical-align': 'middle'
+                        },
+                        /**
+                         * 도형 스타일
+                         */
+                        'shape-style': {
+                            'fill': '#fff',
+                            'fill-opacity': 1,
+                            'font-size': 9
+                        }
+                    }
+                }
+
+                if (value.type == 'doubleActivity') {
+                    return {
+                        shape: new OG.A_Task(value.value),
+                        'shape-position': {
+                            width: '80px',
+                            height: '78px',
+                            top: '1px',
+                            align: 'center'
+                        },
+                        'shape-style': {
+                            'fill': '#f8f8f8',
+                            'fill-opacity': 1,
+                            'font-size': 9
+                        }
+                    }
+                }
+                if (value.type == 'horizontalActivity') {
+                    return {
+                        shape: new OG.A_Task(value.value),
+                        'shape-position': {
+                            width: '160px',
+                            height: '38px',
+                            align: 'center',
+                            'vertical-align': 'middle'
+                        },
+                        'shape-style': {
+                            'fill': '#f8f8f8',
+                            'fill-opacity': 1,
+                            'font-size': 9
+                        }
+                    }
+                }
+                if (value.type == 'largeActivity') {
+                    return {
+                        shape: new OG.A_Task(value.value),
+                        'shape-position': {
+                            width: '80px',
+                            height: '600px',
+                            align: 'center',
+                            'vertical-align': 'middle'
+                        },
+                        'shape-style': {
+                            'fill': '#f8f8f8',
+                            'fill-opacity': 1,
+                            'font-size': 9
+                        }
+                    }
+                }
+                if (value.type == 'report') {
+                    return {
+                        shape: new OG.A_Task(value.value),
+                        'shape-position': {
+                            width: '100px',
+                            height: '68px',
+                            align: 'center',
+                            'vertical-align': 'middle'
+                        },
+                        'shape-style': {
+                            'fill': '#f8f8f8',
+                            'fill-opacity': 1,
+                            'font-size': 9
+                        }
+                    }
+                }
+            }
+
+            //옵션데이터
+            var options = {
+                columns: [
+                    {
+                        data: 'activity',
+                        title: '주요 Activity\n일정(D day)',
+                        defaultContent: '',
+                        columnWidth: 100,
+                        columnStyle: {
+                            'border-right': {
+                                'stroke': '#616063',
+                                'stroke-width': '3'
+                            }
+                        },
+                        cellStyle: {
+                            'border-right': {
+                                'stroke': '#616063',
+                                'stroke-width': '3'
+                            },
+                            'border-left': {
+                                'stroke': '#abaaad',
+                                'stroke-width': '1'
+                            }
+                        }
+                    },
+                    {
+                        data: '90',
+                        title: '견적 착수\n90',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '85',
+                        title: 'IRS\n85',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '80',
+                        title: 'Ref.PJT 선정',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '75',
+                        title: 'HBD\n75',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '70',
+                        title: 'WBD\n70',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '65',
+                        title: 'P&ID\n65',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '60',
+                        title: 'P&ID\n60',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '55',
+                        title: 'P&ID\n55',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '50',
+                        title: 'P&ID\n50',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '45',
+                        title: 'P&ID\n45',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '43',
+                        title: 'P&ID\n43',
+                        defaultContent: '',
+                        renderer: renderer
+                    },
+                    {
+                        data: '40',
+                        title: 'Plot Plan\n40',
+                        defaultContent: '',
+                        cellStyle: {
+                            'border-right': {
+                                'stroke': '#abaaad',
+                                'stroke-width': '1'
+                            }
+                        },
+                        renderer: renderer
+                    }
+                ]
+            }
 
             var dataTable = new OG.DataTable();
             var data = [
@@ -461,54 +692,35 @@
                     '75': {type: 'activity', value: 'Plant Configuration'},
                     '70': {type: 'activity', value: 'Performance Guideline'},
                     '65': {type: 'activity', value: 'Plant HBD\n(보안문서)'}
+                },
+                {
+                    activity: '플랜트(보조기기)',
+                    '55': {type: 'activity', value: 'WBD'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
+                },
+                {
+                    activity: '플랜트(주기기)\nor STG,BLR BG',
+                    '90': {type: 'activity', value: 'MPS'},
+                    '80': {type: 'activity', value: 'GT data / STG\nHBD'},
+                    '65': {type: 'activity', value: 'BLR / HRSG\nPerformance\nData'},
+                    '60': {type: 'activity', value: 'Utility\nConsumption'},
+                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
                 }
             ];
-            //데이터 업데이트시, 기존 rows 들 및 ignoreRenderer 되었던 객체들을 삭제처리?
-            //문제는 row 들끼리 무엇이 변경되고 바뀌었는지 알아야 한다.
-            //간단하게는, setData 시에는 컨텐트와 ignoreRenderer 모두 초기화
-            //그럼, 재구성시 기존 Element, edge 는 모두 날아간다?
-            //1. 뷰데이터를 모두 삭제 => 기존 content 정보를 활용할 수 없다.
-            //우리가 아는 정보는, 액티비티 리스트와 y 값.
-            //데이터를 받아온 후, row 의 value 중 존재하는 데이터와 존재안하는 데이터 확인.
-            //칼럼 중 추가 칼럼과 삭제 칼럼을 확인
-            //컨텐트와 렌더러를 모두 초기화한다.
-            //개별적인 api 를 사용하도록 한다.
-            //개별적인 배정 정보를 사용하기 위해서, 개별적인 api 필요.
-            //칼럼 추가, 삭제
-            //rows 삭제.
-            //row 추가.
-            //clear.
-            //setData 시에는? 없는 row 는 삭제.
 
-            //dataTable.setData(data);
-            //dataTable.draw();
+            var cell1 = dataTable.getCellFromTableIndex(1, 1);
+            var cell2 = dataTable.getCellFromTableIndex(4, 1);
+            var cell3 = dataTable.getCellFromTableIndex(4, 5);
+//
+            dataTable.connect(cell1, cell2);
+            dataTable.connect(cell3, cell1);
+//
+//            var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [60, 20], {});
+//            dataTable.updateCell(cell1, {type: 'activity', value: 'Plant Configuration'}, 'BBB', rect1, null, true);
 
-
-//            var cell1 = dataTable.getCellFromTableIndex(1, 0);
-//            var cell2 = dataTable.getCellFromTableIndex(2, 0);
-//            dataTable.cutAndPasteCell(cell1, cell2);
-
-            //dataTable.updateCell(cell1, {type: 'activity', value: 'Plant Configuration'}, 'BBB', null, null, true);
-//            dataTable.connect(cell1, cell2);
-
-
-//            var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 30], {});
-//            canvas.setShapeStyle(rect1, {stroke : 'red'});
-//            canvas.getRenderer().copyShape(rect1, [300,10]);
-//            var cell = dataTable.getCellFromTableIndex(0,1);
-//            dataTable.updateCell(cell, rect1);
-
-            //dataTable.updateCell(cell, 'sdfsdf', null, true);
-
-//            setTimeout(function () {
-//                dataTable.updateCell(cell, 'sdfsdf', null ,true);
-//            },3000);
-
-
-//            setTimeout(function () {
-//                dataTable.emptyCell(cell);
-//                dataTable.updateCell(cell, 'sdfsdf', null, true);
-//            },3000);
+//            dataTable.setData(data);
+//            dataTable.setOptions(options);
+//            dataTable.draw();
 
 
         });

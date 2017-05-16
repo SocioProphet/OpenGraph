@@ -4,21 +4,14 @@ OG.shape.component.DataTable = function () {
     this.SHAPE_ID = 'OG.shape.component.DataTable';
     this.options = {
         pageLength: 25,
-        currentPage: 1
+        currentPage: 1,
+        cellEditable: true,
+        axis : 'none'
     }
     this.CONNECT_CLONEABLE = false;
     this.LABEL_EDITABLE = false;
     this.CONNECTABLE = false;
     this.RESIZABLE = false;
-
-
-    /**
-     * 옵션 변경 여부. 옵션이 변경되었을 경우,
-     * 기존 엘리먼트중 신규 칼럼에 속하지 않은 엘리먼트는 모두 삭제한다.
-     * 처음 클래스가 로딩되었을 경우 true 값이다.
-     * @type {boolean}
-     */
-    this.OPTION_CHANGE = true;
 
 
     var renderer = function (value) {
@@ -148,6 +141,14 @@ OG.shape.component.DataTable = function () {
 
     //옵션데이터
     this.options = {
+        /**
+         * 셀 에디팅
+         */
+        cellEditable: false,
+        /**
+         * 셀 콘텐트 axis 무브
+         */
+        axis : 'X',
         /**
          * 페이지당 row 수
          */
@@ -367,7 +368,6 @@ OG.shape.component.DataTable.prototype.setOptions = function (options) {
         for (var key in options) {
             this.options[key] = options[key];
         }
-        this.OPTION_CHANGE = true;
     }
 }
 
@@ -512,7 +512,6 @@ OG.shape.component.DataTable.prototype.cutAndPasteCell = function (fromCell, toC
         me.updateCell(toCell, copyValue, fromText, fromData.contentElement, shapePosition, true);
     }
     //content 가 없을경우 value update
-    //ignore 값을 어디서 보충하는지 => 이전의 셀에서 가져오기?
     else {
         me.updateCell(toCell, copyValue, fromText, null, null, true);
     }
@@ -547,6 +546,97 @@ OG.shape.component.DataTable.prototype.copyAndPasteCell = function (fromCell, to
 }
 
 /**
+ * Cell 의 viewData 에 저장된 연결정보를 바탕으로 Cell 의 컨텐트에 Edge 를 재연결시킨다.
+ * @param cell
+ */
+OG.shape.component.DataTable.prototype.reconnectEdgesToContent = function (cell) {
+    var me = this;
+    var edge, shapeId, replace, fromTerminal, toTerminal, direction;
+    var data = me.getCellInformation(cell);
+    var connection = me.data.viewData.rows[data.rowDataIndex].cells[data.column]['connection'];
+    if (connection && connection.length && data.contentElement) {
+        for (var i = 0, leni = connection.length; i < leni; i++) {
+            edge = me.currentCanvas.getElementById(connection[i].edgeId);
+            fromTerminal = connection[i].from;
+            toTerminal = connection[i].to;
+            direction = connection[i].direction;
+
+            if (!edge) {
+                continue;
+            }
+            if (direction == 'from') {
+                shapeId = fromTerminal.substring(0, fromTerminal.indexOf(OG.Constants.TERMINAL));
+                replace = fromTerminal.replace(shapeId, data.contentElement.id);
+                me.currentCanvas.getRenderer().connect(replace, toTerminal, edge, null, null, true);
+            }
+            if (direction == 'to') {
+                shapeId = toTerminal.substring(0, toTerminal.indexOf(OG.Constants.TERMINAL));
+                replace = toTerminal.replace(shapeId, data.contentElement.id);
+                me.currentCanvas.getRenderer().connect(fromTerminal, replace, edge, null, null, true);
+            }
+        }
+        me.data.viewData.rows[data.rowDataIndex].cells[data.column]['connection'] = [];
+    } else if (connection && connection.length && !data.contentElement) {
+        for (var i = 0, leni = connection.length; i < leni; i++) {
+            edge = me.currentCanvas.getElementById(connection[i].edgeId);
+            if (edge) {
+                me.currentCanvas.removeShape(edge, true);
+            }
+        }
+    }
+}
+
+/**
+ * Cell 의 콘텐트와 연결된 Edge 를 연결 해제하고, 재연결 정보를 viewData 에 저장한다.
+ * @param cell
+ */
+OG.shape.component.DataTable.prototype.keepEdgesFromContent = function (cell) {
+    var me = this;
+    var data = me.getCellInformation(cell);
+    var edge, fromShape, toShape, fromXY, toXY;
+    if (data.contentElement) {
+        var prevEdges = me.currentCanvas.getPrevEdges(data.contentElement);
+        var nextEdges = me.currentCanvas.getNextEdges(data.contentElement);
+        var edges = prevEdges.concat(nextEdges);
+        for (var i = 0, leni = edges.length; i < leni; i++) {
+            edge = edges[i];
+            var fromTerminal = $(edge).attr("_from");
+            var toTerminal = $(edge).attr("_to");
+            var direction;
+
+            if (fromTerminal) {
+                fromShape = me.currentCanvas.getRenderer()._getShapeFromTerminal(fromTerminal);
+                fromXY = me.currentCanvas.getRenderer()._getPositionFromTerminal(fromTerminal);
+                if (fromShape && fromShape.id == data.contentElement.id) {
+                    me.currentCanvas.getRenderer().disconnectOneWay(edge, 'from');
+                    direction = 'from';
+                }
+            }
+
+            if (toTerminal) {
+                toShape = me.currentCanvas.getRenderer()._getShapeFromTerminal(toTerminal);
+                toXY = me.currentCanvas.getRenderer()._getPositionFromTerminal(toTerminal);
+                if (toShape && toShape.id == data.contentElement.id) {
+                    me.currentCanvas.getRenderer().disconnectOneWay(edge, 'to');
+                    direction = 'to';
+                }
+            }
+            if (!me.data.viewData.rows[data.rowDataIndex].cells[data.column]['connection']) {
+                me.data.viewData.rows[data.rowDataIndex].cells[data.column]['connection'] = [];
+            }
+
+            var connection = me.data.viewData.rows[data.rowDataIndex].cells[data.column]['connection'];
+            connection.push({
+                edgeId: edge.id,
+                from: fromTerminal,
+                to: toTerminal,
+                direction: direction
+            });
+        }
+    }
+}
+
+/**
  * 셀의 내용을 주어진 value 와 Element 로 교체한다.
  * @param cell OG.Cell
  * @param value 업데이트 할 데이터 값
@@ -565,7 +655,12 @@ OG.shape.component.DataTable.prototype.updateCell = function (cell, value, text,
         //업데이트 대상 셀을 초기화하되, 동일 컨텐트인 경우 컨텐트 삭제를 방지한다.
         if (data.contentElement && data.contentElement.id == contentElement.id) {
             me.emptyCell(cell, true);
-        } else {
+        }
+        //동일 컨텐트가 아닐 경우
+        else {
+            //신규 컨텐트에 기존 셀의 Edge 를 연결시키기 위해 Edge 를 해체한다.
+            me.keepEdgesFromContent(cell);
+            //셀을 비운다.
             me.emptyCell(cell);
         }
 
@@ -627,7 +722,7 @@ OG.shape.component.DataTable.prototype.getCellInformation = function (cell) {
 /**
  * 셀의 내용 및 데이터를 삭제한다.
  * @param cell OG.Cell
- * @param preventRemoveContent {boolean} 컨텐트 삭제 여부
+ * @param preventRemoveContent {boolean} 컨텐트 삭제 방지 여부
  */
 OG.shape.component.DataTable.prototype.emptyCell = function (cell, preventRemoveContent) {
     var me = this;
@@ -682,30 +777,73 @@ OG.shape.component.DataTable.prototype.getCellFromTableIndex = function (cellInd
     return me.currentCanvas.getElementById(cellId);
 }
 
-//row 삭제.
+/**
+ * 주어진 칼럼과 데이터를 바탕으로, 범위에서 벗어난 셀들을 모두 삭제한다.
+ */
+OG.shape.component.DataTable.prototype.removeOutRangeCells = function (columns, dataToDraw) {
+    var me = this
+    var columnToRemove = [];
 
-OG.shape.component.DataTable.prototype.draw = function () {
+    //칼럼 삭제
+    var columnViews = me.data.viewData.columns;
+    for (var field in columnViews) {
+        var isExist = false;
+        for (var i = 0, leni = columns.length; i < leni; i++) {
+            if (columns[i].data == field) {
+                isExist = true;
+            }
+        }
+        if (!isExist) {
+            var cellId = columnViews[field]['cellId'];
+            if (me.currentCanvas.getElementById(cellId)) {
+                me.currentCanvas.removeShape(cellId);
+            }
+            delete columnViews[field];
+            columnToRemove.push(field);
+        }
+    }
+
+    //row 삭제
+    var row;
+    var toDrawRowLength = dataToDraw.data.length;
+    var currentRowLength = me.data.viewData.rows.length;
+
+    for (var r = 0; r < currentRowLength; r++) {
+        row = me.data.viewData.rows[r];
+        for (var key in row.cells) {
+            var cellId = row.cells[key].cellId;
+            var shapeId = row.cells[key].shapeId;
+            var cellToRemove = false;
+
+            //데이터 영역 밖의 row 는 전부 삭제한다.
+            if ((r + 1) > toDrawRowLength) {
+                cellToRemove = true;
+            }
+
+            //데이터 영역 안의 row 중 columnToRemove 에 속한 셀은 삭제한다.
+            else if (columnToRemove.indexOf(key) != -1) {
+                cellToRemove = true;
+            }
+
+            if (cellToRemove) {
+                if (me.currentCanvas.getElementById(cellId)) {
+                    me.currentCanvas.removeShape(cellId);
+                }
+                if (shapeId && me.currentCanvas.getElementById(shapeId)) {
+                    me.currentCanvas.removeShape(shapeId);
+                }
+            }
+        }
+    }
+    me.data.viewData.rows.splice(toDrawRowLength, currentRowLength);
+}
+
+/**
+ * 리사이즈로 인한 draw 여부.
+ * @param isResize
+ */
+OG.shape.component.DataTable.prototype.draw = function (isResize) {
     //TODO
-    //테두리가 숨는 문제 => fail. 한것은, vertices subshape 그릴때 position 개념을 추가한 것.
-    //최종 사이즈에 마추어서 그룹 사이즈 변경. ok
-
-    //데이터 업데이트시 대응
-    //컨텐트 임의 교체 api. ok
-    //컨텐트 임의 교체시, 셀뷰와 셀엘리먼트의 'shape-position' 는 기본적으로 초기화된다.ok
-    //별도의 'shape-position' 를 줄 경우 등록된다. ok
-    //라벨 에디팅 시의 처리. ok
-
-    //콘텐트 강제 속성처리. ok
-    //콘텐트 삭제시 처리. ok
-
-    //테이블 내에서 콘텐트 이동 처리. ok
-    //테이블에 외부에서 드랍되었을 경우 콘텐트로 등록 처리. ok
-    //셀 복사시에 처리. ok
-    //셀 선 연결 처리. ok
-    //테이블 드래그 시 화면 처리. ok
-    //기존 콘텐트가 있으면 덮어쓰기가 안된다. ok
-
-    //옵션 업데이트시 대응
     //페이지 api
     //콘텐트 등록 api, row, cell api
     //http://tutorials.jenkov.com/svg/clip-path.html 클립패스를 사용하여 그리드 부분을 래핑하고, 스크롤을 구현할 것.
@@ -719,14 +857,6 @@ OG.shape.component.DataTable.prototype.draw = function () {
         throw new Error('No table data to render');
     }
 
-    //옵션이 변경된 경우, 변경된 칼럼 리스트에 속하지 않은 셀과 콘텐트는 삭제한다.
-    //뷰 데이터가 ignoreRenderer 일 경우, 컨텐트가 있다면 그대로 둔다.
-    //ignoreRenderer 가 아닐경우, 렌더러에 맡기기 위해 컨텐트가 있다면 삭제한다.
-    if (me.OPTION_CHANGE) {
-        me.OPTION_CHANGE = false;
-
-    }
-
     var boundary = me.currentCanvas.getBoundary(me.currentElement);
     var startP = boundary.getUpperLeft();
     var startX = startP.x;
@@ -735,10 +865,17 @@ OG.shape.component.DataTable.prototype.draw = function () {
     var columnElement, cellElement;
     var columnBoundary, cellBoundary;
 
-    //array
+    //칼럼 리스트
     var columns = me.options.columns;
-    //var columnViews = me.data.viewData.columns;
     var column;
+
+    //드로잉 할 데이터 영역구하기
+    var dataToDraw = me.getDataToDraw();
+
+    //칼럼, dataToDraw 영역 밖에 요소 삭제하기.
+    if (!isResize) {
+        me.removeOutRangeCells(columns, dataToDraw);
+    }
 
     //칼럼 그리기
     for (var i = 0, leni = columns.length; i < leni; i++) {
@@ -751,8 +888,6 @@ OG.shape.component.DataTable.prototype.draw = function () {
     }
 
     //데이터 그리기
-    //드로잉 할 데이터 영역구하기
-    var dataToDraw = me.getDataToDraw();
     me.data.viewData.pageLength = dataToDraw.pageLength;
     me.data.viewData.currentPage = dataToDraw.currentPage;
     var rowData;
@@ -779,7 +914,12 @@ OG.shape.component.DataTable.prototype.draw = function () {
                 }
             }
 
-            cellElement = me.drawCell(columns[c], value, null, c, rowIndex, rowDataIndex, 'saved', [startX, startY]);
+            if (isResize) {
+                cellElement = me.drawCell(columns[c], value, null, c, rowIndex, rowDataIndex, 'saved', [startX, startY], false);
+            } else {
+                cellElement = me.drawCell(columns[c], value, null, c, rowIndex, rowDataIndex, 'saved', [startX, startY], true);
+            }
+
             cellBoundary = me.currentCanvas.getBoundary(cellElement);
             //nextY 에는 다음 row 를 위한 값을 지정한다.
             nextY = startY + cellBoundary.getHeight();
@@ -795,6 +935,7 @@ OG.shape.component.DataTable.prototype.draw = function () {
     var expectWidth = startX - startP.x;
     var expectHeight = nextY - startP.y;
     me.currentCanvas.resize(me.currentElement, [0, expectHeight - currentHeight, 0, expectWidth - currentWidth]);
+
 }
 
 OG.shape.component.DataTable.prototype.getCellStyle = function (type, column, rowIndex, rowDataIndex) {
@@ -1126,9 +1267,11 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
         }
     }
 
+    //셀의 axis 를 콘텐트 엘리먼트에 설정한다.
+    contentElement.shape.AXIS = me.options.axis;
+
     //콘텐트 삭제시 처리
     contentElement.shape.onRemoveShape = function () {
-        //이벤트 중복 발생함.
         me.emptyCell(cellElement);
     }
     //콘텐트 이동시 처리
@@ -1153,9 +1296,10 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
     cellView['shapeId'] = contentElement.id;
     cellView['shape-position'] = shapePosition;
 
-    //셀 엘리머느 데이터를 꾸민다.
+    //셀 엘리먼트 데이터를 꾸민다.
     cellElement.shape.data.dataTable['shapeId'] = contentElement.id;
     cellElement.shape.data.dataTable['shape-position'] = shapePosition;
+
 
     //셀 데이터에 컨텐트포지션 데이터를 넣는다.
     return contentElement;
@@ -1171,9 +1315,10 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
  * @param rowDataIndex
  * @param ignoreRenderer true | false | saved
  * @param startPosition
+ * @param forceRedraw
  * @return {*}
  */
-OG.shape.component.DataTable.prototype.drawCell = function (column, value, text, columnIndex, rowIndex, rowDataIndex, ignoreRenderer, startPosition) {
+OG.shape.component.DataTable.prototype.drawCell = function (column, value, text, columnIndex, rowIndex, rowDataIndex, ignoreRenderer, startPosition, forceRedraw) {
 
     var me = this;
     var cellIndex = columnIndex;
@@ -1195,6 +1340,25 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, text,
         }
         if (shapeId) {
             contentElement = me.currentCanvas.getElementById(shapeId);
+        }
+    }
+
+    //forceRedraw 일 경우는 기존 api 또는 사용자 액션으로 일어난 콘텐츠의 뒤바뀜을 모두 원상복귀한다.
+    if (forceRedraw) {
+        //ignoreRenderer 를 false 로 고정한다.
+        ignoreRenderer = false;
+
+        //cell 과 content 가 있다면 Edge 를 연결해제 하고 저장한 후, Content 는 삭제한다.
+        if (cellElement && contentElement) {
+            me.keepEdgesFromContent(cellElement);
+            me.currentCanvas.removeShape(contentElement, true);
+            contentElement = null;
+
+            me.data.viewData.rows[rowIndex].cells[field]['shapeId'] = null;
+            me.data.viewData.rows[rowIndex].cells[field]['shape-position'] = null;
+
+            cellElement.shape.data.dataTable['shapeId'] = null;
+            cellElement.shape.data.dataTable['shape-position'] = null;
         }
     }
 
@@ -1273,6 +1437,9 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, text,
         } else {
             shape = new OG.Cell();
         }
+
+        //셀의 cellEditable 을 설정한다.
+        shape.LABEL_EDITABLE = me.options.cellEditable;
 
         cellElement = me.currentCanvas.drawShape(
             [startX, startY],
@@ -1364,6 +1531,8 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, text,
     if (useRenderData) {
         me.drawCellContent(column, cellElement, contentElement, renderData);
     }
+    me.reconnectEdgesToContent(cellElement);
+
 
     return cellElement;
 }
@@ -1530,7 +1699,7 @@ OG.shape.component.DataTable.prototype.onCellResize = function (cell, offset) {
     if (moveRight != 0) {
 
     }
-    me.draw();
+    me.draw(true);
 }
 
 /**

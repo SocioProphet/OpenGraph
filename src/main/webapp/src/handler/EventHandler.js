@@ -819,7 +819,7 @@ OG.handler.EventHandler.prototype = {
                     var conditionAnalysis = correctionConditionAnalysis(dx, dy);
                     if ('Y' == element.shape.AXIS) {
                         conditionAnalysis.dx = 0;
-                    } else if ('N' == element.shape.AXIS) {
+                    } else if ('X' == element.shape.AXIS) {
                         conditionAnalysis.dy = 0;
                     }
                     dx = me._grid(conditionAnalysis.dx, 'move');
@@ -851,7 +851,7 @@ OG.handler.EventHandler.prototype = {
                     var conditionAnalysis = correctionConditionAnalysis(dx, dy);
                     if ('Y' == element.shape.AXIS) {
                         conditionAnalysis.dx = 0;
-                    } else if ('N' == element.shape.AXIS) {
+                    } else if ('X' == element.shape.AXIS) {
                         conditionAnalysis.dy = 0;
                     }
                     dx = me._grid(conditionAnalysis.dx, 'move');

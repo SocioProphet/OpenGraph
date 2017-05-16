@@ -175,7 +175,7 @@ OG.shape.IShape = function () {
     this.ignoreExport = false;
 
     /**
-     * x,y 축만 이동 가능여부.
+     * x,y 축만 이동 가능여부. Y | N | none
      * @type {null}
      */
     this.AXIS = 'none';
