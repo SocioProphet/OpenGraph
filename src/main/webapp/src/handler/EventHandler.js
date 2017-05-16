@@ -912,6 +912,9 @@ OG.handler.EventHandler.prototype = {
             if(me._CONFIG.DRAG_PAGE_MOVABLE){
                 var container = me._RENDERER._CANVAS._CONTAINER;
                 $(element).bind("mousedown", function (event) {
+                    if(event.button != 0){
+                        return;
+                    }
                     root = renderer.getRootGroup();
                     var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
                     var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
@@ -2038,15 +2041,15 @@ OG.handler.EventHandler.prototype = {
      * 드래그하여 페이지 이동이 가능하게 한다.
      * @param {Boolean} dragPageMovable 드래그 페이지 이동 가능 여부
      */
-    setDragPageMovable: function (dragPageMovable) {
-        if (!dragPageMovable) {
-            return;
-        }
+    setDragPageMovable: function () {
         var renderer = this._RENDERER;
         var me = this, rootEle = renderer.getRootElement();
         var root = renderer.getRootGroup();
         var container = renderer._CANVAS._CONTAINER;
         $(rootEle).bind("mousedown", function (event) {
+            if(!me._CONFIG.DRAG_PAGE_MOVABLE || event.button != 0){
+                return;
+            }
             root = renderer.getRootGroup();
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
             var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
@@ -2057,6 +2060,9 @@ OG.handler.EventHandler.prototype = {
             $(root).data("dragPageScroll", {x: container.scrollLeft, y: container.scrollTop});
         });
         $(rootEle).bind("mousemove", function (event) {
+            if(!me._CONFIG.DRAG_PAGE_MOVABLE){
+                return;
+            }
             root = renderer.getRootGroup();
             var isResizing = $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE);
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
@@ -2075,6 +2081,9 @@ OG.handler.EventHandler.prototype = {
             }
         });
         $(rootEle).bind("mouseup", function (event) {
+            if(!me._CONFIG.DRAG_PAGE_MOVABLE){
+                return;
+            }
             root = renderer.getRootGroup();
             var isConnectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.LINE_CONNECT_MODE);
             var isRectMode = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE);
@@ -2088,18 +2097,14 @@ OG.handler.EventHandler.prototype = {
 
     /**
      * 휠 스케일을 가능하게 한다.
-     * @param {Boolean} wheelScalable 휠 스케일 가능 여부
      */
-    setWheelScale: function (wheelScalable) {
-        if (!wheelScalable) {
-            return;
-        }
+    setWheelScale: function () {
         var renderer = this._RENDERER;
         var me = this, rootEle = renderer.getRootElement();
         var updateScale = function (event, isUp) {
             var eventOffset = me._getOffset(event);
-            var scrollLeft = rootEle.scrollLeft;
-            var scrollTop = rootEle.scrollTop;
+            // var scrollLeft = rootEle.scrollLeft;
+            // var scrollTop = rootEle.scrollTop;
             var cuScale;
             var preScale = renderer.getScale();
             if (isUp) {
@@ -2133,15 +2138,18 @@ OG.handler.EventHandler.prototype = {
             renderer._CANVAS.updateNavigatior();
 
         };
+
         $(rootEle).bind('mousewheel DOMMouseScroll', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (event.originalEvent.wheelDelta > 0 || event.deltaY > 0) {
-                // scroll up
-                updateScale(event, true);
-            }
-            else {
-                updateScale(event, false);
+            if(me._CONFIG.WHEEL_SCALABLE){
+                event.preventDefault();
+                event.stopPropagation();;
+                if (event.originalEvent.wheelDelta > 0 || event.deltaY > 0) {
+                    // scroll up
+                    updateScale(event, true);
+                }
+                else {
+                    updateScale(event, false);
+                }
             }
         });
     },
@@ -2151,9 +2159,8 @@ OG.handler.EventHandler.prototype = {
      * 선택가능해야 리사이즈가 가능하다.
      *
      * @param {Boolean} isSelectable 선택가능여부
-     * @param {Boolean} dragPageMovable 드래그 페이지 이동 가능 여부
      */
-    setDragSelectable: function (isSelectable, dragPageMovable) {
+    setDragSelectable: function (isSelectable) {
         var renderer = this._RENDERER;
         var me = this, rootEle = renderer.getRootElement(),
             root = renderer.getRootGroup();
@@ -2327,7 +2334,7 @@ OG.handler.EventHandler.prototype = {
                 if (isConnectMode === 'active' || isRectMode === 'active') {
                     return;
                 }
-                if (!dragPageMovable) {
+                if (!me._CONFIG.DRAG_PAGE_MOVABLE) {
                     var eventOffset = me._getOffset(event);
                     $(this).data("dragBox_first", {x: eventOffset.x, y: eventOffset.y});
                     $(this).removeData("dragBox");
@@ -2343,7 +2350,7 @@ OG.handler.EventHandler.prototype = {
                 var first = $(this).data("dragBox_first"),
                     eventOffset, width, height, x, y;
 
-                if (first && !dragPageMovable) {
+                if (first && !me._CONFIG.DRAG_PAGE_MOVABLE) {
                     eventOffset = me._getOffset(event);
                     width = eventOffset.x - first.x;
                     height = eventOffset.y - first.y;
@@ -2364,7 +2371,7 @@ OG.handler.EventHandler.prototype = {
                 if (isConnectMode === 'active' || isRectMode === 'active') {
                     return;
                 }
-                if ("start" == $(this).data("rubber_band_status") && !dragPageMovable) {
+                if ("start" == $(this).data("rubber_band_status") && !me._CONFIG.DRAG_PAGE_MOVABLE) {
                     var first = $(this).data("dragBox_first"),
                         eventOffset, width, height, x, y, envelope, guide, elements = [];
                     renderer.removeRubberBand(rootEle);

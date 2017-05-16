@@ -776,6 +776,9 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 ;
 
 OG.graph.Canvas.prototype = {
+
+    //me._CONFIG.WHEEL_SCALABLE
+
     fastLoadingON: function () {
         this._CONFIG.FAST_LOADING = true;
         // this._CONFIG.AUTO_SLIDER_UPDATE = false;
@@ -868,9 +871,9 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.AUTO_SLIDER_UPDATE = config.autoSliderUpdate === undefined ? this._CONFIG.AUTO_SLIDER_UPDATE : config.autoSliderUpdate;
         }
 
-        this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE, this._CONFIG.DRAG_PAGE_MOVABLE);
-        this._HANDLER.setWheelScale(this._CONFIG.WHEEL_SCALABLE);
-        this._HANDLER.setDragPageMovable(this._CONFIG.DRAG_PAGE_MOVABLE);
+        this._HANDLER.setDragSelectable(this._CONFIG.SELECTABLE && this._CONFIG.DRAG_SELECTABLE);
+        this._HANDLER.setWheelScale();
+        this._HANDLER.setDragPageMovable();
         this._HANDLER.setEnableHotKey(this._CONFIG.ENABLE_HOTKEY);
         if (this._CONFIG.ENABLE_CONTEXTMENU) {
             this._HANDLER.enableRootContextMenu();
