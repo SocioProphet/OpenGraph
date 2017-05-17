@@ -441,42 +441,11 @@
             dataTable.setData(data);
             canvas.drawShape([100, 100], dataTable, [100, 100], {});
             dataTable.draw();
-
-            $('#print-table').click(function(){
-                console.log(dataTable.data);
-            })
-
-            data = [
-                {
-                    activity: 'FUNCTION'
-                },
-                {
-                    activity: '성능',
-                    '75': {type: 'activity', value: 'Plant Configuration'},
-                    '70': {type: 'activity', value: 'Performance Guideline'},
-                    '65': {type: 'activity', value: 'Plant HBD\n(보안문서)'}
-                },
-                {
-                    activity: '플랜트(보조기기)',
-                    '55': {type: 'activity', value: 'WBD'},
-                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
-                },
-                {
-                    activity: '플랜트(주기기)\nor STG,BLR BG',
-                    '90': {type: 'activity', value: 'MPS'},
-                    '80': {type: 'activity', value: 'GT data / STG\nHBD'},
-                    '65': {type: 'activity', value: 'BLR / HRSG\nPerformance\nData'},
-                    '60': {type: 'activity', value: 'Utility\nConsumption'},
-                    '45': {type: 'activity', value: 'Pre-requisite\ndata'}
-                }
-            ];
-
-            var cell1 = dataTable.getCellFromTableIndex(1, 1);
-            var cell2 = dataTable.getCellFromTableIndex(4, 1);
-            var cell3 = dataTable.getCellFromTableIndex(4, 5);
 //
-            dataTable.connect(cell1, cell2);
-            dataTable.connect(cell3, cell1);
+//            $('#print-table').click(function(){
+//                console.log(dataTable.data);
+//            })
+
 //
 //            var rect1 = canvas.drawShape([100, 100], new OG.RectangleShape(), [60, 20], {});
 //            dataTable.updateCell(cell1, {type: 'activity', value: 'Plant Configuration'}, 'BBB', rect1, null, true);
@@ -487,6 +456,25 @@
 
 
             //트리 개발.
+
+            //6000 개
+//            var svgns = "http://www.w3.org/2000/svg";
+//            var root = canvas._RENDERER.getRootElement();
+//            for (var x = 0; x < 5000; x += 50) {
+//                for (var y = 0; y < 3000; y += 50) {
+//                    var rect = document.createElementNS(svgns, 'rect');
+//                    rect.setAttributeNS(null, 'x', x);
+//                    rect.setAttributeNS(null, 'y', y);
+//                    rect.setAttributeNS(null, 'height', '50');
+//                    rect.setAttributeNS(null, 'width', '50');
+//                    rect.setAttributeNS(null, 'fill', '#'+Math.round(0xffffff * Math.random()).toString(16));
+//                    root.appendChild(rect);
+//                }
+//            }
+
+//            for(var i = 0; i < 6000; i++){
+//                canvas.drawShape([50,50], new OG.RectangleShape(), [50,50]);
+//            }
 
 
 

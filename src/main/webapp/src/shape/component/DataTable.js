@@ -6,7 +6,7 @@ OG.shape.component.DataTable = function () {
         pageLength: 25,
         currentPage: 1,
         cellEditable: true,
-        axis : 'none'
+        axis: 'none'
     }
     this.CONNECT_CLONEABLE = false;
     this.LABEL_EDITABLE = false;
@@ -144,11 +144,11 @@ OG.shape.component.DataTable = function () {
         /**
          * 셀 에디팅
          */
-        cellEditable: false,
+        cellEditable: true,
         /**
          * 셀 콘텐트 axis 무브
          */
-        axis : 'X',
+        axis: 'none',
         /**
          * 페이지당 row 수
          */
@@ -843,6 +843,8 @@ OG.shape.component.DataTable.prototype.removeOutRangeCells = function (columns, 
  * @param isResize
  */
 OG.shape.component.DataTable.prototype.draw = function (isResize) {
+    var startDate = new Date();
+// Do your operations
     //TODO
     //페이지 api
     //콘텐트 등록 api, row, cell api
@@ -935,6 +937,10 @@ OG.shape.component.DataTable.prototype.draw = function (isResize) {
     var expectWidth = startX - startP.x;
     var expectHeight = nextY - startP.y;
     me.currentCanvas.resize(me.currentElement, [0, expectHeight - currentHeight, 0, expectWidth - currentWidth]);
+
+    var endDate = new Date();
+    var seconds = (endDate.getTime() - startDate.getTime());
+    console.log(seconds);
 
 }
 
@@ -1203,6 +1209,13 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
         }
         //그 외의 경우 리사이즈 && 이동시킨다.
         else {
+            // var existBoundary = me.currentCanvas.getBoundary(contentElement);
+            // var moveX = left - existBoundary.getUpperLeft().x;
+            // var moveY = top - existBoundary.getUpperLeft().y;
+            // if (existBoundary.getWidth() != width || existBoundary.getHeight() != height
+            //     || moveX != 0 || moveY != 0) {
+            //     me.fitToBoundary(contentElement, width, height, left, top);
+            // }
             var existBoundary = me.currentCanvas.getBoundary(contentElement);
             if (existBoundary.getWidth() != width || existBoundary.getHeight() != height) {
                 me.currentCanvas.resizeBox(contentElement, [width, height], true);
@@ -1303,6 +1316,35 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (column, cellE
 
     //셀 데이터에 컨텐트포지션 데이터를 넣는다.
     return contentElement;
+}
+
+/**
+ * 주어진 Boundary 영역 안으로 공간 기하 객체를 적용한다. left,top 기준(이동 & 리사이즈)
+ * @param element
+ * @param width
+ * @param height
+ * @param left
+ * @param top
+ * @return {Element}
+ */
+OG.shape.component.DataTable.prototype.fitToBoundary = function (element, width, height, left, top) {
+    var boundary = element.shape.geom.boundary,
+        newUpper = boundary.getUpperCenter().y - top,
+        newLower = (top + height) - boundary.getLowerCenter().y,
+        newLeft = boundary.getLeftCenter().x - left,
+        newRight = (left + width) - boundary.getRightCenter().x;
+    this.currentCanvas.getRenderer().resize(element, [newUpper, newLower, newLeft, newRight], true);
+    return element;
+}
+
+OG.shape.component.DataTable.prototype.fitToCenter = function (element, width, height, centerX, centerY) {
+    var boundary = element.shape.geom.boundary,
+        newUpper = boundary.getUpperCenter().y - top,
+        newLower = (top + height) - boundary.getLowerCenter().y,
+        newLeft = boundary.getLeftCenter().x - left,
+        newRight = (left + width) - boundary.getRightCenter().x;
+    this.currentCanvas.getRenderer().resize(element, [newUpper, newLower, newLeft, newRight], true);
+    return element;
 }
 
 /**
@@ -1480,15 +1522,13 @@ OG.shape.component.DataTable.prototype.drawCell = function (column, value, text,
     }
 
     //셀의 크기를 조정한다.
-    if (existBoundary.getWidth() != cellSize[0] || existBoundary.getHeight() != cellSize[1]) {
-        me.currentCanvas.resizeBox(cellElement, cellSize, true);
-    }
-    //셀을 이동시킨다.
     var moveX = startX - upperLeft.x;
     var moveY = startY - upperLeft.y;
-    if (moveX != 0 || moveY != 0) {
-        me.currentCanvas.move(cellElement, [moveX, moveY]);
+    if (existBoundary.getWidth() != cellSize[0] || existBoundary.getHeight() != cellSize[1]
+        || moveX != 0 || moveY != 0) {
+        me.fitToBoundary(cellElement, cellSize[0], cellSize[1], startX, startY);
     }
+
     //셀은 테이블 내부에서 뒤로 이동시킨다.
     //테이블 path는 0 번째이므로 이므로 1로 이동
     var firstChild = OG.Util.isIE() ? me.currentElement.childNodes[1] : me.currentElement.children[1];

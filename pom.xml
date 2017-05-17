@@ -137,6 +137,7 @@
                                 <include>shape/elec/WireShape.js</include>
                                 <include>shape/elec/Load.js</include>
                                 <include>shape/elec/*.js</include>
+                                <include>shape/component/*.js</include>
                                 <include>renderer/IRenderer.js</include>
                                 <include>renderer/*.js</include>
                                 <include>handler/EventHandler.js</include>
@@ -184,6 +185,7 @@
                                 <include>shape/elec/WireShape-min.js</include>
                                 <include>shape/elec/Load-min.js</include>
                                 <include>shape/elec/*.js</include>
+                                <include>shape/component/*.js</include>
                                 <include>renderer/IRenderer-min.js</include>
                                 <include>renderer/*.js</include>
                                 <include>handler/EventHandler-min.js</include>
@@ -237,6 +239,7 @@
                                 <include>shape/elec/WireShape-min.js</include>
                                 <include>shape/elec/Load-min.js</include>
                                 <include>shape/elec/*.js</include>
+                                <include>shape/component/*.js</include>
                                 <include>renderer/IRenderer-min.js</include>
                                 <include>renderer/*.js</include>
                                 <include>handler/EventHandler-min.js</include>

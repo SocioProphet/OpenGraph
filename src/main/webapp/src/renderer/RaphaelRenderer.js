@@ -370,7 +370,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
 
     var me = this, i = 0, pathStr = "", vertices, element, geomObj, _style = {}, connectGuideElement;
     var svg = me.getRootElement();
-    getRoundedPath = function (rectangle, radius) {
+    var getRoundedPath = function (rectangle, radius) {
         var rectObj, rectVert, offset1, offset2, angle, array = [],
             getRoundedOffset = function (coord, dist, deg) {
                 var theta = Math.PI / 180 * deg;
@@ -833,8 +833,8 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawPattern(element, _style, null, 0);
             }
 
-            connectGuideElement = this._PAPER.circle(geometry.coordinate.x, geometry.coordinate.y, 0.5);
-            setConnectGuideAttr(connectGuideElement);
+            // connectGuideElement = this._PAPER.circle(geometry.coordinate.x, geometry.coordinate.y, 0.5);
+            // setConnectGuideAttr(connectGuideElement);
             break;
 
         case OG.Constants.GEOM_TYPE.LINE:
@@ -876,6 +876,10 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 else if (!multi && rootAnimation) {
                     drawAnimation(element, _style);
                 }
+
+                connectGuideElement = this._PAPER.path(pathStr);
+                setConnectGuideAttr(connectGuideElement);
+
             } else {
                 element = this._PAPER.path(pathStr);
                 element.attr(_style);
@@ -891,8 +895,6 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 }
             }
 
-            connectGuideElement = this._PAPER.path(pathStr);
-            setConnectGuideAttr(connectGuideElement);
             break;
         case OG.Constants.GEOM_TYPE.RECTANGLE:
             if ((_style.r || 0) === 0) {
@@ -921,19 +923,19 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawAnimation(element, _style);
             }
 
-            connectGuideElement = this._PAPER.path(pathStr);
-            setConnectGuideAttr(connectGuideElement);
+            // connectGuideElement = this._PAPER.path(pathStr);
+            // setConnectGuideAttr(connectGuideElement);
             break;
 
         case OG.Constants.GEOM_TYPE.CIRCLE:
             geomObj = OG.JSON.decode(geometry.toString());
             if (geomObj.type === OG.Constants.GEOM_NAME[OG.Constants.GEOM_TYPE.CIRCLE]) {
                 element = this._PAPER.circle(geomObj.center[0], geomObj.center[1], geomObj.radius);
-                connectGuideElement = this._PAPER.circle(geomObj.center[0], geomObj.center[1], geomObj.radius);
+                //connectGuideElement = this._PAPER.circle(geomObj.center[0], geomObj.center[1], geomObj.radius);
             } else if (geomObj.type === OG.Constants.GEOM_NAME[OG.Constants.GEOM_TYPE.ELLIPSE]) {
                 if (geomObj.angle === 0) {
                     element = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
-                    connectGuideElement = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
+                    //connectGuideElement = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
                 } else {
                     pathStr = "";
                     vertices = geometry.getControlPoints();
@@ -942,7 +944,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                     pathStr += "M" + vertices[1].x + " " + vertices[1].y + "A" + geomObj.radiusX + " " + geomObj.radiusY
                         + " " + geomObj.angle + " 1 1 " + vertices[5].x + " " + vertices[5].y;
                     element = this._PAPER.path(pathStr);
-                    connectGuideElement = this._PAPER.path(pathStr);
+                    //connectGuideElement = this._PAPER.path(pathStr);
                 }
             }
             element.attr(_style);
@@ -957,14 +959,14 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawAnimation(element, _style);
             }
 
-            setConnectGuideAttr(connectGuideElement);
+            //setConnectGuideAttr(connectGuideElement);
             break;
 
         case OG.Constants.GEOM_TYPE.ELLIPSE:
             geomObj = OG.JSON.decode(geometry.toString());
             if (geomObj.angle === 0) {
                 element = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
-                connectGuideElement = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
+                //connectGuideElement = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
             } else {
                 pathStr = "";
                 vertices = geometry.getControlPoints();
@@ -973,7 +975,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 pathStr += "M" + vertices[1].x + " " + vertices[1].y + "A" + geomObj.radiusX + " " + geomObj.radiusY
                     + " " + geomObj.angle + " 1 1 " + vertices[5].x + " " + vertices[5].y;
                 element = this._PAPER.path(pathStr);
-                connectGuideElement = this._PAPER.path(pathStr);
+                //connectGuideElement = this._PAPER.path(pathStr);
             }
             element.attr(_style);
             //패턴정보가 있을 경우
@@ -985,7 +987,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             if (rootAnimation) {
                 drawAnimation(element, _style);
             }
-            setConnectGuideAttr(connectGuideElement);
+            //setConnectGuideAttr(connectGuideElement);
             break;
 
         case OG.Constants.GEOM_TYPE.CURVE:
@@ -1012,8 +1014,10 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawAnimation(element, _style);
             }
 
-            connectGuideElement = this._PAPER.path(pathStr);
-            setConnectGuideAttr(connectGuideElement);
+            if(isEdge){
+                connectGuideElement = this._PAPER.path(pathStr);
+                setConnectGuideAttr(connectGuideElement);
+            }
             break;
 
         case OG.Constants.GEOM_TYPE.BEZIER_CURVE:
@@ -1041,8 +1045,10 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawAnimation(element, _style);
             }
 
-            connectGuideElement = this._PAPER.path(pathStr);
-            setConnectGuideAttr(connectGuideElement);
+            if(isEdge){
+                connectGuideElement = this._PAPER.path(pathStr);
+                setConnectGuideAttr(connectGuideElement);
+            }
             break;
 
         case OG.Constants.GEOM_TYPE.COLLECTION:
