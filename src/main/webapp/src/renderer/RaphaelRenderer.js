@@ -144,14 +144,14 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         return;
     }
 
-    //shape 데이터와 groupElement 의 데이터 중 element 의 데이터를 우선시한다.
-    if (groupElement.data) {
-        groupElement.shape.setData(groupElement.data);
-    }
-    //shape 만 데이터가 있을 경우 element 에도 데이터를 적용시킨다.
-    else if (groupElement.shape.getData()) {
-        groupElement.data = groupElement.shape.getData();
-    }
+    // //shape 데이터와 groupElement 의 데이터 중 element 의 데이터를 우선시한다.
+    // if (groupElement.data) {
+    //     groupElement.shape.setData(groupElement.data);
+    // }
+    // //shape 만 데이터가 있을 경우 element 에도 데이터를 적용시킨다.
+    // else if (groupElement.shape.getData()) {
+    //     groupElement.data = groupElement.shape.getData();
+    // }
 
     subShapeNodes = groupElement.shape.createSubShape();
     if (!subShapeNodes || !subShapeNodes.length) {
@@ -168,7 +168,7 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
         align = subShapeNode.align;
         zIndex = subShapeNode['z-index'];
         verticalAlign = subShapeNode['vertical-align'];
-        subVertices = subShapeNode.vertices;
+        subVertices = subShapeNode.vertices ? JSON.parse(JSON.stringify(subShapeNode.vertices)) : null;
         subStyle = subShapeNode.style ? subShapeNode.style : {};
         subShape = subShapeNode.shape;
 
@@ -258,12 +258,12 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
             if (subVertices && subVertices.length) {
                 for (var v = 0, lenv = subVertices.length; v < lenv; v++) {
                     //x 축이 left 기준인 경우
-                    if (subVertices[v][0].indexOf('left') != -1) {
+                    if (typeof subVertices[v][0] == 'string' && subVertices[v][0].indexOf('left') != -1) {
                         subVertices[v][0] = subVertices[v][0].replace('left', '');
                         subVertices[v][0] = getLength(bW, subVertices[v][0]) + bL;
                     }
                     //x 축이 right 기준인 경우
-                    else if (subVertices[v][0].indexOf('right') != -1) {
+                    else if (typeof subVertices[v][0] == 'string' && subVertices[v][0].indexOf('right') != -1) {
                         subVertices[v][0] = subVertices[v][0].replace('right', '');
                         subVertices[v][0] = bL + bW - getLength(bW, subVertices[v][0]);
                     }
@@ -273,12 +273,12 @@ OG.renderer.RaphaelRenderer.prototype._drawSubShape = function (groupElement) {
                     }
 
                     //y 축이 top 기준인 경우
-                    if (subVertices[v][1].indexOf('top') != -1) {
+                    if (typeof subVertices[v][1] == 'string' && subVertices[v][1].indexOf('top') != -1) {
                         subVertices[v][1] = subVertices[v][1].replace('top', '');
                         subVertices[v][1] = getLength(bH, subVertices[v][1]) + bT;
                     }
                     //y 축이 bottom 기준인 경우
-                    else if (subVertices[v][1].indexOf('bottom') != -1) {
+                    else if (typeof subVertices[v][1] == 'string' && subVertices[v][1].indexOf('bottom') != -1) {
                         subVertices[v][1] = subVertices[v][1].replace('bottom', '');
                         subVertices[v][1] = bT + bH - getLength(bH, subVertices[v][1]);
                     }
@@ -923,8 +923,6 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawAnimation(element, _style);
             }
 
-            // connectGuideElement = this._PAPER.path(pathStr);
-            // setConnectGuideAttr(connectGuideElement);
             break;
 
         case OG.Constants.GEOM_TYPE.CIRCLE:
@@ -935,7 +933,6 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             } else if (geomObj.type === OG.Constants.GEOM_NAME[OG.Constants.GEOM_TYPE.ELLIPSE]) {
                 if (geomObj.angle === 0) {
                     element = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
-                    //connectGuideElement = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
                 } else {
                     pathStr = "";
                     vertices = geometry.getControlPoints();
@@ -944,7 +941,6 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                     pathStr += "M" + vertices[1].x + " " + vertices[1].y + "A" + geomObj.radiusX + " " + geomObj.radiusY
                         + " " + geomObj.angle + " 1 1 " + vertices[5].x + " " + vertices[5].y;
                     element = this._PAPER.path(pathStr);
-                    //connectGuideElement = this._PAPER.path(pathStr);
                 }
             }
             element.attr(_style);
@@ -959,14 +955,12 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawAnimation(element, _style);
             }
 
-            //setConnectGuideAttr(connectGuideElement);
             break;
 
         case OG.Constants.GEOM_TYPE.ELLIPSE:
             geomObj = OG.JSON.decode(geometry.toString());
             if (geomObj.angle === 0) {
                 element = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
-                //connectGuideElement = this._PAPER.ellipse(geomObj.center[0], geomObj.center[1], geomObj.radiusX, geomObj.radiusY);
             } else {
                 pathStr = "";
                 vertices = geometry.getControlPoints();
@@ -975,7 +969,6 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 pathStr += "M" + vertices[1].x + " " + vertices[1].y + "A" + geomObj.radiusX + " " + geomObj.radiusY
                     + " " + geomObj.angle + " 1 1 " + vertices[5].x + " " + vertices[5].y;
                 element = this._PAPER.path(pathStr);
-                //connectGuideElement = this._PAPER.path(pathStr);
             }
             element.attr(_style);
             //패턴정보가 있을 경우
@@ -987,7 +980,6 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
             if (rootAnimation) {
                 drawAnimation(element, _style);
             }
-            //setConnectGuideAttr(connectGuideElement);
             break;
 
         case OG.Constants.GEOM_TYPE.CURVE:
@@ -1014,7 +1006,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawAnimation(element, _style);
             }
 
-            if(isEdge){
+            if (isEdge) {
                 connectGuideElement = this._PAPER.path(pathStr);
                 setConnectGuideAttr(connectGuideElement);
             }
@@ -1045,7 +1037,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
                 drawAnimation(element, _style);
             }
 
-            if(isEdge){
+            if (isEdge) {
                 connectGuideElement = this._PAPER.path(pathStr);
                 setConnectGuideAttr(connectGuideElement);
             }
@@ -3456,9 +3448,11 @@ OG.renderer.RaphaelRenderer.prototype.drawStickGuide = function (position) {
         path = this._PAPER.path("M0," + pathY + "L10000," + pathY);
         this._stickGuideY = path;
     }
-    path.attr("stroke-width", "2");
-    path.attr("stroke", "#FFCC50");
-    path.attr("opacity", "0.7");
+    if (path) {
+        path.attr("stroke-width", "2");
+        path.attr("stroke", "#FFCC50");
+        path.attr("opacity", "0.7");
+    }
 };
 
 OG.renderer.RaphaelRenderer.prototype.removeStickGuide = function (direction) {
@@ -3848,7 +3842,7 @@ OG.renderer.RaphaelRenderer.prototype.ungroup = function (groupElements) {
 OG.renderer.RaphaelRenderer.prototype.addToGroup = function (groupElement, elements) {
     for (var i = 0, leni = elements.length; i < leni; i++) {
         groupElement.appendChild(elements[i]);
-        if(groupElement.shape && groupElement.shape.onAddToGroup){
+        if (groupElement.shape && groupElement.shape.onAddToGroup) {
             groupElement.shape.onAddToGroup(groupElement, elements[i]);
         }
         elements[i].shape.onAddToGroup(groupElement, elements[i]);
@@ -3978,7 +3972,7 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEv
     beforeEvent = jQuery.Event("beforeRemoveShape", {element: rElement.node});
 
     if (!preventEvent) {
-        if(element.shape){
+        if (element.shape) {
             var onBeforeRemoveShape = element.shape.onBeforeRemoveShape();
             if (typeof onBeforeRemoveShape == 'boolean' && !onBeforeRemoveShape) {
                 return false;
@@ -4005,7 +3999,7 @@ OG.renderer.RaphaelRenderer.prototype.removeShape = function (element, preventEv
     removedElement = OG.Util.clone(rElement.node);
 
     if (!preventEvent) {
-        if(element.shape){
+        if (element.shape) {
             element.shape.onRemoveShape();
         }
     }
@@ -7421,13 +7415,13 @@ OG.renderer.RaphaelRenderer.prototype.offDropablePool = function () {
  * @param {Element|String} element Element 또는 ID
  * @param {Number[]} offset [가로, 세로]
  */
-OG.renderer.RaphaelRenderer.prototype.copyShape = function(element, offset){
+OG.renderer.RaphaelRenderer.prototype.copyShape = function (element, offset) {
     var me = this;
     var handler = this._CANVAS._HANDLER;
     // copy
     var boundary = element.shape.geom.getBoundary(), newShape, newElement, newGuide;
     newShape = element.shape.clone();
-    if(!offset){
+    if (!offset) {
         offset = [handler._CONFIG.COPY_PASTE_PADDING, handler._CONFIG.COPY_PASTE_PADDING];
     }
 
@@ -7450,7 +7444,7 @@ OG.renderer.RaphaelRenderer.prototype.copyShape = function(element, offset){
             newShape, [boundary.getWidth(), boundary.getHeight()], element.shapeStyle
         );
     }
-    
+
     // enable event
     //newGuide = me.drawGuide(newElement);
     handler.setClickSelectable(newElement, handler._isSelectable(newElement.shape));

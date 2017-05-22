@@ -14,6 +14,20 @@ OG.shape.component.DataTable = function () {
     this.RESIZABLE = false;
 
 
+    //애초에 , 렌더러는 text 와 컨텐트를 같이 리턴하도록 한다.
+    //렌더러는 멀티 컨텐트들의 vertical 과 horizontal 배치 결정 가능.
+    //멀티 컨텐트들을 가상의 그룹으로 묶어 바운더리를 삼는다.
+    //이후 vertical-align, align, top, bottom 으로 그룹 바운더리 위치 결정. => 하위 요소들 위치결정.
+
+    //컨텐트 엘리먼트 이동(테이블 드랍) 시에 컨텐트 리스트에서 빠지도록...
+    //컨텐트 리스트에서 빠지면 해당 셀은 다시 draw 하도록....
+    //셀 카피. 셀 컷앤 페이스트.
+
+
+    //한 셀에 컨텐트를 여러개 담을 수 있게.
+    //셀에 컨텐트 배열은 horizontal,vertical 배열.
+    //셀에 컨텐트가 한개 이상일 때는 width,height 만 사용하며, 같이 배치될 content 들을 계산하여 draw.
+
     var renderer = function (value) {
         if (value && value.text) {
             return value.text;
@@ -205,6 +219,10 @@ OG.shape.component.DataTable = function () {
             },
             'border-bottom': {
                 'stroke': '#abaaad',
+                'stroke-width': '1'
+            },
+            'border-right': {
+                'stroke': '#ebeaed',
                 'stroke-width': '1'
             }
         },
@@ -439,30 +457,6 @@ OG.shape.component.DataTable.prototype.getCellFromOffset = function (offset) {
     return expectCell;
 }
 
-/**
- * 컨텐트 엘리먼트로부터 셀을 얻어온다.
- * @param contentElement
- * @return OG.Cell
- */
-OG.shape.component.DataTable.prototype.getCellFromContent = function (contentElement) {
-    var me = this;
-    var rows, cells, cell = null;
-    if (contentElement && contentElement.nodeType == 1 && me.currentCanvas.getRenderer().isShape(contentElement)) {
-        rows = me.data.viewData.rows;
-        cells = [];
-        $.each(rows, function (index, row) {
-            cells = row.cells;
-            if (cells) {
-                for (var field in cells) {
-                    if (cells[field]['shapeId'] == contentElement.id) {
-                        cell = me.currentCanvas.getElementById(cells[field]['cellId']);
-                    }
-                }
-            }
-        })
-    }
-    return cell;
-}
 
 /**
  * 셀의 value 를 복사한다.
@@ -843,105 +837,129 @@ OG.shape.component.DataTable.prototype.removeOutRangeCells = function (columns, 
  * @param isResize
  */
 OG.shape.component.DataTable.prototype.draw = function (isResize) {
+
     var startDate = new Date();
-// Do your operations
     //TODO
     //페이지 api
     //콘텐트 등록 api, row, cell api
     //http://tutorials.jenkov.com/svg/clip-path.html 클립패스를 사용하여 그리드 부분을 래핑하고, 스크롤을 구현할 것.
 
     var me = this;
+    $(me.currentElement).attr('opacity', '0.3');
 
-    if (!me.options.columns) {
-        throw new Error('No column options to render');
-    }
-    if (!me.data || !me.data.tableData) {
-        throw new Error('No table data to render');
-    }
 
-    var boundary = me.currentCanvas.getBoundary(me.currentElement);
-    var startP = boundary.getUpperLeft();
-    var startX = startP.x;
-    var startY = startP.y;
-    var nextY;
-    var columnElement, cellElement;
-    var columnBoundary, cellBoundary;
-
-    //칼럼 리스트
-    var columns = me.options.columns;
-    var column;
-
-    //드로잉 할 데이터 영역구하기
-    var dataToDraw = me.getDataToDraw();
-
-    //칼럼, dataToDraw 영역 밖에 요소 삭제하기.
-    if (!isResize) {
-        me.removeOutRangeCells(columns, dataToDraw);
-    }
-
-    //칼럼 그리기
-    for (var i = 0, leni = columns.length; i < leni; i++) {
-        columnElement = me.drawColumn(columns[i], i, [startX, startY]);
-        columnBoundary = me.currentCanvas.getBoundary(columnElement);
-        //nextY 에는 다음 row 를 위한 값을 지정한다.
-        nextY = startY + columnBoundary.getHeight();
-        //다음 셀의 시작 x 를 증가시킨다.
-        startX = startX + columnBoundary.getWidth();
-    }
-
-    //데이터 그리기
-    me.data.viewData.pageLength = dataToDraw.pageLength;
-    me.data.viewData.currentPage = dataToDraw.currentPage;
-    var rowData;
-    var rowDataIndex;
-    var rowIndex;
-    for (var d = 0, lend = dataToDraw.data.length; d < lend; d++) {
-
-        //그려야 할 row
-        rowData = dataToDraw.data[d];
-        rowIndex = d;
-        rowDataIndex = me.data.viewData.pageLength * (me.data.viewData.currentPage - 1) + d;
-
-        //starX 는 원점으로 돌린다. //startY 는 nextY 를 상속한다.
-        startX = startP.x;
-        startY = nextY;
-
-        //셀 그리기
-        for (var c = 0, lenc = columns.length; c < lenc; c++) {
-            //rowData 에 칼럼에 해당하는 필드가 있는지 찾는다.
-            var value = null;
-            for (var key in rowData) {
-                if (columns[c].data == key) {
-                    value = rowData[key];
-                }
-            }
-
-            if (isResize) {
-                cellElement = me.drawCell(columns[c], value, null, c, rowIndex, rowDataIndex, 'saved', [startX, startY], false);
-            } else {
-                cellElement = me.drawCell(columns[c], value, null, c, rowIndex, rowDataIndex, 'saved', [startX, startY], true);
-            }
-
-            cellBoundary = me.currentCanvas.getBoundary(cellElement);
-            //nextY 에는 다음 row 를 위한 값을 지정한다.
-            nextY = startY + cellBoundary.getHeight();
-
-            //다음 셀의 시작 x 를 증가시킨다.
-            startX = startX + cellBoundary.getWidth();
+    var renderGrid = function () {
+        if (!me.options.columns) {
+            throw new Error('No column options to render');
         }
+        if (!me.data || !me.data.tableData) {
+            throw new Error('No table data to render');
+        }
+
+        var boundary = me.currentCanvas.getBoundary(me.currentElement);
+        var startP = boundary.getUpperLeft();
+        var startX = startP.x;
+        var startY = startP.y;
+        var nextY;
+        var columnElement, cellElement;
+        var columnBoundary, cellBoundary;
+
+        //칼럼 리스트
+        var columns = me.options.columns;
+        var column;
+
+        //드로잉 할 데이터 영역구하기
+        var dataToDraw = me.getDataToDraw();
+
+        //칼럼, dataToDraw 영역 밖에 요소 삭제하기.
+        if (!isResize) {
+            me.removeOutRangeCells(columns, dataToDraw);
+        }
+
+        //칼럼 그리기
+        for (var i = 0, leni = columns.length; i < leni; i++) {
+            columnElement = me.drawColumn(columns[i], i, [startX, startY]);
+            columnBoundary = me.currentCanvas.getBoundary(columnElement);
+            //nextY 에는 다음 row 를 위한 값을 지정한다.
+            nextY = startY + columnBoundary.getHeight();
+            //다음 셀의 시작 x 를 증가시킨다.
+            startX = startX + columnBoundary.getWidth();
+        }
+
+        //데이터 그리기
+        me.data.viewData.pageLength = dataToDraw.pageLength;
+        me.data.viewData.currentPage = dataToDraw.currentPage;
+        var rowData;
+        var rowDataIndex;
+        var rowIndex;
+        for (var d = 0, lend = dataToDraw.data.length; d < lend; d++) {
+
+            //그려야 할 row
+            rowData = dataToDraw.data[d];
+            rowIndex = d;
+            rowDataIndex = me.data.viewData.pageLength * (me.data.viewData.currentPage - 1) + d;
+
+            //starX 는 원점으로 돌린다. //startY 는 nextY 를 상속한다.
+            startX = startP.x;
+            startY = nextY;
+
+            //셀 그리기
+            for (var c = 0, lenc = columns.length; c < lenc; c++) {
+                //rowData 에 칼럼에 해당하는 필드가 있는지 찾는다.
+                var value = null;
+                for (var key in rowData) {
+                    if (columns[c].data == key) {
+                        value = rowData[key];
+                    }
+                }
+
+                if (isResize) {
+                    cellElement = me.drawCell(columns[c], value, null, c, rowIndex, rowDataIndex, 'saved', [startX, startY], false);
+                } else {
+                    cellElement = me.drawCell(columns[c], value, null, c, rowIndex, rowDataIndex, 'saved', [startX, startY], true);
+                }
+
+                cellBoundary = me.currentCanvas.getBoundary(cellElement);
+                //nextY 에는 다음 row 를 위한 값을 지정한다.
+                nextY = startY + cellBoundary.getHeight();
+
+                //다음 셀의 시작 x 를 증가시킨다.
+                startX = startX + cellBoundary.getWidth();
+            }
+        }
+
+        //startX, nextY 가 최종 테이블의 사이즈가 된다.
+        var currentWidth = boundary.getWidth();
+        var currentHeight = boundary.getHeight();
+        var expectWidth = startX - startP.x;
+        var expectHeight = nextY - startP.y;
+        me.currentCanvas.resize(me.currentElement, [0, expectHeight - currentHeight, 0, expectWidth - currentWidth]);
+        var lowerRight = boundary.getLowerRight();
+        var canvasSize = me.currentCanvas.getCanvasSize();
+
+        var resizeCanvas = false;
+        if (canvasSize[0] < lowerRight.x + 5) {
+            canvasSize[0] = lowerRight.x + 5;
+            resizeCanvas = true;
+        }
+        if (canvasSize[1] < lowerRight.y + 5) {
+            canvasSize[1] = lowerRight.y + 5;
+            resizeCanvas = true;
+        }
+        if (resizeCanvas) {
+            me.currentCanvas.setCanvasSize(canvasSize);
+        }
+
+
+        var endDate = new Date();
+        var seconds = (endDate.getTime() - startDate.getTime());
+        $(me.currentElement).attr('opacity', '1.0');
+        console.log(seconds);
     }
 
-    //startX, nextY 가 최종 테이블의 사이즈가 된다.
-    var currentWidth = boundary.getWidth();
-    var currentHeight = boundary.getHeight();
-    var expectWidth = startX - startP.x;
-    var expectHeight = nextY - startP.y;
-    me.currentCanvas.resize(me.currentElement, [0, expectHeight - currentHeight, 0, expectWidth - currentWidth]);
-
-    var endDate = new Date();
-    var seconds = (endDate.getTime() - startDate.getTime());
-    console.log(seconds);
-
+    setTimeout(function () {
+        renderGrid();
+    }, 10);
 }
 
 OG.shape.component.DataTable.prototype.getCellStyle = function (type, column, rowIndex, rowDataIndex) {

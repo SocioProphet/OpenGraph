@@ -246,28 +246,34 @@ OG.shape.IShape.prototype = {
     onConnectShape: function (edge, fromShape, toShape) {
 
     },
-    onDisconnectShape: function(edge, fromShape, toShape){
+    onDisconnectShape: function (edge, fromShape, toShape) {
 
     },
-    onGroup: function(groupShapeEle){
+    onGroup: function (groupShapeEle) {
 
     },
-    onUnGroup: function(){
+    onUnGroup: function () {
 
     },
-    onMoveShape: function(offset){
+    onMoveShape: function (offset) {
 
     },
-    onRotateShape: function(angle){
+    onRotateShape: function (angle) {
 
     },
-    onDuplicated: function(target, duplicated){
+    onDuplicated: function (target, duplicated) {
 
     },
-    onPasteShape: function(copied, pasted){
+    onPasteShape: function (copied, pasted) {
 
     },
-    onAddToGroup: function(groupElement, element){
+    onAddToGroup: function (groupElement, element) {
+
+    },
+    onSelectShape: function () {
+
+    },
+    onDeSelectShape: function () {
 
     }
 };

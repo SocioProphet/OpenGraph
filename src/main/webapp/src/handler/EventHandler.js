@@ -909,10 +909,10 @@ OG.handler.EventHandler.prototype = {
             renderer.setAttr(element, {cursor: me._isSelectable(element.shape) ? 'pointer' : me._CONFIG.DEFAULT_STYLE.SHAPE.cursor});
             OG.Util.apply(element.shape.geom.style.map, {cursor: me._isSelectable(element.shape) ? 'pointer' : me._CONFIG.DEFAULT_STYLE.SHAPE.cursor});
 
-            if(me._CONFIG.DRAG_PAGE_MOVABLE){
+            if (me._CONFIG.DRAG_PAGE_MOVABLE) {
                 var container = me._RENDERER._CANVAS._CONTAINER;
                 $(element).bind("mousedown", function (event) {
-                    if(event.button != 0){
+                    if (event.button != 0) {
                         return;
                     }
                     root = renderer.getRootGroup();
@@ -1874,8 +1874,6 @@ OG.handler.EventHandler.prototype = {
                     if (me._CONFIG.FOCUS_CANVAS_ONSELECT) {
                         $(me._RENDERER.getContainer()).focus();
                     }
-                    //$(me._RENDERER.getContainer()).focus();
-
                     if (element.shape) {
                         me._RENDERER.removeAllVirtualEdge();
 
@@ -2047,7 +2045,7 @@ OG.handler.EventHandler.prototype = {
         var root = renderer.getRootGroup();
         var container = renderer._CANVAS._CONTAINER;
         $(rootEle).bind("mousedown", function (event) {
-            if(!me._CONFIG.DRAG_PAGE_MOVABLE || event.button != 0){
+            if (!me._CONFIG.DRAG_PAGE_MOVABLE || event.button != 0) {
                 return;
             }
             root = renderer.getRootGroup();
@@ -2060,7 +2058,7 @@ OG.handler.EventHandler.prototype = {
             $(root).data("dragPageScroll", {x: container.scrollLeft, y: container.scrollTop});
         });
         $(rootEle).bind("mousemove", function (event) {
-            if(!me._CONFIG.DRAG_PAGE_MOVABLE){
+            if (!me._CONFIG.DRAG_PAGE_MOVABLE) {
                 return;
             }
             root = renderer.getRootGroup();
@@ -2081,7 +2079,7 @@ OG.handler.EventHandler.prototype = {
             }
         });
         $(rootEle).bind("mouseup", function (event) {
-            if(!me._CONFIG.DRAG_PAGE_MOVABLE){
+            if (!me._CONFIG.DRAG_PAGE_MOVABLE) {
                 return;
             }
             root = renderer.getRootGroup();
@@ -2140,9 +2138,10 @@ OG.handler.EventHandler.prototype = {
         };
 
         $(rootEle).bind('mousewheel DOMMouseScroll', function (event) {
-            if(me._CONFIG.WHEEL_SCALABLE){
+            if (me._CONFIG.WHEEL_SCALABLE) {
                 event.preventDefault();
-                event.stopPropagation();;
+                event.stopPropagation();
+                ;
                 if (event.originalEvent.wheelDelta > 0 || event.deltaY > 0) {
                     // scroll up
                     updateScale(event, true);
@@ -3954,7 +3953,7 @@ OG.handler.EventHandler.prototype = {
     copySelectedShape: function () {
         var me = this, root = me._RENDERER.getRootGroup(), selectedElement = [];
         $(me._RENDERER.getRootElement()).find("[_type=" + OG.Constants.NODE_TYPE.SHAPE + "][_selected=true]").each(function (index, element) {
-            if(element.shape.COPYABLE){
+            if (element.shape.COPYABLE) {
                 selectedElement.push(element);
             }
         });
@@ -5072,12 +5071,19 @@ OG.handler.EventHandler.prototype = {
             this.selectedElements = {};
         }
         this.selectedElements[element.attributes["id"].value] = element;
+        //선택 이벤트
+        if (element.shape) {
+            element.shape.onSelectShape();
+        }
     },
 
     //TODO : 선택된 요소를 선택요소배열에서 삭제
     _delSelectedElement: function (element) {
         if (this.selectedElements) {
             delete this.selectedElements[element.attributes["id"].value];
+            if (element.shape) {
+                element.shape.onDeSelectShape();
+            }
         }
     },
 
@@ -5107,7 +5113,11 @@ OG.handler.EventHandler.prototype = {
         //init
         var key;
         for (key in this.selectedElements) {
+            var element = this.selectedElements[key]
             delete this.selectedElements[key];
+            if (element && element.shape) {
+                element.shape.onDeSelectShape();
+            }
         }
     },
     /**
