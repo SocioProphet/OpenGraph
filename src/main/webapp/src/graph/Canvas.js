@@ -141,6 +141,7 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         /**
          * 리사이즈 가능여부
          */
+        RESIZE_CANVAS_MARGIN: 5,
         RESIZABLE: true,
         RESIZABLE_: {
             GEOM: true,
@@ -278,6 +279,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
          * 마우스 우클릭 메뉴 가능여부
          */
         ENABLE_CONTEXTMENU: true,
+
+        /**
+         * 루트 컨텍스트 메뉴 가능여부
+         */
+        ENABLE_ROOT_CONTEXTMENU: true,
 
         /**
          * 캔버스 스케일(리얼 사이즈 : Scale = 1)
@@ -876,7 +882,9 @@ OG.graph.Canvas.prototype = {
         this._HANDLER.setDragPageMovable();
         this._HANDLER.setEnableHotKey(this._CONFIG.ENABLE_HOTKEY);
         if (this._CONFIG.ENABLE_CONTEXTMENU) {
-            this._HANDLER.enableRootContextMenu();
+            if (this._CONFIG.ENABLE_ROOT_CONTEXTMENU) {
+                this._HANDLER.enableRootContextMenu();
+            }
             this._HANDLER.enableShapeContextMenu();
         }
 
@@ -1232,7 +1240,7 @@ OG.graph.Canvas.prototype = {
         var svg = me._RENDERER.getRootElement();
         var svgWidth, svgHeight, vx, vy, xRate, yRate, xImgRate, yImgRate;
         var slider = this._CONFIG.SLIDER;
-        if(!slider){
+        if (!slider) {
             return;
         }
         var sliderImage = slider.find('.sliderImage');

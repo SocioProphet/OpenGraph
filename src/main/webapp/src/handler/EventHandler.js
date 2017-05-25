@@ -1630,6 +1630,7 @@ OG.handler.EventHandler.prototype = {
                 for (var _handleName in guide) {
                     var handles = ['ul', 'uc', 'ur', 'rc', 'lwr', 'lwc', 'lwl', 'lc'];
                     var indexOfHandle = handles.indexOf(_handleName);
+                    var canvasSize;
                     if (indexOfHandle === -1) {
                         continue;
                     }
@@ -1727,6 +1728,18 @@ OG.handler.EventHandler.prototype = {
                                 height: newHeight
                             });
                             renderer.removeAllConnectGuide();
+
+                            canvasSize = renderer.getCanvasSize();
+                            if (canvasSize[0] < newRp + me._CONFIG.RESIZE_CANVAS_MARGIN || canvasSize[1] < newLwp + me._CONFIG.RESIZE_CANVAS_MARGIN) {
+                                if (canvasSize[0] < newRp + me._CONFIG.RESIZE_CANVAS_MARGIN) {
+                                    canvasSize[0] = newRp + me._CONFIG.RESIZE_CANVAS_MARGIN;
+                                }
+                                if (canvasSize[1] < newLwp + me._CONFIG.RESIZE_CANVAS_MARGIN) {
+                                    canvasSize[1] = newLwp + me._CONFIG.RESIZE_CANVAS_MARGIN;
+                                }
+                                renderer.setCanvasSize(canvasSize);
+                            }
+
                         },
                         stop: function (event) {
                             $(root).data(OG.Constants.GUIDE_SUFFIX.ONRESIZE, false);
@@ -3630,12 +3643,16 @@ OG.handler.EventHandler.prototype = {
                     var customMenu = eventShape.customContextMenu;
                     if (!customMenu) {
                         if (eventShape.createContextMenu) {
+                            var eventOffset = me._getOffset(event);
                             customMenu = eventShape.createContextMenu();
                         }
                     }
 
                     //커스텀 콘텍스트 메뉴가 있을경우 처리
                     if (customMenu) {
+                        if($.isEmptyObject(customMenu)){
+                            return false;
+                        }
                         for (var key in customMenu) {
                             if (!customMenu[key]) {
                                 continue;
