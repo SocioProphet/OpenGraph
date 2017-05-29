@@ -631,7 +631,8 @@ OG.shape.component.DataTable.prototype.addCellContent = function (cellView, cont
                 }
                 me.data.viewData.rows[data.rowIndex].cells[data.column]['contents'].move(beforeIndex, newIndex);
                 me.data.viewData.rows[data.rowIndex].cells[data.column]['value'].move(beforeIndex, newIndex);
-                me.data.tableData[data.rowDataIndex][data.column].move(beforeIndex, newIndex);
+                me.data.tableData[data.rowDataIndex][data.column] =
+                    JSON.parse(JSON.stringify(me.data.viewData.rows[data.rowIndex].cells[data.column]['value']));
                 me.redrawCell(me.refreshCellView(cellView));
             }
         }
@@ -708,12 +709,12 @@ OG.shape.component.DataTable.prototype.reconnectEdgesToContent = function (cellV
             if (direction == 'from') {
                 shapeId = fromTerminal.substring(0, fromTerminal.indexOf(OG.Constants.TERMINAL));
                 replace = fromTerminal.replace(shapeId, contentElement.id);
-                me.currentCanvas.getRenderer().connect(replace, toTerminal, edge, null, null, true);
+                me.currentCanvas.getRenderer().connect(replace, null, edge, null, null, true);
             }
             if (direction == 'to') {
                 shapeId = toTerminal.substring(0, toTerminal.indexOf(OG.Constants.TERMINAL));
                 replace = toTerminal.replace(shapeId, contentElement.id);
-                me.currentCanvas.getRenderer().connect(fromTerminal, replace, edge, null, null, true);
+                me.currentCanvas.getRenderer().connect(null, replace, edge, null, null, true);
             }
         }
         me.data.viewData.rows[data.rowDataIndex].cells[data.column]['connection'] = [];
@@ -1717,19 +1718,19 @@ OG.shape.component.DataTable.prototype.onCellResize = function (cell, offset) {
 
     if (cellView.type == 'column') {
         //뷰 데이터의 columnHeight 를 변경한다.
-        if(me.options.resizeAxis != 'X'){
+        if (me.options.resizeAxis != 'X') {
             me.data.viewData.columnHeight = boundary.getHeight();
         }
     }
     else if (cellView.type == 'cell') {
         //뷰 데이터의 rowHeight 를 변경한다.
-        if(me.options.resizeAxis != 'X'){
+        if (me.options.resizeAxis != 'X') {
             me.data.viewData.rows[rowIndex].rowHeight = boundary.getHeight();
         }
     }
 
     //뷰 칼럼의 width 를 변경한다.
-    if(me.options.resizeAxis != 'Y'){
+    if (me.options.resizeAxis != 'Y') {
         var columnViews = me.data.viewData.columns;
         columnViews[column].width = boundary.getWidth();
 
@@ -1780,7 +1781,7 @@ OG.shape.component.DataTable.prototype.onAddToGroup = function (groupElement, el
         //콘텐트의 중심을 포함한 셀을 찾는다.
         var centroid = me.currentCanvas.getBoundary(element).getCentroid();
         dropCell = me.getCellViewFromOffset([centroid.x, centroid.y]);
-        if(dropCell && dropCell.type == 'column'){
+        if (dropCell && dropCell.type == 'column') {
             dropCell = null;
         }
 

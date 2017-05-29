@@ -357,7 +357,8 @@
                 data.push({
                     activity: '견적 TFT / EM' + i,
                     '90_': [
-                        {type: 'activity', value: 'ITB 배포'}
+                        {type: 'activity', value: 'ITB 배포'},
+                        {type: 'activity', value: 'Reference PJT 선정'}
                     ],
                     '85_': [
                         {type: 'activity', value: 'Reference PJT 선정'}
@@ -389,66 +390,64 @@
                 })
             }
 
-            $.get('resources/images/dids/dids-ed-svg.svg', function (data) {
-                canvas.drawShape([200, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
-                    {
-                        fill: '#394',
-                        stroke: 'red',
-                        'stroke-width': '30'
-                    }
-                );
-            });
+            var start = new Date();
+            dataTable.MOVABLE = false;
+            canvas.drawShape([100, 100], dataTable, [100, 100], {});
+            dataTable.setData(data);
+            dataTable.draw();
+            var end = new Date();
+            var number = end.getTime() - start.getTime();
 
-            $.get('resources/images/dids/dids-activity.svg', function (data) {
-                canvas.drawShape([400, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
-                    {
-                        fill: '#394',
-                        stroke: 'red',
-                        'stroke-width': '50'
-                    }
-                );
-            });
+//            $.get('resources/images/dids/dids-ed-svg.svg', function (data) {
+//                canvas.drawShape([200, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+//                    {
+//                        fill: '#394',
+//                        stroke: 'red',
+//                        'stroke-width': '30'
+//                    }
+//                );
+//            });
+//
+//            $.get('resources/images/dids/dids-activity.svg', function (data) {
+//                canvas.drawShape([400, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+//                    {
+//                        fill: '#394',
+//                        stroke: 'red',
+//                        'stroke-width': '50'
+//                    }
+//                );
+//            });
+//
+//            $.get('resources/images/dids/dids-folder.svg', function (data) {
+//                canvas.drawShape([600, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+//                    {
+//                        fill: '#394',
+//                        stroke: 'red',
+//                        'stroke-width': '50'
+//                    }
+//                );
+//            });
+//
+//            $.get('resources/images/dids/dids-doc.svg', function (data) {
+//                canvas.drawShape([200, 500], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+//                    {
+//                        fill: '#394',
+//                        stroke: 'red',
+//                        'stroke-width': '50'
+//                    }
+//                );
+//            });
+//
+//            $.get('resources/images/dids/dids-dwg.svg', function (data) {
+//                canvas.drawShape([400, 500], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+//                    {
+//                        fill: '#394',
+//                        stroke: 'red',
+//                        'stroke-width': '50'
+//                    }
+//                );
+//            });
 
-            $.get('resources/images/dids/dids-folder.svg', function (data) {
-                canvas.drawShape([600, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
-                    {
-                        fill: '#394',
-                        stroke: 'red',
-                        'stroke-width': '50'
-                    }
-                );
-            });
-
-            $.get('resources/images/dids/dids-doc.svg', function (data) {
-                canvas.drawShape([200, 500], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
-                    {
-                        fill: '#394',
-                        stroke: 'red',
-                        'stroke-width': '50'
-                    }
-                );
-            });
-
-            $.get('resources/images/dids/dids-dwg.svg', function (data) {
-                canvas.drawShape([400, 500], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
-                    {
-                        fill: '#394',
-                        stroke: 'red',
-                        'stroke-width': '50'
-                    }
-                );
-            });
-//            canvas.drawShape([300, 300], new OG.ImageShape('resources/images/dids/dids-ed-svg.svg'), [400, 400],
-//                {r: '10'}
-//            );
-
-//            var start = new Date();
-//            dataTable.MOVABLE = false;
-//            canvas.drawShape([100, 100], dataTable, [100, 100], {});
-//            dataTable.setData(data);
-//            dataTable.draw();
-//            var end = new Date();
-//            var number = end.getTime() - start.getTime();
 
 
             //
