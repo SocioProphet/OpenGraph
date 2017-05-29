@@ -112,6 +112,7 @@ OG.shape.component.DataTable = function () {
 
     //옵션데이터
     this.options = {
+        resizeAxis: 'X',
         /**
          * 셀 콘텐트 axis 무브
          */
@@ -119,7 +120,7 @@ OG.shape.component.DataTable = function () {
         /**
          * 페이지당 row 수
          */
-        pageLength: 25,
+        pageLength: 100,
         /**
          * 시작 페이지
          */
@@ -145,6 +146,7 @@ OG.shape.component.DataTable = function () {
                 'stroke-width': '4'
             }
         },
+        columnEditable: false,
 
         rowDividingLine: {
             'stroke': '#abaaad',
@@ -213,13 +215,15 @@ OG.shape.component.DataTable = function () {
                         'stroke': '#abaaad',
                         'stroke-width': '1'
                     }
-                }
+                },
+                columnEditable: false
             },
             {
                 data: '90_',
                 title: '견적 착수\n90',
                 defaultContent: '',
-                renderer: renderer
+                renderer: renderer,
+                columnEditable: true
             },
             {
                 data: '85_',
@@ -394,19 +398,15 @@ OG.shape.component.DataTable.prototype.setData = function (data) {
  */
 OG.shape.component.DataTable.prototype.removeOutRangeCells = function (columns, dataToDraw) {
     var me = this
-    var columnToRemove = [];
-
     //칼럼 삭제
     var columnViews = me.data.viewData.columns;
+    var columnList = [];
+    for (var l = 0, lenl = columns.length; l < lenl; l++) {
+        columnList.push(columns[l].data);
+    }
     for (var column in columnViews) {
-        var isExist = false;
-        for (var i = 0, leni = columns.length; i < leni; i++) {
-            if (columns[i].data == column) {
-                isExist = true;
-            }
-        }
-        if (!isExist) {
-            columnToRemove.push(column);
+        if (columnList.indexOf(column) == -1) {
+            delete columnViews[column];
         }
     }
 
@@ -426,8 +426,8 @@ OG.shape.component.DataTable.prototype.removeOutRangeCells = function (columns, 
                 cellToRemove = true;
             }
 
-            //데이터 영역 안의 row 중 columnToRemove 에 속한 셀은 삭제한다.
-            else if (columnToRemove.indexOf(key) != -1) {
+            //데이터 영역 안의 row 중 columnList 에 없는 것은 삭제한다.
+            else if (columnList.indexOf(key) == -1) {
                 cellToRemove = true;
             }
 
@@ -439,6 +439,7 @@ OG.shape.component.DataTable.prototype.removeOutRangeCells = function (columns, 
                         }
                     })
                 }
+                delete row.cells[key];
             }
         }
     }
@@ -611,8 +612,10 @@ OG.shape.component.DataTable.prototype.addCellContent = function (cellView, cont
             }
             if (typeof me.data.viewData.rows[data.rowIndex].cells[data.column]['value'] == 'object') {
                 me.data.viewData.rows[data.rowIndex].cells[data.column]['value'].splice(newIndex, 0, value);
-                me.data.tableData[data.rowDataIndex][data.column].splice(newIndex, 0, value);
+                me.data.tableData[data.rowDataIndex][data.column] =
+                    JSON.parse(JSON.stringify(me.data.viewData.rows[data.rowIndex].cells[data.column]['value']));
             }
+
             me.drawCell(cellView, true);
         }
         //같은 셀 내부에서 컨텐트를 이동하는 경우
@@ -632,12 +635,6 @@ OG.shape.component.DataTable.prototype.addCellContent = function (cellView, cont
                 me.redrawCell(me.refreshCellView(cellView));
             }
         }
-
-
-        //여기서, 콘텐트 엘리먼트의 포지션과, 셀 뷰에 소속된 콘텐트들의 포지션들과 비교해서, 소팅을 해야한다.
-        //포지션은 각 콘텐트들의 센터를 비교함.
-        //새 엘리먼트의 인덱스를 구함.
-        //뷰 테이블과 value 의 인덱스를 수정함.
     }
 };
 
@@ -1126,10 +1123,13 @@ OG.shape.component.DataTable.prototype.createCellGuid = function (cellView) {
         return;
     }
 
+    //columnEditable
     var shape;
     if (cellView.type == 'column') {
+        var columnOption = me.getColumnByField(cellView.column);
+        var columnEditable = columnOption.columnEditable ? columnOption.columnEditable : me.options.columnEditable;
         shape = new OG.Cell(cellView.text);
-        shape.LABEL_EDITABLE = true;
+        shape.LABEL_EDITABLE = columnEditable;
     } else {
         shape = new OG.Cell();
         shape.LABEL_EDITABLE = false;
@@ -1174,14 +1174,16 @@ OG.shape.component.DataTable.prototype.getCellStyle = function (type, column, ro
     if (type == 'column') {
         //높이 얻기
         viewHeight = me.data.viewData.columnHeight;
-        if (!viewHeight) {
+
+        //viewHeight 없거나 X 리사이즈만 허용이라면
+        if (!viewHeight || me.options.resizeAxis == 'X') {
             me.data.viewData.columnHeight = me.options.columnHeight;
             viewHeight = me.options.columnHeight;
         }
 
         //가로 얻기
         var viewColumn = me.data.viewData.columns[column.data];
-        if (!viewColumn) {
+        if (!viewColumn || me.options.resizeAxis == 'Y') {
             viewWidth = column.columnWidth ? column.columnWidth : me.options.columnWidth;
         } else {
             viewWidth = viewColumn.width
@@ -1219,7 +1221,7 @@ OG.shape.component.DataTable.prototype.getCellStyle = function (type, column, ro
 
         //높이 얻기
         viewHeight = me.data.viewData.rows[rowIndex]['rowHeight'];
-        if (!viewHeight) {
+        if (!viewHeight || me.options.resizeAxis == 'X') {
             me.data.viewData.rows[rowIndex]['rowHeight'] = me.options.cellHeight;
             viewHeight = me.options.cellHeight;
         }
@@ -1528,12 +1530,12 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (cellView, inf
         contentElement.shape.onAddToGroup = function (groupElement, element) {
             //그룹이 소속된 테이블이 아닐 경우, 셀에 자신의 정보를 삭제한 후, 등록된 이벤트 핸들러들을 스스로 초기화시킨다.
             if (groupElement.id != me.currentElement.id) {
-                me.removeCellContent(contentElement, true);
-                contentElement.shape.onRemoveShape = function () {
+                me.removeCellContent(element, true);
+                element.shape.onRemoveShape = function () {
                 };
-                contentElement.shape.onAddToGroup = function () {
+                element.shape.onAddToGroup = function () {
                 };
-                contentElement.shape.onResize = function () {
+                element.shape.onResize = function () {
                 };
             }
         }
@@ -1699,6 +1701,14 @@ OG.shape.component.DataTable.prototype.onCellResize = function (cell, offset) {
     //이웃한 셀의 크기 조정
     //소속한 row 의 height 조정
     var me = this;
+    if (me.options.resizeAxis == 'X') {
+        offset[0] == 0;
+        offset[1] == 0;
+    } else if (me.options.resizeAxis == 'Y') {
+        offset[3] == 0;
+        offset[4] == 0;
+    }
+
     var boundary = me.currentCanvas.getBoundary(cell);
     var cellView = cell.shape.data.dataTable;
     var column = cellView.column;
@@ -1707,33 +1717,39 @@ OG.shape.component.DataTable.prototype.onCellResize = function (cell, offset) {
 
     if (cellView.type == 'column') {
         //뷰 데이터의 columnHeight 를 변경한다.
-        me.data.viewData.columnHeight = boundary.getHeight();
+        if(me.options.resizeAxis != 'X'){
+            me.data.viewData.columnHeight = boundary.getHeight();
+        }
     }
     else if (cellView.type == 'cell') {
         //뷰 데이터의 rowHeight 를 변경한다.
-        me.data.viewData.rows[rowIndex].rowHeight = boundary.getHeight();
-    }
-
-    //뷰 칼럼의 width 를 변경한다.
-    var columnViews = me.data.viewData.columns;
-    columnViews[column].width = boundary.getWidth();
-
-    //이웃한 칼럼의 width 를 변경한다.
-    //offset 은 상,하,좌,우
-    var moveLeft = offset[2];
-    var moveRight = offset[3];
-
-    //좌측이 움직였을 경우
-    if (moveLeft != 0) {
-        var leftCell = me.options.columns[cellIndex - 1];
-        if (leftCell) {
-            columnViews[leftCell.data].width = columnViews[leftCell.data].width - moveLeft;
+        if(me.options.resizeAxis != 'X'){
+            me.data.viewData.rows[rowIndex].rowHeight = boundary.getHeight();
         }
     }
 
-    //우측이 움직였을 경우는 이웃 칼럼의 처리를 하지 않음.
-    if (moveRight != 0) {
+    //뷰 칼럼의 width 를 변경한다.
+    if(me.options.resizeAxis != 'Y'){
+        var columnViews = me.data.viewData.columns;
+        columnViews[column].width = boundary.getWidth();
 
+        //이웃한 칼럼의 width 를 변경한다.
+        //offset 은 상,하,좌,우
+        var moveLeft = offset[2];
+        var moveRight = offset[3];
+
+        //좌측이 움직였을 경우
+        if (moveLeft != 0) {
+            var leftCell = me.options.columns[cellIndex - 1];
+            if (leftCell) {
+                columnViews[leftCell.data].width = columnViews[leftCell.data].width - moveLeft;
+            }
+        }
+
+        //우측이 움직였을 경우는 이웃 칼럼의 처리를 하지 않음.
+        if (moveRight != 0) {
+
+        }
     }
     me.draw(true);
     var refreshCellView = me.refreshCellView(cellView);
@@ -1742,15 +1758,6 @@ OG.shape.component.DataTable.prototype.onCellResize = function (cell, offset) {
 
 //컨텍스트 메뉴에 셀
 OG.shape.component.DataTable.prototype.createContextMenu = function () {
-    var me = this;
-    // this.contextMenu = {
-    //     'property': {
-    //         name: '정보보기', callback: function () {
-    //             $(me.currentCanvas.getRootElement()).trigger('showProperty', [me.currentElement]);
-    //         }
-    //     }
-    // };
-    // return this.contextMenu;
     return {};
 };
 
@@ -1773,6 +1780,9 @@ OG.shape.component.DataTable.prototype.onAddToGroup = function (groupElement, el
         //콘텐트의 중심을 포함한 셀을 찾는다.
         var centroid = me.currentCanvas.getBoundary(element).getCentroid();
         dropCell = me.getCellViewFromOffset([centroid.x, centroid.y]);
+        if(dropCell && dropCell.type == 'column'){
+            dropCell = null;
+        }
 
         //드랍셀이 없고 이전 셀도 없다면 콘텐트를 테이블 밖으로 빼야 한다.
         //이 경우는 외부에서 드랍되었는데 칼럼으로 떨어진 경우다.
@@ -1806,7 +1816,27 @@ OG.shape.component.DataTable.prototype.onAddToGroup = function (groupElement, el
 OG.shape.component.DataTable.prototype.addColumn = function (columnOption, index) {
     var me = this;
     me.options.columns.splice(index, 0, columnOption);
+    //기존 등록된 임시 셀을 모두 삭제토록.
+    var childs = me.currentCanvas.getChilds(me.currentElement);
+    for (var i = 0, leni = childs.length; i < leni; i++) {
+        if (childs[i].shape instanceof OG.Cell) {
+            me.currentCanvas.removeShape(childs[i]);
+        }
+    }
     me.draw(true);
+}
+
+OG.shape.component.DataTable.prototype.removeColumn = function (index) {
+    var me = this;
+    //기존 등록된 임시 셀을 모두 삭제토록.
+    var childs = me.currentCanvas.getChilds(me.currentElement);
+    for (var i = 0, leni = childs.length; i < leni; i++) {
+        if (childs[i].shape instanceof OG.Cell) {
+            me.currentCanvas.removeShape(childs[i]);
+        }
+    }
+    me.options.columns.splice(index, 1);
+    me.draw();
 }
 
 OG.shape.component.Cell = function (label) {
@@ -1906,6 +1936,9 @@ OG.shape.component.Cell.prototype.createSubShape = function () {
 
 OG.shape.component.Cell.prototype.onResize = function (offset) {
     var me = this;
+    if (offset[0] == 0 && offset[1] == 0 && offset[2] == 0 && offset[3] == 0) {
+        return;
+    }
     if (me.data && me.data.dataTable) {
         var tableId = me.data.dataTable.tableId;
         var table = me.currentCanvas.getElementById(tableId);
@@ -1932,5 +1965,62 @@ OG.shape.component.Cell.prototype.onDrawLabel = function (text) {
         }
     }
 }
+OG.shape.component.Cell.prototype.createContextMenu = function () {
+    var me = this;
+
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+    }
+
+    //칼럼인 경우 행 추가 가능하다.
+    if (me.data && me.data.dataTable && me.data.dataTable.type == 'column') {
+        var cellView = me.data.dataTable;
+        var tableId = cellView.tableId;
+        var table = me.currentCanvas.getElementById(tableId);
+        if (table) {
+            this.contextMenu = {
+                'left': {
+                    name: '오른쪽 열 추가', callback: function () {
+                        var existColumn = table.shape.getColumnByField(cellView.column);
+                        table.shape.addColumn({
+                            data: guid(),
+                            title: '',
+                            defaultContent: '',
+                            renderer: existColumn.renderer,
+                            columnEditable: true
+                        }, cellView.cellIndex + 1);
+                    }
+                },
+                'right': {
+                    name: '왼쪽 열 추가', callback: function () {
+                        var existColumn = table.shape.getColumnByField(cellView.column);
+                        table.shape.addColumn({
+                            data: guid(),
+                            title: '',
+                            defaultContent: '',
+                            renderer: existColumn.renderer,
+                            columnEditable: true
+                        }, cellView.cellIndex);
+                    }
+                },
+                'remove': {
+                    name: '열 삭제', callback: function () {
+                        table.shape.removeColumn(cellView.cellIndex);
+                    }
+                }
+            };
+            return this.contextMenu;
+        }
+    } else {
+        return {};
+    }
+};
 
 

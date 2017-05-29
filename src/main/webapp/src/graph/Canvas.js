@@ -469,6 +469,9 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
             ,
             IMAGE: {
                 "label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"
+            },
+            SVG: {
+                "label-position": "bottom", "text-anchor": "middle", "vertical-align": "top"
             }
             ,
             EDGE: {

@@ -3650,7 +3650,7 @@ OG.handler.EventHandler.prototype = {
 
                     //커스텀 콘텍스트 메뉴가 있을경우 처리
                     if (customMenu) {
-                        if($.isEmptyObject(customMenu)){
+                        if(customMenu == null || $.isEmptyObject(customMenu)){
                             return false;
                         }
                         for (var key in customMenu) {

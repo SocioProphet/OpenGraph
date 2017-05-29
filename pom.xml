@@ -126,6 +126,7 @@
                                 <include>shape/TextShape.js</include>
                                 <include>shape/ImageShape.js</include>
                                 <include>shape/EdgeShape.js</include>
+                                <include>shape/SvgShape.js</include>
                                 <include>shape/*.js</include>
                                 <include>shape/bpmn/A_Task.js</include>
                                 <include>shape/bpmn/Event.js</include>
@@ -174,6 +175,7 @@
                                 <include>shape/TextShape-min.js</include>
                                 <include>shape/ImageShape-min.js</include>
                                 <include>shape/EdgeShape-min.js</include>
+                                <include>shape/SvgShape-min.js</include>
                                 <include>shape/*.js</include>
                                 <include>shape/bpmn/A_Task-min.js</include>
                                 <include>shape/bpmn/Event-min.js</include>
@@ -228,6 +230,7 @@
                                 <include>shape/TextShape-min.js</include>
                                 <include>shape/ImageShape-min.js</include>
                                 <include>shape/EdgeShape-min.js</include>
+                                <include>shape/SvgShape-min.js</include>
                                 <include>shape/*.js</include>
                                 <include>shape/bpmn/A_Task-min.js</include>
                                 <include>shape/bpmn/Event-min.js</include>

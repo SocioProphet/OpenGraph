@@ -35,6 +35,9 @@ OG.shape.bpmn = {};
 OG.shape.elec = {};
 
 /** @namespace */
+OG.shape.dids = {};
+
+/** @namespace */
 OG.shape.component = {};
 
 /**
@@ -101,6 +104,7 @@ OG.common.Constants = {
         TEXT: "TEXT",
         HTML: "HTML",
         IMAGE: "IMAGE",
+        SVG: "SVG",
         EDGE: "EDGE",
         GROUP: "GROUP"
     },

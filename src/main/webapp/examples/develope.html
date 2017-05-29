@@ -164,10 +164,14 @@
     <script type="text/javascript" src="../src/shape/elec/BLDG.js"></script>
     <script type="text/javascript" src="../src/shape/elec/Location.js"></script>
     <script type="text/javascript" src="../src/shape/elec/Manhole.js"></script>
+    <script type="text/javascript" src="../src/shape/dids/ED.js"></script>
     <script type="text/javascript" src="../src/shape/component/DataTable.js"></script>
+    <script type="text/javascript" src="../src/shape/SvgShape.js"></script>
 
     <!--<script type="text/javascript" src="../src/worker/og-worker.js"></script>-->
 
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.1/svg.js"></script>
     <style type="text/css">
         .ui-layout-center {
             padding: 0;
@@ -221,7 +225,7 @@
 
             // Canvas
             //canvas = new OG.Canvas('canvas', [1000, 800], 'transparent');
-            canvas = new OG.Canvas('canvas', [500, 300], 'transparent');
+            canvas = new OG.Canvas('canvas', [1000, 800], 'transparent');
             //canvas = new OG.Canvas('canvas', [1000, 800], 'white', 'url(resources/images/symbol/grid.gif)');
             canvas._CONFIG.DEFAULT_STYLE.EDGE["edge-type"] = "plain";
             canvas._CONFIG.GUIDE_CONTROL_LINE_NUM = 1;
@@ -248,7 +252,6 @@
                 checkBridgeEdge: true,
                 autoHistory: false
             });
-
 
 //            canvas.addSlider({
 //                slider: $("#canvas_slider"),
@@ -349,180 +352,106 @@
             });
 
             var dataTable = new OG.DataTable();
-            var data = [
-                {
-                    activity: 'FUNCTION'
-                },
-                {
-                    activity: '견적 TFT / EM',
+            var data = [];
+            for (var i = 0; i < 20; i++) {
+                data.push({
+                    activity: '견적 TFT / EM' + i,
                     '90_': [
-                        {type: 'activity', value: 'ITB 배포'},
-                        {type: 'activity', value: 'ITB 배포2'}
+                        {type: 'activity', value: 'ITB 배포'}
+                    ],
+                    '85_': [
+                        {type: 'activity', value: 'Reference PJT 선정'}
+                    ],
+                    '80_': [
+                        {type: 'activity', value: 'Reference PJT 선정'}
                     ],
                     '75_': [
                         {type: 'activity', value: 'Reference PJT 선정'}
-                    ]
-                },
-                {
-                    activity: '성능',
-                    '75_': [
-                        {type: 'activity', value: 'Plant Configuration'}
                     ],
                     '70_': [
-                        {type: 'activity', value: 'Performance Guideline'}
+                        {type: 'activity', value: 'Reference PJT 선정'}
                     ],
                     '65_': [
-                        {type: 'activity', value: 'Plant HBD\n(보안문서)'}
-                    ]
-                },
-                {
-                    activity: '프로세스',
-                    '60_': [
-                        {type: 'activity', value: 'Utility\nConsumption\n취합'}
-                    ],
-                    '50_': [
-                        {type: 'activity', value: 'P&ID\nCalculation'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: '플랜트(보조기기)',
-                    '55_': [
-                        {type: 'activity', value: 'WBD'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: '플랜트(주기기)\nor STG,BLR BG',
-                    '75_': [
-                        {type: 'activity', value: 'MPS'}
-                    ],
-                    '70_': [
-                        {type: 'activity', value: 'GT data / STG\nHBD'}
-                    ],
-                    '65_': [
-                        {type: 'activity', value: 'BLR / HRSG\nPerformance\nData'}
+                        {type: 'activity', value: 'Reference PJT 선정'}
                     ],
                     '60_': [
-                        {type: 'activity', value: 'Utility\nConsumption'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: '배관'
-                },
-                {
-                    activity: '배치',
-                    '40_': [
-                        {type: 'activity', value: 'Plot\nplan'}
-                    ]
-                },
-                {
-                    activity: '운반',
-                    '85_': [
-                        {type: 'largeActivity', value: 'IRS\n&\nBIGS'}
-                    ],
-                    '80_': [
-                        {type: 'largeActivity', value: 'Devajtion\n&\nClarification'}
-                    ],
-                    '60_': [
-                        {type: 'activity', value: 'Utility\nConsumption'}
-                    ],
-                    '50_': [
-                        {type: 'activity', value: 'CHS & LHS\nFlowdagram'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: '수처리',
-                    '60_': [
-                        {type: 'activity', value: 'Utility\nConsumption'}
+                        {type: 'activity', value: 'Reference PJT 선정'}
                     ],
                     '55_': [
-                        {type: 'activity', value: 'Conceptual\nDesign\nCalculation'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: 'HVAC',
-                    '60_': [
-                        {type: 'activity', value: 'Utility\nConsumption'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: 'Fire Fighting',
-                    '60_': [
-                        {type: 'activity', value: 'Utility\nConsumption'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: '전력',
-                    '60_': [
-                        {type: 'activity', value: 'Utility\nConsumption'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: '계측',
-                    '60_': [
-                        {type: 'activity', value: 'Utility\nConsumption'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'Pre-requisite\ndata'}
-                    ]
-                },
-                {
-                    activity: '건축',
-                    '40_': [
-                        {type: 'activity', value: 'Building list'}
-                    ]
-                },
-                {
-                    activity: '토목',
-                    '90_': [
-                        {type: 'report', value: 'SI Report\nPhotography\nStudy'}
+                        {type: 'activity', value: 'Reference PJT 선정'}
                     ],
                     '50_': [
-                        {type: 'horizontalActivity', value: 'Coal Jetty Design\n Coal Storage Yard Design'}
+                        {type: 'activity', value: 'Reference PJT 선정'}
+                    ],
+                    '45_': [
+                        {type: 'activity', value: 'Reference PJT 선정'}
                     ]
-                },
-                {
-                    activity: ''
-                }
-            ];
+                })
+            }
 
-            dataTable.MOVABLE = false;
-            canvas.drawShape([100, 100], dataTable, [100, 100], {});
-            dataTable.setData(data);
-            dataTable.draw();
+            $.get('resources/images/dids/dids-ed-svg.svg', function (data) {
+                canvas.drawShape([200, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+                    {
+                        fill: '#394',
+                        stroke: 'red',
+                        'stroke-width': '30'
+                    }
+                );
+            });
 
-//            var cellView1 = dataTable.getCellFromTableIndex(1, 1);
-//            var cellView2 = dataTable.getCellFromTableIndex(1, 2);
+            $.get('resources/images/dids/dids-activity.svg', function (data) {
+                canvas.drawShape([400, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+                    {
+                        fill: '#394',
+                        stroke: 'red',
+                        'stroke-width': '50'
+                    }
+                );
+            });
 
-            //dataTable.addCellContent(cellView2, canvas.getElementById(cellView1['contents'][0]))
-            //dataTable.emptyCell(cellView);
+            $.get('resources/images/dids/dids-folder.svg', function (data) {
+                canvas.drawShape([600, 200], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+                    {
+                        fill: '#394',
+                        stroke: 'red',
+                        'stroke-width': '50'
+                    }
+                );
+            });
 
-            setTimeout(function () {
+            $.get('resources/images/dids/dids-doc.svg', function (data) {
+                canvas.drawShape([200, 500], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+                    {
+                        fill: '#394',
+                        stroke: 'red',
+                        'stroke-width': '50'
+                    }
+                );
+            });
 
-            }, 2000);
+            $.get('resources/images/dids/dids-dwg.svg', function (data) {
+                canvas.drawShape([400, 500], new OG.SvgShape(new XMLSerializer().serializeToString(data), 'BBB'), [200, 200],
+                    {
+                        fill: '#394',
+                        stroke: 'red',
+                        'stroke-width': '50'
+                    }
+                );
+            });
+//            canvas.drawShape([300, 300], new OG.ImageShape('resources/images/dids/dids-ed-svg.svg'), [400, 400],
+//                {r: '10'}
+//            );
+
+//            var start = new Date();
+//            dataTable.MOVABLE = false;
+//            canvas.drawShape([100, 100], dataTable, [100, 100], {});
+//            dataTable.setData(data);
+//            dataTable.draw();
+//            var end = new Date();
+//            var number = end.getTime() - start.getTime();
+
+
+            //
 
         });
 
