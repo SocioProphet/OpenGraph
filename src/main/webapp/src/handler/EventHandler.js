@@ -2675,6 +2675,51 @@ OG.handler.EventHandler.prototype = {
         });
     },
 
+    makeRotate: function(){
+        var me = this;
+
+        return {
+            'rotate': {
+                name: '회전',
+                items: {
+                    'rotate_select': {
+                        name: '선택',
+                        type: 'select',
+                        options: {
+                            '0': '0',
+                            '45': '45',
+                            '90': '90',
+                            '135': '135',
+                            '180': '180',
+                            '-45': '-45',
+                            '-90': '-90',
+                            '-135': '-135',
+                            '-180': '-180'
+                        },
+                        selected: '0',
+                        events: {
+                            change: function (e) {
+                                me.rotateSelectedShape(e.target.value);
+                            }
+                        }
+                    },
+                    'sep8_8_1': '---------',
+                    'rotate_custom': {
+                        name: '직접입력',
+                        type: 'text',
+                        events: {
+                            keyup: function (e) {
+                                if (e.target.value !== '') {
+                                    me.rotateSelectedShape(e.target.value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+
     makeFillColor: function () {
         var me = this;
 
@@ -3552,6 +3597,7 @@ OG.handler.EventHandler.prototype = {
                 items: this.mergeContextMenu(
                     this.makeFillColor(),
                     this.makeFillOpacity(),
+                    this.makeRotate(),
                     this.makeLineStyle(),
                     this.makeLineColor(),
                     this.makeLineWidth()
