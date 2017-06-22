@@ -881,7 +881,7 @@ OG.handler.EventHandler.prototype = {
                             if (!parentNode) {
                                 parentNode = ele.parentNode;
                             }
-                            if (parentNode.id !== root.id) {
+                            if (parentNode && parentNode.id !== root.id) {
                                 addToGroupArray.push(ele);
                             }
                         });
@@ -4899,6 +4899,9 @@ OG.handler.EventHandler.prototype = {
             if (renderer.isEdge(ele)) {
                 return;
             }
+            if(ele.shape && !ele.shape.MOVABLE){
+                return;
+            }
             connectCheckShapes.push(ele);
             if (renderer.isGroup(ele)) {
                 $.each(renderer.getInnerShapesOfGroup(ele), function (idx, innerShape) {
@@ -4928,10 +4931,11 @@ OG.handler.EventHandler.prototype = {
             renderer.remove(item.box);
 
             // 이동
-            renderer.move(ele, [dx, dy], excludeEdgeId);
+            if(ele.shape && ele.shape.MOVABLE){
+                renderer.move(ele, [dx, dy], excludeEdgeId);
+                eleArray.push(ele);
+            }
             renderer.drawGuide(ele);
-
-            eleArray.push(ele);
         });
 
         return eleArray;

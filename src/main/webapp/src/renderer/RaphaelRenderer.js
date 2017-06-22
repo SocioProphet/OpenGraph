@@ -3942,10 +3942,10 @@ OG.renderer.RaphaelRenderer.prototype.ungroup = function (groupElements) {
 OG.renderer.RaphaelRenderer.prototype.addToGroup = function (groupElement, elements) {
     for (var i = 0, leni = elements.length; i < leni; i++) {
         groupElement.appendChild(elements[i]);
-        if (groupElement.shape && groupElement.shape.onAddToGroup) {
-            groupElement.shape.onAddToGroup(groupElement, elements[i]);
-        }
-        elements[i].shape.onAddToGroup(groupElement, elements[i]);
+        elements[i].shape.onAddedToGroup(groupElement, elements[i]);
+    }
+    if (groupElement.shape && groupElement.shape.onAddToGroup) {
+        groupElement.shape.onAddToGroup(groupElement, elements);
     }
 };
 
@@ -4999,8 +4999,11 @@ OG.renderer.RaphaelRenderer.prototype.drawConnectGuide = function (element) {
  */
 OG.renderer.RaphaelRenderer.prototype.removeConnectGuide = function (element) {
     var me = this;
-    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element),
-        bBox = me._getREleById(rElement.id + OG.Constants.CONNECT_GUIDE_SUFFIX.BBOX);
+    var rElement = me._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return;
+    }
+    var bBox = me._getREleById(rElement.id + OG.Constants.CONNECT_GUIDE_SUFFIX.BBOX);
     $(me.getSpots(element)).each(function (index, spot) {
         me._remove(me._getREleById(spot.id));
     })

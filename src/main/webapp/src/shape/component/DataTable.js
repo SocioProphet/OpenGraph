@@ -83,11 +83,17 @@ OG.shape.component.DataTable = function () {
             }
 
             if (contentData.type == 'activity') {
+                var shape = new OG.A_Task(contentData.value);
+                shape.CONNECTABLE = true;
+                shape.GROUP_COLLAPSIBLE = false;
+                shape.DELETABLE = false;
+                shape.LABEL_EDITABLE = false;
+                shape.RESIZABLE = false;
                 result.contents.push({
                     /**
                      * 도형 shape
                      */
-                    shape: new OG.A_Task(contentData.value),
+                    shape: shape,
                     /**
                      * 도형 가로 (number,px,%)
                      */
@@ -552,49 +558,68 @@ OG.shape.component.DataTable.prototype.emptyCell = function (cellView, preventRe
 /**
  * 주어진 컨텐트 엘리먼트를 셀에 추가시킨다.
  * @param cellView
- * @param contentElement
- * @param value
+ * @param contentElementsWithValue [{element:element,value:value}]
  */
-OG.shape.component.DataTable.prototype.addCellContent = function (cellView, contentElement, value) {
-    var me = this;
-    var boundary = me.currentCanvas.getBoundary(contentElement);
-    if (contentElement && contentElement.nodeType == 1 && me.currentCanvas.getRenderer().isShape(contentElement)) {
-        var data = me.getCellInformation(cellView);
-        if (!data.contents) {
-            data.contents = [];
-            me.data.viewData.rows[data.rowIndex].cells[data.column]['contents'] = [];
-        }
+OG.shape.component.DataTable.prototype.addCellContent = function (cellView, contentElementsWithValue) {
+    var me = this, contentElement, isExist, beforeIndex, newIndex, boundary, value;
+    var data = me.getCellInformation(cellView);
+    if (!data.contents) {
+        data.contents = [];
+        me.data.viewData.rows[data.rowIndex].cells[data.column]['contents'] = [];
+    }
 
-        if (!data.contentsPosition) {
-            data.contentsPosition = {}
-        }
-        if (!data.contentsPosition['arrangement']) {
-            data.contentsPosition['arrangement'] = 'horizontal';
-        }
-        //신규 컨텐트의 센터와 기존 컨텐트의 센터들 사이간의 위치 인덱스를 구한다.
-        var isExist = false;
-        var beforeIndex = 0;
-        var newIndex = 0;
-        $.each(data.contentElements, function (i, existContent) {
-            if (existContent.id == contentElement.id) {
-                isExist = true;
-                beforeIndex = i;
-            }
-            //가로 방향 정렬일경우 x 포지션 비교
-            if (data.contentsPosition['arrangement'] == 'horizontal') {
-                var x = me.currentCanvas.getBoundary(existContent).getCentroid().x;
-                if (x < boundary.getCentroid().x) {
-                    newIndex = i + 1;
+    if (!data.contentsPosition) {
+        data.contentsPosition = {}
+    }
+    if (!data.contentsPosition['arrangement']) {
+        data.contentsPosition['arrangement'] = 'horizontal';
+    }
+
+    var elementsToAdd = [];
+    for (var i = 0; i < contentElementsWithValue.length; i++) {
+        contentElement = contentElementsWithValue[i].element;
+        if (contentElement && contentElement.nodeType == 1 && me.currentCanvas.getRenderer().isShape(contentElement)) {
+            //신규 컨텐트의 센터와 기존 컨텐트의 센터들 사이간의 위치 인덱스를 구한다.
+            isExist = false;
+            beforeIndex = 0;
+            newIndex = 0;
+            boundary = me.currentCanvas.getBoundary(contentElement);
+            $.each(data.contentElements, function (i, existContent) {
+                if (existContent.id == contentElement.id) {
+                    isExist = true;
+                    beforeIndex = i;
                 }
-            }
-            //세로 방향 정렬일경우 y 포지션 비교
-            else {
-                var y = me.currentCanvas.getBoundary(existContent).getCentroid().y;
-                if (y < boundary.getCentroid().y) {
-                    newIndex = i + 1;
+                //가로 방향 정렬일경우 x 포지션 비교
+                if (data.contentsPosition['arrangement'] == 'horizontal') {
+                    var x = me.currentCanvas.getBoundary(existContent).getCentroid().x;
+                    if (x < boundary.getCentroid().x) {
+                        newIndex = i + 1;
+                    }
                 }
-            }
-        })
+                //세로 방향 정렬일경우 y 포지션 비교
+                else {
+                    var y = me.currentCanvas.getBoundary(existContent).getCentroid().y;
+                    if (y < boundary.getCentroid().y) {
+                        newIndex = i + 1;
+                    }
+                }
+            })
+            elementsToAdd.push({
+                element: contentElement,
+                value: contentElementsWithValue[i].value,
+                isExist: isExist,
+                beforeIndex: beforeIndex,
+                newIndex: newIndex
+            });
+        }
+    }
+
+    for (var c = 0; c < elementsToAdd.length; c++) {
+        isExist = elementsToAdd[c].isExist;
+        beforeIndex = elementsToAdd[c].beforeIndex;
+        newIndex = elementsToAdd[c].newIndex;
+        value = elementsToAdd[c].value;
+        contentElement = elementsToAdd[c].element;
 
         //신규 컨텐트를 추가하는 경우
         if (!isExist) {
@@ -644,6 +669,94 @@ OG.shape.component.DataTable.prototype.addCellContent = function (cellView, cont
             }
         }
     }
+
+    // var boundary = me.currentCanvas.getBoundary(contentElement);
+    // if (contentElement && contentElement.nodeType == 1 && me.currentCanvas.getRenderer().isShape(contentElement)) {
+    //     var data = me.getCellInformation(cellView);
+    //     if (!data.contents) {
+    //         data.contents = [];
+    //         me.data.viewData.rows[data.rowIndex].cells[data.column]['contents'] = [];
+    //     }
+    //
+    //     if (!data.contentsPosition) {
+    //         data.contentsPosition = {}
+    //     }
+    //     if (!data.contentsPosition['arrangement']) {
+    //         data.contentsPosition['arrangement'] = 'horizontal';
+    //     }
+    //     //신규 컨텐트의 센터와 기존 컨텐트의 센터들 사이간의 위치 인덱스를 구한다.
+    //     var isExist = false;
+    //     var beforeIndex = 0;
+    //     var newIndex = 0;
+    //     $.each(data.contentElements, function (i, existContent) {
+    //         if (existContent.id == contentElement.id) {
+    //             isExist = true;
+    //             beforeIndex = i;
+    //         }
+    //         //가로 방향 정렬일경우 x 포지션 비교
+    //         if (data.contentsPosition['arrangement'] == 'horizontal') {
+    //             var x = me.currentCanvas.getBoundary(existContent).getCentroid().x;
+    //             if (x < boundary.getCentroid().x) {
+    //                 newIndex = i + 1;
+    //             }
+    //         }
+    //         //세로 방향 정렬일경우 y 포지션 비교
+    //         else {
+    //             var y = me.currentCanvas.getBoundary(existContent).getCentroid().y;
+    //             if (y < boundary.getCentroid().y) {
+    //                 newIndex = i + 1;
+    //             }
+    //         }
+    //     })
+    //
+    //     //신규 컨텐트를 추가하는 경우
+    //     if (!isExist) {
+    //         //다른 셀에서 contentElement 를 사용한다면 연결을 해제한다.
+    //         var removeValue = me.removeCellContent(contentElement, true);
+    //         //주어진 value 가 없고, 이전 사용중인 셀이 있다면 이전 사용중인 셀에서 가져온 value 로 대체한다.
+    //         if (!value && removeValue) {
+    //             value = removeValue;
+    //         }
+    //         //그래도 value 가 없다면 contentElement 의 데이터로 대체한다.
+    //         if (!value) {
+    //             value = contentElement.shape.data ? contentElement.shape.data : {};
+    //         }
+    //
+    //         //뷰테이블 추가
+    //         me.data.viewData.rows[data.rowIndex].cells[data.column]['contents'].splice(newIndex, 0, contentElement.id);
+    //
+    //         //해당 value 를 인덱스에 추가한다.
+    //         if (!me.data.viewData.rows[data.rowIndex].cells[data.column]['value']) {
+    //             me.data.viewData.rows[data.rowIndex].cells[data.column]['value'] = [];
+    //             me.data.tableData[data.rowDataIndex][data.column] = [];
+    //         }
+    //         if (typeof me.data.viewData.rows[data.rowIndex].cells[data.column]['value'] == 'object') {
+    //             me.data.viewData.rows[data.rowIndex].cells[data.column]['value'].splice(newIndex, 0, value);
+    //             me.data.tableData[data.rowDataIndex][data.column] =
+    //                 JSON.parse(JSON.stringify(me.data.viewData.rows[data.rowIndex].cells[data.column]['value']));
+    //         }
+    //
+    //         me.drawCell(cellView, true);
+    //     }
+    //     //같은 셀 내부에서 컨텐트를 이동하는 경우
+    //     else {
+    //         //위치가 같은 경우 순서를 조작하지 않음.
+    //         if (beforeIndex == newIndex) {
+    //             me.redrawCell(cellView);
+    //         }
+    //         else {
+    //             //뒤로 순서가 이동하는 경우, 자신의 기존 인덱스를 고려하여 newIndex 에서 1 후퇴.
+    //             if (newIndex > beforeIndex) {
+    //                 newIndex = newIndex - 1;
+    //             }
+    //             me.data.viewData.rows[data.rowIndex].cells[data.column]['contents'].move(beforeIndex, newIndex);
+    //             me.data.viewData.rows[data.rowIndex].cells[data.column]['value'].move(beforeIndex, newIndex);
+    //             me.data.tableData[data.rowDataIndex][data.column] =
+    //                 JSON.parse(JSON.stringify(me.data.viewData.rows[data.rowIndex].cells[data.column]['value']));
+    //             me.redrawCell(me.refreshCellView(cellView));
+    //         }
+    //     }
+    // }
 };
 
 /**
@@ -1535,7 +1648,7 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (cellView, inf
             me.removeCellContent(contentElement);
         }
         //콘텐트 이동시 처리
-        contentElement.shape.onAddToGroup = function (groupElement, element) {
+        contentElement.shape.onAddedToGroup = function (groupElement, element) {
             //그룹이 소속된 테이블이 아닐 경우
             if (groupElement.id != me.currentElement.id) {
 
@@ -1549,7 +1662,7 @@ OG.shape.component.DataTable.prototype.drawCellContent = function (cellView, inf
                     me.removeCellContent(element, true);
                     element.shape.onRemoveShape = function () {
                     };
-                    element.shape.onAddToGroup = function () {
+                    element.shape.onAddedToGroup = function () {
                     };
                     element.shape.onResize = function () {
                     };
@@ -1781,51 +1894,81 @@ OG.shape.component.DataTable.prototype.createContextMenu = function () {
 /**
  * 어떠한 도형이 사용자의 행위로 테이블로 끌어당겨졌을 경우
  * @param groupElement
- * @param element
+ * @param elements
  */
-OG.shape.component.DataTable.prototype.onAddToGroup = function (groupElement, element) {
+OG.shape.component.DataTable.prototype.onAddToGroup = function (groupElement, elements) {
     //해당 엘리먼트가 등록된 셀을 조회한다.
     //있다면, 기존셀에서 현재셀로 콘텐트를 이동한다.
     //없다면, 신규 콘텐트로 등록한다.
     var me = this;
     var beforeCell;
-    var dropCell, dropCellData;
+    var dropCell, dropElements;
+    console.log(elements);
     if (groupElement.id == me.currentElement.id) {
-        //콘텐트를 가지고 있던 기존 셀을 구한다.
-        beforeCell = me.getCellViewFromContent(element);
 
-        //콘텐트의 중심을 포함한 셀을 찾는다.
-        var centroid = me.currentCanvas.getBoundary(element).getCentroid();
-        dropCell = me.getCellViewFromOffset([centroid.x, centroid.y]);
-        if (dropCell && dropCell.type == 'column') {
-            dropCell = null;
+        //셀 컨텐트를 부여하고 난 이후에 dropCell 이 달라지기 때문에 미리 배정을 한다.
+        var dropCellMap = {};
+        var noneDropCellList = [];
+        for (var b = 0; b < elements.length; b++) {
+            //셀이 이동되었을 경우 셀 무시
+            if (elements[b].shape instanceof OG.Cell) {
+                continue;
+            }
+
+            //콘텐트의 중심을 포함한 셀을 찾는다.
+            var centroid = me.currentCanvas.getBoundary(elements[b]).getCentroid();
+            var toDropCell = me.getCellViewFromOffset([centroid.x, centroid.y]);
+            if (toDropCell && toDropCell.type == 'column') {
+                toDropCell = null;
+            }
+            if (toDropCell) {
+                var rowIndex = toDropCell.rowIndex;
+                var cellIndex = toDropCell.cellIndex;
+                var dropKey = rowIndex + '_' + cellIndex + '_';
+                if (dropCellMap[dropKey]) {
+                    dropCellMap[dropKey]['elements'].push(elements[b]);
+                } else {
+                    dropCellMap[dropKey] = {
+                        dropCell: toDropCell,
+                        elements: [elements[b]]
+                    }
+                }
+            } else {
+                noneDropCellList.push(elements[b]);
+            }
         }
 
-        //드랍셀이 없고 이전 셀도 없다면 콘텐트를 테이블 밖으로 빼야 한다.
-        //이 경우는 외부에서 드랍되었는데 칼럼으로 떨어진 경우다.
-        if (!dropCell && !beforeCell) {
-            me.currentCanvas.addToGroup(me.currentCanvas.getRootGroup(), [element]);
-            return;
-        }
-        //드랍셀이 없고 이전 셀이 있다면 원복시킨다.
-        //이 경우는 테이블 내에서 이동시켰는데 칼럼으로 떨어진 경우다.
-        if (!dropCell && beforeCell) {
-            me.redrawCell(beforeCell);
-            return;
+        //드랍셀이 없는 엘리먼트를 먼저 처리한다.
+        for (var i = 0; i < noneDropCellList.length; i++) {
+            //콘텐트를 가지고 있던 기존 셀을 구한다.
+            beforeCell = me.getCellViewFromContent(noneDropCellList[i]);
+
+            //드랍셀이 없고 이전 셀도 없다면 콘텐트를 테이블 밖으로 빼야 한다.
+            //이 경우는 외부에서 드랍되었는데 칼럼으로 떨어진 경우다.
+            if (!beforeCell) {
+                me.currentCanvas.addToGroup(me.currentCanvas.getRootGroup(), [noneDropCellList[i]]);
+                continue;
+            }
+            //드랍셀이 없고 이전 셀이 있다면 원복시킨다.
+            //이 경우는 테이블 내에서 이동시켰는데 칼럼으로 떨어진 경우다.
+            if (beforeCell) {
+                me.redrawCell(beforeCell);
+                continue;
+            }
         }
 
-        //드랍셀과 이전 셀이 있다면, addCellContent 처리한다.
-        //이 경우는 테이블 내에서 이동시켰을 경우이다.
-        if (dropCell && beforeCell) {
-            me.addCellContent(dropCell, element);
-            return;
-        }
-
-        //드랍셀만 있다면, updateCell 을 한다.
-        //이 경우는 외부에서 드랍되었을 경우이다.
-        if (dropCell && !beforeCell) {
-            me.addCellContent(dropCell, element);
-            return;
+        //드랍셀이 있는 경우의 처리.
+        for (var key in dropCellMap) {
+            dropCell = dropCellMap[key]['dropCell'];
+            dropElements = dropCellMap[key]['elements'];
+            var elementsWithValues = [];
+            for (var d = 0; d < dropElements.length; d++) {
+                elementsWithValues.push({
+                    element: dropElements[d],
+                    value: null
+                })
+            }
+            me.addCellContent(dropCell, elementsWithValues);
         }
     }
 }

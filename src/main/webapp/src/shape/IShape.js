@@ -267,7 +267,20 @@ OG.shape.IShape.prototype = {
     onPasteShape: function (copied, pasted) {
 
     },
-    onAddToGroup: function (groupElement, element) {
+    /**
+     * 자신에게 도형들이 그룹으로 들어왔을때의 이벤트
+     * @param groupElement
+     * @param elements
+     */
+    onAddToGroup: function (groupElement, elements) {
+
+    },
+    /**
+     * 자신이 그룹속으로 들어갔을 때의 이벤트
+     * @param groupElement
+     * @param element
+     */
+    onAddedToGroup: function(groupElement, element){
 
     },
     onSelectShape: function () {

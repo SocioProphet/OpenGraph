@@ -352,7 +352,7 @@
 
             var dataTable = new OG.DataTable();
             var data = [];
-            for (var i = 0; i < 20; i++) {
+            for (var i = 0; i < 2; i++) {
                 data.push({
                     activity: '견적 TFT / EM' + i,
                     '90_': [
@@ -389,15 +389,15 @@
                 })
             }
 
-//            var start = new Date();
-//            dataTable.MOVABLE = false;
-//            canvas.drawShape([100, 100], dataTable, [100, 100], {});
-//            dataTable.setData(data);
-//            dataTable.draw();
-//            var end = new Date();
-//            var number = end.getTime() - start.getTime();
+            var start = new Date();
+            dataTable.MOVABLE = false;
+            canvas.drawShape([100, 100], dataTable, [100, 100], {});
+            dataTable.setData(data);
+            dataTable.draw();
+            var end = new Date();
+            var number = end.getTime() - start.getTime();
 
-            canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
+//            canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
 
         });
 
