@@ -272,7 +272,7 @@ OG.shape.IShape.prototype = {
      * @param groupElement
      * @param elements
      */
-    onAddToGroup: function (groupElement, elements) {
+    onAddToGroup: function (groupElement, elements, eventOffset) {
 
     },
     /**
@@ -280,7 +280,7 @@ OG.shape.IShape.prototype = {
      * @param groupElement
      * @param element
      */
-    onAddedToGroup: function(groupElement, element){
+    onAddedToGroup: function(groupElement, element, eventOffset){
 
     },
     onSelectShape: function () {

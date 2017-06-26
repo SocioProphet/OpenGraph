@@ -867,7 +867,7 @@ OG.handler.EventHandler.prototype = {
                     // group target 이 있는 경우 grouping 처리
                     if (groupTarget && OG.Util.isElement(groupTarget)) {
                         // grouping
-                        renderer.addToGroup(groupTarget, eleArray);
+                        renderer.addToGroup(groupTarget, eleArray, eventOffset);
                         renderer.remove(groupTarget.id + OG.Constants.DROP_OVER_BBOX_SUFFIX);
                         $(root).removeData("groupTarget");
                     } else {
@@ -885,7 +885,7 @@ OG.handler.EventHandler.prototype = {
                                 addToGroupArray.push(ele);
                             }
                         });
-                        renderer.addToGroup(root, addToGroupArray);
+                        renderer.addToGroup(root, addToGroupArray, eventOffset);
                     }
 
                     $.each(me._getSelectedElement(), function (idx, selected) {
@@ -3734,7 +3734,6 @@ OG.handler.EventHandler.prototype = {
      * @param {Element} element Shape 엘리먼트
      */
     selectShape: function (element, event, param) {
-
         var me = this, guide, root = me._RENDERER.getRootGroup();
 
         //단일 선택 다중 선택 여부 판단

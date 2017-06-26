@@ -352,39 +352,59 @@
 
             var dataTable = new OG.DataTable();
             var data = [];
-            for (var i = 0; i < 2; i++) {
+            for (var i = 0; i < 20; i++) {
                 data.push({
                     activity: '견적 TFT / EM' + i,
                     '90_': [
-                        {type: 'activity', value: 'ITB 배포'},
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포1'}
                     ],
                     '85_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포2'}
                     ],
                     '80_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포3'}
                     ],
                     '75_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포4'}
                     ],
                     '70_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포5'}
                     ],
                     '65_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포6'}
                     ],
                     '60_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포7'}
                     ],
                     '55_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포8'}
                     ],
                     '50_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포9'}
+                    ],
+                    '49_': [
+                        {type: 'activity', value: 'ITB 배포9'}
+                    ],
+                    '48_': [
+                        {type: 'activity', value: 'ITB 배포9'}
+                    ],
+                    '47_': [
+                        {type: 'activity', value: 'ITB 배포9'}
+                    ],
+                    '46_': [
+                        {type: 'activity', value: 'ITB 배포9'}
                     ],
                     '45_': [
-                        {type: 'activity', value: 'Reference PJT 선정'}
+                        {type: 'activity', value: 'ITB 배포9'}
+                    ],
+                    '44_': [
+                        {type: 'activity', value: 'ITB 배포9'}
+                    ],
+                    '43_': [
+                        {type: 'activity', value: 'ITB 배포9'}
+                    ],
+                    '42_': [
+                        {type: 'activity', value: 'ITB 배포10'}
                     ]
                 })
             }
@@ -397,8 +417,36 @@
             var end = new Date();
             var number = end.getTime() - start.getTime();
 
+            alert(number);
+
 //            canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
 
+
+            var activities = [];
+            //로우
+            for (var i = 0; i < 16; i++) {
+
+                //헤더
+                for (var c = 0; c < 13; c++) {
+                    var aaa = {
+                        "tot_wfa": "A-BA-2004-00-001",
+                        "cur_rel_project": "41288901F225472CA37E9B5C6FB207C5",
+                        "cur_wfa": "Z14345-A-BA-2004-00-00" + i + '-' + c,
+                        "cur_wfa_name": "DL 자료 접수 " + c,
+                        "cur_state": "In Planning",
+                        "cur_wfa_config_id": "687FE7856D5C471682AAF0130B3C5403",
+                        "cur_eng_func_code": "P-BA-" + (2000 + i),
+                        "cur_check_alarm": 1,
+                        "ref_rel_project": "NULL",
+                        "ref_wfa": "NULL",
+                        "ref_wfa_config_id": "NULL",
+                        "tot_wfa_label": "BLR) Building Enclosure(A-BA-2004-00-001)",
+                        "cur_rel_fw": "41288901F225472CA37E9B5C6FB207C5"
+                    }
+                    activities.push(aaa);
+                }
+            }
+            //console.log(JSON.stringify(activities));
         });
 
         //JSON 입출력시, viewData.cells 누락.

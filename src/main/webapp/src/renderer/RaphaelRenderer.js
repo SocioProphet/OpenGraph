@@ -3939,13 +3939,13 @@ OG.renderer.RaphaelRenderer.prototype.ungroup = function (groupElements) {
  * @param {Element[]} elements
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.addToGroup = function (groupElement, elements) {
+OG.renderer.RaphaelRenderer.prototype.addToGroup = function (groupElement, elements, eventOffset) {
     for (var i = 0, leni = elements.length; i < leni; i++) {
         groupElement.appendChild(elements[i]);
-        elements[i].shape.onAddedToGroup(groupElement, elements[i]);
+        elements[i].shape.onAddedToGroup(groupElement, elements[i], eventOffset);
     }
     if (groupElement.shape && groupElement.shape.onAddToGroup) {
-        groupElement.shape.onAddToGroup(groupElement, elements);
+        groupElement.shape.onAddToGroup(groupElement, elements, eventOffset);
     }
 };
 

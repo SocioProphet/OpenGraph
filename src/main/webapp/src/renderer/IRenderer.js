@@ -468,7 +468,7 @@ OG.renderer.IRenderer.prototype = {
      * @param {Element} groupElement
      * @param {Element[]} elements
      */
-    addToGroup: function (groupElement, elements) {
+    addToGroup: function (groupElement, elements, eventOffset) {
         throw new OG.NotImplementedException();
     },
 
