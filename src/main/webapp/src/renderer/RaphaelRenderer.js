@@ -2962,7 +2962,6 @@ OG.renderer.RaphaelRenderer.prototype.drawDropOverGuide = function (element) {
 };
 
 OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
-
     var me = this, rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element),
         geometry = rElement ? rElement.node.shape.geom : null,
         envelope,
@@ -2976,6 +2975,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         _trash, isEdge, isEssensia, controllers = [], isLane,
         _qUpper, _qLow, _qBisector, _qThirds;
 
+    var bboxStyle = element.shape.GUIDE_BBOX ? element.shape.GUIDE_BBOX : me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX;
 
     var _isConnectable = rElement && me._CANVAS._HANDLER._isConnectable(element.shape);
     var _isConnectCloneable = rElement && me._CANVAS._HANDLER._isConnectCloneable(element.shape);
@@ -3047,7 +3047,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         if (isEdge) {
             _bBoxRect = me._PAPER.rect(_upperLeft.x - 10, _upperLeft.y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
         }
-        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+        _bBoxRect.attr(bboxStyle);
         me._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
         guide.bBox = _bBoxRect.node;
     }
@@ -3060,7 +3060,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         if (isEdge) {
             _bBoxRect = me._PAPER.rect(_upperLeft.x - 10, _upperLeft.y - 10, envelope.getWidth() + 20, envelope.getHeight() + 20);
         }
-        _bBoxRect.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+        _bBoxRect.attr(bboxStyle);
         me._add(_bBoxRect, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
     }
 
@@ -3637,6 +3637,8 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
         _size = me._CONFIG.GUIDE_RECT_SIZE, _hSize = OG.Util.round(_size / 2), _style = {},
         i;
 
+    var bboxStyle = element.shape.GUIDE_BBOX ? element.shape.GUIDE_BBOX : me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX;
+
     if (rElement && geometry) {
         OG.Util.apply(_style, geometry.style.map, me._CONFIG.DEFAULT_STYLE.EDGE);
 
@@ -3670,7 +3672,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
             }
 
             _bBoxLine = this._PAPER.path(pathStr);
-            _bBoxLine.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+            _bBoxLine.attr(bboxStyle);
             this._add(_bBoxLine, rElement.id + OG.Constants.GUIDE_SUFFIX.BBOX);
             _bBoxLine.insertBefore(rElement);
 
@@ -3738,7 +3740,7 @@ OG.renderer.RaphaelRenderer.prototype.drawEdgeGuide = function (element) {
             }
         }
         _bBoxLine = this._PAPER.path(pathStr);
-        _bBoxLine.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_BBOX);
+        _bBoxLine.attr(bboxStyle);
 
         // 시작지점 가이드
         _fromRect = this._PAPER.rect(vertices[0].x - _hSize, vertices[0].y - _hSize, _size, _size);

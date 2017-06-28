@@ -830,7 +830,10 @@ OG.handler.EventHandler.prototype = {
 
                     $(this).css({"position": "", "left": "", "top": ""});
                     $.each(bBoxArray, function (k, item) {
-                        renderer.setAttr(item.box, {transform: "t" + dx + "," + dy});
+                        renderer.setAttr(item.box, {
+                            transform: "t" + dx + "," + dy,
+                            'stroke-width': 1
+                        });
                     });
 
                     setGroupTarget();

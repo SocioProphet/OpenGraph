@@ -89,17 +89,13 @@ OG.shape.component.DataTable = function () {
                 shape.DELETABLE = false;
                 shape.LABEL_EDITABLE = false;
                 shape.RESIZABLE = false;
-                shape.onSelectShape = function () {
-                    var me = this;
-                    me.currentCanvas.setShapeStyle(me.currentElement, {
-                        stroke: '#ff0100'
-                    })
-                }
-                shape.onDeSelectShape = function () {
-                    var me = this;
-                    me.currentCanvas.setShapeStyle(me.currentElement, {
-                        stroke: '#000'
-                    })
+                shape.GUIDE_BBOX = {
+                    stroke: "#ff5b00",
+                    'stroke-width': 4,
+                    fill: "white",
+                    "fill-opacity": 0,
+                    "shape-rendering": "crispEdges",
+                    cursor: "move"
                 }
                 result.contents.push({
                     /**
@@ -130,6 +126,8 @@ OG.shape.component.DataTable = function () {
 
     //옵션데이터
     this.options = {
+        selectable: 'column',
+
         //mode: 'view',
         /**
          * 컨텐트 외부 드래그 가능 여부
@@ -1229,6 +1227,18 @@ OG.shape.component.DataTable.prototype.bindCellEvent = function () {
 
 OG.shape.component.DataTable.prototype.createCellGuid = function (cellView) {
     var me = this;
+
+    if(me.options.selectable == 'column'){
+        if(cellView.type != 'column'){
+            return;
+        }
+    }
+    if(me.options.selectable == 'cell'){
+        if(cellView.type != 'cell'){
+            return;
+        }
+    }
+
     //기존 등록된 임시 셀을 모두 삭제토록.
     var childs = me.currentCanvas.getChilds(me.currentElement);
     for (var i = 0, leni = childs.length; i < leni; i++) {
