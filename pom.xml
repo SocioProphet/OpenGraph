@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.uengine</groupId>
     <artifactId>OpenGraph</artifactId>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.1.3-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>OpenGraph</name>
     <description>JavaScript graph visualization library for workflow, BPM, org charts, UML, ER, network diagrams.

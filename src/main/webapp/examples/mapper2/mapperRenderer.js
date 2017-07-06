@@ -1724,6 +1724,8 @@ EditorRenderer.prototype = {
      */
     drawTransformer: function (position, label, inputs, outputs, drawData, id) {
         var me = this, shape, element, style, envelope, i, toShape, fromShape, toElement, fromElement, textShape, textElement;
+
+        shape = new OG.shape.Transformer(label);
         var existTransformerData = me.selectById(id);
         if (!existTransformerData) {
             existTransformerData = {
@@ -1734,12 +1736,9 @@ EditorRenderer.prototype = {
                 "className": drawData.className,
                 "position": me.Constants.POSITION.OTHER_MY
             };
-            console.log(existTransformerData);
             me.updateData([existTransformerData], true);
+            shape.data = JSON.parse(JSON.stringify(existTransformerData));
         }
-
-
-        shape = new OG.shape.Transformer(label);
 
         if (!Array.isArray(inputs) || !Array.isArray(outputs)) {
             return null;
