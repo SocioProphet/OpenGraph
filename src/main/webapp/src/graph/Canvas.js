@@ -1484,6 +1484,10 @@ OG.graph.Canvas.prototype = {
 
         $.each(inputs, function (idx, input) {
             textShape = new OG.shape.bpmn.M_Text(input);
+            textShape.MOVABLE = false;
+            textShape.SELECTABLE = false;
+            textShape.CONNECTABLE = false;
+            textShape.DELETABLE = false;
             textElement = me.drawShape([envelope.getUpperLeft().x + 35, envelope.getUpperLeft().y + (idx * 25) + 40], textShape, [50, 20]);
             element.appendChild(textElement);
             toShape = new OG.shape.To();
@@ -1498,6 +1502,10 @@ OG.graph.Canvas.prototype = {
 
         $.each(outputs, function (idx, output) {
             textShape = new OG.shape.bpmn.M_Text(output);
+            textShape.MOVABLE = false;
+            textShape.SELECTABLE = false;
+            textShape.CONNECTABLE = false;
+            textShape.DELETABLE = false;
             textElement = me.drawShape([envelope.getUpperRight().x - 35, envelope.getUpperRight().y + (idx * 25) + 40], textShape, [50, 20]);
             element.appendChild(textElement);
             fromShape = new OG.shape.From();

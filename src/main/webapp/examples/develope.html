@@ -419,34 +419,6 @@
 
             alert(number);
 
-//            canvas.drawShape([100, 100], new OG.RectangleShape(), [100, 100], {});
-
-
-            var activities = [];
-            //로우
-            for (var i = 0; i < 16; i++) {
-
-                //헤더
-                for (var c = 0; c < 13; c++) {
-                    var aaa = {
-                        "tot_wfa": "A-BA-2004-00-001",
-                        "cur_rel_project": "41288901F225472CA37E9B5C6FB207C5",
-                        "cur_wfa": "Z14345-A-BA-2004-00-00" + i + '-' + c,
-                        "cur_wfa_name": "DL 자료 접수 " + c,
-                        "cur_state": "In Planning",
-                        "cur_wfa_config_id": "687FE7856D5C471682AAF0130B3C5403",
-                        "cur_eng_func_code": "P-BA-" + (2000 + i),
-                        "cur_check_alarm": 1,
-                        "ref_rel_project": "NULL",
-                        "ref_wfa": "NULL",
-                        "ref_wfa_config_id": "NULL",
-                        "tot_wfa_label": "BLR) Building Enclosure(A-BA-2004-00-001)",
-                        "cur_rel_fw": "41288901F225472CA37E9B5C6FB207C5"
-                    }
-                    activities.push(aaa);
-                }
-            }
-            //console.log(JSON.stringify(activities));
         });
 
         //JSON 입출력시, viewData.cells 누락.

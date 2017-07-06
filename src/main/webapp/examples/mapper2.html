@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!--[if IE 9]>
+<html lang="en" class="ie9"> <![endif]-->
+<!--[if IE 8]>
+<html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org"
+      lang="en">
+<!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>OG Mapper</title>
+
+    <!-- 타이틀 -->
+    <meta http-equiv="cache-control" content="No-Cache"/>
+    <meta http-equiv="pragma" content="No-Cache"/>
+    <meta name="Location" content="South Korea"/>
+    <meta name="Distribution" content="Global"/>
+
+
+    <!-- jquery -->
+    <script type="text/javascript" src="./lib/jquery-1.11.1/jquery-1.11.1.min.js"></script>
+
+    <!-- jquery ui -->
+    <script type="text/javascript" src="./lib/jquery-ui-1.11.0.custom/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./lib/jquery-ui-1.11.0.custom/jquery-ui.css"/>
+
+    <!-- jquery Context Menu -->
+    <link rel="stylesheet" type="text/css" href="./lib/contextmenu/jquery.contextMenu.css"/>
+    <script type="text/javascript" src="./lib/contextmenu/jquery.contextMenu-min.js"></script>
+
+    <!-- Opengraph -->
+    <script type="text/javascript" src="./lib/opengraph/OpenGraph-0.1.2-SNAPSHOT.js"></script>
+
+    <!-- Tree js -->
+    <script type="text/javascript" src="./mapper2/shape/editor/Area.js"></script>
+    <script type="text/javascript" src="./mapper2/shape/editor/DIDS.js"></script>
+    <script type="text/javascript" src="./mapper2/shape/editor/Activity.js"></script>
+    <script type="text/javascript" src="./mapper2/shape/editor/Folder.js"></script>
+    <script type="text/javascript" src="./mapper2/shape/editor/Ed.js"></script>
+    <script type="text/javascript" src="./mapper2/shape/editor/Expander.js"></script>
+    <script type="text/javascript" src="./mapper2/mapperRenderer.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var mode = 'sample';
+            var tree = new EditorRenderer('canvas');
+            tree._CONFIG.CEHCKBOX = true;
+            tree._CONFIG.CHANGE_NAME = true;
+            tree._CONFIG.CHANGE_OWNER = true;
+            tree._CONFIG.MOVE_SORTABLE = true;
+            tree._CONFIG.MAPPING_ENABLE = true;
+            tree._CONFIG.CREATE_FOLDER = true;
+            tree._CONFIG.CREATE_ED = true;
+            tree._CONFIG.PICK_ED = true;
+            tree._CONFIG.DELETABLE = true;
+            tree._CONFIG.AREA.lAc.display = true;
+            tree._CONFIG.AREA.lOut.display = true;
+            tree._CONFIG.AREA.rIn.display = true;
+            tree._CONFIG.AREA.rAc.display = true;
+            tree._CONFIG.AREA.rOut.display = false;
+
+            tree.init();
+
+
+            $('#save').click(function(){
+                var mappingData = tree.convertToJavaMappingData(tree.load());
+                console.log(mappingData);
+            })
+
+            var renderSampleData = function () {
+                $.getJSON("mapper2/sampleData/rightTree.json", function (myData) {
+
+                    tree._INCOLLAPSE = [];
+                    tree.removeDataByFilter({position: tree.Constants.POSITION.MY});
+                    tree.removeDataByFilter({position: tree.Constants.POSITION.MY_IN});
+                    tree.removeDataByFilter({position: tree.Constants.POSITION.MY_OUT});
+
+                    tree.updateData(tree.convertTreeData(myData.node, 'my'), true);
+
+                    $.getJSON("mapper2/sampleData/leftTree.json", function (otherData) {
+                        tree.removeDataByFilter({position: tree.Constants.POSITION.OTHER});
+                        tree.removeDataByFilter({position: tree.Constants.POSITION.OTHER_OUT});
+                        tree.updateData(tree.convertTreeData(otherData.node, 'other'), true);
+
+                        $.getJSON("mapper2/sampleData/mapper.json", function (mappingElements) {
+
+                            var mappingData = tree.convertMappingData(mappingElements);
+                            tree.removeDataByFilter({type: tree.Constants.TYPE.MAPPING});
+                            tree.removeDataByFilter({type: tree.Constants.TYPE.TRANSFORMER});
+                            tree.updateData(mappingData);
+
+//                            var original = convertToJavaMappingData(mappingData);
+//                            console.log(original);
+                            //tree.updateMappingElements(mappingElements);
+                        });
+                    });
+                });
+            };
+            renderSampleData();
+        });
+
+    </script>
+</head>
+<body>
+
+<button id="save">Save</button>
+<div id="canvas" style="cursor: default;width: 100%;overflow: scroll;"/>
+</div>
+<div id="canvas_slider"></div>
+
+</body>
+</html>

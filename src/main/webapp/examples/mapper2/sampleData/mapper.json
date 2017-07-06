@@ -1,0 +1,48 @@
+[
+  {
+    "__className": "org.uengine.kernel.ParameterContext",
+    "direction": "in",
+    "argument": {
+      "__className": "org.uengine.contexts.TextContext",
+      "text": "[instance].instanceId"
+    },
+    "transformerMapping": {
+      "__className": "org.uengine.processdesigner.mapper.TransformerMapping",
+      "transformer": {
+        "__className": "org.uengine.processdesigner.mapper.transformers.ConcatTransformer",
+        "name": "Concat",
+        "transformerJson": "{\"id\":\"OG_2917_125\",\"x\":700,\"y\":500}",
+        "argumentSourceMap": {
+          "in1": {
+            "__className": "org.uengine.processdesigner.mapper.TransformerMapping",
+            "transformer": {
+              "__className": "org.uengine.processdesigner.mapper.transformers.MaxTransformer",
+              "name": "Max",
+              "transformerJson": "{\"id\":\"OG_2917_56\",\"x\":500,\"y\":250}",
+              "argumentSourceMap": {
+                "in1": "leftRoles",
+                "in2": "[roles].role1"
+              }
+            },
+            "linkedArgumentName": "out"
+          },
+          "in2": "[instance].instanceId",
+          "in3": "[instance].name"
+        }
+      },
+      "linkedArgumentName": "out"
+    }
+  },
+  {
+    "__className": "org.uengine.kernel.ParameterContext",
+    "direction": "in",
+    "argument": {
+      "__className": "org.uengine.contexts.TextContext",
+      "text": "[instance].info"
+    },
+    "variable": {
+      "__className": "org.uengine.kernel.ProcessVariable",
+      "name": "[instance].info"
+    }
+  }
+]
