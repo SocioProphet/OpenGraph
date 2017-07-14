@@ -300,11 +300,14 @@ OG.handler.EventHandler.prototype = {
         }
 
         var calculateMoveCorrectionConditions = function (bBoxArray) {
-
             //이동 딜레이
             var delay = me._CONFIG.EDGE_MOVE_DELAY_SIZE;
             //조건집합
             var correctionConditions = [];
+
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                return correctionConditions;
+            }
 
             //이동 타켓이 다수인 경우 해당되지 않는다.
             if (!bBoxArray) {
@@ -554,6 +557,9 @@ OG.handler.EventHandler.prototype = {
                 dx: dx,
                 dy: dy
             };
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                return fixedPosition;
+            }
             var boundary = renderer.getBoundary(element);
             var centroid = boundary.getCentroid();
             var center = {
@@ -1032,6 +1038,10 @@ OG.handler.EventHandler.prototype = {
             var minSize = me._CONFIG.GUIDE_MIN_SIZE;
             var laneMinSize = me._CONFIG.LANE_MIN_SIZE;
             var groupInnerSapce = me._CONFIG.GROUP_INNER_SAPCE;
+
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                return correctionConditions;
+            }
 
             //모든 Shape 의 중심점,상하좌우 끝을 조건에 포함한다.
             //이 조건은 다른 조건과 달리 리사이즈 최소 보정치 계산과 함께 하기 때문에 min,max 가 반대이다.
@@ -1529,6 +1539,9 @@ OG.handler.EventHandler.prototype = {
                 x: offset.x,
                 y: offset.y
             };
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                return fixedPosition;
+            }
             var calculateFixedPosition = function (expectedPosition) {
                 if (!expectedPosition) {
                     return fixedPosition;
@@ -2678,7 +2691,7 @@ OG.handler.EventHandler.prototype = {
         });
     },
 
-    makeRotate: function(){
+    makeRotate: function () {
         var me = this;
 
         return {
@@ -3699,7 +3712,7 @@ OG.handler.EventHandler.prototype = {
 
                     //커스텀 콘텍스트 메뉴가 있을경우 처리
                     if (customMenu) {
-                        if(customMenu == null || $.isEmptyObject(customMenu)){
+                        if (customMenu == null || $.isEmptyObject(customMenu)) {
                             return false;
                         }
                         for (var key in customMenu) {
@@ -3772,6 +3785,11 @@ OG.handler.EventHandler.prototype = {
 
             //선택상태 설정
             $(element).attr("_selected", "true");
+
+            //Edge 일 경우 상단으로
+            if (element.shape && element.shape instanceof OG.EdgeShape) {
+                me._RENDERER._CANVAS.toFront(element);
+            }
 
             //선택요소배열 추가
             me._addSelectedElement(element);
@@ -4901,7 +4919,7 @@ OG.handler.EventHandler.prototype = {
             if (renderer.isEdge(ele)) {
                 return;
             }
-            if(ele.shape && !ele.shape.MOVABLE){
+            if (ele.shape && !ele.shape.MOVABLE) {
                 return;
             }
             connectCheckShapes.push(ele);
@@ -4933,7 +4951,7 @@ OG.handler.EventHandler.prototype = {
             renderer.remove(item.box);
 
             // 이동
-            if(ele.shape && ele.shape.MOVABLE){
+            if (ele.shape && ele.shape.MOVABLE) {
                 renderer.move(ele, [dx, dy], excludeEdgeId);
                 eleArray.push(ele);
             }
@@ -5213,14 +5231,23 @@ OG.handler.EventHandler.prototype = {
             var vertices = element.shape.geom.getVertices();
             var allVertices;
 
-            //모든 엣지의 변곡점 집합
-            var allEdges = renderer.getAllEdges();
-            $.each(allEdges, function (idx, edge) {
-                allVertices = edge.shape.geom.getVertices();
+            //AUTOMATIC_GUIDANCE 가 아닌경우는 나 자신의 변곡점 집합
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                allVertices = element.shape.geom.getVertices();
                 $.each(allVertices, function (i, vertice) {
                     reativePoints.push(vertice);
                 });
-            });
+            }
+            //모든 엣지의 변곡점 집합
+            else {
+                var allEdges = renderer.getAllEdges();
+                $.each(allEdges, function (idx, edge) {
+                    allVertices = edge.shape.geom.getVertices();
+                    $.each(allVertices, function (i, vertice) {
+                        reativePoints.push(vertice);
+                    });
+                });
+            }
 
             //서클 타입 스팟이고, 마지막 변곡점인 경우 shape 바운더리의 십자 영역을 번위조건에 추가한다.
             if (type === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
@@ -5402,6 +5429,11 @@ OG.handler.EventHandler.prototype = {
                 }
 
                 if (isEdge) {
+                    //엣지일 경우 선택되었을때만 동작
+                    if (me._CONFIG.SPOT_ON_SELECT && $(element).attr("_selected") != "true") {
+                        return;
+                    }
+
                     eventOffset = me._getOffset(event);
                     var virtualSpot = renderer.createVirtualSpot(eventOffset.x, eventOffset.y, element);
                     if (virtualSpot) {
@@ -5641,6 +5673,11 @@ OG.handler.EventHandler.prototype = {
                 }
 
                 if (isEdge) {
+                    //엣지일 경우 선택되었을때만 동작
+                    if (me._CONFIG.SPOT_ON_SELECT && $(element).attr("_selected") != "true") {
+                        return;
+                    }
+
                     if (isConnectMode) {
                         return;
                     }

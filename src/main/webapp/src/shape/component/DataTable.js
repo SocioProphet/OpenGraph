@@ -985,8 +985,9 @@ OG.shape.component.DataTable.prototype.getCellFromTableIndex = function (cellInd
 /**
  * 리사이즈로 인한 draw 여부.
  * @param isResize
+ * @param isAddColumn
  */
-OG.shape.component.DataTable.prototype.draw = function (isResize) {
+OG.shape.component.DataTable.prototype.draw = function (isResize, isAddColumn) {
 
     var startDate = new Date();
     var me = this;
@@ -1014,6 +1015,8 @@ OG.shape.component.DataTable.prototype.draw = function (isResize) {
     var dataToDraw = me.getDataToDraw();
     //칼럼, dataToDraw 영역 밖에 요소 삭제하기.
     if (!isResize) {
+        me.removeOutRangeCells(columns, dataToDraw);
+    } else if (isAddColumn) {
         me.removeOutRangeCells(columns, dataToDraw);
     }
 
@@ -1130,7 +1133,7 @@ OG.shape.component.DataTable.prototype.draw = function (isResize) {
                 me.data.viewData.rows[rowIndex].cells[column.data]['text'] = value;
             }
 
-            if (isResize) {
+            if (isResize || isAddColumn) {
                 me.drawCell(me.data.viewData.rows[rowIndex].cells[column.data], 'saved', false);
             } else {
                 me.drawCell(me.data.viewData.rows[rowIndex].cells[column.data], 'saved', true);
@@ -1228,13 +1231,13 @@ OG.shape.component.DataTable.prototype.bindCellEvent = function () {
 OG.shape.component.DataTable.prototype.createCellGuid = function (cellView) {
     var me = this;
 
-    if(me.options.selectable == 'column'){
-        if(cellView.type != 'column'){
+    if (me.options.selectable == 'column') {
+        if (cellView.type != 'column') {
             return;
         }
     }
-    if(me.options.selectable == 'cell'){
-        if(cellView.type != 'cell'){
+    if (me.options.selectable == 'cell') {
+        if (cellView.type != 'cell') {
             return;
         }
     }
@@ -2070,9 +2073,38 @@ OG.shape.component.DataTable.prototype.removeColumn = function (index) {
             me.currentCanvas.removeShape(childs[i]);
         }
     }
+
+    //잘라내기에 등록된 경우 잘라내기를 없앤다.
+    if (me.cutColumn == me.options.columns[index].data) {
+        me.cutColumn = null;
+    }
+
     me.options.columns.splice(index, 1);
-    me.draw();
+    me.draw(false, true);
 }
+
+OG.shape.component.DataTable.prototype.cutAndPaste = function (beforeColumn, afterColumn) {
+    var me = this;
+    var beforeCell, afterCell, cellInformation;
+    $.each(me.data.viewData.rows, function (i, row) {
+        beforeCell = row.cells[beforeColumn];
+        afterCell = row.cells[afterColumn];
+        if (beforeCell && afterCell) {
+            cellInformation = me.getCellInformation(beforeCell);
+            if(cellInformation.contentElements && cellInformation.contentElements.length){
+                var elementsWithValues = [];
+                $.each(cellInformation.contentElements, function(c, contentElement){
+                    elementsWithValues.push({
+                        element: contentElement,
+                        value: null
+                    })
+                })
+                me.addCellContent(afterCell, elementsWithValues);
+            }
+        }
+    })
+}
+
 
 OG.shape.component.Cell = function (label) {
     OG.shape.component.Cell.superclass.call(this);
@@ -2249,8 +2281,23 @@ OG.shape.component.Cell.prototype.createContextMenu = function () {
                     name: '열 삭제', callback: function () {
                         table.shape.removeColumn(cellView.cellIndex);
                     }
+                },
+                'cut': {
+                    name: '잘라내기', callback: function () {
+                        table.shape.cutColumn = cellView.column;
+                    }
                 }
             };
+            if (table.shape.cutColumn) {
+                this.contextMenu['paste'] = {
+                    name: '붙여넣기', callback: function () {
+                        var cutColumn = table.shape.cutColumn;
+                        table.shape.cutColumn = null;
+                        table.shape.cutAndPaste(cutColumn, cellView.column);
+                    }
+                }
+            }
+
             return this.contextMenu;
         }
     } else {

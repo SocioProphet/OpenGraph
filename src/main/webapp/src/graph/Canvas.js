@@ -29,6 +29,15 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
     this._CONFIG = {
 
         /**
+         * 도형, 스팟 이동시 이웃한 도형에 대해 자동보정이 이루어지는 여부.
+         */
+        AUTOMATIC_GUIDANCE: true,
+        /**
+         * 선연결을 클릭하였을때만 변곡점 변경 가능 여부
+         */
+        SPOT_ON_SELECT: false,
+
+        /**
          * 백도어
          */
         BACKDOOR: {

@@ -18106,8 +18106,9 @@ OG.shape.component.DataTable.prototype.getCellFromTableIndex = function (cellInd
 /**
  * 리사이즈로 인한 draw 여부.
  * @param isResize
+ * @param isAddColumn
  */
-OG.shape.component.DataTable.prototype.draw = function (isResize) {
+OG.shape.component.DataTable.prototype.draw = function (isResize, isAddColumn) {
 
     var startDate = new Date();
     var me = this;
@@ -18135,6 +18136,8 @@ OG.shape.component.DataTable.prototype.draw = function (isResize) {
     var dataToDraw = me.getDataToDraw();
     //칼럼, dataToDraw 영역 밖에 요소 삭제하기.
     if (!isResize) {
+        me.removeOutRangeCells(columns, dataToDraw);
+    } else if (isAddColumn) {
         me.removeOutRangeCells(columns, dataToDraw);
     }
 
@@ -18251,7 +18254,7 @@ OG.shape.component.DataTable.prototype.draw = function (isResize) {
                 me.data.viewData.rows[rowIndex].cells[column.data]['text'] = value;
             }
 
-            if (isResize) {
+            if (isResize || isAddColumn) {
                 me.drawCell(me.data.viewData.rows[rowIndex].cells[column.data], 'saved', false);
             } else {
                 me.drawCell(me.data.viewData.rows[rowIndex].cells[column.data], 'saved', true);
@@ -18349,13 +18352,13 @@ OG.shape.component.DataTable.prototype.bindCellEvent = function () {
 OG.shape.component.DataTable.prototype.createCellGuid = function (cellView) {
     var me = this;
 
-    if(me.options.selectable == 'column'){
-        if(cellView.type != 'column'){
+    if (me.options.selectable == 'column') {
+        if (cellView.type != 'column') {
             return;
         }
     }
-    if(me.options.selectable == 'cell'){
-        if(cellView.type != 'cell'){
+    if (me.options.selectable == 'cell') {
+        if (cellView.type != 'cell') {
             return;
         }
     }
@@ -19191,9 +19194,38 @@ OG.shape.component.DataTable.prototype.removeColumn = function (index) {
             me.currentCanvas.removeShape(childs[i]);
         }
     }
+
+    //잘라내기에 등록된 경우 잘라내기를 없앤다.
+    if (me.cutColumn == me.options.columns[index].data) {
+        me.cutColumn = null;
+    }
+
     me.options.columns.splice(index, 1);
-    me.draw();
+    me.draw(false, true);
 }
+
+OG.shape.component.DataTable.prototype.cutAndPaste = function (beforeColumn, afterColumn) {
+    var me = this;
+    var beforeCell, afterCell, cellInformation;
+    $.each(me.data.viewData.rows, function (i, row) {
+        beforeCell = row.cells[beforeColumn];
+        afterCell = row.cells[afterColumn];
+        if (beforeCell && afterCell) {
+            cellInformation = me.getCellInformation(beforeCell);
+            if(cellInformation.contentElements && cellInformation.contentElements.length){
+                var elementsWithValues = [];
+                $.each(cellInformation.contentElements, function(c, contentElement){
+                    elementsWithValues.push({
+                        element: contentElement,
+                        value: null
+                    })
+                })
+                me.addCellContent(afterCell, elementsWithValues);
+            }
+        }
+    })
+}
+
 
 OG.shape.component.Cell = function (label) {
     OG.shape.component.Cell.superclass.call(this);
@@ -19370,8 +19402,23 @@ OG.shape.component.Cell.prototype.createContextMenu = function () {
                     name: '열 삭제', callback: function () {
                         table.shape.removeColumn(cellView.cellIndex);
                     }
+                },
+                'cut': {
+                    name: '잘라내기', callback: function () {
+                        table.shape.cutColumn = cellView.column;
+                    }
                 }
             };
+            if (table.shape.cutColumn) {
+                this.contextMenu['paste'] = {
+                    name: '붙여넣기', callback: function () {
+                        var cutColumn = table.shape.cutColumn;
+                        table.shape.cutColumn = null;
+                        table.shape.cutAndPaste(cutColumn, cellView.column);
+                    }
+                }
+            }
+
             return this.contextMenu;
         }
     } else {
@@ -28540,11 +28587,14 @@ OG.handler.EventHandler.prototype = {
         }
 
         var calculateMoveCorrectionConditions = function (bBoxArray) {
-
             //이동 딜레이
             var delay = me._CONFIG.EDGE_MOVE_DELAY_SIZE;
             //조건집합
             var correctionConditions = [];
+
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                return correctionConditions;
+            }
 
             //이동 타켓이 다수인 경우 해당되지 않는다.
             if (!bBoxArray) {
@@ -28794,6 +28844,9 @@ OG.handler.EventHandler.prototype = {
                 dx: dx,
                 dy: dy
             };
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                return fixedPosition;
+            }
             var boundary = renderer.getBoundary(element);
             var centroid = boundary.getCentroid();
             var center = {
@@ -29272,6 +29325,10 @@ OG.handler.EventHandler.prototype = {
             var minSize = me._CONFIG.GUIDE_MIN_SIZE;
             var laneMinSize = me._CONFIG.LANE_MIN_SIZE;
             var groupInnerSapce = me._CONFIG.GROUP_INNER_SAPCE;
+
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                return correctionConditions;
+            }
 
             //모든 Shape 의 중심점,상하좌우 끝을 조건에 포함한다.
             //이 조건은 다른 조건과 달리 리사이즈 최소 보정치 계산과 함께 하기 때문에 min,max 가 반대이다.
@@ -29769,6 +29826,9 @@ OG.handler.EventHandler.prototype = {
                 x: offset.x,
                 y: offset.y
             };
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                return fixedPosition;
+            }
             var calculateFixedPosition = function (expectedPosition) {
                 if (!expectedPosition) {
                     return fixedPosition;
@@ -30918,7 +30978,7 @@ OG.handler.EventHandler.prototype = {
         });
     },
 
-    makeRotate: function(){
+    makeRotate: function () {
         var me = this;
 
         return {
@@ -31939,7 +31999,7 @@ OG.handler.EventHandler.prototype = {
 
                     //커스텀 콘텍스트 메뉴가 있을경우 처리
                     if (customMenu) {
-                        if(customMenu == null || $.isEmptyObject(customMenu)){
+                        if (customMenu == null || $.isEmptyObject(customMenu)) {
                             return false;
                         }
                         for (var key in customMenu) {
@@ -32012,6 +32072,11 @@ OG.handler.EventHandler.prototype = {
 
             //선택상태 설정
             $(element).attr("_selected", "true");
+
+            //Edge 일 경우 상단으로
+            if (element.shape && element.shape instanceof OG.EdgeShape) {
+                me._RENDERER._CANVAS.toFront(element);
+            }
 
             //선택요소배열 추가
             me._addSelectedElement(element);
@@ -33141,7 +33206,7 @@ OG.handler.EventHandler.prototype = {
             if (renderer.isEdge(ele)) {
                 return;
             }
-            if(ele.shape && !ele.shape.MOVABLE){
+            if (ele.shape && !ele.shape.MOVABLE) {
                 return;
             }
             connectCheckShapes.push(ele);
@@ -33173,7 +33238,7 @@ OG.handler.EventHandler.prototype = {
             renderer.remove(item.box);
 
             // 이동
-            if(ele.shape && ele.shape.MOVABLE){
+            if (ele.shape && ele.shape.MOVABLE) {
                 renderer.move(ele, [dx, dy], excludeEdgeId);
                 eleArray.push(ele);
             }
@@ -33453,14 +33518,23 @@ OG.handler.EventHandler.prototype = {
             var vertices = element.shape.geom.getVertices();
             var allVertices;
 
-            //모든 엣지의 변곡점 집합
-            var allEdges = renderer.getAllEdges();
-            $.each(allEdges, function (idx, edge) {
-                allVertices = edge.shape.geom.getVertices();
+            //AUTOMATIC_GUIDANCE 가 아닌경우는 나 자신의 변곡점 집합
+            if (!me._CONFIG.AUTOMATIC_GUIDANCE) {
+                allVertices = element.shape.geom.getVertices();
                 $.each(allVertices, function (i, vertice) {
                     reativePoints.push(vertice);
                 });
-            });
+            }
+            //모든 엣지의 변곡점 집합
+            else {
+                var allEdges = renderer.getAllEdges();
+                $.each(allEdges, function (idx, edge) {
+                    allVertices = edge.shape.geom.getVertices();
+                    $.each(allVertices, function (i, vertice) {
+                        reativePoints.push(vertice);
+                    });
+                });
+            }
 
             //서클 타입 스팟이고, 마지막 변곡점인 경우 shape 바운더리의 십자 영역을 번위조건에 추가한다.
             if (type === OG.Constants.CONNECT_GUIDE_SUFFIX.SPOT_CIRCLE) {
@@ -33642,6 +33716,11 @@ OG.handler.EventHandler.prototype = {
                 }
 
                 if (isEdge) {
+                    //엣지일 경우 선택되었을때만 동작
+                    if (me._CONFIG.SPOT_ON_SELECT && $(element).attr("_selected") != "true") {
+                        return;
+                    }
+
                     eventOffset = me._getOffset(event);
                     var virtualSpot = renderer.createVirtualSpot(eventOffset.x, eventOffset.y, element);
                     if (virtualSpot) {
@@ -33881,6 +33960,11 @@ OG.handler.EventHandler.prototype = {
                 }
 
                 if (isEdge) {
+                    //엣지일 경우 선택되었을때만 동작
+                    if (me._CONFIG.SPOT_ON_SELECT && $(element).attr("_selected") != "true") {
+                        return;
+                    }
+
                     if (isConnectMode) {
                         return;
                     }
@@ -34634,6 +34718,15 @@ OG.RemoteHandler.checkExpiredRemoteCanvas();
 OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroundImage) {
 
     this._CONFIG = {
+
+        /**
+         * 도형, 스팟 이동시 이웃한 도형에 대해 자동보정이 이루어지는 여부.
+         */
+        AUTOMATIC_GUIDANCE: true,
+        /**
+         * 선연결을 클릭하였을때만 변곡점 변경 가능 여부
+         */
+        SPOT_ON_SELECT: false,
 
         /**
          * 백도어
