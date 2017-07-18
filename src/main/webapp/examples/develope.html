@@ -351,78 +351,8 @@
                 canvas.updateBackDoor(150, 0.7);
             });
 
-            var dataTable = new OG.DataTable();
-            var data = [];
-            for (var i = 0; i < 20; i++) {
-                data.push({
-                    activity: '견적 TFT / EM' + i,
-                    '90_': [
-                        {type: 'activity', value: 'ITB 배포1'}
-                    ],
-                    '85_': [
-                        {type: 'activity', value: 'ITB 배포2'}
-                    ],
-                    '80_': [
-                        {type: 'activity', value: 'ITB 배포3'}
-                    ],
-                    '75_': [
-                        {type: 'activity', value: 'ITB 배포4'}
-                    ],
-                    '70_': [
-                        {type: 'activity', value: 'ITB 배포5'}
-                    ],
-                    '65_': [
-                        {type: 'activity', value: 'ITB 배포6'}
-                    ],
-                    '60_': [
-                        {type: 'activity', value: 'ITB 배포7'}
-                    ],
-                    '55_': [
-                        {type: 'activity', value: 'ITB 배포8'}
-                    ],
-                    '50_': [
-                        {type: 'activity', value: 'ITB 배포9'}
-                    ],
-                    '49_': [
-                        {type: 'activity', value: 'ITB 배포9'}
-                    ],
-                    '48_': [
-                        {type: 'activity', value: 'ITB 배포9'}
-                    ],
-                    '47_': [
-                        {type: 'activity', value: 'ITB 배포9'}
-                    ],
-                    '46_': [
-                        {type: 'activity', value: 'ITB 배포9'}
-                    ],
-                    '45_': [
-                        {type: 'activity', value: 'ITB 배포9'}
-                    ],
-                    '44_': [
-                        {type: 'activity', value: 'ITB 배포9'}
-                    ],
-                    '43_': [
-                        {type: 'activity', value: 'ITB 배포9'}
-                    ],
-                    '42_': [
-                        {type: 'activity', value: 'ITB 배포10'}
-                    ]
-                })
-            }
-
-            var start = new Date();
-            dataTable.MOVABLE = false;
-            canvas.drawShape([100, 100], dataTable, [100, 100], {});
-            dataTable.setData(data);
-            dataTable.draw();
-            var end = new Date();
-            var number = end.getTime() - start.getTime();
-
-
 
         });
-
-        //JSON 입출력시, viewData.cells 누락.
 
         function save() {
             opengraphJSON = canvas.toJSON();
