@@ -47,7 +47,7 @@ OG.shape.bpmn.E_End.prototype.createSubShape = function () {
 
     if (this.inclusion) {
         this.sub.push({
-            shape: new OG.ImageShape('resources/images/symbol/complete.png'),
+            shape: new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'complete.png'),
             width: '20px',
             height: '20px',
             right: '0px',

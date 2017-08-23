@@ -55,10 +55,10 @@ OG.shape.bpmn.A_Subprocess.prototype.createSubShape = function () {
     var statusShape, statusAnimation;
     switch (this.status) {
         case "Completed":
-            statusShape = new OG.ImageShape("resources/images/symbol/complete.png");
+            statusShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + "complete.png");
             break;
         case "Running":
-            statusShape = new OG.ImageShape('resources/images/symbol/running.png');
+            statusShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'running.png');
             statusAnimation = new OG.RectangleShape();
             break;
     }
@@ -114,7 +114,7 @@ OG.shape.bpmn.A_Subprocess.prototype.createSubShape = function () {
 
     if (this.inclusion) {
         this.sub.push({
-            shape: new OG.ImageShape('resources/images/symbol/complete.png'),
+            shape: new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'complete.png'),
             width: '20px',
             height: '20px',
             right: '0px',
@@ -125,7 +125,7 @@ OG.shape.bpmn.A_Subprocess.prototype.createSubShape = function () {
 
     if (this.HaveButton) {
         this.sub.push({
-            shape: new OG.ImageShape('resources/images/symbol/subprocess.png'),
+            shape: new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'subprocess.png'),
             width: '20px',
             height: '20px',
             align: 'center',

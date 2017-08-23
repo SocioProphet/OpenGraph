@@ -1278,6 +1278,9 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         groupNode, geometry, text, image, html, xml,
         me = this;
 
+    //현재 캔버스 등록
+    shape.currentCanvas = this._CANVAS;
+
     if (shape instanceof OG.shape.GeomShape) {
         geometry = shape.createShape();
 
@@ -1419,14 +1422,21 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
     //     me.putInnerShapeToPool(groupNode);
     // }
 
-    //shape 에 현재 캔버스,엘리먼트 등록
+    //shape 에 현재 엘리먼트 등록
     shape.currentElement = groupNode;
-    shape.currentCanvas = this._CANVAS;
 
     // drawShape event fire
     if (!preventEvent) {
         shape.onDrawShape();
         $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
+    }
+
+    if (!id && (me.isLane(groupNode) || me.isPool(groupNode))) {
+        if(me.isTopGroup(groupNode)){
+            console.log('top');
+            me.setDropablePool(groupNode);
+        }
+        //me.isTopGroup(element)
     }
 
     return groupNode;
@@ -3141,7 +3151,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         if (!_isDeletable) {
             return;
         }
-        _trash = me._PAPER.image("resources/images/symbol/trash.png", 0, 0, _ctrlSize, _ctrlSize);
+        _trash = me._PAPER.image(me._CONFIG.IMAGE_BASE + 'trash.png', 0, 0, _ctrlSize, _ctrlSize);
         _trash.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
         group.appendChild(_trash);
         me._add(_trash, rElement.id + OG.Constants.GUIDE_SUFFIX.TRASH);
@@ -3315,7 +3325,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
     }
 
     function _drawLaneQuarter(divideCount) {
-        _qUpper = me._PAPER.image("resources/images/symbol/quarter-upper.png", 0, 0, _ctrlSize, _ctrlSize);
+        _qUpper = me._PAPER.image(me._CONFIG.IMAGE_BASE + "quarter-upper.png", 0, 0, _ctrlSize, _ctrlSize);
         _qUpper.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
         group.appendChild(_qUpper);
         me._add(_qUpper, rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_UPPER);
@@ -3324,7 +3334,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             me.divideLane(element, OG.Constants.GUIDE_SUFFIX.QUARTER_UPPER);
         });
 
-        _qBisector = me._PAPER.image("resources/images/symbol/quarter-bisector.png", 0, 0, _ctrlSize, _ctrlSize);
+        _qBisector = me._PAPER.image(me._CONFIG.IMAGE_BASE + "quarter-bisector.png", 0, 0, _ctrlSize, _ctrlSize);
         _qBisector.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
         group.appendChild(_qBisector);
         me._add(_qBisector, rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_BISECTOR);
@@ -3333,7 +3343,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             me.divideLane(element, OG.Constants.GUIDE_SUFFIX.QUARTER_BISECTOR);
         });
 
-        _qThirds = me._PAPER.image("resources/images/symbol/quarter-thirds.png", 0, 0, _ctrlSize, _ctrlSize);
+        _qThirds = me._PAPER.image(me._CONFIG.IMAGE_BASE + "quarter-thirds.png", 0, 0, _ctrlSize, _ctrlSize);
         _qThirds.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
         group.appendChild(_qThirds);
         me._add(_qThirds, rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_THIRDS);
@@ -3342,7 +3352,7 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
             me.divideLane(element, OG.Constants.GUIDE_SUFFIX.QUARTER_THIRDS);
         });
 
-        _qLow = me._PAPER.image("resources/images/symbol/quarter-low.png", 0, 0, _ctrlSize, _ctrlSize);
+        _qLow = me._PAPER.image(me._CONFIG.IMAGE_BASE + "quarter-low.png", 0, 0, _ctrlSize, _ctrlSize);
         _qLow.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
         group.appendChild(_qLow);
         me._add(_qLow, rElement.id + OG.Constants.GUIDE_SUFFIX.QUARTER_LOW);

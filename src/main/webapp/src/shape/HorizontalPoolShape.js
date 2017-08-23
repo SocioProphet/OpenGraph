@@ -53,7 +53,7 @@ OG.shape.HorizontalPoolShape.prototype.createSubShape = function () {
     var loopShape;
     switch (this.LoopType) {
         case 'Standard' :
-            loopShape = new OG.ImageShape('resources/images/symbol/loop_standard.png');
+            loopShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'loop_standard.png');
             break;
         case 'MIParallel' :
             loopShape = new OG.MIParallel();

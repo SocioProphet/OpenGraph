@@ -46,7 +46,7 @@ OG.shape.bpmn.Value_Chain.prototype.createSubShape = function () {
 
     if (this.inclusion) {
         this.sub.push({
-            shape: new OG.ImageShape('resources/images/symbol/complete.png'),
+            shape: new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'complete.png'),
             width: '20px',
             height: '20px',
             right: '0px',
@@ -57,7 +57,7 @@ OG.shape.bpmn.Value_Chain.prototype.createSubShape = function () {
 
     if (this.HaveButton) {
         this.sub.push({
-            shape: new OG.ImageShape('resources/images/symbol/subprocess.png'),
+            shape: new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'subprocess.png'),
             width: '20px',
             height: '20px',
             align: 'center',

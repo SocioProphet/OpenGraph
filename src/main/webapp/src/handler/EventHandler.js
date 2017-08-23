@@ -3961,6 +3961,8 @@ OG.handler.EventHandler.prototype = {
 
         $(me._RENDERER.getRootElement()).find("[_selected=true]").each(function (index, item) {
             shape = eval('new ' + value + '()');
+
+            shape.currentCanvas = me._RENDERER._CANVAS
             if (label) {
                 shape.label = label;
             } else {

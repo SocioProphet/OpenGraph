@@ -61,7 +61,7 @@ OG.shape.bpmn.A_Task.prototype.createSubShape = function () {
     var loopShape;
     switch (this.LoopType) {
         case 'Standard' :
-            loopShape = new OG.ImageShape('resources/images/symbol/loop_standard.png');
+            loopShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'loop_standard.png');
             break;
         case 'MIParallel' :
             loopShape = new OG.MIParallel();
@@ -84,31 +84,31 @@ OG.shape.bpmn.A_Task.prototype.createSubShape = function () {
     var taskTypeShape;
     switch (this.TaskType) {
         case "User":
-            taskTypeShape = new OG.ImageShape("resources/images/symbol/User.png");
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + "User.png");
             break;
         case "Send":
-            taskTypeShape = new OG.ImageShape('resources/images/symbol/Send.png');
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'Send.png');
             break;
         case "Receive":
-            taskTypeShape = new OG.ImageShape("resources/images/symbol/Receive.png");
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'Receive.png');
             break;
         case "Manual":
-            taskTypeShape = new OG.ImageShape("resources/images/symbol/Manual.png");
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'Manual.png');
             break;
         case "Service":
-            taskTypeShape = new OG.ImageShape("resources/images/symbol/Service.png");
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'Service.png');
             break;
         case "BusinessRule":
-            taskTypeShape = new OG.ImageShape("resources/images/symbol/BusinessRule.png");
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'BusinessRule.png');
             break;
         case "Script":
-            taskTypeShape = new OG.ImageShape("resources/images/symbol/Script.png");
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'Script.png');
             break;
         case "Mapper":
-            taskTypeShape = new OG.ImageShape("resources/images/symbol/Mapper.png");
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'Mapper.png');
             break;
         case "WebService":
-            taskTypeShape = new OG.ImageShape("resources/images/symbol/WebService.png");
+            taskTypeShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'WebService.png');
             break;
     }
     if (taskTypeShape) {
@@ -125,10 +125,10 @@ OG.shape.bpmn.A_Task.prototype.createSubShape = function () {
     var statusShape, statusAnimation;
     switch (this.status) {
         case "Completed":
-            statusShape = new OG.ImageShape("resources/images/symbol/complete.png");
+            statusShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'complete.png');
             break;
         case "Running":
-            statusShape = new OG.ImageShape('resources/images/symbol/running.png');
+            statusShape = new OG.ImageShape(this.currentCanvas._CONFIG.IMAGE_BASE + 'running.png');
             statusAnimation = new OG.RectangleShape();
             break;
     }

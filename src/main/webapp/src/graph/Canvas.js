@@ -399,6 +399,11 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         CANVAS_BACKGROUND: "#f9f9f9",
 
         /**
+         * 이미지 베이스 패스
+         */
+        IMAGE_BASE: 'resources/images/symbol/',
+
+        /**
          * 이미지 url 정보
          */
         IMAGE_USER: "http://processcodi.com/images/opengraph/User.png",
