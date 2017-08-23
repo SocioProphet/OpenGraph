@@ -1272,7 +1272,7 @@ OG.renderer.RaphaelRenderer.prototype._drawLabel = function (position, text, siz
  * @return {Element} Group DOM Element with geometry
  * @override
  */
-OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, size, style, id, preventEvent) {
+OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, size, style, id, preventEvent, preventDropEvent) {
     var width = size ? size[0] : 100,
         height = size ? size[1] : 100,
         groupNode, geometry, text, image, html, xml,
@@ -1431,12 +1431,8 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         $(this._PAPER.canvas).trigger('drawShape', [groupNode]);
     }
 
-    if (!id && (me.isLane(groupNode) || me.isPool(groupNode))) {
-        if(me.isTopGroup(groupNode)){
-            console.log('top');
-            me.setDropablePool(groupNode);
-        }
-        //me.isTopGroup(element)
+    if (me._CONFIG.POOL_DROP_EVENT && !id && !preventDropEvent && me.isTopGroup(groupNode) && (me.isLane(groupNode) || me.isPool(groupNode))) {
+        me.setDropablePool(groupNode);
     }
 
     return groupNode;
@@ -6198,7 +6194,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 if (i === quarterLength - 1) {
                     _height = _height + (targetArea.getHeight() % quarterLength);
                 }
-                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.HorizontalLaneShape(), [_width, _height], null, null, element.id, true);
+                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.HorizontalLaneShape(), [_width, _height], null, null, element.id, true, true);
                 divedLanes.push(newLane);
             }
 
@@ -6210,7 +6206,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 if (i === quarterLength - 1) {
                     _width = _width + (targetArea.getWidth() % quarterLength);
                 }
-                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.VerticalLaneShape(), [_width, _height], null, null, element.id, true);
+                var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], new OG.VerticalLaneShape(), [_width, _height], null, null, element.id, true, true);
                 divedLanes.push(newLane);
             }
             me.fitLaneOrder(element);
@@ -6242,7 +6238,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                 var x = targetUpperLeft.x;
                 var y = targetUpperLeft.y;
                 var shape = me.isHorizontalLane(element) ? new OG.HorizontalLaneShape() : new OG.VerticalLaneShape();
-                standardLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, element.id, true);
+                standardLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, element.id, true, true);
                 divedLanes.push(standardLane);
             }
 
@@ -6344,7 +6340,7 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
                     }
                 }
             });
-            var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, parent.id, true);
+            var newLane = me._CANVAS.drawShape([x + (_width / 2), y + (_height / 2)], shape, [_width, _height], null, null, parent.id, true, true);
             divedLanes.push(newLane);
             $.each(lanesToMove, function (index, laneToMove) {
                 me.move(laneToMove, moveOffset);

@@ -29,6 +29,10 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
     this._CONFIG = {
 
         /**
+         * 풀, 래인 도형의 드랍시 자동 위치 조정 기능
+         */
+        POOL_DROP_EVENT: false,
+        /**
          * 도형, 스팟 이동시 이웃한 도형에 대해 자동보정이 이루어지는 여부.
          */
         AUTOMATIC_GUIDANCE: true,
@@ -1437,11 +1441,12 @@ OG.graph.Canvas.prototype = {
      * @param {String} id Element ID 지정 (Optional)
      * @param {String} parentId 부모 Element ID 지정 (Optional)
      * @param {Boolean} preventEvent  이벤트 생성 방지
+     * @param {Boolean} preventDropEvent  드랍 이벤트 방지
      * @return {Element} Group DOM Element with geometry
      */
-    drawShape: function (position, shape, size, style, id, parentId, preventEvent) {
+    drawShape: function (position, shape, size, style, id, parentId, preventEvent, preventDropEvent) {
 
-        var element = this._RENDERER.drawShape(position, shape, size, style, id, preventEvent);
+        var element = this._RENDERER.drawShape(position, shape, size, style, id, preventEvent, preventDropEvent);
 
         if (position && (shape.TYPE === OG.Constants.SHAPE_TYPE.EDGE)) {
             element = this._RENDERER.move(element, position);
