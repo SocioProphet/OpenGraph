@@ -6397,7 +6397,9 @@ OG.common.Constants = {
         LINE_CONNECT_LABEL: "LINE_CONNECT_LABEL",
         LINE_VIRTUAL_EDGE: "LINE_VIRTUAL_EDGE",
         RECT_CONNECT_MODE: "RECT_CONNECT_MODE",
+        RECT_CONNECT_TO_DRAW: "RECT_CONNECT_TO_DRAW",
         TRASH: "_GUIDE_TRASH",
+        CONTROLLER: "_GUIDE_CONT",
         RECT: "_GUIDE_RECT",
         QUARTER_UPPER: "QUARTER_UPPER",
         QUARTER_LOW: "QUARTER_LOW",
@@ -10878,6 +10880,13 @@ OG.shape.IShape = function () {
      * @type {Array}
      */
     this.textList = [];
+
+
+    /**
+     * 도형 특수 컨트롤러 목록
+     * @type {Array}
+     */
+    this.controllers = [];
 
     /**
      * 기본 컨텍스트 메뉴 정보
@@ -23860,6 +23869,38 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         _lwcRect.attr({x: _lowerCenter.x - _hSize, y: _lowerCenter.y - _hSize});
     }
 
+    function _drawController(i, controller) {
+        var _image = me._PAPER.image(me._CONFIG.IMAGE_BASE + controller.image, 0, 0, _ctrlSize, _ctrlSize);
+        _image.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+        group.appendChild(_image);
+        me._add(_image, rElement.id + OG.Constants.GUIDE_SUFFIX.CONTROLLER + i);
+        guide._image = _image.node;
+
+        if (controller.action) {
+            $(_image.node).click(function () {
+                controller.action(element);
+            })
+        }
+        else if (controller.create) {
+            if (!guide.rect) {
+                guide.rect = [];
+            }
+            guide.rect.push({
+                node: _image.node,
+                shape: controller.create.shape,
+                width: controller.create.width,
+                height: controller.create.height,
+                style: controller.create.style
+            });
+        }
+        controllers.push(_image);
+    }
+
+    function _redrawController(i, controller) {
+        var _image = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.CONTROLLER + i);
+        controllers.push(_image);
+    }
+
     function _drawTrash() {
         if (!_isDeletable) {
             return;
@@ -24025,7 +24066,12 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
 
         me._add(_rect, rElement.id + OG.Constants.GUIDE_SUFFIX.RECT);
 
-        guide.rect = _rect.node;
+        if (!guide.rect) {
+            guide.rect = [];
+        }
+        guide.rect.push({
+            node: _rect.node
+        });
         controllers.push(_rect);
     }
 
@@ -24173,6 +24219,11 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         textList = [];
     }
 
+    var shapeControllers = [];
+    if (element.shape && element.shape.controllers && element.shape.controllers.length) {
+        shapeControllers = element.shape.controllers;
+    }
+
     //기존에 가이드가 있을 경우
     if (this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE)) {
         if (!isEdge) {
@@ -24181,9 +24232,19 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
 
             if (isLane) {
                 _redrawLaneQuarter(me.enableDivideCount(element));
+                if (shapeControllers.length) {
+                    $.each(shapeControllers, function (i, controller) {
+                        _redrawController(i, controller);
+                    })
+                }
             }
             if (!isLane) {
                 _redrawRect();
+                if (shapeControllers.length) {
+                    $.each(shapeControllers, function (i, controller) {
+                        _redrawController(i, controller);
+                    })
+                }
                 if (textList.length) {
                     $.each(textList, function (i, text) {
                         _redrawTextLine(i, text);
@@ -24216,9 +24277,19 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
 
             if (isLane) {
                 _drawLaneQuarter(me.enableDivideCount(element));
+                if (shapeControllers.length) {
+                    $.each(shapeControllers, function (i, controller) {
+                        _drawController(i, controller);
+                    })
+                }
             }
             if (!isLane) {
                 _drawRect();
+                if (shapeControllers.length) {
+                    $.each(shapeControllers, function (i, controller) {
+                        _drawController(i, controller);
+                    })
+                }
                 if (textList.length) {
                     $.each(textList, function (i, text) {
                         _drawTextLine(i, text);
@@ -29276,25 +29347,37 @@ OG.handler.EventHandler.prototype = {
                     });
                 });
 
-                $(guide.rect).bind({
-                    click: function (event) {
-                        eventOffset = me._getOffset(event);
-                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
-                        if (virtualEdge) {
-                            $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'created');
+                $.each(guide.rect, function (i, rect) {
+                    $(rect.node).bind({
+                        click: function (event) {
+                            eventOffset = me._getOffset(event);
+                            virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                            if (virtualEdge) {
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'created');
+                                if (rect.shape) {
+                                    $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW, rect);
+                                } else {
+                                    $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW, false);
+                                }
+                            }
                         }
-                    }
-                });
+                    });
 
-                $(guide.rect).draggable({
-                    start: function (event) {
-                        me.deselectAll();
-                        me._RENDERER.removeAllConnectGuide();
-                        me._RENDERER.removeAllVirtualEdge();
-                        eventOffset = me._getOffset(event);
-                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
-                        $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'active');
-                    }
+                    $(rect.node).draggable({
+                        start: function (event) {
+                            me.deselectAll();
+                            me._RENDERER.removeAllConnectGuide();
+                            me._RENDERER.removeAllVirtualEdge();
+                            eventOffset = me._getOffset(event);
+                            virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'active');
+                            if (rect.shape) {
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW, rect);
+                            } else {
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW, false);
+                            }
+                        }
+                    });
                 });
             }
         }
@@ -30580,33 +30663,59 @@ OG.handler.EventHandler.prototype = {
                 }
                 if (isRectMode === 'active') {
                     //새로운 것 만드는 과정
-                    var eventOffset = me._getOffset(event);
+                    var toDraw = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW);
+                    if (!toDraw) {
+                        var eventOffset = me._getOffset(event);
 
-                    var target = me._RENDERER.getTargetfromVirtualEdge();
-                    renderer.removeAllVirtualEdge();
-                    var shapeId = $(target).attr('_shape_id');
-                    var newShape;
-                    eval('newShape = new ' + shapeId + '()');
+                        var target = me._RENDERER.getTargetfromVirtualEdge();
+                        renderer.removeAllVirtualEdge();
+                        var shapeId = $(target).attr('_shape_id');
+                        var newShape;
+                        eval('newShape = new ' + shapeId + '()');
 
-                    var style = target.shape.geom.style;
-                    var boundary = renderer.getBoundary(target);
-                    var width = boundary.getWidth();
-                    var height = boundary.getHeight();
+                        var style = target.shape.geom.style;
+                        var boundary = renderer.getBoundary(target);
+                        var width = boundary.getWidth();
+                        var height = boundary.getHeight();
 
-                    //From,To 가능여부 확인
-                    var isConnectable = me._isConnectable(target.shape);
-                    if (!me._isConnectableFrom(target.shape)) {
-                        isConnectable = false;
-                    }
-                    if (!me._isConnectableTo(target.shape)) {
-                        isConnectable = false;
-                    }
-                    if (isConnectable) {
-                        newShape.setData(JSON.parse(JSON.stringify(target.shape.getData())));
-                        var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                        $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
+                        //From,To 가능여부 확인
+                        var isConnectable = me._isConnectable(target.shape);
+                        if (!me._isConnectableFrom(target.shape)) {
+                            isConnectable = false;
+                        }
+                        if (!me._isConnectableTo(target.shape)) {
+                            isConnectable = false;
+                        }
+                        if (isConnectable) {
+                            newShape.setData(JSON.parse(JSON.stringify(target.shape.getData())));
+                            var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
+                            $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
 
-                        renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                            renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                        }
+                    } else {
+                        var eventOffset = me._getOffset(event);
+
+                        var target = me._RENDERER.getTargetfromVirtualEdge();
+                        renderer.removeAllVirtualEdge();
+                        var shapeId = toDraw.shape;
+                        var newShape;
+                        eval('newShape = new ' + shapeId + '()');
+
+                        var style = toDraw.style;
+                        var width = toDraw.width;
+                        var height = toDraw.height;
+
+                        //From 가능여부 확인
+                        var isConnectable = me._isConnectable(target.shape);
+                        if (!me._isConnectableFrom(target.shape)) {
+                            isConnectable = false;
+                        }
+                        if (isConnectable) {
+                            var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
+                            $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
+                            renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                        }
                     }
                 }
             }
@@ -37870,6 +37979,16 @@ OG.graph.Canvas.prototype = {
     onExpanded: function (callbackFunc) {
         $(this.getRootElement()).bind('expanded', function (event, element) {
             callbackFunc(event, element);
+        });
+    },
+
+    /**
+     *
+     * @param {Function} callbackFunc 콜백함수(event, sourceElement, targetElement)
+     */
+    onDuplicated: function (callbackFunc) {
+        $(this.getRootElement()).bind('duplicated', function (event, sourceElement, targetElement) {
+            callbackFunc(event, sourceElement, targetElement);
         });
     },
 

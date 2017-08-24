@@ -3143,6 +3143,38 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         _lwcRect.attr({x: _lowerCenter.x - _hSize, y: _lowerCenter.y - _hSize});
     }
 
+    function _drawController(i, controller) {
+        var _image = me._PAPER.image(me._CONFIG.IMAGE_BASE + controller.image, 0, 0, _ctrlSize, _ctrlSize);
+        _image.attr(me._CONFIG.DEFAULT_STYLE.GUIDE_LINE_AREA);
+        group.appendChild(_image);
+        me._add(_image, rElement.id + OG.Constants.GUIDE_SUFFIX.CONTROLLER + i);
+        guide._image = _image.node;
+
+        if (controller.action) {
+            $(_image.node).click(function () {
+                controller.action(element);
+            })
+        }
+        else if (controller.create) {
+            if (!guide.rect) {
+                guide.rect = [];
+            }
+            guide.rect.push({
+                node: _image.node,
+                shape: controller.create.shape,
+                width: controller.create.width,
+                height: controller.create.height,
+                style: controller.create.style
+            });
+        }
+        controllers.push(_image);
+    }
+
+    function _redrawController(i, controller) {
+        var _image = me._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.CONTROLLER + i);
+        controllers.push(_image);
+    }
+
     function _drawTrash() {
         if (!_isDeletable) {
             return;
@@ -3308,7 +3340,12 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
 
         me._add(_rect, rElement.id + OG.Constants.GUIDE_SUFFIX.RECT);
 
-        guide.rect = _rect.node;
+        if (!guide.rect) {
+            guide.rect = [];
+        }
+        guide.rect.push({
+            node: _rect.node
+        });
         controllers.push(_rect);
     }
 
@@ -3456,6 +3493,11 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         textList = [];
     }
 
+    var shapeControllers = [];
+    if (element.shape && element.shape.controllers && element.shape.controllers.length) {
+        shapeControllers = element.shape.controllers;
+    }
+
     //기존에 가이드가 있을 경우
     if (this._getREleById(rElement.id + OG.Constants.GUIDE_SUFFIX.GUIDE)) {
         if (!isEdge) {
@@ -3464,9 +3506,19 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
 
             if (isLane) {
                 _redrawLaneQuarter(me.enableDivideCount(element));
+                if (shapeControllers.length) {
+                    $.each(shapeControllers, function (i, controller) {
+                        _redrawController(i, controller);
+                    })
+                }
             }
             if (!isLane) {
                 _redrawRect();
+                if (shapeControllers.length) {
+                    $.each(shapeControllers, function (i, controller) {
+                        _redrawController(i, controller);
+                    })
+                }
                 if (textList.length) {
                     $.each(textList, function (i, text) {
                         _redrawTextLine(i, text);
@@ -3499,9 +3551,19 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
 
             if (isLane) {
                 _drawLaneQuarter(me.enableDivideCount(element));
+                if (shapeControllers.length) {
+                    $.each(shapeControllers, function (i, controller) {
+                        _drawController(i, controller);
+                    })
+                }
             }
             if (!isLane) {
                 _drawRect();
+                if (shapeControllers.length) {
+                    $.each(shapeControllers, function (i, controller) {
+                        _drawController(i, controller);
+                    })
+                }
                 if (textList.length) {
                     $.each(textList, function (i, text) {
                         _drawTextLine(i, text);

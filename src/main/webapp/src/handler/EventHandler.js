@@ -983,25 +983,37 @@ OG.handler.EventHandler.prototype = {
                     });
                 });
 
-                $(guide.rect).bind({
-                    click: function (event) {
-                        eventOffset = me._getOffset(event);
-                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
-                        if (virtualEdge) {
-                            $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'created');
+                $.each(guide.rect, function (i, rect) {
+                    $(rect.node).bind({
+                        click: function (event) {
+                            eventOffset = me._getOffset(event);
+                            virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                            if (virtualEdge) {
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'created');
+                                if (rect.shape) {
+                                    $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW, rect);
+                                } else {
+                                    $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW, false);
+                                }
+                            }
                         }
-                    }
-                });
+                    });
 
-                $(guide.rect).draggable({
-                    start: function (event) {
-                        me.deselectAll();
-                        me._RENDERER.removeAllConnectGuide();
-                        me._RENDERER.removeAllVirtualEdge();
-                        eventOffset = me._getOffset(event);
-                        virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
-                        $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'active');
-                    }
+                    $(rect.node).draggable({
+                        start: function (event) {
+                            me.deselectAll();
+                            me._RENDERER.removeAllConnectGuide();
+                            me._RENDERER.removeAllVirtualEdge();
+                            eventOffset = me._getOffset(event);
+                            virtualEdge = me._RENDERER.createVirtualEdge(eventOffset.x, eventOffset.y, element);
+                            $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_MODE, 'active');
+                            if (rect.shape) {
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW, rect);
+                            } else {
+                                $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW, false);
+                            }
+                        }
+                    });
                 });
             }
         }
@@ -2287,33 +2299,59 @@ OG.handler.EventHandler.prototype = {
                 }
                 if (isRectMode === 'active') {
                     //새로운 것 만드는 과정
-                    var eventOffset = me._getOffset(event);
+                    var toDraw = $(root).data(OG.Constants.GUIDE_SUFFIX.RECT_CONNECT_TO_DRAW);
+                    if (!toDraw) {
+                        var eventOffset = me._getOffset(event);
 
-                    var target = me._RENDERER.getTargetfromVirtualEdge();
-                    renderer.removeAllVirtualEdge();
-                    var shapeId = $(target).attr('_shape_id');
-                    var newShape;
-                    eval('newShape = new ' + shapeId + '()');
+                        var target = me._RENDERER.getTargetfromVirtualEdge();
+                        renderer.removeAllVirtualEdge();
+                        var shapeId = $(target).attr('_shape_id');
+                        var newShape;
+                        eval('newShape = new ' + shapeId + '()');
 
-                    var style = target.shape.geom.style;
-                    var boundary = renderer.getBoundary(target);
-                    var width = boundary.getWidth();
-                    var height = boundary.getHeight();
+                        var style = target.shape.geom.style;
+                        var boundary = renderer.getBoundary(target);
+                        var width = boundary.getWidth();
+                        var height = boundary.getHeight();
 
-                    //From,To 가능여부 확인
-                    var isConnectable = me._isConnectable(target.shape);
-                    if (!me._isConnectableFrom(target.shape)) {
-                        isConnectable = false;
-                    }
-                    if (!me._isConnectableTo(target.shape)) {
-                        isConnectable = false;
-                    }
-                    if (isConnectable) {
-                        newShape.setData(JSON.parse(JSON.stringify(target.shape.getData())));
-                        var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                        $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
+                        //From,To 가능여부 확인
+                        var isConnectable = me._isConnectable(target.shape);
+                        if (!me._isConnectableFrom(target.shape)) {
+                            isConnectable = false;
+                        }
+                        if (!me._isConnectableTo(target.shape)) {
+                            isConnectable = false;
+                        }
+                        if (isConnectable) {
+                            newShape.setData(JSON.parse(JSON.stringify(target.shape.getData())));
+                            var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
+                            $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
 
-                        renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                            renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                        }
+                    } else {
+                        var eventOffset = me._getOffset(event);
+
+                        var target = me._RENDERER.getTargetfromVirtualEdge();
+                        renderer.removeAllVirtualEdge();
+                        var shapeId = toDraw.shape;
+                        var newShape;
+                        eval('newShape = new ' + shapeId + '()');
+
+                        var style = toDraw.style;
+                        var width = toDraw.width;
+                        var height = toDraw.height;
+
+                        //From 가능여부 확인
+                        var isConnectable = me._isConnectable(target.shape);
+                        if (!me._isConnectableFrom(target.shape)) {
+                            isConnectable = false;
+                        }
+                        if (isConnectable) {
+                            var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
+                            $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
+                            renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                        }
                     }
                 }
             }

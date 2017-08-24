@@ -144,6 +144,13 @@ OG.shape.IShape = function () {
      */
     this.textList = [];
 
+
+    /**
+     * 도형 특수 컨트롤러 목록
+     * @type {Array}
+     */
+    this.controllers = [];
+
     /**
      * 기본 컨텍스트 메뉴 정보
      * @type {Object} json

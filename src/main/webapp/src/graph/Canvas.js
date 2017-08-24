@@ -3175,6 +3175,16 @@ OG.graph.Canvas.prototype = {
     },
 
     /**
+     *
+     * @param {Function} callbackFunc 콜백함수(event, sourceElement, targetElement)
+     */
+    onDuplicated: function (callbackFunc) {
+        $(this.getRootElement()).bind('duplicated', function (event, sourceElement, targetElement) {
+            callbackFunc(event, sourceElement, targetElement);
+        });
+    },
+
+    /**
      * 캔버스 로딩 이벤트 리스너
      */
     onLoading: function (callbackFunc) {
