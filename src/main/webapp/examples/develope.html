@@ -352,21 +352,23 @@
                 canvas.updateBackDoor(150, 0.7);
             });
 
-            var shape = new OG.RectangleShape();
-            shape.controllers = [
-                {
-                    image: 'annotation.png',
-//                    create: {
-//                        shape: 'OG.CircleShape',
-//                        width: 100,
-//                        height: 100,
-//                        style: {}
-//                    }
-                    action: function (clicked) {
-                        console.log(clicked);
+            var shape = new OG.A_HumanTask();
+            shape.createController = function () {
+                return [
+                    {
+                        image: 'annotation.png',
+                        create: {
+                            shape: 'OG.CircleShape',
+                            width: 100,
+                            height: 100,
+                            style: {}
+                        }
+//                        action: function (clicked) {
+//                            console.log(clicked);
+//                        }
                     }
-                }
-            ]
+                ]
+            }
             canvas.drawShape([200, 200], shape, [200, 200]);
 
         });
