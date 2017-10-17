@@ -1041,7 +1041,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
         case OG.Constants.GEOM_TYPE.COLLECTION:
             for (var i = 0, leni = geometry.geometries.length; i < leni; i++) {
                 // recursive call
-                this._drawGeometry(groupElement, geometry.geometries[i], style, geometry.style.map);
+                this._drawGeometry(groupElement, geometry.geometries[i], geometry.geometries[i].style, geometry.style.map);
             }
             break;
     }
@@ -1287,10 +1287,12 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         // 좌상단으로 이동 및 크기 조정
         geometry.moveCentroid(position);
         geometry.resizeBox(width, height);
-
+        if (size && size[2]) {
+            geometry.rotate(size[2]);
+            shape.angle = size[2];
+        }
         groupNode = this.drawGeom(geometry, style, id);
         shape.geom = groupNode.geom;
-
 
     } else if (shape instanceof OG.shape.TextShape) {
         text = shape.createShape();
@@ -1331,6 +1333,10 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         // 좌상단으로 이동 및 크기 조정
         geometry.moveCentroid(position);
         geometry.resizeBox(width, height);
+        if (size && size[2]) {
+            geometry.rotate(size[2]);
+            shape.angle = size[2];
+        }
 
         groupNode = this.drawGroup(geometry, style, id);
         shape.geom = groupNode.geom;
@@ -1338,6 +1344,8 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
 
     if (shape.geom) {
         groupNode.shape = shape;
+    } else {
+        groupNode.shape.label = shape.label;
     }
     groupNode.shapeStyle = (style instanceof OG.geometry.Style) ? style.map : style;
     $(groupNode).attr("_shape_id", shape.SHAPE_ID);
@@ -2219,7 +2227,6 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
             }
             text = beforeEvent.afterText;
         }
-
         OG.Util.apply(element.shape.geom.style.map, _style);
         element.shape.label = text === undefined ? element.shape.label : text;
 
@@ -2792,6 +2799,80 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
     return edge;
 };
 
+/**
+ * 주어진 도형을 신규 아이디로 변경한다.
+ * @param element
+ * @param id
+ */
+OG.renderer.RaphaelRenderer.prototype.updateId = function (element, id) {
+    var me = this;
+    var replaceTerminalId = function (edge, oldId, id) {
+        var terminal, newTerminal;
+        terminal = $(edge).attr('_from');
+        if (terminal && terminal.length > 0) {
+            var split = terminal.split('_TERMINAL_');
+            if (split[0] == oldId) {
+                newTerminal = id + '_TERMINAL_' + split[1];
+                $(edge).attr('_from', newTerminal);
+            }
+        }
+        terminal = $(edge).attr('_to');
+        if (terminal && terminal.length > 0) {
+            var split = terminal.split('_TERMINAL_');
+            if (split[0] == oldId) {
+                newTerminal = id + '_TERMINAL_' + split[1];
+                $(edge).attr('_to', newTerminal);
+            }
+        }
+    };
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return;
+    }
+
+    var oldId = rElement.id;
+    //Edge 인 경우 연결된 도형이 있을 경우, _toedge, _fromedge 를 변경한다.
+    if (rElement.node.shape instanceof OG.EdgeShape) {
+        var relatedElementsFromEdge = me._CANVAS.getRelatedElementsFromEdge(rElement.node);
+        if (relatedElementsFromEdge.from) {
+            var toedge = $(relatedElementsFromEdge.from).attr('_toedge');
+            var array = toedge.split(",");
+            $.each(array, function (idx, item) {
+                if (item == oldId) {
+                    array[idx] = id;
+                }
+            });
+            $(relatedElementsFromEdge.from).attr('_toedge', array.toString());
+        }
+        if (relatedElementsFromEdge.to) {
+            var fromedge = $(relatedElementsFromEdge.to).attr('_fromedge');
+            var array = fromedge.split(",");
+            $.each(array, function (idx, item) {
+                if (item == oldId) {
+                    array[idx] = id;
+                }
+            });
+            $(relatedElementsFromEdge.to).attr('_fromedge', array.toString());
+        }
+    }
+    //Edge 가 아니고 연결된 Edge 가 있을경우, Edge 의 터미널을 변경한다.
+    else {
+        var prevEdges = me.getPrevEdges(rElement.node);
+        var nextEdges = me.getNextEdges(rElement.node);
+        for (var i = 0, leni = prevEdges.length; i < leni; i++) {
+            replaceTerminalId(prevEdges[i], oldId, id);
+        }
+        for (var i = 0, leni = nextEdges.length; i < leni; i++) {
+            replaceTerminalId(nextEdges[i], oldId, id);
+        }
+    }
+
+    rElement.node.id = id;
+    rElement.id = id;
+    this._ELE_MAP.put(id, rElement);
+    this._ELE_MAP.remove(oldId);
+    return rElement.node;
+};
 
 /**
  * 단방향 연결속성정보를 삭제한다. Edge 인 경우에만 해당한다.
@@ -3158,8 +3239,11 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         guide._image = _image.node;
 
         if (controller.action) {
-            $(_image.node).click(function () {
-                controller.action(element);
+            $(_image.node).click(function (event) {
+                //mousedown 이후에 지속하도록.
+                setTimeout(function () {
+                    controller.action(event, element);
+                }, 10);
             })
         }
         else if (controller.create) {
@@ -4672,7 +4756,8 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle) {
     if (rElement && type && geometry) {
         if (type === OG.Constants.SHAPE_TYPE.IMAGE ||
             type === OG.Constants.SHAPE_TYPE.TEXT ||
-            type === OG.Constants.SHAPE_TYPE.HTML) {
+            type === OG.Constants.SHAPE_TYPE.HTML ||
+            type === OG.Constants.SHAPE_TYPE.SVG) {
             shape = rElement.node.shape.clone();
             envelope = geometry.getBoundary();
             center = envelope.getCentroid();
@@ -6421,6 +6506,9 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
 
     if (divedLanes.length) {
         for (var i = 0, leni = divedLanes.length; i < leni; i++) {
+            //생성된 lane 의 부모에 대해 첫번째 자식으로 들어감으로써 lane 에 속한 다른 도형의 인덱스들을 방해하지 않는다.
+            divedLanes[i].parentElement.insertBefore(divedLanes[i], divedLanes[i].parentElement.firstChild);
+
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
     }

@@ -241,7 +241,7 @@ OG.shape.IShape.prototype = {
     onDrawShape: function () {
 
     },
-    onBeforeLabelChange: function () {
+    onBeforeLabelChange: function (text, beforeText) {
 
     },
     onRedrawShape: function () {
@@ -268,7 +268,7 @@ OG.shape.IShape.prototype = {
     onRotateShape: function (angle) {
 
     },
-    onDuplicated: function (target, duplicated) {
+    onDuplicated: function (edge, target, rectShape) {
 
     },
     onPasteShape: function (copied, pasted) {

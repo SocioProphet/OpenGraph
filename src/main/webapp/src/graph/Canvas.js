@@ -123,11 +123,6 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         HISTORY_SIZE: 100,
 
         /**
-         * 확대/축소 슬라이더
-         */
-        USE_SLIDER: true,
-
-        /**
          * 클릭선택 가능여부
          */
         SELECTABLE: true,
@@ -891,7 +886,6 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.ENABLE_HOTKEY = config.enableHotKey === undefined ? this._CONFIG.ENABLE_HOTKEY : config.enableHotKey;
             this._CONFIG.ENABLE_CONTEXTMENU = config.enableContextMenu === undefined ? this._CONFIG.ENABLE_CONTEXTMENU : config.enableContextMenu;
             this._CONFIG.AUTO_EXTENSIONAL = config.autoExtensional === undefined ? this._CONFIG.AUTO_EXTENSIONAL : config.autoExtensional;
-            this._CONFIG.USE_SLIDER = config.useSlider === undefined ? this._CONFIG.USE_SLIDER : config.useSlider;
             this._CONFIG.STICK_GUIDE = config.stickGuide === undefined ? this._CONFIG.STICK_GUIDE : config.stickGuide;
             this._CONFIG.CHECK_BRIDGE_EDGE = config.checkBridgeEdge === undefined ? this._CONFIG.CHECK_BRIDGE_EDGE : config.checkBridgeEdge;
             this._CONFIG.AUTO_HISTORY = config.autoHistory === undefined ? this._CONFIG.AUTO_HISTORY : config.autoHistory;
@@ -1445,7 +1439,10 @@ OG.graph.Canvas.prototype = {
      * @return {Element} Group DOM Element with geometry
      */
     drawShape: function (position, shape, size, style, id, parentId, preventEvent, preventDropEvent) {
-
+        var existElement
+        if (id) {
+            existElement = this.getElementById(id);
+        }
         var element = this._RENDERER.drawShape(position, shape, size, style, id, preventEvent, preventDropEvent);
 
         if (position && (shape.TYPE === OG.Constants.SHAPE_TYPE.EDGE)) {
@@ -1460,16 +1457,18 @@ OG.graph.Canvas.prototype = {
             this.initConfig();
         }
 
-        this._HANDLER.setClickSelectable(element, this._HANDLER._isSelectable(element.shape));
-        this._HANDLER.setMovable(element, this._HANDLER._isMovable(element.shape));
-        this._HANDLER.setGroupDropable(element);
-        this._HANDLER.setConnectGuide(element, this._HANDLER._isConnectable(element.shape));
+        if (!existElement) {
+            this._HANDLER.setClickSelectable(element, this._HANDLER._isSelectable(element.shape));
+            this._HANDLER.setMovable(element, this._HANDLER._isMovable(element.shape));
+            this._HANDLER.setGroupDropable(element);
+            this._HANDLER.setConnectGuide(element, this._HANDLER._isConnectable(element.shape));
 
-        if (this._HANDLER._isLabelEditable(element.shape)) {
-            this._HANDLER.enableEditLabel(element);
-        }
-        if (!id) {
-            this._RENDERER.addHistory();
+            if (this._HANDLER._isLabelEditable(element.shape)) {
+                this._HANDLER.enableEditLabel(element);
+            }
+            if (!id) {
+                this._RENDERER.addHistory();
+            }
         }
         this.updateSlider();
         return element;
@@ -1636,6 +1635,10 @@ OG.graph.Canvas.prototype = {
      * @returns {*|Element}
      */
     connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger, id, edgeShape) {
+        var existElement
+        if (id) {
+            existElement = this.getElementById(id);
+        }
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
         if (fromP) {
@@ -1660,7 +1663,7 @@ OG.graph.Canvas.prototype = {
         edgeShape.from = fromPosition;
         edgeShape.to = toPosition;
         edge = this._RENDERER.drawShape(null, edgeShape, null, style, id);
-        edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
+        //edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
 
         //if label null, convert undefined
         label = label ? label : undefined;
@@ -1668,7 +1671,7 @@ OG.graph.Canvas.prototype = {
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, preventTrigger);
 
-        if (edge) {
+        if (edge && !existElement) {
             this._HANDLER.setClickSelectable(edge, edge.shape.SELECTABLE);
             this._HANDLER.setMovable(edge, edge.shape.SELECTABLE && edge.shape.MOVABLE);
             this._HANDLER.setConnectGuide(edge, this._HANDLER._isConnectable(edge.shape));
@@ -1693,6 +1696,10 @@ OG.graph.Canvas.prototype = {
      * @return {OG.geometry} geom Edge geometry
      */
     connectWithTerminalId: function (fromTerminal, toTerminal, style, label, id, shapeId, geom) {
+        var existElement
+        if (id) {
+            existElement = this.getElementById(id);
+        }
         var vertices, edge, fromPosition, toPosition, fromto, shape;
 
         fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
@@ -1730,7 +1737,7 @@ OG.graph.Canvas.prototype = {
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, true);
 
-        if (edge) {
+        if (edge && !existElement) {
             this._HANDLER.setClickSelectable(edge, edge.shape.SELECTABLE);
             this._HANDLER.setMovable(edge, edge.shape.SELECTABLE && edge.shape.MOVABLE);
             this._HANDLER.setConnectGuide(edge, this._HANDLER._isConnectable(edge.shape));
@@ -1752,6 +1759,14 @@ OG.graph.Canvas.prototype = {
         this._RENDERER.disconnect(element);
     }
     ,
+    /**
+     * 주어진 도형을 신규 아이디로 변경한다.
+     * @param element
+     * @param id
+     */
+    updateId: function (element, id) {
+        return this._RENDERER.updateId(element, id);
+    },
 
     /**
      * 주어진 Shape 들을 그룹핑한다.
@@ -3187,11 +3202,11 @@ OG.graph.Canvas.prototype = {
 
     /**
      *
-     * @param {Function} callbackFunc 콜백함수(event, sourceElement, targetElement)
+     * @param {Function} callbackFunc 콜백함수(event, edgeElement, sourceElement, targetElement)
      */
     onDuplicated: function (callbackFunc) {
-        $(this.getRootElement()).bind('duplicated', function (event, sourceElement, targetElement) {
-            callbackFunc(event, sourceElement, targetElement);
+        $(this.getRootElement()).bind('duplicated', function (event, edgeElement, sourceElement, targetElement) {
+            callbackFunc(event, edgeElement, sourceElement, targetElement);
         });
     },
 

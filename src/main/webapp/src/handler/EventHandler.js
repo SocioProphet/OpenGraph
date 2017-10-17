@@ -983,7 +983,7 @@ OG.handler.EventHandler.prototype = {
                     });
                 });
 
-                if(guide.rect && guide.rect.length){
+                if (guide.rect && guide.rect.length) {
                     $.each(guide.rect, function (i, rect) {
                         $(rect.node).bind({
                             click: function (event) {
@@ -2123,9 +2123,9 @@ OG.handler.EventHandler.prototype = {
             var cuScale;
             var preScale = renderer.getScale();
             if (isUp) {
-                cuScale = preScale + 0.1;
+                cuScale = preScale + 0.02;
             } else {
-                cuScale = preScale - 0.1;
+                cuScale = preScale - 0.02;
             }
             if (cuScale < 0.25) {
                 cuScale = 0.25;
@@ -2158,7 +2158,6 @@ OG.handler.EventHandler.prototype = {
             if (me._CONFIG.WHEEL_SCALABLE) {
                 event.preventDefault();
                 event.stopPropagation();
-                ;
                 if (event.originalEvent.wheelDelta > 0 || event.deltaY > 0) {
                     // scroll up
                     updateScale(event, true);
@@ -2207,9 +2206,8 @@ OG.handler.EventHandler.prototype = {
                 if (isConnectable) {
                     newShape.setData(JSON.parse(JSON.stringify(target.shape.getData())));
                     var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                    $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
-
-                    renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                    var edge = renderer._CANVAS.connect(target, rectShape, null, null, null, null, true);
+                    $(renderer._PAPER.canvas).trigger('duplicated', [edge, target, rectShape]);
                 }
             } else {
                 var eventOffset = me._getOffset(event);
@@ -2218,7 +2216,11 @@ OG.handler.EventHandler.prototype = {
                 renderer.removeAllVirtualEdge();
                 var shapeId = toDraw.shape;
                 var newShape;
-                eval('newShape = new ' + shapeId + '()');
+                if (shapeId instanceof OG.IShape) {
+                    newShape = shapeId;
+                } else {
+                    eval('newShape = new ' + shapeId + '()');
+                }
 
                 var style = toDraw.style;
                 var width = toDraw.width;
@@ -2231,8 +2233,14 @@ OG.handler.EventHandler.prototype = {
                 }
                 if (isConnectable) {
                     var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                    $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
-                    renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                    var edge = renderer._CANVAS.connect(target, rectShape, null, null, null, null, true);
+                    if (target.shape.onDuplicated) {
+                        target.shape.onDuplicated(edge, target, rectShape);
+                    }
+                    if (rectShape.shape.onDuplicated) {
+                        rectShape.shape.onDuplicated(edge, target, rectShape);
+                    }
+                    $(renderer._PAPER.canvas).trigger('duplicated', [edge, target, rectShape]);
                 }
             }
         }

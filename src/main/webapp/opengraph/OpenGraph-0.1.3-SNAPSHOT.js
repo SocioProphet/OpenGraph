@@ -10978,7 +10978,7 @@ OG.shape.IShape.prototype = {
     onDrawShape: function () {
 
     },
-    onBeforeLabelChange: function () {
+    onBeforeLabelChange: function (text, beforeText) {
 
     },
     onRedrawShape: function () {
@@ -11005,7 +11005,7 @@ OG.shape.IShape.prototype = {
     onRotateShape: function (angle) {
 
     },
-    onDuplicated: function (target, duplicated) {
+    onDuplicated: function (edge, target, rectShape) {
 
     },
     onPasteShape: function (copied, pasted) {
@@ -21767,7 +21767,7 @@ OG.renderer.RaphaelRenderer.prototype._drawGeometry = function (groupElement, ge
         case OG.Constants.GEOM_TYPE.COLLECTION:
             for (var i = 0, leni = geometry.geometries.length; i < leni; i++) {
                 // recursive call
-                this._drawGeometry(groupElement, geometry.geometries[i], style, geometry.style.map);
+                this._drawGeometry(groupElement, geometry.geometries[i], geometry.geometries[i].style, geometry.style.map);
             }
             break;
     }
@@ -22013,10 +22013,12 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         // 좌상단으로 이동 및 크기 조정
         geometry.moveCentroid(position);
         geometry.resizeBox(width, height);
-
+        if (size && size[2]) {
+            geometry.rotate(size[2]);
+            shape.angle = size[2];
+        }
         groupNode = this.drawGeom(geometry, style, id);
         shape.geom = groupNode.geom;
-
 
     } else if (shape instanceof OG.shape.TextShape) {
         text = shape.createShape();
@@ -22057,6 +22059,10 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
         // 좌상단으로 이동 및 크기 조정
         geometry.moveCentroid(position);
         geometry.resizeBox(width, height);
+        if (size && size[2]) {
+            geometry.rotate(size[2]);
+            shape.angle = size[2];
+        }
 
         groupNode = this.drawGroup(geometry, style, id);
         shape.geom = groupNode.geom;
@@ -22064,6 +22070,8 @@ OG.renderer.RaphaelRenderer.prototype.drawShape = function (position, shape, siz
 
     if (shape.geom) {
         groupNode.shape = shape;
+    } else {
+        groupNode.shape.label = shape.label;
     }
     groupNode.shapeStyle = (style instanceof OG.geometry.Style) ? style.map : style;
     $(groupNode).attr("_shape_id", shape.SHAPE_ID);
@@ -22945,7 +22953,6 @@ OG.renderer.RaphaelRenderer.prototype.drawLabel = function (shapeElement, text, 
             }
             text = beforeEvent.afterText;
         }
-
         OG.Util.apply(element.shape.geom.style.map, _style);
         element.shape.label = text === undefined ? element.shape.label : text;
 
@@ -23518,6 +23525,80 @@ OG.renderer.RaphaelRenderer.prototype.connect = function (fromTerminal, toTermin
     return edge;
 };
 
+/**
+ * 주어진 도형을 신규 아이디로 변경한다.
+ * @param element
+ * @param id
+ */
+OG.renderer.RaphaelRenderer.prototype.updateId = function (element, id) {
+    var me = this;
+    var replaceTerminalId = function (edge, oldId, id) {
+        var terminal, newTerminal;
+        terminal = $(edge).attr('_from');
+        if (terminal && terminal.length > 0) {
+            var split = terminal.split('_TERMINAL_');
+            if (split[0] == oldId) {
+                newTerminal = id + '_TERMINAL_' + split[1];
+                $(edge).attr('_from', newTerminal);
+            }
+        }
+        terminal = $(edge).attr('_to');
+        if (terminal && terminal.length > 0) {
+            var split = terminal.split('_TERMINAL_');
+            if (split[0] == oldId) {
+                newTerminal = id + '_TERMINAL_' + split[1];
+                $(edge).attr('_to', newTerminal);
+            }
+        }
+    };
+    var rElement = this._getREleById(OG.Util.isElement(element) ? element.id : element);
+    if (!rElement) {
+        return;
+    }
+
+    var oldId = rElement.id;
+    //Edge 인 경우 연결된 도형이 있을 경우, _toedge, _fromedge 를 변경한다.
+    if (rElement.node.shape instanceof OG.EdgeShape) {
+        var relatedElementsFromEdge = me._CANVAS.getRelatedElementsFromEdge(rElement.node);
+        if (relatedElementsFromEdge.from) {
+            var toedge = $(relatedElementsFromEdge.from).attr('_toedge');
+            var array = toedge.split(",");
+            $.each(array, function (idx, item) {
+                if (item == oldId) {
+                    array[idx] = id;
+                }
+            });
+            $(relatedElementsFromEdge.from).attr('_toedge', array.toString());
+        }
+        if (relatedElementsFromEdge.to) {
+            var fromedge = $(relatedElementsFromEdge.to).attr('_fromedge');
+            var array = fromedge.split(",");
+            $.each(array, function (idx, item) {
+                if (item == oldId) {
+                    array[idx] = id;
+                }
+            });
+            $(relatedElementsFromEdge.to).attr('_fromedge', array.toString());
+        }
+    }
+    //Edge 가 아니고 연결된 Edge 가 있을경우, Edge 의 터미널을 변경한다.
+    else {
+        var prevEdges = me.getPrevEdges(rElement.node);
+        var nextEdges = me.getNextEdges(rElement.node);
+        for (var i = 0, leni = prevEdges.length; i < leni; i++) {
+            replaceTerminalId(prevEdges[i], oldId, id);
+        }
+        for (var i = 0, leni = nextEdges.length; i < leni; i++) {
+            replaceTerminalId(nextEdges[i], oldId, id);
+        }
+    }
+
+    rElement.node.id = id;
+    rElement.id = id;
+    this._ELE_MAP.put(id, rElement);
+    this._ELE_MAP.remove(oldId);
+    return rElement.node;
+};
 
 /**
  * 단방향 연결속성정보를 삭제한다. Edge 인 경우에만 해당한다.
@@ -23884,8 +23965,11 @@ OG.renderer.RaphaelRenderer.prototype.drawGuide = function (element) {
         guide._image = _image.node;
 
         if (controller.action) {
-            $(_image.node).click(function () {
-                controller.action(element);
+            $(_image.node).click(function (event) {
+                //mousedown 이후에 지속하도록.
+                setTimeout(function () {
+                    controller.action(event, element);
+                }, 10);
             })
         }
         else if (controller.create) {
@@ -25398,7 +25482,8 @@ OG.renderer.RaphaelRenderer.prototype.rotate = function (element, angle) {
     if (rElement && type && geometry) {
         if (type === OG.Constants.SHAPE_TYPE.IMAGE ||
             type === OG.Constants.SHAPE_TYPE.TEXT ||
-            type === OG.Constants.SHAPE_TYPE.HTML) {
+            type === OG.Constants.SHAPE_TYPE.HTML ||
+            type === OG.Constants.SHAPE_TYPE.SVG) {
             shape = rElement.node.shape.clone();
             envelope = geometry.getBoundary();
             center = envelope.getCentroid();
@@ -27147,6 +27232,9 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
 
     if (divedLanes.length) {
         for (var i = 0, leni = divedLanes.length; i < leni; i++) {
+            //생성된 lane 의 부모에 대해 첫번째 자식으로 들어감으로써 lane 에 속한 다른 도형의 인덱스들을 방해하지 않는다.
+            divedLanes[i].parentElement.insertBefore(divedLanes[i], divedLanes[i].parentElement.firstChild);
+
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
     }
@@ -29369,7 +29457,7 @@ OG.handler.EventHandler.prototype = {
                     });
                 });
 
-                if(guide.rect && guide.rect.length){
+                if (guide.rect && guide.rect.length) {
                     $.each(guide.rect, function (i, rect) {
                         $(rect.node).bind({
                             click: function (event) {
@@ -30509,9 +30597,9 @@ OG.handler.EventHandler.prototype = {
             var cuScale;
             var preScale = renderer.getScale();
             if (isUp) {
-                cuScale = preScale + 0.1;
+                cuScale = preScale + 0.02;
             } else {
-                cuScale = preScale - 0.1;
+                cuScale = preScale - 0.02;
             }
             if (cuScale < 0.25) {
                 cuScale = 0.25;
@@ -30544,7 +30632,6 @@ OG.handler.EventHandler.prototype = {
             if (me._CONFIG.WHEEL_SCALABLE) {
                 event.preventDefault();
                 event.stopPropagation();
-                ;
                 if (event.originalEvent.wheelDelta > 0 || event.deltaY > 0) {
                     // scroll up
                     updateScale(event, true);
@@ -30593,9 +30680,8 @@ OG.handler.EventHandler.prototype = {
                 if (isConnectable) {
                     newShape.setData(JSON.parse(JSON.stringify(target.shape.getData())));
                     var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                    $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
-
-                    renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                    var edge = renderer._CANVAS.connect(target, rectShape, null, null, null, null, true);
+                    $(renderer._PAPER.canvas).trigger('duplicated', [edge, target, rectShape]);
                 }
             } else {
                 var eventOffset = me._getOffset(event);
@@ -30604,7 +30690,11 @@ OG.handler.EventHandler.prototype = {
                 renderer.removeAllVirtualEdge();
                 var shapeId = toDraw.shape;
                 var newShape;
-                eval('newShape = new ' + shapeId + '()');
+                if (shapeId instanceof OG.IShape) {
+                    newShape = shapeId;
+                } else {
+                    eval('newShape = new ' + shapeId + '()');
+                }
 
                 var style = toDraw.style;
                 var width = toDraw.width;
@@ -30617,8 +30707,14 @@ OG.handler.EventHandler.prototype = {
                 }
                 if (isConnectable) {
                     var rectShape = renderer._CANVAS.drawShape([eventOffset.x, eventOffset.y], newShape, [width, height], style);
-                    $(renderer._PAPER.canvas).trigger('duplicated', [target, rectShape]);
-                    renderer._CANVAS.connect(target, rectShape, null, null, null, null);
+                    var edge = renderer._CANVAS.connect(target, rectShape, null, null, null, null, true);
+                    if (target.shape.onDuplicated) {
+                        target.shape.onDuplicated(edge, target, rectShape);
+                    }
+                    if (rectShape.shape.onDuplicated) {
+                        rectShape.shape.onDuplicated(edge, target, rectShape);
+                    }
+                    $(renderer._PAPER.canvas).trigger('duplicated', [edge, target, rectShape]);
                 }
             }
         }
@@ -34936,11 +35032,6 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
         HISTORY_SIZE: 100,
 
         /**
-         * 확대/축소 슬라이더
-         */
-        USE_SLIDER: true,
-
-        /**
          * 클릭선택 가능여부
          */
         SELECTABLE: true,
@@ -35704,7 +35795,6 @@ OG.graph.Canvas.prototype = {
             this._CONFIG.ENABLE_HOTKEY = config.enableHotKey === undefined ? this._CONFIG.ENABLE_HOTKEY : config.enableHotKey;
             this._CONFIG.ENABLE_CONTEXTMENU = config.enableContextMenu === undefined ? this._CONFIG.ENABLE_CONTEXTMENU : config.enableContextMenu;
             this._CONFIG.AUTO_EXTENSIONAL = config.autoExtensional === undefined ? this._CONFIG.AUTO_EXTENSIONAL : config.autoExtensional;
-            this._CONFIG.USE_SLIDER = config.useSlider === undefined ? this._CONFIG.USE_SLIDER : config.useSlider;
             this._CONFIG.STICK_GUIDE = config.stickGuide === undefined ? this._CONFIG.STICK_GUIDE : config.stickGuide;
             this._CONFIG.CHECK_BRIDGE_EDGE = config.checkBridgeEdge === undefined ? this._CONFIG.CHECK_BRIDGE_EDGE : config.checkBridgeEdge;
             this._CONFIG.AUTO_HISTORY = config.autoHistory === undefined ? this._CONFIG.AUTO_HISTORY : config.autoHistory;
@@ -36258,7 +36348,10 @@ OG.graph.Canvas.prototype = {
      * @return {Element} Group DOM Element with geometry
      */
     drawShape: function (position, shape, size, style, id, parentId, preventEvent, preventDropEvent) {
-
+        var existElement
+        if (id) {
+            existElement = this.getElementById(id);
+        }
         var element = this._RENDERER.drawShape(position, shape, size, style, id, preventEvent, preventDropEvent);
 
         if (position && (shape.TYPE === OG.Constants.SHAPE_TYPE.EDGE)) {
@@ -36273,16 +36366,18 @@ OG.graph.Canvas.prototype = {
             this.initConfig();
         }
 
-        this._HANDLER.setClickSelectable(element, this._HANDLER._isSelectable(element.shape));
-        this._HANDLER.setMovable(element, this._HANDLER._isMovable(element.shape));
-        this._HANDLER.setGroupDropable(element);
-        this._HANDLER.setConnectGuide(element, this._HANDLER._isConnectable(element.shape));
+        if (!existElement) {
+            this._HANDLER.setClickSelectable(element, this._HANDLER._isSelectable(element.shape));
+            this._HANDLER.setMovable(element, this._HANDLER._isMovable(element.shape));
+            this._HANDLER.setGroupDropable(element);
+            this._HANDLER.setConnectGuide(element, this._HANDLER._isConnectable(element.shape));
 
-        if (this._HANDLER._isLabelEditable(element.shape)) {
-            this._HANDLER.enableEditLabel(element);
-        }
-        if (!id) {
-            this._RENDERER.addHistory();
+            if (this._HANDLER._isLabelEditable(element.shape)) {
+                this._HANDLER.enableEditLabel(element);
+            }
+            if (!id) {
+                this._RENDERER.addHistory();
+            }
         }
         this.updateSlider();
         return element;
@@ -36449,6 +36544,10 @@ OG.graph.Canvas.prototype = {
      * @returns {*|Element}
      */
     connect: function (fromElement, toElement, style, label, fromP, toP, preventTrigger, id, edgeShape) {
+        var existElement
+        if (id) {
+            existElement = this.getElementById(id);
+        }
         var fromTerminal, toTerminal, edge, fromPosition, toPosition;
 
         if (fromP) {
@@ -36473,7 +36572,7 @@ OG.graph.Canvas.prototype = {
         edgeShape.from = fromPosition;
         edgeShape.to = toPosition;
         edge = this._RENDERER.drawShape(null, edgeShape, null, style, id);
-        edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
+        //edge = this._RENDERER.trimEdgeDirection(edge, fromElement, toElement);
 
         //if label null, convert undefined
         label = label ? label : undefined;
@@ -36481,7 +36580,7 @@ OG.graph.Canvas.prototype = {
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, preventTrigger);
 
-        if (edge) {
+        if (edge && !existElement) {
             this._HANDLER.setClickSelectable(edge, edge.shape.SELECTABLE);
             this._HANDLER.setMovable(edge, edge.shape.SELECTABLE && edge.shape.MOVABLE);
             this._HANDLER.setConnectGuide(edge, this._HANDLER._isConnectable(edge.shape));
@@ -36506,6 +36605,10 @@ OG.graph.Canvas.prototype = {
      * @return {OG.geometry} geom Edge geometry
      */
     connectWithTerminalId: function (fromTerminal, toTerminal, style, label, id, shapeId, geom) {
+        var existElement
+        if (id) {
+            existElement = this.getElementById(id);
+        }
         var vertices, edge, fromPosition, toPosition, fromto, shape;
 
         fromPosition = this._RENDERER._getPositionFromTerminal(fromTerminal);
@@ -36543,7 +36646,7 @@ OG.graph.Canvas.prototype = {
         // connect
         edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, true);
 
-        if (edge) {
+        if (edge && !existElement) {
             this._HANDLER.setClickSelectable(edge, edge.shape.SELECTABLE);
             this._HANDLER.setMovable(edge, edge.shape.SELECTABLE && edge.shape.MOVABLE);
             this._HANDLER.setConnectGuide(edge, this._HANDLER._isConnectable(edge.shape));
@@ -36565,6 +36668,14 @@ OG.graph.Canvas.prototype = {
         this._RENDERER.disconnect(element);
     }
     ,
+    /**
+     * 주어진 도형을 신규 아이디로 변경한다.
+     * @param element
+     * @param id
+     */
+    updateId: function (element, id) {
+        return this._RENDERER.updateId(element, id);
+    },
 
     /**
      * 주어진 Shape 들을 그룹핑한다.
@@ -38000,11 +38111,11 @@ OG.graph.Canvas.prototype = {
 
     /**
      *
-     * @param {Function} callbackFunc 콜백함수(event, sourceElement, targetElement)
+     * @param {Function} callbackFunc 콜백함수(event, edgeElement, sourceElement, targetElement)
      */
     onDuplicated: function (callbackFunc) {
-        $(this.getRootElement()).bind('duplicated', function (event, sourceElement, targetElement) {
-            callbackFunc(event, sourceElement, targetElement);
+        $(this.getRootElement()).bind('duplicated', function (event, edgeElement, sourceElement, targetElement) {
+            callbackFunc(event, edgeElement, sourceElement, targetElement);
         });
     },
 

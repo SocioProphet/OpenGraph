@@ -282,6 +282,9 @@
                         var dropY = event.pageY - $('#canvas').offset().top + $('#canvas')[0].scrollTop;
                         dropX = dropX / canvas._CONFIG.SCALE;
                         dropY = dropY / canvas._CONFIG.SCALE;
+                        shape.onAddedToGroup = function (a, b, c) {
+                            console.log('onAddedToGroup', b);
+                        };
                         element = canvas.drawShape([dropX, dropY],
                             shape, [parseInt(shapeInfo._width, 10), parseInt(shapeInfo._height, 10)]);
                         $('#canvas').removeData('DRAG_SHAPE');
@@ -352,25 +355,42 @@
                 canvas.updateBackDoor(150, 0.7);
             });
 
-            var shape = new OG.A_HumanTask();
-            shape.createController = function () {
-                return [
-                    {
-                        image: 'annotation.png',
-                        create: {
-                            shape: 'OG.CircleShape',
-                            width: 100,
-                            height: 100,
-                            style: {}
-                        }
-//                        action: function (clicked) {
-//                            console.log(clicked);
-//                        }
-                    }
-                ]
-            }
-            canvas.drawShape([200, 200], shape, [200, 200]);
 
+            var e1 = canvas.drawShape([200, 200], new OG.RectangleShape('aaa'), [200, 200, 45], {});
+            var e2 = canvas.drawShape([600, 500], new OG.RectangleShape('aaa'), [200, 400], {});
+
+            canvas.updateId(e1, 'BBB');
+
+
+            var rectangleShape = new OG.RectangleShape();
+            rectangleShape.label = 'ccc';
+            canvas.drawShape([200, 200], rectangleShape, [200, 200, 30], {}, 'BBB');
+
+
+            var connect = canvas.connect(e1, e2);
+            $(connect).bind('click', function () {
+                // alert('click');
+            });
+            $(connect).bind('dblclick', function () {
+                alert('dblclick');
+            });
+
+//            var edgeShape = new OG.EdgeShape();
+//            var geom = new OG.geometry.PolyLine([[200, 200], [200, 500], [600, 500], [600, 200]]);
+//            geom.type = 'PolyLine';
+//            edgeShape.geom = geom;
+//            var edge = canvas.connect(e1, e2, {}, null, null, null, true, 'CCC', edgeShape);
+
+
+//            var edge = canvas.drawShape(null, edgeShape, null, {}, 'CCC', null, true);
+//            console.log(edge.shape.geom.getVertices());
+//            edge = canvas._RENDERER.trimEdgeDirection(edge, e1, e2);
+
+            //if label null, convert undefined
+//            label = label ? label : undefined;
+//
+//            // connect
+//            edge = this._RENDERER.connect(fromTerminal, toTerminal, edge, style, label, preventTrigger);
         });
 
         function save() {
