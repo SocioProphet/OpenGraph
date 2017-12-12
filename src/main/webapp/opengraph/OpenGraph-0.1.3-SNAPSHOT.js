@@ -30649,12 +30649,15 @@ OG.handler.EventHandler.prototype = {
                 if (Math.abs(deltaX) < 120 && Math.abs(deltaY) < 120) {
                     isTrackPad = true;
                 }
+                if(!me._CONFIG.ENABLE_TRACKPAD){
+                    isTrackPad = false;
+                }
                 if (isTrackPad) {
                     //chrome pinch-to-zoom
                     if (event.ctrlKey) {
                         event.preventDefault();
                         event.stopPropagation();
-                        if (event.originalEvent.wheelDeltaY > 0 || event.deltaY > 0) {
+                        if (event.originalEvent.wheelDelta > 0 || event.deltaY > 0) {
                             // scroll up
                             updateScale(event, true);
                         }
@@ -30665,7 +30668,7 @@ OG.handler.EventHandler.prototype = {
                 } else {
                     event.preventDefault();
                     event.stopPropagation();
-                    if (event.originalEvent.wheelDeltaY > 0 || event.deltaY > 0) {
+                    if (event.originalEvent.wheelDelta > 0 || event.deltaY > 0) {
                         // scroll up
                         updateScale(event, true);
                     }
@@ -33510,12 +33513,11 @@ OG.handler.EventHandler.prototype = {
     _autoExtend: function (currentX, currentY, element) {
         var me = this, rootBBox = me._RENDERER.getRootBBox(),
             width = element.shape.geom.boundary.getWidth(), height = element.shape.geom.boundary.getHeight()
-
         // Canvas 영역을 벗어나서 드래그되는 경우 Canvas 확장
-        if (me._CONFIG.AUTO_EXTENSIONAL && rootBBox.width < (currentX + width) * me._CONFIG.SCALE) {
+        if (me._CONFIG.AUTO_EXTENSIONAL && rootBBox.width < (currentX + width)) {
             me._RENDERER.setCanvasSize([rootBBox.width + me._CONFIG.AUTO_EXTENSION_SIZE, rootBBox.height]);
         }
-        if (me._CONFIG.AUTO_EXTENSIONAL && rootBBox.height < (currentY + height) * me._CONFIG.SCALE) {
+        if (me._CONFIG.AUTO_EXTENSIONAL && rootBBox.height < (currentY + height)) {
             me._RENDERER.setCanvasSize([rootBBox.width, rootBBox.height + me._CONFIG.AUTO_EXTENSION_SIZE]);
         }
     },
@@ -34971,6 +34973,10 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
 
     this._CONFIG = {
 
+        /**
+         * 트랙패드 허용
+         */
+        ENABLE_TRACKPAD: false,
         /**
          * 풀, 래인 도형의 드랍시 자동 위치 조정 기능
          */

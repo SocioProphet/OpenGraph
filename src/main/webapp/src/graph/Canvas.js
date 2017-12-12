@@ -29,6 +29,10 @@ OG.graph.Canvas = function (container, containerSize, backgroundColor, backgroun
     this._CONFIG = {
 
         /**
+         * 트랙패드 허용
+         */
+        ENABLE_TRACKPAD: false,
+        /**
          * 풀, 래인 도형의 드랍시 자동 위치 조정 기능
          */
         POOL_DROP_EVENT: false,
