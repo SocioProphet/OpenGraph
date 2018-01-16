@@ -2168,7 +2168,7 @@ OG.handler.EventHandler.prototype = {
                 if (Math.abs(deltaX) < 120 && Math.abs(deltaY) < 120) {
                     isTrackPad = true;
                 }
-                if(!me._CONFIG.ENABLE_TRACKPAD){
+                if (!me._CONFIG.ENABLE_TRACKPAD) {
                     isTrackPad = false;
                 }
                 if (isTrackPad) {
@@ -4313,7 +4313,7 @@ OG.handler.EventHandler.prototype = {
         var setPastedShapes = function (copied, selected) {
             copiedShapes.push(copied);
             pastedShapes.push(selected);
-            selected.shape.onPasteShape(copied, selected);
+            copied.shape.onPasteShape(copied, selected);
 
             if (renderer.isGroup(copied)) {
                 var copiedChilds = renderer.getChilds(copied);
