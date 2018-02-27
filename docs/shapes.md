@@ -380,7 +380,7 @@ canvas.getRenderer().connect(fromTerminal,toTerminal,edgeElement);
 
 OG.shape.GroupShape 클래스는 기본적으로 OG.geometry.Rectangle 을 그리게 되며, 자신 안에 다른 도형을 포함시킬 수 있습니다.
  
-앞서 [Canvas Drawing - group](document/canvas.md#group) 파트에서 canvas.group([도형1,도형2...]) 메소드로 그룹핑을 할때 리턴되는 Dom 객체가
+앞서 [Canvas Drawing - group](canvas.md#group) 파트에서 canvas.group([도형1,도형2...]) 메소드로 그룹핑을 할때 리턴되는 Dom 객체가
 OG.shape.GroupShape 클래스를 shape 으로 가지고 있습니다.
 
 

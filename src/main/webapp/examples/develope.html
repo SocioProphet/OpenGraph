@@ -363,8 +363,8 @@
 
             var rectangleShape = new OG.RectangleShape();
             rectangleShape.label = 'ccc';
-            canvas.drawShape([200, 200], rectangleShape, [200, 200, 30], {}, 'BBB');
-
+            var element = canvas.drawShape([200, 200], rectangleShape, [200, 200, 30], {}, 'BBB');
+            canvas._HANDLER.selectShape(element);
 
             var connect = canvas.connect(e1, e2);
             $(connect).bind('click', function () {
