@@ -1,5 +1,5 @@
-- [Getting Started](getting-start.md)
- 
+- 오픈그래프 가이드
+  - [Getting Started](getting-start.md)
 - Canvas
   - [Canvas Drawing](canvas.md)
   - [Canvas Selector](selector.md)
