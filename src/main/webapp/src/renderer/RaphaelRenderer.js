@@ -2062,7 +2062,8 @@ OG.renderer.RaphaelRenderer.prototype.drawEdge = function (line, style, id, isSe
 };
 
 OG.renderer.RaphaelRenderer.prototype.drawGroup = function (geometry, style, id) {
-    var me = this, group, geomElement, _style = {}, childNodes, i, boundary, titleLine, group_hidden, _tempStyle = {}, geom_shadow;
+    var me = this, group, geomElement, _style = {}, childNodes, i, boundary, titleLine, group_hidden, _tempStyle = {},
+        geom_shadow;
 
     OG.Util.apply(_style, (style instanceof OG.geometry.Style) ? style.map : style || {});
 
@@ -6514,7 +6515,9 @@ OG.renderer.RaphaelRenderer.prototype.divideLane = function (element, quarterOrd
     if (divedLanes.length) {
         for (var i = 0, leni = divedLanes.length; i < leni; i++) {
             //생성된 lane 의 부모에 대해 첫번째 자식으로 들어감으로써 lane 에 속한 다른 도형의 인덱스들을 방해하지 않는다.
-            divedLanes[i].parentElement.insertBefore(divedLanes[i], divedLanes[i].parentElement.firstChild);
+
+            //Fix. 부모 lane 의 path 들이 내부 lane 보다 인덱스가 뒤로 잡히게 되면서 내부 도형이 선택이 되지 않는다.
+            //divedLanes[i].parentElement.insertBefore(divedLanes[i], divedLanes[i].parentElement.firstChild);
 
             $(this._PAPER.canvas).trigger('divideLane', divedLanes[i]);
         }
